@@ -1,4 +1,4 @@
 (executable
  (public_name tact)
  (name main)
- (libraries tact))
+ (libraries tact menhirLib))
