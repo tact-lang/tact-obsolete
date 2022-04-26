@@ -1,4 +1,4 @@
-program: RBRACKET
+program: STRUCT
 ##
 ## Ends in an error in state: 0.
 ##
@@ -10,52 +10,96 @@ program: RBRACKET
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT STRUCT
+program: TYPE TYPE
 ##
 ## Ends in an error in state: 1.
 ##
-## list(top_level_expr) -> STRUCT . IDENT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
-## list(top_level_expr) -> STRUCT . IDENT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE . IDENT EQUALS STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE . IDENT EQUALS STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE . IDENT EQUALS INTERFACE LBRACKET RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE . IDENT EQUALS IDENT list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## STRUCT
+## TYPE
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT STRUCT
+program: TYPE IDENT TYPE
 ##
 ## Ends in an error in state: 2.
 ##
-## list(top_level_expr) -> STRUCT IDENT . LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
-## list(top_level_expr) -> STRUCT IDENT . LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT . EQUALS STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT . EQUALS STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT . EQUALS INTERFACE LBRACKET RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT . EQUALS IDENT list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## STRUCT IDENT
+## TYPE IDENT
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT LBRACKET STRUCT
+program: TYPE IDENT EQUALS TYPE
 ##
 ## Ends in an error in state: 3.
 ##
-## list(top_level_expr) -> STRUCT IDENT LBRACKET . nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
-## list(top_level_expr) -> STRUCT IDENT LBRACKET . loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS . STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS . STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS . INTERFACE LBRACKET RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS . IDENT list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## STRUCT IDENT LBRACKET
+## TYPE IDENT EQUALS
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT LBRACKET IDENT STRUCT
+program: TYPE IDENT EQUALS STRUCT TYPE
 ##
 ## Ends in an error in state: 4.
 ##
+## list(top_level_expr) -> TYPE IDENT EQUALS STRUCT . LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS STRUCT . LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## TYPE IDENT EQUALS STRUCT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET TYPE
+##
+## Ends in an error in state: 5.
+##
+## list(top_level_expr) -> TYPE IDENT EQUALS STRUCT LBRACKET . nonempty_list(terminated(struct_fields,COMMA)) RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS STRUCT LBRACKET . loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET list(top_level_expr) [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## TYPE IDENT EQUALS STRUCT LBRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT TYPE
+##
+## Ends in an error in state: 6.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON INTERFACE LBRACKET RBRACKET COMMA [ RBRACKET ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON IDENT COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON INTERFACE LBRACKET RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT . COLON IDENT COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON INTERFACE LBRACKET RBRACKET [ RBRACKET ]
 ## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON IDENT [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON INTERFACE LBRACKET RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
 ## separated_nonempty_list(COMMA,struct_fields) -> IDENT . COLON IDENT COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
 ##
 ## The known suffix of the stack is as follows:
@@ -64,13 +108,25 @@ program: STRUCT IDENT LBRACKET IDENT STRUCT
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT LBRACKET IDENT COLON STRUCT
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON TYPE
 ##
-## Ends in an error in state: 5.
+## Ends in an error in state: 7.
 ##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . INTERFACE LBRACKET RBRACKET COMMA [ RBRACKET ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . IDENT COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . INTERFACE LBRACKET RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON . IDENT COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . INTERFACE LBRACKET RBRACKET [ RBRACKET ]
 ## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . IDENT [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . INTERFACE LBRACKET RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
 ## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON . IDENT COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
 ##
 ## The known suffix of the stack is as follows:
@@ -79,9 +135,164 @@ program: STRUCT IDENT LBRACKET IDENT COLON STRUCT
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT LBRACKET IDENT COLON IDENT STRUCT
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON STRUCT TYPE
 ##
-## Ends in an error in state: 6.
+## Ends in an error in state: 8.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT . LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT . LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT . LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT . LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT . LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT . LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT . LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT . LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON STRUCT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON STRUCT LBRACKET TYPE
+##
+## Ends in an error in state: 9.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET . nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET . loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET . nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET . loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET . nonempty_list(terminated(struct_fields,COMMA)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET . loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET . nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET . loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON STRUCT LBRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON STRUCT LBRACKET IDENT COLON IDENT COMMA RBRACKET TYPE
+##
+## Ends in an error in state: 12.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET . COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET . COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET . [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET . COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON STRUCT LBRACKET IDENT COLON IDENT COMMA RBRACKET COMMA TYPE
+##
+## Ends in an error in state: 13.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA . [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA . nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA . separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON STRUCT LBRACKET RBRACKET TYPE
+##
+## Ends in an error in state: 17.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET . COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET . COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET . [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET . COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON STRUCT LBRACKET RBRACKET COMMA TYPE
+##
+## Ends in an error in state: 18.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA . [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA . nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA . separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON INTERFACE TYPE
+##
+## Ends in an error in state: 21.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE . LBRACKET RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE . LBRACKET RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON INTERFACE . LBRACKET RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON INTERFACE . LBRACKET RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON INTERFACE
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON INTERFACE LBRACKET TYPE
+##
+## Ends in an error in state: 22.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE LBRACKET . RBRACKET COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE LBRACKET . RBRACKET COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON INTERFACE LBRACKET . RBRACKET [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON INTERFACE LBRACKET . RBRACKET COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON INTERFACE LBRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON INTERFACE LBRACKET RBRACKET TYPE
+##
+## Ends in an error in state: 23.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE LBRACKET RBRACKET . COMMA [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE LBRACKET RBRACKET . COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON INTERFACE LBRACKET RBRACKET . [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON INTERFACE LBRACKET RBRACKET . COMMA separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON INTERFACE LBRACKET RBRACKET
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON INTERFACE LBRACKET RBRACKET COMMA TYPE
+##
+## Ends in an error in state: 24.
+##
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE LBRACKET RBRACKET COMMA . [ RBRACKET ]
+## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON INTERFACE LBRACKET RBRACKET COMMA . nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
+## separated_nonempty_list(COMMA,struct_fields) -> IDENT COLON INTERFACE LBRACKET RBRACKET COMMA . separated_nonempty_list(COMMA,struct_fields) [ RBRACKET ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COLON INTERFACE LBRACKET RBRACKET COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON IDENT TYPE
+##
+## Ends in an error in state: 27.
 ##
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON IDENT . COMMA [ RBRACKET ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON IDENT . COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
@@ -94,9 +305,9 @@ program: STRUCT IDENT LBRACKET IDENT COLON IDENT STRUCT
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT LBRACKET IDENT COLON IDENT COMMA STRUCT
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON IDENT COMMA TYPE
 ##
-## Ends in an error in state: 7.
+## Ends in an error in state: 28.
 ##
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON IDENT COMMA . [ RBRACKET ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON IDENT COMMA . nonempty_list(terminated(struct_fields,COMMA)) [ RBRACKET ]
@@ -108,74 +319,74 @@ program: STRUCT IDENT LBRACKET IDENT COLON IDENT COMMA STRUCT
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT LBRACKET IDENT COLON IDENT COMMA RBRACKET RBRACKET
+program: TYPE IDENT EQUALS STRUCT LBRACKET IDENT COLON IDENT COMMA RBRACKET STRUCT
 ##
-## Ends in an error in state: 12.
+## Ends in an error in state: 32.
 ##
-## list(top_level_expr) -> STRUCT IDENT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET . list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## STRUCT IDENT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET
+## TYPE IDENT EQUALS STRUCT LBRACKET nonempty_list(terminated(struct_fields,COMMA)) RBRACKET
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: INTERFACE STRUCT
+program: TYPE IDENT EQUALS STRUCT LBRACKET RBRACKET STRUCT
 ##
-## Ends in an error in state: 13.
+## Ends in an error in state: 35.
 ##
-## list(top_level_expr) -> INTERFACE . IDENT LBRACKET RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## INTERFACE
+## TYPE IDENT EQUALS STRUCT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: INTERFACE IDENT STRUCT
+program: TYPE IDENT EQUALS INTERFACE TYPE
 ##
-## Ends in an error in state: 14.
+## Ends in an error in state: 37.
 ##
-## list(top_level_expr) -> INTERFACE IDENT . LBRACKET RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS INTERFACE . LBRACKET RBRACKET list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## INTERFACE IDENT
+## TYPE IDENT EQUALS INTERFACE
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: INTERFACE IDENT LBRACKET STRUCT
+program: TYPE IDENT EQUALS INTERFACE LBRACKET TYPE
 ##
-## Ends in an error in state: 15.
+## Ends in an error in state: 38.
 ##
-## list(top_level_expr) -> INTERFACE IDENT LBRACKET . RBRACKET list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS INTERFACE LBRACKET . RBRACKET list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## INTERFACE IDENT LBRACKET
+## TYPE IDENT EQUALS INTERFACE LBRACKET
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: INTERFACE IDENT LBRACKET RBRACKET RBRACKET
+program: TYPE IDENT EQUALS INTERFACE LBRACKET RBRACKET STRUCT
 ##
-## Ends in an error in state: 16.
+## Ends in an error in state: 39.
 ##
-## list(top_level_expr) -> INTERFACE IDENT LBRACKET RBRACKET . list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS INTERFACE LBRACKET RBRACKET . list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## INTERFACE IDENT LBRACKET RBRACKET
+## TYPE IDENT EQUALS INTERFACE LBRACKET RBRACKET
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: STRUCT IDENT LBRACKET RBRACKET RBRACKET
+program: TYPE IDENT EQUALS IDENT STRUCT
 ##
-## Ends in an error in state: 20.
+## Ends in an error in state: 41.
 ##
-## list(top_level_expr) -> STRUCT IDENT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET . list(top_level_expr) [ EOF ]
+## list(top_level_expr) -> TYPE IDENT EQUALS IDENT . list(top_level_expr) [ EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## STRUCT IDENT LBRACKET loption(separated_nonempty_list(COMMA,struct_fields)) RBRACKET
+## TYPE IDENT EQUALS IDENT
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>

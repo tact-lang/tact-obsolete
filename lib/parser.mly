@@ -1,3 +1,5 @@
+%token TYPE
+%token EQUALS
 %token STRUCT
 %token INTERFACE
 %token <string> IDENT
@@ -19,36 +21,46 @@ let located(x) ==
 let program :=
   top_level = list(top_level_expr);
   EOF; { make_program 
-  ~structs: (List.filter_map (fun x -> match x with Struct(s) -> Some(s) | _ -> None) top_level) 
-  ~interfaces: (List.filter_map (fun x -> match x with Interface(s) -> Some(s) | _ -> None) top_level) 
+  ~types: (List.filter_map (fun x -> match x with Type(t) -> Some(t)) top_level) 
   ()
   }
 
 let top_level_expr ==
-  | ~= struct_definition ; <Struct>
-  | ~= interface_definition ; <Interface>
+  | ~= type_definition ; <Type>
+
+let type_definition ==
+| located (
+  TYPE;
+  name = ident;
+  EQUALS;
+  expr = located(expr);
+  { make_type_definition ~name: name ~expr: expr () }
+)
+
+let expr ==
+ | struct_definition
+ | interface_definition
+ | ~= raw_ident; <Reference>
 
 let struct_definition ==
-| located ( 
-  STRUCT ; 
-  identifier = ident;
+| STRUCT; 
   fields = delimited_separated_trailing_list(LBRACKET, struct_fields, COMMA, RBRACKET);
-  { make_struct_definition ~name: identifier () ~fields: fields }
-)
+  { Struct (make_struct_definition ~fields: fields ()) }
 
 let struct_fields ==
-| located ( name = ident; COLON; typ = ident; { make_struct_field ~name: name ~typ: typ () } )
+| located ( name = ident; COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
 
 let interface_definition ==
-| located ( 
-  INTERFACE ;
-  identifier = ident;
+|
+  INTERFACE;
   LBRACKET ; RBRACKET ;
-  { make_interface_definition ~name: identifier () }
-)
+  { Interface (make_interface_definition ~members: [] ()) }
 
 let ident ==
-  located ( ~= IDENT ; <Ident> )
+  located ( raw_ident )
+
+let raw_ident ==
+  ~= IDENT ; <Ident>
 
 let delimited_separated_trailing_list(opening, x, sep, closing) ==
  | l = delimited(opening, nonempty_list(terminated(x, sep)), closing); { l } 
