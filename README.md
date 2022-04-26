@@ -3,8 +3,13 @@
 ## Building from source
 
 * Install `opam` using this [guide](https://ocaml.org/learn/tutorials/up_and_running.html)
-* Run `opam switch create $(pwd) -y`
-* Run `dune build && dune install`
+* Run following commands:
+```
+opam init
+opam switch create $(pwd) -y
+eval $(opam env)
+dune build && dune install
+```
 
 You can now use `tact /path/to/file.tact`
 
