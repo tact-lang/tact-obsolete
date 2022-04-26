@@ -7,27 +7,28 @@ type 'a located =
 
 type ident = Ident of string [@@deriving show]
 
-type struct_field = {
-  name: ident located;
-  typ: ident located;
-} [@@deriving show, make]
-
-type struct_definition = {
+and struct_definition = {
   fields: struct_field located list;
 } [@@deriving show, make]
 
-type interface_member = {
-  name: ident located;
+and interface_member = {
+  member_name: ident located;
 } [@@deriving show, make]
 
-type interface_definition = {
+and interface_definition = {
   members: interface_member located list;
 } [@@deriving show, make]
 
-type expr = 
+and expr = 
   | Struct of struct_definition
   | Interface of interface_definition
+  | Reference of ident
   [@@deriving show]
+
+and struct_field = {
+  field_name: ident located;
+  field_type: expr located;
+} [@@deriving show, make]
 
 type type_definition = {
   name: ident located;

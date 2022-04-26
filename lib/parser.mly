@@ -33,33 +33,34 @@ let type_definition ==
   TYPE;
   name = ident;
   EQUALS;
-  expr = expr;
+  expr = located(expr);
   { make_type_definition ~name: name ~expr: expr () }
 )
 
 let expr ==
  | struct_definition
  | interface_definition
+ | ~= raw_ident; <Reference>
 
 let struct_definition ==
-| located ( 
-  STRUCT; 
+| STRUCT; 
   fields = delimited_separated_trailing_list(LBRACKET, struct_fields, COMMA, RBRACKET);
   { Struct (make_struct_definition ~fields: fields ()) }
-)
 
 let struct_fields ==
-| located ( name = ident; COLON; typ = ident; { make_struct_field ~name: name ~typ: typ () } )
+| located ( name = ident; COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
 
 let interface_definition ==
-| located ( 
+|
   INTERFACE;
   LBRACKET ; RBRACKET ;
   { Interface (make_interface_definition ~members: [] ()) }
-)
 
 let ident ==
-  located ( ~= IDENT ; <Ident> )
+  located ( raw_ident )
+
+let raw_ident ==
+  ~= IDENT ; <Ident>
 
 let delimited_separated_trailing_list(opening, x, sep, closing) ==
  | l = delimited(opening, nonempty_list(terminated(x, sep)), closing); { l } 
