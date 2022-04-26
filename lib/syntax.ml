@@ -13,21 +13,31 @@ type struct_field = {
 } [@@deriving show, make]
 
 type struct_definition = {
-  name: ident located;
   fields: struct_field located list;
 } [@@deriving show, make]
 
-type interface_definition = {
+type interface_member = {
   name: ident located;
 } [@@deriving show, make]
 
+type interface_definition = {
+  members: interface_member located list;
+} [@@deriving show, make]
+
+type expr = 
+  | Struct of struct_definition
+  | Interface of interface_definition
+  [@@deriving show]
+
+type type_definition = {
+  name: ident located;
+  expr: expr located;
+} [@@deriving show, make]
+
 type top_level_expr = 
-  | Struct of struct_definition located
-  | Interface of interface_definition located
+  | Type of type_definition located
   [@@deriving show]
 
 type program = {
-    structs: (struct_definition located) list;
-    interfaces: (interface_definition located) list;
-  }
-  [@@deriving show, make]
+    types: (type_definition located) list;
+} [@@deriving show, make]

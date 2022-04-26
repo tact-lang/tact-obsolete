@@ -16,6 +16,8 @@ rule token = parse
  | ':' { COLON }
  | '{' { LBRACKET }
  | '}' { RBRACKET }
+ | '=' { EQUALS }
+ | "type" { TYPE }
  | "struct" { STRUCT }
  | "interface" { INTERFACE }
  | ident { IDENT (Lexing.lexeme lexbuf) }
