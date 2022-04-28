@@ -27,8 +27,7 @@ rule token = parse
  | "enum" { ENUM }
  | "interface" { INTERFACE }
  | "fn" { FN }
- | '-' integer_with_underscores as i { INT (Z.of_string i) }
- | integer_with_underscores as i { INT (Z.of_string i) }
+ | '-'? integer_with_underscores as i { INT (Z.of_string i) }
  | ident { IDENT (Lexing.lexeme lexbuf) }
  | eof { EOF }
  | _
