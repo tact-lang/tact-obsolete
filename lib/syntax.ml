@@ -1,5 +1,12 @@
 type pos = [%import: Lexing.position] [@@deriving show {with_path=false}]
 
+(* Z wrapper to enable show derivation *)
+module Z' = struct
+  type t = [%import: Z.t]
+  let pp = Z.pp_print
+end
+type zt = Z'.t [@@deriving show {with_path=false}]
+
 type 'a located =
   { loc: pos * pos;
     value: 'a }
@@ -40,7 +47,7 @@ and expr =
   | Reference of ident
   | FunctionCall of function_call
   | Function of function_definition
-  | Int of int
+  | Int of zt
   [@@deriving show {with_path=false}]
 
 and struct_field = {

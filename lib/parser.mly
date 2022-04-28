@@ -6,7 +6,7 @@
 %token RBRACKET RPAREN
 %token COMMA
 %token COLON
-%token <int> INT
+%token <Z.t> INT
 
 %start <Syntax.program> program
 
