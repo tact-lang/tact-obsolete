@@ -16,7 +16,7 @@ and interface_member = {
 } [@@deriving show {with_path=false}, make]
 
 and interface_definition = {
-  members: interface_member located list;
+  interface_members: interface_member located list;
 } [@@deriving show {with_path=false}, make]
 
 and function_call = {
@@ -24,12 +24,23 @@ and function_call = {
   arguments: expr located list;
 } [@@deriving show {with_path=false}, make]
 
+and enum_definition = {
+  enum_members: enum_member located list;
+} [@@deriving show {with_path=false}, make]
+
+and enum_member = {
+  enum_name: ident located;
+  enum_value: expr located option;
+} [@@deriving show {with_path=false}, make]
+
 and expr = 
   | Struct of struct_definition
   | Interface of interface_definition
+  | Enum of enum_definition
   | Reference of ident
   | FunctionCall of function_call
   | Function of function_definition
+  | Int of int
   [@@deriving show {with_path=false}]
 
 and struct_field = {

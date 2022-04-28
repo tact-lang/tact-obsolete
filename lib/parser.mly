@@ -1,4 +1,4 @@
-%token TYPE INTERFACE STRUCT FN
+%token TYPE INTERFACE STRUCT ENUM FN
 %token EQUALS
 %token <string> IDENT
 %token EOF
@@ -6,6 +6,7 @@
 %token RBRACKET RPAREN
 %token COMMA
 %token COLON
+%token <int> INT
 
 %start <Syntax.program> program
 
@@ -129,12 +130,16 @@ let expr :=
  | struct_definition
  (* can be an `interface` definition *)
  | interface_definition
+ (* can be an `enum` definition *)
+ | enum_definition
  (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
  (* can be a function call *)
  | function_call
  (* can be an inline function definition *)
  | inline_function_definition
+ (* can be an integer *)
+ | ~= INT; <Int>
 
 (* Structure 
 
@@ -172,11 +177,38 @@ let interface_definition ==
 |
   INTERFACE;
   LBRACKET ; RBRACKET ;
-  { Interface (make_interface_definition ~members: [] ()) }
+  { Interface (make_interface_definition ~interface_members: [] ()) }
 
 (* Identifier *)
 let ident ==
   ~= IDENT ; <Ident>
+
+(* Enum 
+
+  enum {
+    member,
+    member = expr,
+    ...
+  }
+
+  * Empty enums are allowed
+  * Trailing commas are allowed
+  * exprs must evaluate to integers
+
+*)
+let enum_definition ==
+| ENUM; 
+  members = delimited_separated_trailing_list(LBRACKET, enum_member, COMMA, RBRACKET);
+  { Enum (make_enum_definition ~enum_members: members ()) }
+
+ (* Enum member
+
+    Can be an identifier alone or `identifier = expr` where expr
+    must evaluate to integers
+*)
+let enum_member ==
+| located ( name = located(ident); { make_enum_member ~enum_name: name () } )
+| located ( name = located(ident); EQUALS; value = located(expr); { make_enum_member ~enum_name: name ~enum_value: value () } )
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==

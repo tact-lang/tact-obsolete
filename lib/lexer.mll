@@ -21,8 +21,11 @@ rule token = parse
  | '=' { EQUALS }
  | "type" { TYPE }
  | "struct" { STRUCT }
+ | "enum" { ENUM }
  | "interface" { INTERFACE }
  | "fn" { FN }
+ | '-' digit+ as i { INT (int_of_string i) }
+ | digit+ as i { INT (int_of_string i) }
  | ident { IDENT (Lexing.lexeme lexbuf) }
  | eof { EOF }
  | _
