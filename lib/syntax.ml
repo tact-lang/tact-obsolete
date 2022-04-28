@@ -81,13 +81,15 @@ type type_definition = {
   expr: expr located;
 } [@@deriving show {with_path=false}, make]
 
+type binding = {
+  name: ident located;
+  expr: expr located;
+} [@@deriving show {with_path=false}, make]
 
 type top_level_expr = 
-  | Type of type_definition located
-  | Function of function_definition located
+  | Let of binding located
   [@@deriving show {with_path=false}]
 
 type program = {
-    types: (type_definition located) list;
-    functions: (function_definition located) list;
+    bindings: (binding located) list;
 } [@@deriving show {with_path=false}, make]

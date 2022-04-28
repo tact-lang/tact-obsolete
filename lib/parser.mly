@@ -1,4 +1,4 @@
-%token TYPE INTERFACE STRUCT ENUM FN
+%token LET INTERFACE STRUCT ENUM FN
 %token EQUALS
 %token <string> IDENT
 %token EOF
@@ -20,42 +20,38 @@ let program :=
   top_level = list(top_level_expr);
   EOF; { 
     make_program 
-       (* collect defined types *)
-       ~types: (List.filter_map (fun x -> match x with Type(t) -> Some(t) | _ -> None) top_level) 
-       (* collect defined functions *)
-       ~functions: (List.filter_map (fun x -> match x with Function(t) -> Some(t) | _ -> None) top_level) 
+       (* collect bindings *)
+       ~bindings: (List.filter_map (fun x -> match x with Let(t) -> Some(t)) top_level) 
   ()
   }
 
 (* Top level expression *)
 let top_level_expr ==
-  (* can be a type definition *)
-  | ~= type_definition ; <Type>
-  (* can be a function definition *)
-  | ~= function_definition ; <Function> 
+  (* can be a `let` binding definition *)
+  | ~= binding ; <Let>
 
-(* Type definition
+(* Binding definition
 
-type Name = <expression> 
+let Name = <expression> 
 
 See Expression
 
 *)
-let type_definition ==
+let binding ==
 | located (
-  TYPE;
+  LET;
   name = located(ident);
   EQUALS;
   expr = located(expr);
-  { make_type_definition ~name: name ~expr: expr () }
+  { make_binding ~name: name ~expr: expr () }
 )
 | located (
-  TYPE;
+  LET;
   name = located(ident);
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   EQUALS;
   expr = located(expr);
-  { make_type_definition ~name: name 
+  { make_binding ~name: name 
       ~expr: 
         { loc = $loc; 
           value = Function (make_function_definition ~params: params  
@@ -69,25 +65,6 @@ let type_definition ==
 
 (* Function definition
 
-fn name(arg: Type, ...) Type {
-  expr
-  expr
-  ...
-}
-
-*)
-let function_definition ==
-| located (
-  FN;
-  name = located(ident);
-  params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
-  returns = located(expr);
-  exprs = delimited(LBRACKET, list(located(expr)), RBRACKET);
-  { make_function_definition ~name: name ~params: params ~returns: returns ~exprs: exprs () }
-)
-
-(* Inline function definition
-
 fn (arg: Type, ...) Type {
   expr
   expr
@@ -95,7 +72,7 @@ fn (arg: Type, ...) Type {
 }
 
 *)
-let inline_function_definition ==
+let function_definition ==
 | 
   FN;
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
@@ -136,8 +113,8 @@ let expr :=
  | ~= ident; <Reference>
  (* can be a function call *)
  | function_call
- (* can be an inline function definition *)
- | inline_function_definition
+ (* can be a function definition *)
+ | function_definition
  (* can be an integer *)
  | ~= INT; <Int>
 
