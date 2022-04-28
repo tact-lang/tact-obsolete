@@ -1,4 +1,16 @@
-type pos = [%import: Lexing.position] [@@deriving show {with_path=false}]
+module Lexing' = struct
+  type pos = [%import: Lexing.position]
+
+  open Format
+
+  let pp_pos f p = 
+    pp_print_string f p.pos_fname;
+    pp_print_string f ":";
+    pp_print_int f p.pos_lnum;
+    pp_print_string f ",";
+    pp_print_int f p.pos_cnum
+end
+type pos = Lexing'.pos [@@deriving show {with_path=false}]
 
 (* Z wrapper to enable show derivation *)
 module Z' = struct
