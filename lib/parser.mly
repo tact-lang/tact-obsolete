@@ -4,8 +4,8 @@
 %token INTERFACE
 %token <string> IDENT
 %token EOF
-%token LBRACKET
-%token RBRACKET
+%token LBRACKET LPAREN
+%token RBRACKET RPAREN
 %token COMMA
 %token COLON
 
@@ -55,6 +55,8 @@ let expr ==
  | interface_definition
  (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
+ (* can be a function call *)
+ | function_call
 
 (* Structure 
 
@@ -97,6 +99,17 @@ let interface_definition ==
 (* Identifier *)
 let ident ==
   ~= IDENT ; <Ident>
+
+(* Function call
+
+   name([parameter,])
+
+  * Trailing commas are allowed
+*)
+let function_call ==
+  name = located(ident);
+  arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
+  { FunctionCall (make_function_call ~name: name ~arguments: arguments ()) }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==

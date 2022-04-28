@@ -19,10 +19,16 @@ and interface_definition = {
   members: interface_member located list;
 } [@@deriving show, make]
 
+and function_call = {
+  name: ident located;
+  arguments: expr located list;
+} [@@deriving show, make]
+
 and expr = 
   | Struct of struct_definition
   | Interface of interface_definition
   | Reference of ident
+  | FunctionCall of function_call
   [@@deriving show]
 
 and struct_field = {

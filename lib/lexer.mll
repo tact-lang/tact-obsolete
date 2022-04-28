@@ -16,6 +16,8 @@ rule token = parse
  | ':' { COLON }
  | '{' { LBRACKET }
  | '}' { RBRACKET }
+ | '(' { LPAREN }
+ | ')' { RPAREN }
  | '=' { EQUALS }
  | "type" { TYPE }
  | "struct" { STRUCT }
