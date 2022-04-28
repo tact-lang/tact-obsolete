@@ -20,7 +20,7 @@ and interface_definition = {
 } [@@deriving show, make]
 
 and function_call = {
-  name: ident located;
+  fn: expr located;
   arguments: expr located list;
 } [@@deriving show, make]
 
@@ -29,6 +29,7 @@ and expr =
   | Interface of interface_definition
   | Reference of ident
   | FunctionCall of function_call
+  | Function of function_definition
   [@@deriving show]
 
 and struct_field = {
@@ -36,15 +37,27 @@ and struct_field = {
   field_type: expr located;
 } [@@deriving show, make]
 
+and function_param = FunctionParam of ident located * expr located [@@deriving show]
+
+and function_definition = {
+  name: ident located option;
+  params: function_param located list;
+  returns: expr located;
+  exprs: expr located list;
+} [@@deriving show, make]   
+
 type type_definition = {
   name: ident located;
   expr: expr located;
 } [@@deriving show, make]
 
+
 type top_level_expr = 
   | Type of type_definition located
+  | Function of function_definition located
   [@@deriving show]
 
 type program = {
     types: (type_definition located) list;
+    functions: (function_definition located) list;
 } [@@deriving show, make]

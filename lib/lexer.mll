@@ -22,6 +22,7 @@ rule token = parse
  | "type" { TYPE }
  | "struct" { STRUCT }
  | "interface" { INTERFACE }
+ | "fn" { FN }
  | ident { IDENT (Lexing.lexeme lexbuf) }
  | eof { EOF }
  | _

@@ -1,7 +1,5 @@
-%token TYPE
+%token TYPE INTERFACE STRUCT FN
 %token EQUALS
-%token STRUCT
-%token INTERFACE
 %token <string> IDENT
 %token EOF
 %token LBRACKET LPAREN
@@ -22,7 +20,9 @@ let program :=
   EOF; { 
     make_program 
        (* collect defined types *)
-       ~types: (List.filter_map (fun x -> match x with Type(t) -> Some(t)) top_level) 
+       ~types: (List.filter_map (fun x -> match x with Type(t) -> Some(t) | _ -> None) top_level) 
+       (* collect defined functions *)
+       ~functions: (List.filter_map (fun x -> match x with Function(t) -> Some(t) | _ -> None) top_level) 
   ()
   }
 
@@ -30,6 +30,8 @@ let program :=
 let top_level_expr ==
   (* can be a type definition *)
   | ~= type_definition ; <Type>
+  (* can be a function definition *)
+  | ~= function_definition ; <Function> 
 
 (* Type definition
 
@@ -46,9 +48,83 @@ let type_definition ==
   expr = located(expr);
   { make_type_definition ~name: name ~expr: expr () }
 )
+| located (
+  TYPE;
+  name = located(ident);
+  params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
+  EQUALS;
+  expr = located(expr);
+  { make_type_definition ~name: name 
+      ~expr: 
+        { loc = $loc; 
+          value = Function (make_function_definition ~params: params  
+                                           ~returns: {loc = $loc; value = Reference (Ident "Type")}
+                                           ~exprs: [expr] 
+                                           ())
+        } 
+        () 
+  }
+)
+
+(* Function definition
+
+fn name(arg: Type, ...) Type {
+  expr
+  expr
+  ...
+}
+
+*)
+let function_definition ==
+| located (
+  FN;
+  name = located(ident);
+  params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
+  returns = located(expr);
+  exprs = delimited(LBRACKET, list(located(expr)), RBRACKET);
+  { make_function_definition ~name: name ~params: params ~returns: returns ~exprs: exprs () }
+)
+
+(* Inline function definition
+
+fn (arg: Type, ...) Type {
+  expr
+  expr
+  ...
+}
+
+*)
+let inline_function_definition ==
+| 
+  FN;
+  params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
+  returns = located(expr);
+  exprs = delimited(LBRACKET, list(located(expr)), RBRACKET);
+  { Function (make_function_definition ~params: params ~returns: returns ~exprs: exprs ()) }
+
+let function_param ==
+  located (
+  ~ = located(ident);
+  COLON;
+  ~ = located(expr);
+  <FunctionParam>
+  )
+
+(* Function call
+
+   name([argument,])
+   <expr>([argument,])
+
+  * Trailing commas are allowed
+*)
+let function_call ==
+  fn = located(expr);
+  arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
+  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+
 
 (* Expression *)
-let expr ==
+let expr :=
  (* can be a `struct` definition *)
  | struct_definition
  (* can be an `interface` definition *)
@@ -57,6 +133,8 @@ let expr ==
  | ~= ident; <Reference>
  (* can be a function call *)
  | function_call
+ (* can be an inline function definition *)
+ | inline_function_definition
 
 (* Structure 
 
@@ -99,17 +177,6 @@ let interface_definition ==
 (* Identifier *)
 let ident ==
   ~= IDENT ; <Ident>
-
-(* Function call
-
-   name([parameter,])
-
-  * Trailing commas are allowed
-*)
-let function_call ==
-  name = located(ident);
-  arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
-  { FunctionCall (make_function_call ~name: name ~arguments: arguments ()) }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==
