@@ -7,6 +7,9 @@
 let digit = ['0'-'9']
 let alpha = ['a'-'z' 'A'-'Z']
 
+let integer = digit+
+let integer_with_underscores = integer ('_' integer)*
+
 let ident = (alpha) (alpha|digit|'_')* (* regex for identifier *)
 let whitespace = [' ' '\t' '\n' '\r']+
 
@@ -24,8 +27,8 @@ rule token = parse
  | "enum" { ENUM }
  | "interface" { INTERFACE }
  | "fn" { FN }
- | '-' digit+ as i { INT (Z.of_string i) }
- | digit+ as i { INT (Z.of_string i) }
+ | '-' integer_with_underscores as i { INT (Z.of_string i) }
+ | integer_with_underscores as i { INT (Z.of_string i) }
  | ident { IDENT (Lexing.lexeme lexbuf) }
  | eof { EOF }
  | _
