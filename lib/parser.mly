@@ -65,7 +65,7 @@ let binding ==
 
 (* Function definition
 
-fn (arg: Type, ...) Type {
+fn (arg: Type, ...) : Type {
   expr
   expr
   ...
@@ -76,6 +76,7 @@ let function_definition ==
 | 
   FN;
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
+  COLON;
   returns = located(expr);
   exprs = delimited(LBRACKET, list(located(expr)), RBRACKET);
   { Function (make_function_definition ~params: params ~returns: returns ~exprs: exprs ()) }
