@@ -1,4 +1,4 @@
-%token LET INTERFACE STRUCT ENUM FN
+%token LET INTERFACE STRUCT ENUM UNION FN
 %token EQUALS
 %token <string> IDENT
 %token EOF
@@ -110,6 +110,8 @@ let expr :=
  | interface_definition
  (* can be an `enum` definition *)
  | enum_definition
+ (* can be an `union` definition *)
+ | union_definition
  (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
  (* can be a function call *)
@@ -187,6 +189,23 @@ let enum_definition ==
 let enum_member ==
 | located ( name = located(ident); { make_enum_member ~enum_name: name () } )
 | located ( name = located(ident); EQUALS; value = located(expr); { make_enum_member ~enum_name: name ~enum_value: value () } )
+
+(* Union 
+
+  union {
+    member,
+    member,
+    ...
+  }
+
+  * Empty unions are allowed
+  * Trailing commas are allowed
+
+*)
+let union_definition ==
+| UNION;
+  members = delimited_separated_trailing_list(LBRACKET, located(expr), COMMA, RBRACKET);
+  { Union (make_union_definition ~members: members ()) }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==

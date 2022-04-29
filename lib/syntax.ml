@@ -52,10 +52,15 @@ and enum_member = {
   enum_value: expr located option;
 } [@@deriving show {with_path=false}, make]
 
+and union_definition = {
+  members: expr located list;
+} [@@deriving show {with_path=false}, make]
+
 and expr = 
   | Struct of struct_definition
   | Interface of interface_definition
   | Enum of enum_definition
+  | Union of union_definition
   | Reference of ident
   | FunctionCall of function_call
   | Function of function_definition
