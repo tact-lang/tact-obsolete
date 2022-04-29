@@ -1,4 +1,4 @@
-%token LET INTERFACE STRUCT ENUM FN
+%token LET INTERFACE STRUCT ENUM UNION FN
 %token EQUALS
 %token <string> IDENT
 %token EOF
@@ -65,7 +65,7 @@ let binding ==
 
 (* Function definition
 
-fn (arg: Type, ...) Type {
+fn (arg: Type, ...) : Type {
   expr
   expr
   ...
@@ -76,6 +76,7 @@ let function_definition ==
 | 
   FN;
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
+  COLON;
   returns = located(expr);
   exprs = delimited(LBRACKET, list(located(expr)), RBRACKET);
   { Function (make_function_definition ~params: params ~returns: returns ~exprs: exprs ()) }
@@ -109,6 +110,8 @@ let expr :=
  | interface_definition
  (* can be an `enum` definition *)
  | enum_definition
+ (* can be an `union` definition *)
+ | union_definition
  (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
  (* can be a function call *)
@@ -186,6 +189,23 @@ let enum_definition ==
 let enum_member ==
 | located ( name = located(ident); { make_enum_member ~enum_name: name () } )
 | located ( name = located(ident); EQUALS; value = located(expr); { make_enum_member ~enum_name: name ~enum_value: value () } )
+
+(* Union 
+
+  union {
+    member,
+    member,
+    ...
+  }
+
+  * Empty unions are allowed
+  * Trailing commas are allowed
+
+*)
+let union_definition ==
+| UNION;
+  members = delimited_separated_trailing_list(LBRACKET, located(expr), COMMA, RBRACKET);
+  { Union (make_union_definition ~members: members ()) }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==
