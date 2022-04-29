@@ -1,6 +1,15 @@
 {
   open Parser
+  open Lexing
   exception Error of string
+
+  let next_line lexbuf =
+    let pos = lexbuf.lex_curr_p in
+    lexbuf.lex_curr_p <-
+      { pos with pos_bol = pos.pos_cnum;
+                 pos_lnum = pos.pos_lnum + 1;
+      }
+
 }
 
 (* Define helper regexes *)
@@ -11,10 +20,12 @@ let integer = digit+
 let integer_with_underscores = integer ('_' integer)*
 
 let ident = (alpha) (alpha|digit|'_')* (* regex for identifier *)
-let whitespace = [' ' '\t' '\n' '\r']+
+let newline = '\r' | '\n' | "\r\n"
+let whitespace = [' ' '\t']+
 
 rule token = parse
  | whitespace { token lexbuf }
+ | newline  { next_line lexbuf; token lexbuf }
  | ',' { COMMA }
  | ':' { COLON }
  | '{' { LBRACKET }
