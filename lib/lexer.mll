@@ -22,7 +22,7 @@ rule token = parse
  | '(' { LPAREN }
  | ')' { RPAREN }
  | '=' { EQUALS }
- | "type" { TYPE }
+ | "let" { LET }
  | "struct" { STRUCT }
  | "enum" { ENUM }
  | "interface" { INTERFACE }
