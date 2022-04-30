@@ -12,6 +12,14 @@
 
 %{ open Syntax %}
 
+%{
+  let expand_fn_sugar params loc typ expr =
+    Function (make_function_definition ~params: params  
+                                           ~returns: {loc; value = typ}
+                                           ~exprs: [expr] 
+                                           ())
+  %}
+
 %%
 
 (* At the very top, there's a program *) 
@@ -36,6 +44,22 @@ let Name = <expression>
 
 See Expression
 
+There is another "sugared" form of bindings for types and functions:
+
+```
+struct S{ ... }
+struct S(T: Type){v: T}
+```
+
+They are equivalent to these:
+
+```
+let S = struct { ... }
+let S(T: Type) = struct {v: T}
+```
+
+Same applies to enums, interfaces, unions and fns
+
 *)
 let binding ==
 | located (
@@ -54,14 +78,36 @@ let binding ==
   { make_binding ~name: name 
       ~expr: 
         { loc = $loc; 
-          value = Function (make_function_definition ~params: params  
-                                           ~returns: {loc = $loc; value = Reference (Ident "Type")}
-                                           ~exprs: [expr] 
-                                           ())
+          value = expand_fn_sugar params $loc (Reference (Ident "Type")) expr
         } 
         () 
   }
 )
+| located( (name, expr) = function_definition(located(ident)); { make_binding ~name: name ~expr: { loc = $loc; value = expr } () })
+| located( ((name, params), expr) = function_definition(located_ident_with_params); {
+  make_binding ~name: name ~expr: { 
+    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Function")) { loc = $loc; value = expr } (* FIXME: Function type is a temp punt *)
+  } () })
+| located( (name, expr) = struct_definition(located(ident)); { make_binding ~name: name ~expr: { loc = $loc; value = expr } () })
+| located( ((name, params), expr) = struct_definition(located_ident_with_params); {
+  make_binding ~name: name ~expr: { 
+    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
+  } () })
+| located( (name, expr) = enum_definition(located(ident)); { make_binding ~name: name ~expr: { loc = $loc; value = expr } () })
+| located( ((name, params), expr) = enum_definition(located_ident_with_params); {
+  make_binding ~name: name ~expr: { 
+    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
+  } () })
+| located( (name, expr) = union_definition(located(ident)); { make_binding ~name: name ~expr: { loc = $loc; value = expr } () })
+| located( ((name, params), expr) = union_definition(located_ident_with_params); {
+  make_binding ~name: name ~expr: { 
+    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
+  } () })
+
+let located_ident_with_params ==
+   ~ = located(ident);
+   ~ = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
+   <>
 
 (* Function definition
 
@@ -72,14 +118,14 @@ fn (arg: Type, ...) : Type {
 }
 
 *)
-let function_definition ==
-| 
+let function_definition(name) ==
   FN;
+  n = name;
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   COLON;
   returns = located(expr);
   exprs = delimited(LBRACKET, list(located(expr)), RBRACKET);
-  { Function (make_function_definition ~params: params ~returns: returns ~exprs: exprs ()) }
+  { (n, Function (make_function_definition ~params: params ~returns: returns ~exprs: exprs ())) }
 
 let function_param ==
   located (
@@ -105,19 +151,19 @@ let function_call ==
 (* Expression *)
 let expr :=
  (* can be a `struct` definition *)
- | struct_definition
+ | (_, s) = struct_definition(nothing); { s }
  (* can be an `interface` definition *)
- | interface_definition
+ | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)
- | enum_definition
+ | (_, e) = enum_definition(nothing); { e }
  (* can be an `union` definition *)
- | union_definition
+ | (_, u) = union_definition(nothing); { u }
  (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
  (* can be a function call *)
  | function_call
  (* can be a function definition *)
- | function_definition
+ | (_, f) = function_definition(nothing); { f }
  (* can be an integer *)
  | ~= INT; <Int>
 
@@ -132,10 +178,11 @@ let expr :=
   * Trailing commas are allowed
 
 *)
-let struct_definition ==
-| STRUCT; 
+let struct_definition(name) ==
+  STRUCT; 
+  n = name;
   fields = delimited_separated_trailing_list(LBRACKET, struct_fields, COMMA, RBRACKET);
-  { Struct (make_struct_definition ~fields: fields ()) }
+  { (n, Struct (make_struct_definition ~fields: fields ())) }
 
 (* Structure field
 
@@ -153,11 +200,11 @@ let struct_fields ==
    NB: member definitions TBD
 *)  
 
-let interface_definition ==
-|
+let interface_definition(name) ==
   INTERFACE;
+  n = name;
   LBRACKET ; RBRACKET ;
-  { Interface (make_interface_definition ~interface_members: [] ()) }
+  { (n, Interface (make_interface_definition ~interface_members: [] ())) }
 
 (* Identifier *)
 let ident ==
@@ -176,10 +223,11 @@ let ident ==
   * exprs must evaluate to integers
 
 *)
-let enum_definition ==
-| ENUM; 
+let enum_definition(name) ==
+  ENUM; 
+  n = name;
   members = delimited_separated_trailing_list(LBRACKET, enum_member, COMMA, RBRACKET);
-  { Enum (make_enum_definition ~enum_members: members ()) }
+  { (n, Enum (make_enum_definition ~enum_members: members ())) }
 
  (* Enum member
 
@@ -202,10 +250,11 @@ let enum_member ==
   * Trailing commas are allowed
 
 *)
-let union_definition ==
-| UNION;
+let union_definition(name) ==
+  UNION;
+  n = name;
   members = delimited_separated_trailing_list(LBRACKET, located(expr), COMMA, RBRACKET);
-  { Union (make_union_definition ~members: members ()) }
+  { (n, Union (make_union_definition ~members: members ())) }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==
@@ -215,4 +264,5 @@ let delimited_separated_trailing_list(opening, x, sep, closing) ==
 (* Wraps into an `'a located` record *)
 let located(x) ==
   ~ = x; { { loc = $loc; value = x } }
- 
+
+let nothing == { None } 
