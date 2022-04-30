@@ -1,3 +1,26 @@
 (lang dune 2.9)
-(name tact)
 (using menhir 2.1)
+(generate_opam_files true)
+
+(name tact)
+(source (github tact-lang/tact))
+(license Apache-2.0)
+(authors "cmxog@protonmail.com")
+(maintainers "cmxog@protonmail.com")
+
+(package
+ (name tact)
+ (synopsis "TON Tact Language")
+ (depends
+   (ocaml (>= 4.14.0))
+   (ppx_show (>= 0.2.1))
+   (ppx_make (>= 0.3.0))
+   (ppx_import (>= 1.9.1))
+   (dune (>= 3.1.1))
+   (menhirLib (= 20220210))
+   (menhir (= 20220210))
+   (menhirSdk (= 20220210))
+   (zarith (>= 1.12))
+   (utop (and :build (>= 2.9.1)))
+   (alcotest (and :build (>= 1.5.0))))
+)
