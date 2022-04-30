@@ -21,3 +21,7 @@ Run `opam install tact --working-dir`
 
 Run `dune utop`
 
+### Running tests
+
+Run `dune test`
+

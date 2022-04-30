@@ -1,2 +1,4 @@
-(test
- (name tact))
+(tests
+ ;(action (run %{test} -e))
+ (names syntax)
+ (libraries tact alcotest))

@@ -22,5 +22,6 @@ depends: [
   "menhirSdk" {= "20220210"}
   "zarith" {>= "1.12"}
   "utop" {build & >= "2.9.1"}
+  "alcotest" {build & >= "1.5.0"}
 ]
 synopsis: "TON Tact Language"
