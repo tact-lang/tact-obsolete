@@ -29,32 +29,28 @@ type ident = Ident of string [@@deriving show {with_path=false}]
 and struct_definition = {
   fields: struct_field located list;
   struct_bindings: binding located list;
-} [@@deriving show {with_path=false}, make]
-
+}
 and interface_definition = {
   interface_members: binding located list;
-} [@@deriving show {with_path=false}, make]
-
+}
 and function_call = {
   fn: expr located;
   arguments: expr located list;
-} [@@deriving show {with_path=false}, make]
-
+}
 and enum_definition = {
   enum_members: enum_member located list;
   enum_bindings: binding located list;
-} [@@deriving show {with_path=false}, make]
+}
 
 and enum_member = {
   enum_name: ident located;
   enum_value: expr located option;
-} [@@deriving show {with_path=false}, make]
+}
 
 and union_definition = {
   union_members: expr located list;
   union_bindings: binding located list;
-} [@@deriving show {with_path=false}, make]
-
+}
 and expr = 
   | Struct of struct_definition
   | Interface of interface_definition
@@ -64,36 +60,36 @@ and expr =
   | FunctionCall of function_call
   | Function of function_definition
   | Int of zt
-  [@@deriving show {with_path=false}]
 
 and struct_field = {
   field_name: ident located;
   field_type: expr located;
-} [@@deriving show {with_path=false}, make]
+}
 
-and function_param = FunctionParam of ident located * expr located [@@deriving show {with_path=false}]
+and function_param = FunctionParam of ident located * expr located
 
 and function_definition = {
   name: ident located option;
   params: function_param located list;
   returns: expr located;
   exprs: expr located list;
-} [@@deriving show {with_path=false}, make]   
-
+}
 and type_definition = {
   type_name: ident located;
   type_expr: expr located;
-} [@@deriving show {with_path=false}, make]
+}
 
 and binding = {
   binding_name: ident located;
   binding_expr: expr located;
-} [@@deriving show {with_path=false}, make]
+}
 
-type top_level_expr = 
+and top_level_expr = 
   | Let of binding located
-  [@@deriving show {with_path=false}]
 
-type program = {
+and program = {
     bindings: (binding located) list;
-} [@@deriving show {with_path=false}, make]
+} 
+[@@deriving show {with_path=false}, make]
+
+let ident_to_string i = match i with Ident(s) -> s
