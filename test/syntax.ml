@@ -122,6 +122,45 @@ let test_struct_methods () =
   }; _}] } -> true
   | _ -> false)
 
+let test_struct_with_fields_and_methods_source = {|
+    struct Struct {
+      a: Int257
+      fn test(): Bool {}
+    }
+  |} 
+
+let test_struct_with_fields_and_methods_trailing_comma_source = {|
+    struct Struct {
+      a: Int257,
+      fn test(): Bool {}
+    }
+  |} 
+
+let test_struct_with_fields_and_methods source () =
+  Alcotest.(check bool) "struct methods" true
+  (match (parse_program source) with
+  | { bindings = [{value = 
+                     {binding_name = {value = Ident("Struct"); _};
+                      binding_expr = {value = Struct({
+                      fields = [
+                        {value={field_name = {value = Ident("a");_}; field_type = {value = Reference Ident("Int257");_}};_};
+                      ];
+                      struct_bindings = [
+                        {value = {binding_name = {value = Ident("test"); _};
+                                  binding_expr = {value = Function({
+                                    name = None;
+                                    params = [];
+                                    exprs = [];
+                                    returns = {value = Reference Ident("Bool");_};
+                                    _
+                                  });_}
+                        };_}
+                      ]}); _}
+  }; _}] } -> true
+  | _ -> false)
+
+
+
 let () =
   let open Alcotest in
   run "Syntax" [
@@ -136,5 +175,7 @@ let () =
       test_case "struct fields" `Quick (test_struct_fields test_struct_fields_source);
       test_case "struct fields with a trailing comma" `Quick (test_struct_fields test_struct_fields_trailing_comma_source);
       test_case "struct methods" `Quick test_struct_methods;
+      test_case "struct with fields and methods" `Quick (test_struct_with_fields_and_methods test_struct_with_fields_and_methods_source);
+      test_case "struct with fields and methods with a trailing comma" `Quick (test_struct_with_fields_and_methods test_struct_with_fields_and_methods_trailing_comma_source);
     ]
   ]
