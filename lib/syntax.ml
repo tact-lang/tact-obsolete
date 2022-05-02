@@ -1,5 +1,9 @@
 module Lexing' = struct
-  type pos = [%import: Lexing.position]
+  let equal_string = String.equal
+
+  let equal_int = Int.equal
+
+  type pos = [%import: Lexing.position] [@@deriving equal]
 
   open Format
 
@@ -11,7 +15,7 @@ module Lexing' = struct
     pp_print_int f p.pos_cnum
 end
 
-type pos = Lexing'.pos [@@deriving show {with_path = false}]
+type pos = Lexing'.pos [@@deriving show {with_path = false}, equal]
 
 (* Z wrapper to enable show derivation *)
 module Z' = struct
@@ -20,10 +24,11 @@ module Z' = struct
   let pp = Z.pp_print
 end
 
+type loc = pos * pos [@@deriving show, equal]
+
 type zt = Z'.t [@@deriving show {with_path = false}]
 
-type 'a located = {loc : pos * pos; value : 'a}
-[@@deriving show {with_path = false}]
+type 'a located = {loc : loc; value : 'a} [@@deriving show {with_path = false}]
 
 type ident = Ident of string [@@deriving show {with_path = false}]
 
@@ -71,4 +76,4 @@ and top_level_expr = Let of binding located
 and program = {bindings : binding located list}
 [@@deriving show {with_path = false}, make]
 
-let ident_to_string i = match i with Ident s -> s
+let ident_to_string = function Ident s -> s

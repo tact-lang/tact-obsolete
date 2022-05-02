@@ -1,4 +1,5 @@
 (tests
- ;(action (run %{test} -e))
- (names syntax)
- (libraries tact alcotest))
+ (preprocess
+  (staged_pps ppx_matches))
+ (names syntax lang)
+ (libraries tact alcotest ppx_matches))

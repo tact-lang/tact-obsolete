@@ -1,8 +1,8 @@
 (library
- (libraries menhirLib ppx_show.runtime zarith)
+ (libraries base menhirLib ppx_show.runtime zarith)
  (preprocess
-  (staged_pps ppx_import ppx_show ppx_make))
- (modules parser lexer syntax unitActionsParser parserMessages)
+  (staged_pps ppx_import ppx_show ppx_make ppx_compare))
+ (modules parser lexer syntax unitActionsParser parserMessages lang)
  (name tact))
 
 (ocamllex lexer)
