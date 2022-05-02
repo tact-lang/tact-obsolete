@@ -35,6 +35,7 @@ and error =
   | Duplicate_Identifier of string * value
   | Duplicate_Field of string * struct_
   | Unresolved of string
+  | Recursive_Reference of string
   | Unsupported
 [@@deriving equal]
 
@@ -87,20 +88,23 @@ and resolve_inner scope =
 
 and resolve_scope scope =
   let scope' = Map.to_alist scope in
-  let rec resolve resolved (k, v) =
+  let rec resolve path resolved (k, v) =
     match v with
     | Reference ref -> (
-      match Map.find resolved ref with
-      | None ->
-          Error (Unresolved ref)
-      | Some (Reference ref') ->
-          resolve resolved (k, Reference ref')
-      | Some value ->
-          Ok (Map.set resolved ~key:k ~data:value) )
+        if List.exists path ~f:(String.equal ref) then
+          Error (Recursive_Reference k)
+        else
+          match Map.find resolved ref with
+          | None ->
+              Error (Unresolved ref)
+          | Some (Reference ref') ->
+              resolve (ref :: path) resolved (k, Reference ref')
+          | Some value ->
+              Ok (Map.set resolved ~key:k ~data:value) )
     | _ ->
         Ok resolved
   in
-  List.fold_result ~init:scope ~f:resolve scope'
+  List.fold_result ~init:scope ~f:(resolve []) scope'
 
 and scope_from_bindings bindings =
   let scope = empty_scope in

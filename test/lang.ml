@@ -24,6 +24,20 @@ let test_scope_resolution () =
     | _ ->
         false )
 
+let test_recursive_scope_resolution () =
+  let source = {|
+  let A = B
+  let B = C
+  let C = A
+  |} in
+  Alcotest.(check bool)
+    "reference resolution" true
+    ( match parse_program source |> build_program with
+    | Error (Recursive_Reference "A") ->
+        true
+    | _ ->
+        false )
+
 let test_struct () =
   let source =
     {|
@@ -89,8 +103,9 @@ let () =
   let open Alcotest in
   run "Lang"
     [ ( "identifiers",
-        [test_case "name resolution in the scope" `Quick test_scope_resolution]
-      );
+        [ test_case "name resolution in the scope" `Quick test_scope_resolution;
+          test_case "recursive name resolution in the scope" `Quick
+            test_recursive_scope_resolution ] );
       ( "struct",
         [ test_case "struct definition" `Quick test_struct;
           test_case "duplicate struct definition" `Quick test_struct_duplicate;
