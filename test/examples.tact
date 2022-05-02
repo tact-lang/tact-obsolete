@@ -1,4 +1,4 @@
-let Struct = struct {
+let T = type {
     field: Type,
 }
 

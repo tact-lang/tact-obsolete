@@ -1,4 +1,4 @@
-%token LET INTERFACE STRUCT ENUM UNION FN
+%token LET INTERFACE TYPE ENUM UNION FN
 %token EQUALS
 %token <string> IDENT
 %token EOF
@@ -47,15 +47,15 @@ See Expression
 There is another "sugared" form of bindings for types and functions:
 
 ```
-struct S{ ... }
-struct S(T: Type){v: T}
+type S{ ... }
+type S(T: Type){v: T}
 ```
 
 They are equivalent to these:
 
 ```
-let S = struct { ... }
-let S(T: Type) = struct {v: T}
+let S = type { ... }
+let S(T: Type) = type {v: T}
 ```
 
 Same applies to enums, interfaces, unions and fns
@@ -84,8 +84,8 @@ let binding ==
   }
 )
 | sugared_function_definition
-| located( (name, expr) = struct_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
-| located( ((name, params), expr) = struct_definition(located_ident_with_params); {
+| located( (name, expr) = type_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
+| located( ((name, params), expr) = type_definition(located_ident_with_params); {
   make_binding ~binding_name: name ~binding_expr: {
     loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
   } () })
@@ -174,8 +174,8 @@ let function_call ==
 
 (* Expression *)
 let expr :=
- (* can be a `struct` definition *)
- | (_, s) = struct_definition(nothing); { s }
+ (* can be a `type` definition *)
+ | (_, s) = type_definition(nothing); { s }
  (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)
@@ -192,9 +192,9 @@ let expr :=
  | ~= INT; <Int>
 
 
-(* Structure
+(* Type
 
-  struct {
+   type {
     field_name: <expression>,
     ...
     
@@ -202,22 +202,22 @@ let expr :=
     ...
   }
 
-  * Empty structures are allowed
+  * Empty types are allowed
   * Trailing commas are allowed
 
 *)
-let struct_definition(name) ==
-  STRUCT;
+let type_definition(name) ==
+  TYPE;
   n = name;
-  (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACKET, struct_fields, COMMA, list(sugared_function_definition), RBRACKET);
-  { (n, Struct (make_struct_definition ~fields: fields ~struct_bindings: bindings  ())) }
+  (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACKET, type_fields, COMMA, list(sugared_function_definition), RBRACKET);
+  { (n, Type (make_type_definition ~fields: fields ~type_bindings: bindings  ())) }
 
-(* Structure field
+(* Typeure field
 
    field_name: <expression>
 *)
-let struct_fields ==
-| located ( name = located(ident); COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
+let type_fields ==
+| located ( name = located(ident); COLON; typ = located(expr); { make_type_field ~field_name: name ~field_type: typ () } )
 
 (* Interface
 
@@ -291,8 +291,8 @@ let union_definition(name) ==
   { (n, Union (make_union_definition ~union_members: members ~union_bindings: bindings ())) }
 
 let union_member :=
- (* can be a `struct` definition *)
- | (_, s) = struct_definition(nothing); { s }
+ (* can be a type definition *)
+ | (_, s) = type_definition(nothing); { s }
  (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)

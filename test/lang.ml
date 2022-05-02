@@ -45,64 +45,64 @@ let test_recursive_scope_resolution () =
     | _ ->
         false )
 
-let test_struct () =
+let test_type () =
   let source =
     {|
-  let Struct = struct {
+  let MyType = type {
        a: Int257,
        b: Bool
   }
   |}
   in
   Alcotest.(check bool)
-    "struct binding" true
+    "type binding" true
     ( match parse_program source |> build_program with
     | Ok {scope; _} -> (
-      match Map.find scope "Struct" with
-      | Some (Struct s) ->
+      match Map.find scope "MyType" with
+      | Some (Type s) ->
           [%matches?
             Some
               {field_type = Resolved_Reference ("Int257", Builtin "Int257"); _}]
-            (Map.find s.struct_fields "a")
+            (Map.find s.type_fields "a")
           && [%matches?
                Some {field_type = Resolved_Reference ("Bool", Builtin "Bool"); _}]
-               (Map.find s.struct_fields "b")
+               (Map.find s.type_fields "b")
       | _ ->
           false )
     | _ ->
         false )
 
-let test_struct_duplicate () =
+let test_type_duplicate () =
   let source = {|
-  let Struct = struct {}
-  let Struct = struct {}
+  let MyType = type {}
+  let MyType = type {}
   |} in
   Alcotest.(check bool)
-    "struct binding" true
-    ([%matches? Error (Duplicate_Identifier ("Struct", Struct _))]
+    "type binding" true
+    ([%matches? Error (Duplicate_Identifier ("MyType", Type _))]
        (parse_program source |> build_program) )
 
-let test_struct_duplicate_non_struct () =
+let test_type_duplicate_non_type () =
   let source = {|
-  let Struct = 1
-  let Struct = struct {}
+  let MyType = 1
+  let MyType = type {}
   |} in
   Alcotest.(check bool)
-    "struct binding" true
-    ([%matches? Error (Duplicate_Identifier ("Struct", Integer _))]
+    "type binding" true
+    ([%matches? Error (Duplicate_Identifier ("MyType", Integer _))]
        (parse_program source |> build_program) )
 
-let test_struct_duplicate_field () =
+let test_type_duplicate_field () =
   let source =
     {|
-  let Struct = struct {
+  let MyType = type {
       a: Int257,
       a: Bool
   }
   |}
   in
   Alcotest.(check bool)
-    "struct binding" true
+    "type binding" true
     ([%matches? Error (Duplicate_Field ("a", _))]
        (parse_program source |> build_program) )
 
@@ -113,10 +113,10 @@ let () =
         [ test_case "name resolution in the scope" `Quick test_scope_resolution;
           test_case "recursive name resolution in the scope" `Quick
             test_recursive_scope_resolution ] );
-      ( "struct",
-        [ test_case "struct definition" `Quick test_struct;
-          test_case "duplicate struct definition" `Quick test_struct_duplicate;
-          test_case "duplicate struct definition (with a non-structure)" `Quick
-            test_struct_duplicate_non_struct;
-          test_case "duplicate struct field" `Quick test_struct_duplicate_field
-        ] ) ]
+      ( "type",
+        [ test_case "type definition" `Quick test_type;
+          test_case "duplicate type definition" `Quick test_type_duplicate;
+          test_case "duplicate type definition (with a non-typeure)" `Quick
+            test_type_duplicate_non_type;
+          test_case "duplicate type field" `Quick test_type_duplicate_field ] )
+    ]

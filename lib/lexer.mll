@@ -34,7 +34,7 @@ rule token = parse
  | ')' { RPAREN }
  | '=' { EQUALS }
  | "let" { LET }
- | "struct" { STRUCT }
+ | "type" { TYPE }
  | "enum" { ENUM }
  | "interface" { INTERFACE }
  | "union" { UNION }

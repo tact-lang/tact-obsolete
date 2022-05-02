@@ -32,8 +32,8 @@ type 'a located = {loc : loc; value : 'a} [@@deriving show {with_path = false}]
 
 type ident = Ident of string [@@deriving show {with_path = false}]
 
-and struct_definition =
-  {fields : struct_field located list; struct_bindings : binding located list}
+and type_definition =
+  {fields : type_field located list; type_bindings : binding located list}
 
 and interface_definition = {interface_members : binding located list}
 
@@ -48,7 +48,7 @@ and union_definition =
   {union_members : expr located list; union_bindings : binding located list}
 
 and expr =
-  | Struct of struct_definition
+  | Type of type_definition
   | Interface of interface_definition
   | Enum of enum_definition
   | Union of union_definition
@@ -57,7 +57,7 @@ and expr =
   | Function of function_definition
   | Int of zt
 
-and struct_field = {field_name : ident located; field_type : expr located}
+and type_field = {field_name : ident located; field_type : expr located}
 
 and function_param = FunctionParam of ident located * expr located
 
@@ -66,8 +66,6 @@ and function_definition =
     params : function_param located list;
     returns : expr located;
     exprs : expr located list }
-
-and type_definition = {type_name : ident located; type_expr : expr located}
 
 and binding = {binding_name : ident located; binding_expr : expr located}
 

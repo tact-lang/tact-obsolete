@@ -16,7 +16,7 @@ type 'a named_map = (string, 'a, String.comparator_witness) Map.t
 let equal_named_map = Map.equal
 
 type value =
-  | Struct of struct_
+  | Type of type_
   | Integer of Z.t
   | Reference of string
   | Resolved_Reference of string * value
@@ -31,12 +31,12 @@ and code_expr =
   | FunctionCall of function_ * code_expr named_map
   | Value of value
 
-and struct_ =
-  { struct_loc : Syntax.loc;
-    struct_fields : struct_field named_map;
-    struct_methods : function_ named_map }
+and type_ =
+  { type_loc : Syntax.loc;
+    type_fields : type_field named_map;
+    type_methods : function_ named_map }
 
-and struct_field = {field_type : value}
+and type_field = {field_type : value}
 
 and env = {scope : scope}
 
@@ -44,7 +44,7 @@ and scope = value named_map
 
 and error =
   | Duplicate_Identifier of string * value
-  | Duplicate_Field of string * struct_
+  | Duplicate_Field of string * type_
   | Unresolved of string
   | Recursive_Reference of string
   | Unsupported
@@ -70,8 +70,8 @@ and resolve_inner scope elist =
   let scope' = Map.to_alist scope in
   let resolve resolved (k, v) =
     match v with
-    | Struct s ->
-        let fields = Map.to_alist s.struct_fields in
+    | Type s ->
+        let fields = Map.to_alist s.type_fields in
         let _, resolved =
           List.fold ~init:(s, resolved)
             ~f:(fun (s, resolved) (field_name, field) ->
@@ -81,11 +81,11 @@ and resolve_inner scope elist =
                 | Some (Resolved_Reference (_, t)) | Some t ->
                     let s' =
                       { s with
-                        struct_fields =
-                          Map.set s.struct_fields ~key:field_name
+                        type_fields =
+                          Map.set s.type_fields ~key:field_name
                             ~data:{field_type = Resolved_Reference (ref, t)} }
                     in
-                    (s', Map.set resolved ~key:k ~data:(Struct s'))
+                    (s', Map.set resolved ~key:k ~data:(Type s'))
                 | None ->
                     new_error (Unresolved ref) elist ;
                     (s, resolved) )
@@ -144,8 +144,8 @@ and binding_to_value binding elist =
 
 and expr_to_value expr loc elist =
   match expr with
-  | Struct s ->
-      Ok (struct_to_struct s loc elist)
+  | Type s ->
+      Ok (type_to_type s loc elist)
   | Int i ->
       Ok (Integer i)
   | Reference ref ->
@@ -153,17 +153,17 @@ and expr_to_value expr loc elist =
   | _ ->
       Error Unsupported
 
-and struct_to_struct s loc elist =
+and type_to_type s loc elist =
   let s' =
-    { struct_loc = loc;
-      struct_fields = Map.empty (module String);
-      struct_methods = Map.empty (module String) }
+    { type_loc = loc;
+      type_fields = Map.empty (module String);
+      type_methods = Map.empty (module String) }
   in
   let s =
     List.fold ~init:s'
       ~f:(fun s' field ->
         let ident = Syntax.ident_to_string field.value.field_name.value in
-        match Map.find s'.struct_fields ident with
+        match Map.find s'.type_fields ident with
         | Some _ ->
             new_error (Duplicate_Field (ident, s')) elist ;
             s'
@@ -175,11 +175,11 @@ and struct_to_struct s loc elist =
             match value with
             | Ok value ->
                 { s' with
-                  struct_fields =
-                    Map.set s'.struct_fields ~key:ident
-                      ~data:{field_type = value} }
+                  type_fields =
+                    Map.set s'.type_fields ~key:ident ~data:{field_type = value}
+                }
             | Error e ->
                 new_error e elist ; s' ) )
       s.fields
   in
-  Struct s
+  Type s

@@ -7,82 +7,33 @@ let test_empty () =
     "no bindings" true
     (match parse_program source with {bindings = []} -> true | _ -> false)
 
-let test_let_struct () =
+let test_let_type () =
   let source = {|
-  let Struct = struct {}
+  let MyType = type {}
   |} in
   Alcotest.(check bool)
-    "struct binding" true
+    "type binding" true
     ( match parse_program source with
     | { bindings =
           [ { value =
-                { binding_name = {value = Ident "Struct"; _};
+                { binding_name = {value = Ident "MyType"; _};
                   binding_expr =
-                    {value = Struct {fields = []; struct_bindings = []}; _} };
+                    {value = Type {fields = []; type_bindings = []}; _} };
               _ } ] } ->
         true
     | _ ->
         false )
 
-let test_let_struct_param () =
+let test_let_type_param () =
   let source = {|
-  let Struct(T: Type) = struct {}
+  let MyType(T: Type) = type {}
   |} in
   Alcotest.(check bool)
-    "struct binding" true
+    "type binding" true
     ( match parse_program source with
     | { bindings =
           [ { value =
-                { binding_name = {value = Ident "Struct"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params =
-                              [ { value =
-                                    FunctionParam
-                                      ( {value = Ident "T"; _},
-                                        {value = Reference (Ident "Type"); _} );
-                                  _ } ];
-                            returns = {value = Reference (Ident "Type"); _};
-                            exprs =
-                              [ { value =
-                                    Struct {fields = []; struct_bindings = []};
-                                  _ } ];
-                            _ };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
-
-let test_struct () =
-  let source = {|
-  struct Struct {}
-  |} in
-  Alcotest.(check bool)
-    "struct binding" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "Struct"; _};
-                  binding_expr =
-                    {value = Struct {fields = []; struct_bindings = []}; _} };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
-
-let test_struct_param () =
-  let source = {|
-  struct Struct(T: Type) {}
-  |} in
-  Alcotest.(check bool)
-    "struct binding" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "Struct"; _};
+                { binding_name = {value = Ident "MyType"; _};
                   binding_expr =
                     { value =
                         Function
@@ -95,8 +46,7 @@ let test_struct_param () =
                                   _ } ];
                             returns = {value = Reference (Ident "Type"); _};
                             exprs =
-                              [ { value =
-                                    Struct {fields = []; struct_bindings = []};
+                              [ { value = Type {fields = []; type_bindings = []};
                                   _ } ];
                             _ };
                       _ } };
@@ -105,32 +55,80 @@ let test_struct_param () =
     | _ ->
         false )
 
-let test_struct_fields_source =
+let test_type () =
+  let source = {|
+  type MyType {}
+  |} in
+  Alcotest.(check bool)
+    "type binding" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "MyType"; _};
+                  binding_expr =
+                    {value = Type {fields = []; type_bindings = []}; _} };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_type_param () =
+  let source = {|
+  type MyType(T: Type) {}
+  |} in
+  Alcotest.(check bool)
+    "type binding" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "MyType"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params =
+                              [ { value =
+                                    FunctionParam
+                                      ( {value = Ident "T"; _},
+                                        {value = Reference (Ident "Type"); _} );
+                                  _ } ];
+                            returns = {value = Reference (Ident "Type"); _};
+                            exprs =
+                              [ { value = Type {fields = []; type_bindings = []};
+                                  _ } ];
+                            _ };
+                      _ } };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_type_fields_source =
   {|
-  struct Struct {
+  type MyType {
     a: Int257,
     f: get_type()
   }
   |}
 
-let test_struct_fields_trailing_comma_source =
+let test_type_fields_trailing_comma_source =
   {|
-  struct Struct {
+  type MyType {
     a: Int257,
     f: get_type(),
   }
   |}
 
-let test_struct_fields source () =
+let test_type_fields source () =
   Alcotest.(check bool)
-    "struct fields" true
+    "type fields" true
     ( match parse_program source with
     | { bindings =
           [ { value =
-                { binding_name = {value = Ident "Struct"; _};
+                { binding_name = {value = Ident "MyType"; _};
                   binding_expr =
                     { value =
-                        Struct
+                        Type
                           { fields =
                               [ { value =
                                     { field_name = {value = Ident "a"; _};
@@ -151,30 +149,30 @@ let test_struct_fields source () =
                                                 arguments = [] };
                                           _ } };
                                   _ } ];
-                            struct_bindings = [] };
+                            type_bindings = [] };
                       _ } };
               _ } ] } ->
         true
     | _ ->
         false )
 
-let test_struct_methods () =
+let test_type_methods () =
   let source = {|
-    struct Struct {
+    type MyType {
       fn test(): Bool {}
     }
   |} in
   Alcotest.(check bool)
-    "struct methods" true
+    "type methods" true
     ( match parse_program source with
     | { bindings =
           [ { value =
-                { binding_name = {value = Ident "Struct"; _};
+                { binding_name = {value = Ident "MyType"; _};
                   binding_expr =
                     { value =
-                        Struct
+                        Type
                           { fields = [];
-                            struct_bindings =
+                            type_bindings =
                               [ { value =
                                     { binding_name = {value = Ident "test"; _};
                                       binding_expr =
@@ -196,32 +194,32 @@ let test_struct_methods () =
     | _ ->
         false )
 
-let test_struct_with_fields_and_methods_source =
+let test_type_with_fields_and_methods_source =
   {|
-    struct Struct {
+    type MyType {
       a: Int257
       fn test(): Bool {}
     }
   |}
 
-let test_struct_with_fields_and_methods_trailing_comma_source =
+let test_type_with_fields_and_methods_trailing_comma_source =
   {|
-    struct Struct {
+    type MyType {
       a: Int257,
       fn test(): Bool {}
     }
   |}
 
-let test_struct_with_fields_and_methods source () =
+let test_type_with_fields_and_methods source () =
   Alcotest.(check bool)
-    "struct methods" true
+    "type methods" true
     ( match parse_program source with
     | { bindings =
           [ { value =
-                { binding_name = {value = Ident "Struct"; _};
+                { binding_name = {value = Ident "MyType"; _};
                   binding_expr =
                     { value =
-                        Struct
+                        Type
                           { fields =
                               [ { value =
                                     { field_name = {value = Ident "a"; _};
@@ -229,7 +227,7 @@ let test_struct_with_fields_and_methods source () =
                                         {value = Reference (Ident "Int257"); _}
                                     };
                                   _ } ];
-                            struct_bindings =
+                            type_bindings =
                               [ { value =
                                     { binding_name = {value = Ident "test"; _};
                                       binding_expr =
@@ -255,23 +253,21 @@ let () =
   let open Alcotest in
   run "Syntax"
     [ ("empty file", [test_case "Empty file" `Quick test_empty]);
-      ( "struct",
-        [ test_case "let syntax for struct" `Quick test_let_struct;
-          test_case "let syntax for parameterized struct" `Quick
-            test_let_struct_param;
-          test_case "shorthand syntax for struct" `Quick test_struct;
-          test_case "shorthand syntax for parameterized struct" `Quick
-            test_struct_param;
-          test_case "struct fields" `Quick
-            (test_struct_fields test_struct_fields_source);
-          test_case "struct fields with a trailing comma" `Quick
-            (test_struct_fields test_struct_fields_trailing_comma_source);
-          test_case "struct methods" `Quick test_struct_methods;
-          test_case "struct with fields and methods" `Quick
-            (test_struct_with_fields_and_methods
-               test_struct_with_fields_and_methods_source );
-          test_case "struct with fields and methods with a trailing comma"
-            `Quick
-            (test_struct_with_fields_and_methods
-               test_struct_with_fields_and_methods_trailing_comma_source ) ] )
-    ]
+      ( "type",
+        [ test_case "let syntax for type" `Quick test_let_type;
+          test_case "let syntax for parameterized type" `Quick
+            test_let_type_param;
+          test_case "shorthand syntax for type" `Quick test_type;
+          test_case "shorthand syntax for parameterized type" `Quick
+            test_type_param;
+          test_case "type fields" `Quick
+            (test_type_fields test_type_fields_source);
+          test_case "type fields with a trailing comma" `Quick
+            (test_type_fields test_type_fields_trailing_comma_source);
+          test_case "type methods" `Quick test_type_methods;
+          test_case "type with fields and methods" `Quick
+            (test_type_with_fields_and_methods
+               test_type_with_fields_and_methods_source );
+          test_case "type with fields and methods with a trailing comma" `Quick
+            (test_type_with_fields_and_methods
+               test_type_with_fields_and_methods_trailing_comma_source ) ] ) ]
