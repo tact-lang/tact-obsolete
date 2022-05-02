@@ -5,9 +5,9 @@ type ('w, 'e) error_list =
   {mutable warnings : 'w list ref; mutable errors : 'e list ref}
 [@@deriving make]
 
-let new_warn warn errors = errors.warnings := warn :: !(errors.warnings)
+let new_warn warn errors = errors.warnings := !(errors.warnings) @ [warn]
 
-let new_error error errors = errors.errors := error :: !(errors.errors)
+let new_error error errors = errors.errors := !(errors.errors) @ [error]
 
 (* *)
 

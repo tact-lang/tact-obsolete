@@ -40,7 +40,7 @@ let test_recursive_scope_resolution () =
   Alcotest.(check bool)
     "reference resolution" true
     ( match parse_program source |> build_program with
-    | Error (Recursive_Reference "C") | Error (Recursive_Reference "A") ->
+    | Error (Recursive_Reference "A") ->
         true
     | _ ->
         false )
