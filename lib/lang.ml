@@ -113,7 +113,7 @@ and resolve_scope scope elist =
               new_error (Unresolved ref) elist ;
               resolved
           | Some (Reference ref') ->
-              resolve (ref::path) resolved (k, Reference ref')
+              resolve (ref :: path) resolved (k, Reference ref')
           | Some value ->
               Map.set resolved ~key:k ~data:value )
     | _ ->

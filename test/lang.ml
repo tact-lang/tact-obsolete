@@ -5,12 +5,12 @@ let parse_program s =
   Tact.Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program stx =
-  let elist = make_error_list ~warnings: (ref []) ~errors: (ref []) () in
+  let elist = make_error_list ~warnings:(ref []) ~errors:(ref []) () in
   let env = Tact.Lang.env_from_program stx elist in
   match (!(elist.errors), !(elist.warnings)) with
-   | error::_, _ ->
+  | error :: _, _ ->
       Error error
-   | _ ->
+  | _ ->
       Ok env
 
 let test_scope_resolution () =
