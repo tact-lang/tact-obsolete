@@ -1,5 +1,16 @@
 open Base
 
+(* Error management *)
+type ('w, 'e) error_list =
+  {mutable warnings : 'w list ref; mutable errors : 'e list ref}
+[@@deriving make]
+
+let new_warn warn errors = errors.warnings := warn :: !(errors.warnings)
+
+let new_error error errors = errors.errors := error :: !(errors.errors)
+
+(* *)
+
 type 'a named_map = (string, 'a, String.comparator_witness) Map.t
 
 let equal_named_map = Map.equal
@@ -39,29 +50,30 @@ and error =
   | Unsupported
 [@@deriving equal]
 
+type elist = (string, error) error_list
+
 let empty_scope =
   Map.of_alist_exn
     (module String)
     [("Int257", Builtin "Int257"); ("Bool", Builtin "Bool")]
 
-let rec env_from_program (stx : Syntax.program) =
-  let scope = scope_from_bindings stx.bindings in
-  Result.bind scope ~f:(fun scope ->
-      (* Resolve top-level scope first *)
-      let scope = resolve_scope scope in
-      (* Resolve references inside *)
-      let scope = Result.bind scope ~f:resolve_inner in
-      (* Build env *)
-      Result.map scope ~f:(fun scope -> {scope}) )
+let rec env_from_program (stx : Syntax.program) (elist : elist) =
+  let scope = scope_from_bindings stx.bindings elist in
+  (* Resolve top-level scope first *)
+  let scope = resolve_scope scope elist in
+  (* Resolve references inside *)
+  let scope = resolve_inner scope elist in
+  (* Build env *)
+  {scope}
 
-and resolve_inner scope =
+and resolve_inner scope elist =
   let scope' = Map.to_alist scope in
   let resolve resolved (k, v) =
     match v with
     | Struct s ->
         let fields = Map.to_alist s.struct_fields in
-        let resolved =
-          List.fold_result ~init:(s, resolved)
+        let _, resolved =
+          List.fold ~init:(s, resolved)
             ~f:(fun (s, resolved) (field_name, field) ->
               match field with
               | {field_type = Reference ref; _} -> (
@@ -73,60 +85,67 @@ and resolve_inner scope =
                           Map.set s.struct_fields ~key:field_name
                             ~data:{field_type = Resolved_Reference (ref, t)} }
                     in
-                    Ok (s', Map.set resolved ~key:k ~data:(Struct s'))
+                    (s', Map.set resolved ~key:k ~data:(Struct s'))
                 | None ->
-                    Error (Unresolved ref) )
+                    new_error (Unresolved ref) elist ;
+                    (s, resolved) )
               | _ ->
-                  Ok (s, resolved) )
+                  (s, resolved) )
             fields
         in
-        Result.map resolved ~f:(fun (_, resolved) -> resolved)
+        resolved
     | _ ->
-        Ok resolved
+        resolved
   in
-  List.fold_result ~init:scope ~f:resolve scope'
+  List.fold ~init:scope ~f:resolve scope'
 
-and resolve_scope scope =
+and resolve_scope scope elist =
   let scope' = Map.to_alist scope in
   let rec resolve path resolved (k, v) =
     match v with
     | Reference ref -> (
-        if List.exists path ~f:(String.equal ref) then
-          Error (Recursive_Reference k)
+        if List.exists path ~f:(String.equal ref) then (
+          new_error (Recursive_Reference k) elist ;
+          resolved )
         else
           match Map.find resolved ref with
           | None ->
-              Error (Unresolved ref)
+              new_error (Unresolved ref) elist ;
+              resolved
           | Some (Reference ref') ->
-              resolve (ref :: path) resolved (k, Reference ref')
+              resolve (ref::path) resolved (k, Reference ref')
           | Some value ->
-              Ok (Map.set resolved ~key:k ~data:value) )
+              Map.set resolved ~key:k ~data:value )
     | _ ->
-        Ok resolved
+        resolved
   in
-  List.fold_result ~init:scope ~f:(resolve []) scope'
+  List.fold ~init:scope ~f:(resolve []) scope'
 
-and scope_from_bindings bindings =
+and scope_from_bindings bindings elist =
   let scope = empty_scope in
-  List.fold_result ~init:scope
+  List.fold ~init:scope
     ~f:(fun scope binding ->
       let binding = binding.value in
       let ident = Syntax.ident_to_string binding.binding_name.value in
       match Map.find scope ident with
-      | None ->
-          let data = binding_to_value binding in
-          Result.map data ~f:(fun data -> Map.set scope ~key:ident ~data)
+      | None -> (
+        match binding_to_value binding elist with
+        | Ok data ->
+            Map.set scope ~key:ident ~data
+        | Error e ->
+            new_error e elist ; scope )
       | Some existing ->
-          Error (Duplicate_Identifier (ident, existing)) )
+          new_error (Duplicate_Identifier (ident, existing)) elist ;
+          scope )
     bindings
 
-and binding_to_value binding =
-  expr_to_value binding.binding_expr.value binding.binding_expr.loc
+and binding_to_value binding elist =
+  expr_to_value binding.binding_expr.value binding.binding_expr.loc elist
 
-and expr_to_value expr loc =
+and expr_to_value expr loc elist =
   match expr with
   | Struct s ->
-      struct_to_struct s loc
+      Ok (struct_to_struct s loc elist)
   | Int i ->
       Ok (Integer i)
   | Reference ref ->
@@ -134,29 +153,33 @@ and expr_to_value expr loc =
   | _ ->
       Error Unsupported
 
-and struct_to_struct s loc =
+and struct_to_struct s loc elist =
   let s' =
     { struct_loc = loc;
       struct_fields = Map.empty (module String);
       struct_methods = Map.empty (module String) }
   in
   let s =
-    List.fold_result ~init:s'
+    List.fold ~init:s'
       ~f:(fun s' field ->
         let ident = Syntax.ident_to_string field.value.field_name.value in
         match Map.find s'.struct_fields ident with
         | Some _ ->
-            Error (Duplicate_Field (ident, s'))
-        | None ->
+            new_error (Duplicate_Field (ident, s')) elist ;
+            s'
+        | None -> (
             let value =
               expr_to_value field.value.field_type.value
-                field.value.field_type.loc
+                field.value.field_type.loc elist
             in
-            Result.map value ~f:(fun value ->
+            match value with
+            | Ok value ->
                 { s' with
                   struct_fields =
                     Map.set s'.struct_fields ~key:ident
-                      ~data:{field_type = value} } ) )
+                      ~data:{field_type = value} }
+            | Error e ->
+                new_error e elist ; s' ) )
       s.fields
   in
-  Result.map s ~f:(fun s -> Struct s)
+  Struct s
