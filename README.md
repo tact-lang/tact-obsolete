@@ -25,3 +25,7 @@ Run `dune utop`
 
 Run `dune test`
 
+### Formatting code
+
+Run `dune build @fmt --auto-promote` (or no `--auto-promote` if you want to review changes, followed
+by `dune promote`)
