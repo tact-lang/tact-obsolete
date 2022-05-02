@@ -9,7 +9,7 @@ let test_empty () =
 
 let test_let_type () =
   let source = {|
-  let MyType = type {}
+  let MyType = type {};
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -26,7 +26,7 @@ let test_let_type () =
 
 let test_let_type_param () =
   let source = {|
-  let MyType(T: Type) = type {}
+  let MyType(T: Type) = type {};
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -40,14 +40,15 @@ let test_let_type_param () =
                           { name = None;
                             params =
                               [ { value =
-                                    FunctionParam
-                                      ( {value = Ident "T"; _},
-                                        {value = Reference (Ident "Type"); _} );
+                                    ( {value = Ident "T"; _},
+                                      {value = Reference (Ident "Type"); _} );
                                   _ } ];
                             returns = {value = Reference (Ident "Type"); _};
                             exprs =
-                              [ { value = Type {fields = []; type_bindings = []};
-                                  _ } ];
+                              Some
+                                [ { value =
+                                      Type {fields = []; type_bindings = []};
+                                    _ } ];
                             _ };
                       _ } };
               _ } ] } ->
@@ -57,7 +58,7 @@ let test_let_type_param () =
 
 let test_type () =
   let source = {|
-  type MyType {}
+  type MyType {};
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -74,7 +75,7 @@ let test_type () =
 
 let test_type_param () =
   let source = {|
-  type MyType(T: Type) {}
+  type MyType(T: Type) {};
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -88,14 +89,15 @@ let test_type_param () =
                           { name = None;
                             params =
                               [ { value =
-                                    FunctionParam
-                                      ( {value = Ident "T"; _},
-                                        {value = Reference (Ident "Type"); _} );
+                                    ( {value = Ident "T"; _},
+                                      {value = Reference (Ident "Type"); _} );
                                   _ } ];
                             returns = {value = Reference (Ident "Type"); _};
                             exprs =
-                              [ { value = Type {fields = []; type_bindings = []};
-                                  _ } ];
+                              Some
+                                [ { value =
+                                      Type {fields = []; type_bindings = []};
+                                    _ } ];
                             _ };
                       _ } };
               _ } ] } ->
@@ -108,7 +110,7 @@ let test_type_fields_source =
   type MyType {
     a: Int257,
     f: get_type()
-  }
+  };
   |}
 
 let test_type_fields_trailing_comma_source =
@@ -116,7 +118,7 @@ let test_type_fields_trailing_comma_source =
   type MyType {
     a: Int257,
     f: get_type(),
-  }
+  };
   |}
 
 let test_type_fields source () =
@@ -161,7 +163,7 @@ let test_type_shorthand_fields () =
     type MyType {
       A,
       B
-    }
+    };
   |} in
   Alcotest.(check bool)
     "type fields" true
@@ -191,11 +193,14 @@ let test_type_shorthand_fields () =
         false )
 
 let test_type_methods () =
-  let source = {|
+  let source =
+    {|
     type MyType {
-      fn test(): Bool {}
-    }
-  |} in
+      fn test() -> Bool {}
+      fn todo() -> Int257
+    };
+  |}
+  in
   Alcotest.(check bool)
     "type methods" true
     ( match parse_program source with
@@ -214,10 +219,25 @@ let test_type_methods () =
                                             Function
                                               { name = None;
                                                 params = [];
-                                                exprs = [];
+                                                exprs = Some [];
                                                 returns =
                                                   { value =
                                                       Reference (Ident "Bool");
+                                                    _ };
+                                                _ };
+                                          _ } };
+                                  _ };
+                                { value =
+                                    { binding_name = {value = Ident "todo"; _};
+                                      binding_expr =
+                                        { value =
+                                            Function
+                                              { name = None;
+                                                params = [];
+                                                exprs = None;
+                                                returns =
+                                                  { value =
+                                                      Reference (Ident "Int257");
                                                     _ };
                                                 _ };
                                           _ } };
@@ -232,16 +252,16 @@ let test_type_with_fields_and_methods_source =
   {|
     type MyType {
       a: Int257
-      fn test(): Bool {}
-    }
+      fn test() -> Bool {}
+    };
   |}
 
 let test_type_with_fields_and_methods_trailing_comma_source =
   {|
     type MyType {
       a: Int257,
-      fn test(): Bool {}
-    }
+      fn test() -> Bool {}
+    };
   |}
 
 let test_type_with_fields_and_methods source () =
@@ -269,7 +289,7 @@ let test_type_with_fields_and_methods source () =
                                             Function
                                               { name = None;
                                                 params = [];
-                                                exprs = [];
+                                                exprs = Some [];
                                                 returns =
                                                   { value =
                                                       Reference (Ident "Bool");
@@ -278,6 +298,166 @@ let test_type_with_fields_and_methods source () =
                                           _ } };
                                   _ } ] };
                       _ } };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_fn_sig_over_call () =
+  let source = {|
+  let F = fn (A: T) -> P(1);
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "F"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params =
+                              [ { value =
+                                    ( {value = Ident "A"; _},
+                                      {value = Reference (Ident "T"); _} );
+                                  _ } ];
+                            exprs = None;
+                            returns =
+                              { value =
+                                  FunctionCall
+                                    { fn = {value = Reference (Ident "P"); _};
+                                      arguments = [{value = Int _; _}] };
+                                _ } };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_fn_sig_returns_fn_sig () =
+  let source = {|
+  let F = fn (A: T) -> (fn () -> T);
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "F"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params =
+                              [ { value =
+                                    ( {value = Ident "A"; _},
+                                      {value = Reference (Ident "T"); _} );
+                                  _ } ];
+                            exprs = None;
+                            returns =
+                              { value =
+                                  Function
+                                    { name = None;
+                                      params = [];
+                                      returns =
+                                        {value = Reference (Ident "T"); _};
+                                      exprs = None };
+                                _ } };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_fn_call_over_sig () =
+  let source = {|
+  let F = (fn (A: T) -> P)(1);
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "F"; _};
+                  binding_expr =
+                    { value =
+                        FunctionCall
+                          { fn =
+                              { value =
+                                  Function
+                                    { name = None;
+                                      params =
+                                        [ { value =
+                                              ( {value = Ident "A"; _},
+                                                { value = Reference (Ident "T");
+                                                  _ } );
+                                            _ } ];
+                                      exprs = None;
+                                      returns =
+                                        {value = Reference (Ident "P"); _} };
+                                _ };
+                            arguments = [{value = Int _; _}] };
+                      _ } };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_function_call () =
+  let source = {|
+  let F = func(1);
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "F"; _};
+                  binding_expr =
+                    { value =
+                        FunctionCall
+                          { fn = {value = Reference (Ident "func"); _};
+                            arguments = [{value = Int _; _}];
+                            _ };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_function_call_in_alist_of_expr () =
+  let source = {|
+  let F = fn() -> T { 
+       func(1);
+  };
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "F"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params = [];
+                            exprs =
+                              Some
+                                [ { value =
+                                      FunctionCall
+                                        { fn =
+                                            {value = Reference (Ident "func"); _};
+                                          arguments = [{value = Int _; _}];
+                                          _ };
+                                    _ } ];
+                            returns = {value = Reference (Ident "T"); _} };
+                      _ };
+                  _ };
               _ } ] } ->
         true
     | _ ->
@@ -305,4 +485,15 @@ let () =
                test_type_with_fields_and_methods_source );
           test_case "type with fields and methods with a trailing comma" `Quick
             (test_type_with_fields_and_methods
-               test_type_with_fields_and_methods_trailing_comma_source ) ] ) ]
+               test_type_with_fields_and_methods_trailing_comma_source ) ] );
+      ( "functions",
+        [ test_case "function signature over function call" `Quick
+            test_fn_sig_over_call;
+          test_case "function signature returning function signature" `Quick
+            test_fn_sig_returns_fn_sig;
+          test_case "function call over function signature" `Quick
+            test_fn_call_over_sig ] );
+      ( "function calls",
+        [ test_case "function call" `Quick test_function_call;
+          test_case "function call in a list of exprs" `Quick
+            test_function_call_in_alist_of_expr ] ) ]

@@ -59,13 +59,13 @@ and expr =
 
 and type_field = {field_name : ident located; field_type : expr located}
 
-and function_param = FunctionParam of ident located * expr located
+and function_param = ident located * expr located
 
 and function_definition =
   { name : ident located option;
     params : function_param located list;
     returns : expr located;
-    exprs : expr located list }
+    exprs : expr located list option }
 
 and binding = {binding_name : ident located; binding_expr : expr located}
 

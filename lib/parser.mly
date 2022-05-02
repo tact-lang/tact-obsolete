@@ -5,7 +5,7 @@
 %token LBRACKET LPAREN
 %token RBRACKET RPAREN
 %token COMMA
-%token COLON
+%token COLON RARROW SEMICOLON
 %token <Z.t> INT
 
 %start <Syntax.program> program
@@ -36,7 +36,7 @@ let program :=
 (* Top level expression *)
 let top_level_expr ==
   (* can be a `let` binding definition *)
-  | ~= binding ; <Let>
+  | ~= binding; SEMICOLON; <Let>
 
 (* Binding definition
 
@@ -119,44 +119,36 @@ let sugared_function_definition ==
 
 (* Function definition
 
-fn (arg: Type, ...) : Type {
+fn (arg: Type, ...) -> Type [{
   expr
   expr
   ...
-}
+}]
 
 *)
-let function_definition(name) ==
+let function_definition(name) :=
   FN;
   n = name;
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
-  COLON;
-  returns = located(expr);
-  exprs = delimited(LBRACKET, list(located(expr)), RBRACKET);
-  { (n, Function (make_function_definition ~params: params ~returns: returns ~exprs: exprs ())) }
+  RARROW;
+  returns = located(fexpr);
+  exprs = option(delimited(LBRACKET, list(located(stmt)), RBRACKET));
+  { (n, Function (make_function_definition ~params: params ~returns: returns 
+                    ?exprs: exprs ())) } 
 
-(* Function signature
-
-fn (arg: Type, ...) : Type
-
-*)
-let function_signature ==
-  FN;
-  n = located(ident);
-  params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
-  COLON;
-  returns = located(expr);
-  { make_binding ~binding_name: n ~binding_expr: { loc = $loc; 
-    value = Function (make_function_definition ~params: params ~returns: returns ~exprs: [] ()) }
-  () }
-
+let function_signature_binding ==
+    (n, f) = function_definition(located(ident)); {
+    make_binding ~binding_name: n ~binding_expr: { loc = $loc; 
+                                                   value = f }
+      ()
+  }
 
 let function_param ==
   located (
   ~ = located(ident);
   COLON;
   ~ = located(expr);
-  <FunctionParam>
+  <>
   )
 
 (* Function call
@@ -166,14 +158,27 @@ let function_param ==
 
   * Trailing commas are allowed
 *)
-let function_call ==
-  fn = located(expr);
+let function_call :=
+  fn = located(fexpr);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
   { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
 
+(* Statement (they are separated expressions / control flow, but ultimately not very different) *)
+let stmt :=
+    e = expr; SEMICOLON; {e}
 
 (* Expression *)
 let expr :=
+ | expr_
+ (* can be a function definition *)
+ | (_, f) = function_definition(nothing); { f }
+
+let fexpr :=
+ | expr_
+ (* can be a function definition *)
+ | (_, f) = delimited(LPAREN, function_definition(nothing), RPAREN); { f }
+
+ let expr_ ==
  (* can be a `type` definition *)
  | (_, s) = type_definition(nothing); { s }
  (* can be an `interface` definition *)
@@ -182,15 +187,12 @@ let expr :=
  | (_, e) = enum_definition(nothing); { e }
  (* can be an `union` definition *)
  | (_, u) = union_definition(nothing); { u }
- (* can be a function definition *)
- | (_, f) = function_definition(nothing); { f }
- (* can be an identifier, as a reference to some identifier *)
+  (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
  (* can be a function call *)
  | function_call
-  (* can be an integer *)
+ (* can be an integer *)
  | ~= INT; <Int>
-
 
 (* Type
 
@@ -200,7 +202,7 @@ let expr :=
     Type,
     ...
     
-    fn name(...): ... { ... }
+    fn name(...) -> ... { ... }
     ...
   }
 
@@ -226,7 +228,7 @@ let type_fields ==
 (* Interface
 
    interface {
-     fn name(...): Type
+     fn name(...) -> Type
    }
 
 *) 
@@ -234,7 +236,7 @@ let type_fields ==
 let interface_definition(name) ==
   INTERFACE;
   n = name;
-  bindings = delimited(LBRACKET, list(located(function_signature)), RBRACKET);
+  bindings = delimited(LBRACKET, list(located(function_signature_binding)), RBRACKET);
   { (n, Interface (make_interface_definition ~interface_members: bindings ())) }
 
 (* Identifier *)
@@ -247,7 +249,7 @@ let ident ==
     member,
     member = expr,
     ...
-    fn name(...): ... { ... }
+    fn name(...) -> ... { ... }
     ...
 
   }
@@ -279,7 +281,7 @@ let enum_member ==
     member,
     ...
 
-    fn name(...): ... { ... }
+    fn name(...) -> ... { ... }
     ...
 
   }

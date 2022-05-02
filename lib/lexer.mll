@@ -28,6 +28,8 @@ rule token = parse
  | newline  { next_line lexbuf; token lexbuf }
  | ',' { COMMA }
  | ':' { COLON }
+ | ';' { SEMICOLON }
+ | "->" { RARROW }
  | '{' { LBRACKET }
  | '}' { RBRACKET }
  | '(' { LPAREN }

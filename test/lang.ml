@@ -14,12 +14,14 @@ let build_program stx =
       Ok env
 
 let test_scope_resolution () =
-  let source = {|
-  let I = Int257
-  let I_ = I
-  let n = 1
-  let n_ = n
-  |} in
+  let source =
+    {|
+  let I = Int257;
+  let I_ = I;
+  let n = 1;
+  let n_ = n;
+  |}
+  in
   Alcotest.(check bool)
     "reference resolution" true
     ( match parse_program source |> build_program with
@@ -33,9 +35,9 @@ let test_scope_resolution () =
 
 let test_recursive_scope_resolution () =
   let source = {|
-  let A = B
-  let B = C
-  let C = A
+  let A = B;
+  let B = C;
+  let C = A;
   |} in
   Alcotest.(check bool)
     "reference resolution" true
@@ -51,7 +53,7 @@ let test_type () =
   let MyType = type {
        a: Int257,
        b: Bool
-  }
+  };
   |}
   in
   Alcotest.(check bool)
@@ -74,8 +76,8 @@ let test_type () =
 
 let test_type_duplicate () =
   let source = {|
-  let MyType = type {}
-  let MyType = type {}
+  let MyType = type {};
+  let MyType = type {};
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -84,8 +86,8 @@ let test_type_duplicate () =
 
 let test_type_duplicate_non_type () =
   let source = {|
-  let MyType = 1
-  let MyType = type {}
+  let MyType = 1;
+  let MyType = type {};
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -98,7 +100,7 @@ let test_type_duplicate_field () =
   let MyType = type {
       a: Int257,
       a: Bool
-  }
+  };
   |}
   in
   Alcotest.(check bool)
