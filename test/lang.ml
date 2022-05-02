@@ -4,7 +4,14 @@ open Tact.Lang
 let parse_program s =
   Tact.Parser.program Tact.Lexer.token (Lexing.from_string s)
 
-let build_program = Tact.Lang.env_from_program
+let build_program stx =
+  let elist = make_error_list ~warnings: (ref []) ~errors: (ref []) () in
+  let env = Tact.Lang.env_from_program stx elist in
+  match (!(elist.errors), !(elist.warnings)) with
+   | error::_, _ ->
+      Error error
+   | _ ->
+      Ok env
 
 let test_scope_resolution () =
   let source = {|
@@ -33,7 +40,7 @@ let test_recursive_scope_resolution () =
   Alcotest.(check bool)
     "reference resolution" true
     ( match parse_program source |> build_program with
-    | Error (Recursive_Reference "A") ->
+    | Error (Recursive_Reference "C") | Error (Recursive_Reference "A") ->
         true
     | _ ->
         false )
