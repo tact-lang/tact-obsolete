@@ -1,11 +1,15 @@
 (library
-  (libraries menhirLib ppx_show.runtime zarith)
-  (preprocess (staged_pps ppx_import ppx_show ppx_make))
-  (modules parser lexer syntax unitActionsParser parserMessages)
-  (name tact))
+ (libraries menhirLib ppx_show.runtime zarith)
+ (preprocess
+  (staged_pps ppx_import ppx_show ppx_make))
+ (modules parser lexer syntax unitActionsParser parserMessages)
+ (name tact))
 
 (ocamllex lexer)
-(menhir (modules parser) (flags -v))
+
+(menhir
+ (modules parser)
+ (flags -v))
 
 ;; The following two rules create a copy of the file parser.mly named
 ;; unitActionsParser.mly. This is a copy of the grammar where the semantic
@@ -17,17 +21,14 @@
 ;; lexer.
 
 (rule
-  (action
-    (with-stdout-to unitActionsParser.mly
-      (run menhir
-        %{dep:parser.mly}
-        --only-preprocess-u
-))))
+ (action
+  (with-stdout-to
+   unitActionsParser.mly
+   (run menhir %{dep:parser.mly} --only-preprocess-u))))
 
 (menhir
-  (modules unitActionsParser)
-  (flags --table --external-tokens Parser)
-)
+ (modules unitActionsParser)
+ (flags --table --external-tokens Parser))
 
 ;; -----------------------------------------------------------------------------
 
@@ -38,26 +39,23 @@
 ;; performed first. (If desired, this check could be disabled.)
 
 (rule
-  (deps parserMessages.check)
-  (action (with-stdout-to parserMessages.ml
-    (run menhir
-      %{dep:parser.mly}
-      --compile-errors %{dep:parserMessages.messages}
-    )
-  ))
-)
+ (deps parserMessages.check)
+ (action
+  (with-stdout-to
+   parserMessages.ml
+   (run
+    menhir
+    %{dep:parser.mly}
+    --compile-errors
+    %{dep:parserMessages.messages}))))
 
 ;; This rule generates a file "parserMessages.auto.messages" that contains a
 ;; list of all error states. It is used by the completeness check.
 
 (rule
-  (with-stdout-to parserMessages.auto.messages
-    (run menhir
-       %{dep:parser.mly}
-       --list-errors
-    )
-  )
-)
+ (with-stdout-to
+  parserMessages.auto.messages
+  (run menhir %{dep:parser.mly} --list-errors)))
 
 ;; This rule implements the completeness check. It checks that every error
 ;; state listed in the auto-generated file "parserMessages.auto.messages"
@@ -65,13 +63,14 @@
 ;; by the programmer.
 
 (rule
-  (with-stdout-to parserMessages.check
-  (run menhir
-    %{dep:parser.mly}
-    --compare-errors %{dep:parserMessages.auto.messages}
-    --compare-errors %{dep:parserMessages.messages}
-  ))
-)
+ (with-stdout-to
+  parserMessages.check
+  (run
+   menhir
+   %{dep:parser.mly}
+   --compare-errors
+   %{dep:parserMessages.auto.messages}
+   --compare-errors
+   %{dep:parserMessages.messages})))
 
 ;; -----------------------------------------------------------------------------
-

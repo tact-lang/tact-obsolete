@@ -22,5 +22,6 @@
    (menhirSdk (= 20220210))
    (zarith (>= 1.12))
    (utop (and :build (>= 2.9.1)))
-   (alcotest (and :build (>= 1.5.0))))
+   (alcotest (and :build (>= 1.5.0)))
+   (ocamlformat (and :build (>= 0.21.0))))
 )

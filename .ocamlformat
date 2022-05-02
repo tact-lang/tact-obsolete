@@ -1,0 +1,4 @@
+profile = ocamlformat
+break-separators = after
+field-space = loose
+version = 0.21.0
