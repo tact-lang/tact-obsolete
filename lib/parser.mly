@@ -196,6 +196,8 @@ let expr :=
 
    type {
     field_name: <expression>,
+    // or a shorthand version for a type-named field:
+    Type,
     ...
     
     fn name(...): ... { ... }
@@ -212,12 +214,14 @@ let type_definition(name) ==
   (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACKET, type_fields, COMMA, list(sugared_function_definition), RBRACKET);
   { (n, Type (make_type_definition ~fields: fields ~type_bindings: bindings  ())) }
 
-(* Typeure field
+(* Type field
 
    field_name: <expression>
+   FieldName
 *)
 let type_fields ==
 | located ( name = located(ident); COLON; typ = located(expr); { make_type_field ~field_name: name ~field_type: typ () } )
+| located ( name = located(ident); { make_type_field ~field_name: name ~field_type: { loc = name.loc; value = Reference name.value } () } )
 
 (* Interface
 

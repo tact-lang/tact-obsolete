@@ -1,5 +1,5 @@
 let T = type {
-    field: Type,
+    field: Type
 }
 
 let Enum = enum {

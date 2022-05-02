@@ -172,9 +172,13 @@ program: TYPE IDENT LBRACKET IDENT UNION
 ## Ends in an error in state: 12.
 ##
 ## nonempty_list(terminated(type_fields,COMMA)) -> IDENT . COLON expr COMMA [ RBRACKET FN ]
+## nonempty_list(terminated(type_fields,COMMA)) -> IDENT . COMMA [ RBRACKET FN ]
 ## nonempty_list(terminated(type_fields,COMMA)) -> IDENT . COLON expr COMMA nonempty_list(terminated(type_fields,COMMA)) [ RBRACKET FN ]
+## nonempty_list(terminated(type_fields,COMMA)) -> IDENT . COMMA nonempty_list(terminated(type_fields,COMMA)) [ RBRACKET FN ]
 ## separated_nonempty_list(COMMA,type_fields) -> IDENT . COLON expr [ RBRACKET FN ]
+## separated_nonempty_list(COMMA,type_fields) -> IDENT . [ RBRACKET FN ]
 ## separated_nonempty_list(COMMA,type_fields) -> IDENT . COLON expr COMMA separated_nonempty_list(COMMA,type_fields) [ RBRACKET FN ]
+## separated_nonempty_list(COMMA,type_fields) -> IDENT . COMMA separated_nonempty_list(COMMA,type_fields) [ RBRACKET FN ]
 ##
 ## The known suffix of the stack is as follows:
 ## IDENT
@@ -182,9 +186,23 @@ program: TYPE IDENT LBRACKET IDENT UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: TYPE IDENT LBRACKET IDENT COLON RPAREN
+program: TYPE IDENT LBRACKET IDENT COMMA UNION
 ##
 ## Ends in an error in state: 13.
+##
+## nonempty_list(terminated(type_fields,COMMA)) -> IDENT COMMA . [ RBRACKET FN ]
+## nonempty_list(terminated(type_fields,COMMA)) -> IDENT COMMA . nonempty_list(terminated(type_fields,COMMA)) [ RBRACKET FN ]
+## separated_nonempty_list(COMMA,type_fields) -> IDENT COMMA . separated_nonempty_list(COMMA,type_fields) [ RBRACKET FN ]
+##
+## The known suffix of the stack is as follows:
+## IDENT COMMA
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: TYPE IDENT LBRACKET IDENT COLON RPAREN
+##
+## Ends in an error in state: 16.
 ##
 ## nonempty_list(terminated(type_fields,COMMA)) -> IDENT COLON . expr COMMA [ RBRACKET FN ]
 ## nonempty_list(terminated(type_fields,COMMA)) -> IDENT COLON . expr COMMA nonempty_list(terminated(type_fields,COMMA)) [ RBRACKET FN ]
@@ -199,7 +217,7 @@ program: TYPE IDENT LBRACKET IDENT COLON RPAREN
 
 program: LET IDENT EQUALS TYPE UNION
 ##
-## Ends in an error in state: 14.
+## Ends in an error in state: 17.
 ##
 ## expr -> TYPE . LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> TYPE . LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
@@ -212,7 +230,7 @@ program: LET IDENT EQUALS TYPE UNION
 
 program: LET IDENT EQUALS TYPE LBRACKET UNION
 ##
-## Ends in an error in state: 15.
+## Ends in an error in state: 18.
 ##
 ## expr -> TYPE LBRACKET . nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> TYPE LBRACKET . loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
@@ -225,7 +243,7 @@ program: LET IDENT EQUALS TYPE LBRACKET UNION
 
 program: ENUM IDENT LBRACKET FN UNION
 ##
-## Ends in an error in state: 18.
+## Ends in an error in state: 21.
 ##
 ## list(sugared_function_definition) -> FN . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ## list(sugared_function_definition) -> FN . IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
@@ -242,7 +260,7 @@ program: ENUM IDENT LBRACKET FN UNION
 
 program: ENUM IDENT LBRACKET FN IDENT UNION
 ##
-## Ends in an error in state: 19.
+## Ends in an error in state: 22.
 ##
 ## list(sugared_function_definition) -> FN IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ## list(sugared_function_definition) -> FN IDENT . LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
@@ -259,7 +277,7 @@ program: ENUM IDENT LBRACKET FN IDENT UNION
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN UNION
 ##
-## Ends in an error in state: 20.
+## Ends in an error in state: 23.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ## list(sugared_function_definition) -> FN IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
@@ -276,7 +294,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN UNION
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 23.
+## Ends in an error in state: 26.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
@@ -290,7 +308,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNIO
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN UNION
 ##
-## Ends in an error in state: 24.
+## Ends in an error in state: 27.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
@@ -303,7 +321,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 26.
+## Ends in an error in state: 29.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -315,7 +333,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 27.
+## Ends in an error in state: 30.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -327,7 +345,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: LET IDENT EQUALS INTERFACE UNION
 ##
-## Ends in an error in state: 28.
+## Ends in an error in state: 31.
 ##
 ## expr -> INTERFACE . LBRACKET list(located(function_signature)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -339,7 +357,7 @@ program: LET IDENT EQUALS INTERFACE UNION
 
 program: LET IDENT EQUALS INTERFACE LBRACKET UNION
 ##
-## Ends in an error in state: 29.
+## Ends in an error in state: 32.
 ##
 ## expr -> INTERFACE LBRACKET . list(located(function_signature)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -351,7 +369,7 @@ program: LET IDENT EQUALS INTERFACE LBRACKET UNION
 
 program: INTERFACE IDENT LBRACKET FN UNION
 ##
-## Ends in an error in state: 30.
+## Ends in an error in state: 33.
 ##
 ## list(located(function_signature)) -> FN . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr list(located(function_signature)) [ RBRACKET ]
 ## list(located(function_signature)) -> FN . IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr list(located(function_signature)) [ RBRACKET ]
@@ -364,7 +382,7 @@ program: INTERFACE IDENT LBRACKET FN UNION
 
 program: INTERFACE IDENT LBRACKET FN IDENT UNION
 ##
-## Ends in an error in state: 31.
+## Ends in an error in state: 34.
 ##
 ## list(located(function_signature)) -> FN IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr list(located(function_signature)) [ RBRACKET ]
 ## list(located(function_signature)) -> FN IDENT . LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr list(located(function_signature)) [ RBRACKET ]
@@ -377,7 +395,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT UNION
 
 program: INTERFACE IDENT LBRACKET FN IDENT LPAREN UNION
 ##
-## Ends in an error in state: 32.
+## Ends in an error in state: 35.
 ##
 ## list(located(function_signature)) -> FN IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr list(located(function_signature)) [ RBRACKET ]
 ## list(located(function_signature)) -> FN IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr list(located(function_signature)) [ RBRACKET ]
@@ -390,7 +408,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT LPAREN UNION
 
 program: INTERFACE IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 34.
+## Ends in an error in state: 37.
 ##
 ## list(located(function_signature)) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr list(located(function_signature)) [ RBRACKET ]
 ##
@@ -402,7 +420,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN
 
 program: INTERFACE IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 35.
+## Ends in an error in state: 38.
 ##
 ## list(located(function_signature)) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr list(located(function_signature)) [ RBRACKET ]
 ##
@@ -414,7 +432,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN
 
 program: LET IDENT EQUALS FN UNION
 ##
-## Ends in an error in state: 38.
+## Ends in an error in state: 41.
 ##
 ## expr -> FN . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> FN . LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
@@ -427,7 +445,7 @@ program: LET IDENT EQUALS FN UNION
 
 program: LET IDENT EQUALS FN LPAREN UNION
 ##
-## Ends in an error in state: 39.
+## Ends in an error in state: 42.
 ##
 ## expr -> FN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> FN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
@@ -440,7 +458,7 @@ program: LET IDENT EQUALS FN LPAREN UNION
 
 program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 41.
+## Ends in an error in state: 44.
 ##
 ## expr -> FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -452,7 +470,7 @@ program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 42.
+## Ends in an error in state: 45.
 ##
 ## expr -> FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -464,7 +482,7 @@ program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 
 program: LET IDENT EQUALS ENUM UNION
 ##
-## Ends in an error in state: 43.
+## Ends in an error in state: 46.
 ##
 ## expr -> ENUM . LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> ENUM . LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
@@ -477,7 +495,7 @@ program: LET IDENT EQUALS ENUM UNION
 
 program: LET IDENT EQUALS ENUM LBRACKET UNION
 ##
-## Ends in an error in state: 44.
+## Ends in an error in state: 47.
 ##
 ## expr -> ENUM LBRACKET . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> ENUM LBRACKET . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
@@ -490,7 +508,7 @@ program: LET IDENT EQUALS ENUM LBRACKET UNION
 
 program: ENUM IDENT LBRACKET IDENT UNION
 ##
-## Ends in an error in state: 45.
+## Ends in an error in state: 48.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT . COMMA [ RBRACKET FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT . EQUALS expr COMMA [ RBRACKET FN ]
@@ -509,7 +527,7 @@ program: ENUM IDENT LBRACKET IDENT UNION
 
 program: ENUM IDENT LBRACKET IDENT EQUALS RPAREN
 ##
-## Ends in an error in state: 46.
+## Ends in an error in state: 49.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS . expr COMMA [ RBRACKET FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS . expr COMMA nonempty_list(terminated(enum_member,COMMA)) [ RBRACKET FN ]
@@ -524,7 +542,7 @@ program: ENUM IDENT LBRACKET IDENT EQUALS RPAREN
 
 program: ENUM IDENT LBRACKET IDENT EQUALS IDENT UNION
 ##
-## Ends in an error in state: 47.
+## Ends in an error in state: 50.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RBRACKET LPAREN FN COMMA ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ RBRACKET LPAREN FN COMMA ]
@@ -541,7 +559,7 @@ program: ENUM IDENT LBRACKET IDENT EQUALS IDENT UNION
 
 program: LET IDENT EQUALS IDENT LPAREN RBRACKET
 ##
-## Ends in an error in state: 48.
+## Ends in an error in state: 51.
 ##
 ## expr -> expr LPAREN . nonempty_list(terminated(located(expr),COMMA)) RPAREN [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> expr LPAREN . loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
@@ -554,7 +572,7 @@ program: LET IDENT EQUALS IDENT LPAREN RBRACKET
 
 program: LET IDENT EQUALS IDENT LPAREN IDENT UNION
 ##
-## Ends in an error in state: 54.
+## Ends in an error in state: 57.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RPAREN LPAREN COMMA ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ RPAREN LPAREN COMMA ]
@@ -571,7 +589,7 @@ program: LET IDENT EQUALS IDENT LPAREN IDENT UNION
 
 program: LET IDENT EQUALS IDENT LPAREN IDENT COMMA RBRACKET
 ##
-## Ends in an error in state: 55.
+## Ends in an error in state: 58.
 ##
 ## nonempty_list(terminated(located(expr),COMMA)) -> expr COMMA . [ RPAREN ]
 ## nonempty_list(terminated(located(expr),COMMA)) -> expr COMMA . nonempty_list(terminated(located(expr),COMMA)) [ RPAREN ]
@@ -585,7 +603,7 @@ program: LET IDENT EQUALS IDENT LPAREN IDENT COMMA RBRACKET
 
 program: ENUM IDENT LBRACKET IDENT EQUALS IDENT COMMA UNION
 ##
-## Ends in an error in state: 58.
+## Ends in an error in state: 61.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS expr COMMA . [ RBRACKET FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS expr COMMA . nonempty_list(terminated(enum_member,COMMA)) [ RBRACKET FN ]
@@ -599,7 +617,7 @@ program: ENUM IDENT LBRACKET IDENT EQUALS IDENT COMMA UNION
 
 program: ENUM IDENT LBRACKET IDENT COMMA UNION
 ##
-## Ends in an error in state: 61.
+## Ends in an error in state: 64.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT COMMA . [ RBRACKET FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT COMMA . nonempty_list(terminated(enum_member,COMMA)) [ RBRACKET FN ]
@@ -613,7 +631,7 @@ program: ENUM IDENT LBRACKET IDENT COMMA UNION
 
 program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 71.
+## Ends in an error in state: 74.
 ##
 ## expr -> FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr . LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
@@ -627,7 +645,7 @@ program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT U
 
 program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 72.
+## Ends in an error in state: 75.
 ##
 ## expr -> FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -639,7 +657,7 @@ program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT L
 
 program: FN IDENT LPAREN RPAREN COLON IDENT LBRACKET IDENT RPAREN
 ##
-## Ends in an error in state: 75.
+## Ends in an error in state: 78.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ UNION TYPE RBRACKET LPAREN INTERFACE INT IDENT FN ENUM ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ UNION TYPE RBRACKET LPAREN INTERFACE INT IDENT FN ENUM ]
@@ -653,7 +671,7 @@ program: FN IDENT LPAREN RPAREN COLON IDENT LBRACKET IDENT RPAREN
 
 program: LET IDENT EQUALS FN LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 78.
+## Ends in an error in state: 81.
 ##
 ## expr -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -665,7 +683,7 @@ program: LET IDENT EQUALS FN LPAREN RPAREN UNION
 
 program: LET IDENT EQUALS FN LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 79.
+## Ends in an error in state: 82.
 ##
 ## expr -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -677,7 +695,7 @@ program: LET IDENT EQUALS FN LPAREN RPAREN COLON RPAREN
 
 program: LET IDENT EQUALS FN LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 80.
+## Ends in an error in state: 83.
 ##
 ## expr -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr . LBRACKET list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
@@ -691,7 +709,7 @@ program: LET IDENT EQUALS FN LPAREN RPAREN COLON IDENT UNION
 
 program: LET IDENT EQUALS FN LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 81.
+## Ends in an error in state: 84.
 ##
 ## expr -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET [ UNION TYPE RPAREN RBRACKET LPAREN LET LBRACKET INTERFACE INT IDENT FN EOF ENUM COMMA ]
 ##
@@ -703,7 +721,7 @@ program: LET IDENT EQUALS FN LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 
 program: INTERFACE IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 84.
+## Ends in an error in state: 87.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RBRACKET LPAREN FN ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ RBRACKET LPAREN FN ]
@@ -717,7 +735,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN
 
 program: INTERFACE IDENT LBRACKET FN IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 87.
+## Ends in an error in state: 90.
 ##
 ## list(located(function_signature)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr list(located(function_signature)) [ RBRACKET ]
 ##
@@ -729,7 +747,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT LPAREN RPAREN UNION
 
 program: INTERFACE IDENT LBRACKET FN IDENT LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 88.
+## Ends in an error in state: 91.
 ##
 ## list(located(function_signature)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr list(located(function_signature)) [ RBRACKET ]
 ##
@@ -741,7 +759,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT LPAREN RPAREN COLON RPAREN
 
 program: INTERFACE IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 89.
+## Ends in an error in state: 92.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RBRACKET LPAREN FN ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ RBRACKET LPAREN FN ]
@@ -755,7 +773,7 @@ program: INTERFACE IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT UNION
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 93.
+## Ends in an error in state: 96.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -769,7 +787,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 94.
+## Ends in an error in state: 97.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -781,7 +799,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RBRACKET UNION
 ##
-## Ends in an error in state: 96.
+## Ends in an error in state: 99.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -793,7 +811,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 99.
+## Ends in an error in state: 102.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -805,7 +823,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 100.
+## Ends in an error in state: 103.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -817,7 +835,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 101.
+## Ends in an error in state: 104.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -831,7 +849,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 102.
+## Ends in an error in state: 105.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -843,7 +861,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDENT LBRACKET RBRACKET UNION
 ##
-## Ends in an error in state: 104.
+## Ends in an error in state: 107.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -855,7 +873,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAR
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 106.
+## Ends in an error in state: 109.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -867,7 +885,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLO
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 107.
+## Ends in an error in state: 110.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -881,7 +899,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLO
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 108.
+## Ends in an error in state: 111.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -893,7 +911,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLO
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RBRACKET UNION
 ##
-## Ends in an error in state: 110.
+## Ends in an error in state: 113.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -905,7 +923,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLO
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 113.
+## Ends in an error in state: 116.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
@@ -919,7 +937,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN UNION
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN UNION
 ##
-## Ends in an error in state: 114.
+## Ends in an error in state: 117.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
@@ -932,7 +950,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN UNION
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 116.
+## Ends in an error in state: 119.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -944,7 +962,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COM
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 117.
+## Ends in an error in state: 120.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -956,7 +974,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COM
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 118.
+## Ends in an error in state: 121.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -970,7 +988,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COM
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 119.
+## Ends in an error in state: 122.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -982,7 +1000,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COM
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RBRACKET UNION
 ##
-## Ends in an error in state: 121.
+## Ends in an error in state: 124.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -994,7 +1012,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COM
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 124.
+## Ends in an error in state: 127.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -1006,7 +1024,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN UNION
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 125.
+## Ends in an error in state: 128.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -1018,7 +1036,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON RPAREN
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 126.
+## Ends in an error in state: 129.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -1032,7 +1050,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT UN
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 127.
+## Ends in an error in state: 130.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -1044,7 +1062,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LB
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LBRACKET RBRACKET UNION
 ##
-## Ends in an error in state: 129.
+## Ends in an error in state: 132.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -1056,7 +1074,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LB
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 131.
+## Ends in an error in state: 134.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -1068,7 +1086,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON RPAREN
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 132.
+## Ends in an error in state: 135.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -1082,7 +1100,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT UNION
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 133.
+## Ends in an error in state: 136.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -1094,7 +1112,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 
 program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RBRACKET UNION
 ##
-## Ends in an error in state: 135.
+## Ends in an error in state: 138.
 ##
 ## list(sugared_function_definition) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(sugared_function_definition) [ RBRACKET ]
 ##
@@ -1106,7 +1124,7 @@ program: ENUM IDENT LBRACKET FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RBRACKE
 
 program: TYPE IDENT LBRACKET IDENT COLON IDENT UNION
 ##
-## Ends in an error in state: 142.
+## Ends in an error in state: 145.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RBRACKET LPAREN FN COMMA ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ RBRACKET LPAREN FN COMMA ]
@@ -1123,7 +1141,7 @@ program: TYPE IDENT LBRACKET IDENT COLON IDENT UNION
 
 program: TYPE IDENT LBRACKET IDENT COLON IDENT COMMA UNION
 ##
-## Ends in an error in state: 143.
+## Ends in an error in state: 146.
 ##
 ## nonempty_list(terminated(type_fields,COMMA)) -> IDENT COLON expr COMMA . [ RBRACKET FN ]
 ## nonempty_list(terminated(type_fields,COMMA)) -> IDENT COLON expr COMMA . nonempty_list(terminated(type_fields,COMMA)) [ RBRACKET FN ]
@@ -1137,7 +1155,7 @@ program: TYPE IDENT LBRACKET IDENT COLON IDENT COMMA UNION
 
 program: UNION IDENT LBRACKET INTERFACE UNION
 ##
-## Ends in an error in state: 152.
+## Ends in an error in state: 155.
 ##
 ## union_member -> INTERFACE . LBRACKET list(located(function_signature)) RBRACKET [ RBRACKET FN COMMA ]
 ##
@@ -1149,7 +1167,7 @@ program: UNION IDENT LBRACKET INTERFACE UNION
 
 program: UNION IDENT LBRACKET INTERFACE LBRACKET UNION
 ##
-## Ends in an error in state: 153.
+## Ends in an error in state: 156.
 ##
 ## union_member -> INTERFACE LBRACKET . list(located(function_signature)) RBRACKET [ RBRACKET FN COMMA ]
 ##
@@ -1161,7 +1179,7 @@ program: UNION IDENT LBRACKET INTERFACE LBRACKET UNION
 
 program: UNION IDENT LBRACKET IDENT UNION
 ##
-## Ends in an error in state: 156.
+## Ends in an error in state: 159.
 ##
 ## union_member -> IDENT . [ RBRACKET FN COMMA ]
 ## union_member -> IDENT . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RBRACKET FN COMMA ]
@@ -1175,7 +1193,7 @@ program: UNION IDENT LBRACKET IDENT UNION
 
 program: UNION IDENT LBRACKET IDENT LPAREN RBRACKET
 ##
-## Ends in an error in state: 157.
+## Ends in an error in state: 160.
 ##
 ## union_member -> IDENT LPAREN . nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RBRACKET FN COMMA ]
 ## union_member -> IDENT LPAREN . loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ RBRACKET FN COMMA ]
@@ -1188,7 +1206,7 @@ program: UNION IDENT LBRACKET IDENT LPAREN RBRACKET
 
 program: UNION IDENT LBRACKET ENUM UNION
 ##
-## Ends in an error in state: 162.
+## Ends in an error in state: 165.
 ##
 ## union_member -> ENUM . LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET [ RBRACKET FN COMMA ]
 ## union_member -> ENUM . LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET [ RBRACKET FN COMMA ]
@@ -1201,7 +1219,7 @@ program: UNION IDENT LBRACKET ENUM UNION
 
 program: UNION IDENT LBRACKET ENUM LBRACKET UNION
 ##
-## Ends in an error in state: 163.
+## Ends in an error in state: 166.
 ##
 ## union_member -> ENUM LBRACKET . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET [ RBRACKET FN COMMA ]
 ## union_member -> ENUM LBRACKET . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET [ RBRACKET FN COMMA ]
@@ -1214,7 +1232,7 @@ program: UNION IDENT LBRACKET ENUM LBRACKET UNION
 
 program: UNION IDENT LBRACKET UNION LBRACKET RBRACKET UNION
 ##
-## Ends in an error in state: 170.
+## Ends in an error in state: 173.
 ##
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member . COMMA [ RBRACKET FN ]
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member . COMMA nonempty_list(terminated(located(union_member),COMMA)) [ RBRACKET FN ]
@@ -1229,7 +1247,7 @@ program: UNION IDENT LBRACKET UNION LBRACKET RBRACKET UNION
 
 program: UNION IDENT LBRACKET IDENT COMMA RPAREN
 ##
-## Ends in an error in state: 171.
+## Ends in an error in state: 174.
 ##
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member COMMA . [ RBRACKET FN ]
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member COMMA . nonempty_list(terminated(located(union_member),COMMA)) [ RBRACKET FN ]
@@ -1243,7 +1261,7 @@ program: UNION IDENT LBRACKET IDENT COMMA RPAREN
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT UNION
 ##
-## Ends in an error in state: 187.
+## Ends in an error in state: 190.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ RPAREN LPAREN COMMA ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ RPAREN LPAREN COMMA ]
@@ -1260,7 +1278,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA UNION
 ##
-## Ends in an error in state: 188.
+## Ends in an error in state: 191.
 ##
 ## nonempty_list(terminated(function_param,COMMA)) -> IDENT COLON expr COMMA . [ RPAREN ]
 ## nonempty_list(terminated(function_param,COMMA)) -> IDENT COLON expr COMMA . nonempty_list(terminated(function_param,COMMA)) [ RPAREN ]
@@ -1274,7 +1292,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA UNION
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 192.
+## Ends in an error in state: 195.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACKET nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACKET loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1287,7 +1305,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RPAREN
 ##
-## Ends in an error in state: 193.
+## Ends in an error in state: 196.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET . nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET . loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1300,7 +1318,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RPAREN
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 196.
+## Ends in an error in state: 199.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1312,7 +1330,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET IDENT COMMA 
 
 program: TYPE UNION
 ##
-## Ends in an error in state: 197.
+## Ends in an error in state: 200.
 ##
 ## list(top_level_expr) -> TYPE . IDENT LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE . IDENT LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1329,7 +1347,7 @@ program: TYPE UNION
 
 program: TYPE IDENT UNION
 ##
-## Ends in an error in state: 198.
+## Ends in an error in state: 201.
 ##
 ## list(top_level_expr) -> TYPE IDENT . LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE IDENT . LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1346,7 +1364,7 @@ program: TYPE IDENT UNION
 
 program: TYPE IDENT LPAREN UNION
 ##
-## Ends in an error in state: 199.
+## Ends in an error in state: 202.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1361,7 +1379,7 @@ program: TYPE IDENT LPAREN UNION
 
 program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 201.
+## Ends in an error in state: 204.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1374,7 +1392,7 @@ program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET UNION
 ##
-## Ends in an error in state: 202.
+## Ends in an error in state: 205.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET . nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET . loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1385,9 +1403,9 @@ program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET IDENT COLON IDENT COMMA RBRACKET RPAREN
+program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 205.
+## Ends in an error in state: 208.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1399,7 +1417,7 @@ program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET IDENT COLON I
 
 program: LET UNION
 ##
-## Ends in an error in state: 206.
+## Ends in an error in state: 209.
 ##
 ## list(top_level_expr) -> LET . IDENT EQUALS expr list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> LET . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr list(top_level_expr) [ EOF ]
@@ -1413,7 +1431,7 @@ program: LET UNION
 
 program: LET IDENT UNION
 ##
-## Ends in an error in state: 207.
+## Ends in an error in state: 210.
 ##
 ## list(top_level_expr) -> LET IDENT . EQUALS expr list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> LET IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr list(top_level_expr) [ EOF ]
@@ -1427,7 +1445,7 @@ program: LET IDENT UNION
 
 program: LET IDENT LPAREN UNION
 ##
-## Ends in an error in state: 208.
+## Ends in an error in state: 211.
 ##
 ## list(top_level_expr) -> LET IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> LET IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr list(top_level_expr) [ EOF ]
@@ -1440,7 +1458,7 @@ program: LET IDENT LPAREN UNION
 
 program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 210.
+## Ends in an error in state: 213.
 ##
 ## list(top_level_expr) -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . EQUALS expr list(top_level_expr) [ EOF ]
 ##
@@ -1452,7 +1470,7 @@ program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS RPAREN
 ##
-## Ends in an error in state: 211.
+## Ends in an error in state: 214.
 ##
 ## list(top_level_expr) -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS . expr list(top_level_expr) [ EOF ]
 ##
@@ -1464,7 +1482,7 @@ program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS RPAREN
 
 program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 212.
+## Ends in an error in state: 215.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ UNION TYPE LPAREN LET INTERFACE FN EOF ENUM ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ UNION TYPE LPAREN LET INTERFACE FN EOF ENUM ]
@@ -1478,7 +1496,7 @@ program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS IDENT RPAREN
 
 program: INTERFACE UNION
 ##
-## Ends in an error in state: 213.
+## Ends in an error in state: 216.
 ##
 ## list(top_level_expr) -> INTERFACE . IDENT LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> INTERFACE . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1492,7 +1510,7 @@ program: INTERFACE UNION
 
 program: INTERFACE IDENT UNION
 ##
-## Ends in an error in state: 214.
+## Ends in an error in state: 217.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT . LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> INTERFACE IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1506,7 +1524,7 @@ program: INTERFACE IDENT UNION
 
 program: INTERFACE IDENT LPAREN UNION
 ##
-## Ends in an error in state: 215.
+## Ends in an error in state: 218.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1519,7 +1537,7 @@ program: INTERFACE IDENT LPAREN UNION
 
 program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 217.
+## Ends in an error in state: 220.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1531,7 +1549,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET UNION
 ##
-## Ends in an error in state: 218.
+## Ends in an error in state: 221.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET . list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1543,7 +1561,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET UNION
 
 program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 220.
+## Ends in an error in state: 223.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET list(located(function_signature)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1555,7 +1573,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET
 
 program: FN UNION
 ##
-## Ends in an error in state: 221.
+## Ends in an error in state: 224.
 ##
 ## list(top_level_expr) -> FN . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> FN . IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1572,7 +1590,7 @@ program: FN UNION
 
 program: FN IDENT UNION
 ##
-## Ends in an error in state: 222.
+## Ends in an error in state: 225.
 ##
 ## list(top_level_expr) -> FN IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> FN IDENT . LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1589,7 +1607,7 @@ program: FN IDENT UNION
 
 program: FN IDENT LPAREN UNION
 ##
-## Ends in an error in state: 223.
+## Ends in an error in state: 226.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> FN IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1606,7 +1624,7 @@ program: FN IDENT LPAREN UNION
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 225.
+## Ends in an error in state: 228.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1620,7 +1638,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN UNION
 ##
-## Ends in an error in state: 226.
+## Ends in an error in state: 229.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
@@ -1633,7 +1651,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN UNION
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 228.
+## Ends in an error in state: 231.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1645,7 +1663,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 229.
+## Ends in an error in state: 232.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1657,7 +1675,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 230.
+## Ends in an error in state: 233.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -1671,7 +1689,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 231.
+## Ends in an error in state: 234.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1683,7 +1701,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 233.
+## Ends in an error in state: 236.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1695,7 +1713,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT
 
 program: ENUM UNION
 ##
-## Ends in an error in state: 234.
+## Ends in an error in state: 237.
 ##
 ## list(top_level_expr) -> ENUM . IDENT LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM . IDENT LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1712,7 +1730,7 @@ program: ENUM UNION
 
 program: ENUM IDENT UNION
 ##
-## Ends in an error in state: 235.
+## Ends in an error in state: 238.
 ##
 ## list(top_level_expr) -> ENUM IDENT . LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM IDENT . LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1729,7 +1747,7 @@ program: ENUM IDENT UNION
 
 program: ENUM IDENT LPAREN UNION
 ##
-## Ends in an error in state: 236.
+## Ends in an error in state: 239.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1744,7 +1762,7 @@ program: ENUM IDENT LPAREN UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 238.
+## Ends in an error in state: 241.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1757,7 +1775,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET UNION
 ##
-## Ends in an error in state: 239.
+## Ends in an error in state: 242.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1770,7 +1788,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 242.
+## Ends in an error in state: 245.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1782,7 +1800,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET IDENT COMMA R
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 246.
+## Ends in an error in state: 249.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1794,7 +1812,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET RPAR
 
 program: ENUM IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 249.
+## Ends in an error in state: 252.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1807,7 +1825,7 @@ program: ENUM IDENT LPAREN RPAREN UNION
 
 program: ENUM IDENT LPAREN RPAREN LBRACKET UNION
 ##
-## Ends in an error in state: 250.
+## Ends in an error in state: 253.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1820,7 +1838,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACKET UNION
 
 program: ENUM IDENT LPAREN RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 253.
+## Ends in an error in state: 256.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1832,7 +1850,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 
 program: ENUM IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 257.
+## Ends in an error in state: 260.
 ##
 ## list(top_level_expr) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1844,7 +1862,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 
 program: ENUM IDENT LBRACKET UNION
 ##
-## Ends in an error in state: 259.
+## Ends in an error in state: 262.
 ##
 ## list(top_level_expr) -> ENUM IDENT LBRACKET . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> ENUM IDENT LBRACKET . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -1857,7 +1875,7 @@ program: ENUM IDENT LBRACKET UNION
 
 program: ENUM IDENT LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 262.
+## Ends in an error in state: 265.
 ##
 ## list(top_level_expr) -> ENUM IDENT LBRACKET nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1869,7 +1887,7 @@ program: ENUM IDENT LBRACKET IDENT COMMA RBRACKET RPAREN
 
 program: ENUM IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 266.
+## Ends in an error in state: 269.
 ##
 ## list(top_level_expr) -> ENUM IDENT LBRACKET loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1881,7 +1899,7 @@ program: ENUM IDENT LBRACKET RBRACKET RPAREN
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 270.
+## Ends in an error in state: 273.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1893,7 +1911,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 271.
+## Ends in an error in state: 274.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1905,7 +1923,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON RPAR
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 272.
+## Ends in an error in state: 275.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -1919,7 +1937,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDEN
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 273.
+## Ends in an error in state: 276.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1931,7 +1949,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDEN
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 275.
+## Ends in an error in state: 278.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1943,7 +1961,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN COLON IDEN
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 277.
+## Ends in an error in state: 280.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1955,7 +1973,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 278.
+## Ends in an error in state: 281.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -1969,7 +1987,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 279.
+## Ends in an error in state: 282.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -1981,7 +1999,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPA
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 281.
+## Ends in an error in state: 284.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -1993,7 +2011,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RBR
 
 program: FN IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 284.
+## Ends in an error in state: 287.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
@@ -2007,7 +2025,7 @@ program: FN IDENT LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LPAREN UNION
 ##
-## Ends in an error in state: 285.
+## Ends in an error in state: 288.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
@@ -2020,7 +2038,7 @@ program: FN IDENT LPAREN RPAREN LPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 287.
+## Ends in an error in state: 290.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2032,7 +2050,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 288.
+## Ends in an error in state: 291.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2044,7 +2062,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON RPAR
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 289.
+## Ends in an error in state: 292.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -2058,7 +2076,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDEN
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 290.
+## Ends in an error in state: 293.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2070,7 +2088,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDEN
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 292.
+## Ends in an error in state: 295.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2082,7 +2100,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN COLON IDEN
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 295.
+## Ends in an error in state: 298.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . COLON expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2094,7 +2112,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 296.
+## Ends in an error in state: 299.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2106,7 +2124,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON RPAREN
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 297.
+## Ends in an error in state: 300.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -2120,7 +2138,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT UNION
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 298.
+## Ends in an error in state: 301.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2132,7 +2150,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 300.
+## Ends in an error in state: 303.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2144,7 +2162,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN COLON IDENT LBRACKET RBRACKET RPAR
 
 program: FN IDENT LPAREN RPAREN COLON RPAREN
 ##
-## Ends in an error in state: 302.
+## Ends in an error in state: 305.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON . expr LBRACKET list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2156,7 +2174,7 @@ program: FN IDENT LPAREN RPAREN COLON RPAREN
 
 program: FN IDENT LPAREN RPAREN COLON IDENT UNION
 ##
-## Ends in an error in state: 303.
+## Ends in an error in state: 306.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ LPAREN LBRACKET ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ LPAREN LBRACKET ]
@@ -2170,7 +2188,7 @@ program: FN IDENT LPAREN RPAREN COLON IDENT UNION
 
 program: FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 304.
+## Ends in an error in state: 307.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET . list(located(expr)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2182,7 +2200,7 @@ program: FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RPAREN
 
 program: FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 306.
+## Ends in an error in state: 309.
 ##
 ## list(top_level_expr) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN COLON expr LBRACKET list(located(expr)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2194,7 +2212,7 @@ program: FN IDENT LPAREN RPAREN COLON IDENT LBRACKET RBRACKET RPAREN
 
 program: INTERFACE IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 310.
+## Ends in an error in state: 313.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACKET list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2206,7 +2224,7 @@ program: INTERFACE IDENT LPAREN RPAREN UNION
 
 program: INTERFACE IDENT LPAREN RPAREN LBRACKET UNION
 ##
-## Ends in an error in state: 311.
+## Ends in an error in state: 314.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET . list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2218,7 +2236,7 @@ program: INTERFACE IDENT LPAREN RPAREN LBRACKET UNION
 
 program: INTERFACE IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 313.
+## Ends in an error in state: 316.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET list(located(function_signature)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2230,7 +2248,7 @@ program: INTERFACE IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 
 program: INTERFACE IDENT LBRACKET UNION
 ##
-## Ends in an error in state: 315.
+## Ends in an error in state: 318.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LBRACKET . list(located(function_signature)) RBRACKET list(top_level_expr) [ EOF ]
 ##
@@ -2242,7 +2260,7 @@ program: INTERFACE IDENT LBRACKET UNION
 
 program: INTERFACE IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 317.
+## Ends in an error in state: 320.
 ##
 ## list(top_level_expr) -> INTERFACE IDENT LBRACKET list(located(function_signature)) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2254,7 +2272,7 @@ program: INTERFACE IDENT LBRACKET RBRACKET RPAREN
 
 program: LET IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 321.
+## Ends in an error in state: 324.
 ##
 ## list(top_level_expr) -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . EQUALS expr list(top_level_expr) [ EOF ]
 ##
@@ -2266,7 +2284,7 @@ program: LET IDENT LPAREN RPAREN UNION
 
 program: LET IDENT LPAREN RPAREN EQUALS RPAREN
 ##
-## Ends in an error in state: 322.
+## Ends in an error in state: 325.
 ##
 ## list(top_level_expr) -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS . expr list(top_level_expr) [ EOF ]
 ##
@@ -2278,7 +2296,7 @@ program: LET IDENT LPAREN RPAREN EQUALS RPAREN
 
 program: LET IDENT LPAREN RPAREN EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 323.
+## Ends in an error in state: 326.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ UNION TYPE LPAREN LET INTERFACE FN EOF ENUM ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ UNION TYPE LPAREN LET INTERFACE FN EOF ENUM ]
@@ -2292,7 +2310,7 @@ program: LET IDENT LPAREN RPAREN EQUALS IDENT RPAREN
 
 program: LET IDENT EQUALS RPAREN
 ##
-## Ends in an error in state: 325.
+## Ends in an error in state: 328.
 ##
 ## list(top_level_expr) -> LET IDENT EQUALS . expr list(top_level_expr) [ EOF ]
 ##
@@ -2304,7 +2322,7 @@ program: LET IDENT EQUALS RPAREN
 
 program: LET IDENT EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 326.
+## Ends in an error in state: 329.
 ##
 ## expr -> expr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ UNION TYPE LPAREN LET INTERFACE FN EOF ENUM ]
 ## expr -> expr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ UNION TYPE LPAREN LET INTERFACE FN EOF ENUM ]
@@ -2318,7 +2336,7 @@ program: LET IDENT EQUALS IDENT RPAREN
 
 program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 331.
+## Ends in an error in state: 334.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2330,7 +2348,7 @@ program: TYPE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET RPAR
 
 program: TYPE IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 334.
+## Ends in an error in state: 337.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -2343,7 +2361,7 @@ program: TYPE IDENT LPAREN RPAREN UNION
 
 program: TYPE IDENT LPAREN RPAREN LBRACKET UNION
 ##
-## Ends in an error in state: 335.
+## Ends in an error in state: 338.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET . nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET . loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -2354,9 +2372,9 @@ program: TYPE IDENT LPAREN RPAREN LBRACKET UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: TYPE IDENT LPAREN RPAREN LBRACKET IDENT COLON IDENT COMMA RBRACKET RPAREN
+program: TYPE IDENT LPAREN RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 338.
+## Ends in an error in state: 341.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2368,7 +2386,7 @@ program: TYPE IDENT LPAREN RPAREN LBRACKET IDENT COLON IDENT COMMA RBRACKET RPAR
 
 program: TYPE IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 342.
+## Ends in an error in state: 345.
 ##
 ## list(top_level_expr) -> TYPE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2380,7 +2398,7 @@ program: TYPE IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 
 program: TYPE IDENT LBRACKET UNION
 ##
-## Ends in an error in state: 344.
+## Ends in an error in state: 347.
 ##
 ## list(top_level_expr) -> TYPE IDENT LBRACKET . nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> TYPE IDENT LBRACKET . loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -2391,9 +2409,9 @@ program: TYPE IDENT LBRACKET UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: TYPE IDENT LBRACKET IDENT COLON IDENT COMMA RBRACKET RPAREN
+program: TYPE IDENT LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 347.
+## Ends in an error in state: 350.
 ##
 ## list(top_level_expr) -> TYPE IDENT LBRACKET nonempty_list(terminated(type_fields,COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2405,7 +2423,7 @@ program: TYPE IDENT LBRACKET IDENT COLON IDENT COMMA RBRACKET RPAREN
 
 program: TYPE IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 351.
+## Ends in an error in state: 354.
 ##
 ## list(top_level_expr) -> TYPE IDENT LBRACKET loption(separated_nonempty_list(COMMA,type_fields)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2417,7 +2435,7 @@ program: TYPE IDENT LBRACKET RBRACKET RPAREN
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 356.
+## Ends in an error in state: 359.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2429,7 +2447,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACKET RBRACKET RPA
 
 program: UNION IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 359.
+## Ends in an error in state: 362.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACKET nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACKET loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -2442,7 +2460,7 @@ program: UNION IDENT LPAREN RPAREN UNION
 
 program: UNION IDENT LPAREN RPAREN LBRACKET RPAREN
 ##
-## Ends in an error in state: 360.
+## Ends in an error in state: 363.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET . nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET . loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -2455,7 +2473,7 @@ program: UNION IDENT LPAREN RPAREN LBRACKET RPAREN
 
 program: UNION IDENT LPAREN RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 363.
+## Ends in an error in state: 366.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2467,7 +2485,7 @@ program: UNION IDENT LPAREN RPAREN LBRACKET IDENT COMMA RBRACKET RPAREN
 
 program: UNION IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 367.
+## Ends in an error in state: 370.
 ##
 ## list(top_level_expr) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACKET loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2479,7 +2497,7 @@ program: UNION IDENT LPAREN RPAREN LBRACKET RBRACKET RPAREN
 
 program: UNION IDENT LBRACKET RPAREN
 ##
-## Ends in an error in state: 369.
+## Ends in an error in state: 372.
 ##
 ## list(top_level_expr) -> UNION IDENT LBRACKET . nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
 ## list(top_level_expr) -> UNION IDENT LBRACKET . loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET list(top_level_expr) [ EOF ]
@@ -2492,7 +2510,7 @@ program: UNION IDENT LBRACKET RPAREN
 
 program: UNION IDENT LBRACKET IDENT COMMA RBRACKET RPAREN
 ##
-## Ends in an error in state: 372.
+## Ends in an error in state: 375.
 ##
 ## list(top_level_expr) -> UNION IDENT LBRACKET nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##
@@ -2504,7 +2522,7 @@ program: UNION IDENT LBRACKET IDENT COMMA RBRACKET RPAREN
 
 program: UNION IDENT LBRACKET RBRACKET RPAREN
 ##
-## Ends in an error in state: 376.
+## Ends in an error in state: 379.
 ##
 ## list(top_level_expr) -> UNION IDENT LBRACKET loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACKET . list(top_level_expr) [ EOF ]
 ##

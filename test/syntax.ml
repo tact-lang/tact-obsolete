@@ -156,6 +156,40 @@ let test_type_fields source () =
     | _ ->
         false )
 
+let test_type_shorthand_fields () =
+  let source = {|
+    type MyType {
+      A,
+      B
+    }
+  |} in
+  Alcotest.(check bool)
+    "type fields" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "MyType"; _};
+                  binding_expr =
+                    { value =
+                        Type
+                          { fields =
+                              [ { value =
+                                    { field_name = {value = Ident "A"; _};
+                                      field_type =
+                                        {value = Reference (Ident "A"); _} };
+                                  _ };
+                                { value =
+                                    { field_name = {value = Ident "B"; _};
+                                      field_type =
+                                        {value = Reference (Ident "B"); _} };
+                                  _ } ];
+                            type_bindings = [] };
+                      _ } };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
 let test_type_methods () =
   let source = {|
     type MyType {
@@ -264,6 +298,7 @@ let () =
             (test_type_fields test_type_fields_source);
           test_case "type fields with a trailing comma" `Quick
             (test_type_fields test_type_fields_trailing_comma_source);
+          test_case "type shorthand fields" `Quick test_type_shorthand_fields;
           test_case "type methods" `Quick test_type_methods;
           test_case "type with fields and methods" `Quick
             (test_type_with_fields_and_methods
