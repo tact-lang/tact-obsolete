@@ -64,10 +64,15 @@ let test_type () =
       | Some (Type s) ->
           [%matches?
             Some
-              {field_type = Resolved_Reference ("Int257", Builtin "Int257"); _}]
+              { field_type =
+                  ResolvedReferenceKind ("Int257", BuiltinKind "Int257");
+                _ }]
             (Map.find s.type_fields "a")
           && [%matches?
-               Some {field_type = Resolved_Reference ("Bool", Builtin "Bool"); _}]
+               Some
+                 { field_type =
+                     ResolvedReferenceKind ("Bool", BuiltinKind "Bool");
+                   _ }]
                (Map.find s.type_fields "b")
       | _ ->
           false )
@@ -108,6 +113,46 @@ let test_type_duplicate_field () =
     ([%matches? Error (Duplicate_Field ("a", _))]
        (parse_program source |> build_program) )
 
+let test_function () =
+  let source =
+    {|
+      fn test(a: Int257, b: Bool) -> Int257 {
+       1;
+       2;
+      }
+  |}
+  in
+  Alcotest.(check bool)
+    "function" true
+    ( match parse_program source |> build_program with
+    | Ok {scope; _} -> (
+      match Map.find scope "test" with
+      | Some (Function f) ->
+          [%matches?
+            {function_params; _} when [%matches?
+                                        [ ( "a",
+                                            ResolvedReferenceKind
+                                              ("Int257", BuiltinKind "Int257")
+                                          );
+                                          ( "b",
+                                            ResolvedReferenceKind
+                                              ("Bool", BuiltinKind "Bool") ) ]]
+                                        (Map.to_alist function_params)]
+            f
+          && [%matches?
+               { function_returns =
+                   ResolvedReferenceKind ("Int257", BuiltinKind "Int257");
+                 _ }]
+               f
+          && [%matches?
+               {function_body = Some [Value (Integer i); Value (Integer i')]; _} when 
+               equal (Z.to_int i) 1 && equal (Z.to_int i') 2]
+               f
+      | _ ->
+          false )
+    | _ ->
+        false )
+
 let () =
   let open Alcotest in
   run "Lang"
@@ -120,5 +165,5 @@ let () =
           test_case "duplicate type definition" `Quick test_type_duplicate;
           test_case "duplicate type definition (with a non-typeure)" `Quick
             test_type_duplicate_non_type;
-          test_case "duplicate type field" `Quick test_type_duplicate_field ] )
-    ]
+          test_case "duplicate type field" `Quick test_type_duplicate_field ] );
+      ("function", [test_case "function definition" `Quick test_function]) ]
