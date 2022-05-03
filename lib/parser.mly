@@ -1,4 +1,4 @@
-%token LET INTERFACE TYPE ENUM UNION FN
+%token LET INTERFACE TYPE ENUM UNION FN IF ELSE RETURN
 %token EQUALS
 %token <string> IDENT
 %token EOF
@@ -135,9 +135,9 @@ let function_definition(name) :=
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   RARROW;
   returns = located(fexpr);
-  exprs = option(delimited_separated_trailing_list(LBRACE, located(stmt), SEMICOLON, RBRACE));
+  body = option(code_block);
   { (n, Function (make_function_definition ~params: params ~returns: returns 
-                    ?exprs: exprs ())) } 
+                    ?exprs: (match body with Some(CodeBlock({block_exprs;_})) -> Some(block_exprs) | _ -> None) ())) } 
 
 let function_signature_binding ==
     (n, f) = function_definition(located(ident)); {
@@ -166,10 +166,29 @@ let function_call :=
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
   { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
 
+let else_ :=
+  | ELSE; ~= if_; <>
+  | ELSE; ~= code_block; <>
+
+let if_ :=
+  IF;
+  condition = delimited(LPAREN, located(expr), RPAREN);
+  body = code_block;
+  else_ = option(located(else_));
+  { If (make_if_ ~condition ~body: (match body with CodeBlock({block_exprs;}) -> block_exprs | _ -> []) ?else_ ()) }
+
+let code_block :=
+  block_exprs = delimited(LBRACE, list(located(stmt)), RBRACE);
+  {CodeBlock (make_code_block ~block_exprs ())}
+
+
 (* Statement (they are separated expressions / control flow, but ultimately not very different) *)
 let stmt :=
-  |  expr
-  | ~= let_binding; <Let>
+  | terminated(expr, SEMICOLON)
+  | ~= terminated(let_binding, SEMICOLON); <Let>
+  | if_
+  | code_block
+  | ~ = delimited(RETURN, expr, SEMICOLON); <Return>
 
 (* Expression *)
 let expr :=

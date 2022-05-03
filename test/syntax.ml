@@ -534,7 +534,7 @@ let test_let_in_function_body () =
     {|
   let f = fn() -> Int257 { 
        let a = 1;
-       a;
+       return a;
   };
   |}
   in
@@ -560,7 +560,7 @@ let test_let_in_function_body () =
                                             };
                                           _ };
                                     _ };
-                                  {value = Reference (Ident "a"); _} ];
+                                  {value = Return (Reference (Ident "a")); _} ];
                             returns = {value = Reference (Ident "Int257"); _} };
                       _ };
                   _ };
@@ -569,25 +569,105 @@ let test_let_in_function_body () =
     | _ ->
         false )
 
-let test_optional_trailing_semicolon_in_function_body () =
+let test_if_empty_body_no_else () =
   let source = {|
-  let f = fn() -> Int257 { 
-      1
-  };
+  fn test() -> A {
+    if (1) {}
+  }
   |} in
   Alcotest.(check bool)
-    "function signature" true
+    "if expr empty body no else" true
     ( match parse_program source with
     | { bindings =
           [ { value =
-                { binding_name = {value = Ident "f"; _};
+                { binding_name = {value = Ident "test"; _};
                   binding_expr =
                     { value =
                         Function
-                          { name = None;
-                            params = [];
-                            exprs = Some [{value = Int _; _}];
-                            returns = {value = Reference (Ident "Int257"); _} };
+                          { exprs =
+                              Some
+                                [ { value =
+                                      If
+                                        { condition = {value = Int _; _};
+                                          body = [];
+                                          else_ = None };
+                                    _ } ];
+                            _ };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_if_has_body_with_else () =
+  let source =
+    {|
+          fn test() -> A {
+            if (1) {
+              a;
+            }
+            else {}
+          }
+          |}
+  in
+  Alcotest.(check bool)
+    "if expr has body with else" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "test"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { exprs =
+                              Some
+                                [ { value =
+                                      If
+                                        { condition = {value = Int _; _};
+                                          body =
+                                            [{value = Reference (Ident "a"); _}];
+                                          else_ =
+                                            Some
+                                              { value =
+                                                  CodeBlock {block_exprs = []};
+                                                _ } };
+                                    _ } ];
+                            _ };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_if_with_else_if () =
+  let source =
+    {|
+    fn test() -> A {
+      if (1) {}
+      else if (10) {}
+    }
+    |}
+  in
+  Alcotest.(check bool)
+    "if expr with else if" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "test"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { exprs =
+                              Some
+                                [ { value =
+                                      If
+                                        { condition = {value = Int _; _};
+                                          body = [];
+                                          else_ = Some {value = If _; _} };
+                                    _ } ];
+                            _ };
                       _ };
                   _ };
               _ } ] } ->
@@ -627,10 +707,14 @@ let () =
             test_fn_sig_returns_fn_sig;
           test_case "function call over function signature" `Quick
             test_fn_call_over_sig;
-          test_case "let in function body" `Quick test_let_in_function_body;
-          test_case "optional trailing semicolon in function bodies" `Quick
-            test_optional_trailing_semicolon_in_function_body ] );
+          test_case "let in function body" `Quick test_let_in_function_body ] );
       ( "function calls",
         [ test_case "function call" `Quick test_function_call;
           test_case "function call in a list of exprs" `Quick
-            test_function_call_in_alist_of_expr ] ) ]
+            test_function_call_in_alist_of_expr ] );
+      ( "if stmts",
+        [ test_case "if expr empty body no else" `Quick
+            test_if_empty_body_no_else;
+          test_case "if expr has body with else" `Quick
+            test_if_has_body_with_else;
+          test_case "if expr with else if" `Quick test_if_with_else_if ] ) ]
