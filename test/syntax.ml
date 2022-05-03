@@ -503,6 +503,32 @@ let test_let_in_function_body () =
     | _ ->
         false )
 
+let test_optional_trailing_semicolon_in_function_body () =
+  let source = {|
+  let f = fn() -> Int257 { 
+      1
+  };
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "f"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params = [];
+                            exprs = Some [{value = Int _; _}];
+                            returns = {value = Reference (Ident "Int257"); _} };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
 let () =
   let open Alcotest in
   run "Syntax"
@@ -533,7 +559,9 @@ let () =
             test_fn_sig_returns_fn_sig;
           test_case "function call over function signature" `Quick
             test_fn_call_over_sig;
-          test_case "let in function body" `Quick test_let_in_function_body ] );
+          test_case "let in function body" `Quick test_let_in_function_body;
+          test_case "optional trailing semicolon in function bodies" `Quick
+            test_optional_trailing_semicolon_in_function_body ] );
       ( "function calls",
         [ test_case "function call" `Quick test_function_call;
           test_case "function call in a list of exprs" `Quick

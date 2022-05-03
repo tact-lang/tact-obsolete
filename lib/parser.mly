@@ -132,7 +132,7 @@ let function_definition(name) :=
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   RARROW;
   returns = located(fexpr);
-  exprs = option(delimited(LBRACE, list(located(stmt)), RBRACE));
+  exprs = option(delimited_separated_trailing_list(LBRACE, located(stmt), SEMICOLON, RBRACE));
   { (n, Function (make_function_definition ~params: params ~returns: returns 
                     ?exprs: exprs ())) } 
 
@@ -165,8 +165,8 @@ let function_call :=
 
 (* Statement (they are separated expressions / control flow, but ultimately not very different) *)
 let stmt :=
-  |  e = expr; SEMICOLON; {e}
-  | ~= binding; SEMICOLON; <Let>
+  |  expr
+  | ~= binding; <Let>
 
 (* Expression *)
 let expr :=
