@@ -463,6 +463,46 @@ let test_function_call_in_alist_of_expr () =
     | _ ->
         false )
 
+let test_let_in_function_body () =
+  let source =
+    {|
+  let f = fn() -> Int257 { 
+       let a = 1;
+       a;
+  };
+  |}
+  in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "f"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params = [];
+                            exprs =
+                              Some
+                                [ { value =
+                                      Let
+                                        { value =
+                                            { binding_name =
+                                                {value = Ident "a"; _};
+                                              binding_expr = {value = Int _; _}
+                                            };
+                                          _ };
+                                    _ };
+                                  {value = Reference (Ident "a"); _} ];
+                            returns = {value = Reference (Ident "Int257"); _} };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
 let () =
   let open Alcotest in
   run "Syntax"
@@ -492,7 +532,8 @@ let () =
           test_case "function signature returning function signature" `Quick
             test_fn_sig_returns_fn_sig;
           test_case "function call over function signature" `Quick
-            test_fn_call_over_sig ] );
+            test_fn_call_over_sig;
+          test_case "let in function body" `Quick test_let_in_function_body ] );
       ( "function calls",
         [ test_case "function call" `Quick test_function_call;
           test_case "function call in a list of exprs" `Quick

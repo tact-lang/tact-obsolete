@@ -25,16 +25,16 @@
 (* At the very top, there's a program *)
 let program :=
   (* it consists of a list of top-level expressions *)
-  top_level = list(top_level_expr);
+  top_level = list(top_level_stmt);
   EOF; {
     make_program
        (* collect bindings *)
-       ~bindings: (List.filter_map (fun x -> match x with Let(t) -> Some(t)) top_level)
+       ~bindings: (List.filter_map (fun x -> match x with Let(t) -> Some(t) | _ -> None) top_level)
   ()
   }
 
-(* Top level expression *)
-let top_level_expr ==
+(* Top level statement *)
+let top_level_stmt ==
   (* can be a `let` binding definition *)
   | ~= binding; SEMICOLON; <Let>
 
@@ -165,7 +165,8 @@ let function_call :=
 
 (* Statement (they are separated expressions / control flow, but ultimately not very different) *)
 let stmt :=
-    e = expr; SEMICOLON; {e}
+  |  e = expr; SEMICOLON; {e}
+  | ~= binding; SEMICOLON; <Let>
 
 (* Expression *)
 let expr :=

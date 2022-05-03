@@ -48,6 +48,7 @@ and union_definition =
   {union_members : expr located list; union_bindings : binding located list}
 
 and expr =
+  | Let of binding located
   | Type of type_definition
   | Interface of interface_definition
   | Enum of enum_definition
@@ -68,8 +69,6 @@ and function_definition =
     exprs : expr located list option }
 
 and binding = {binding_name : ident located; binding_expr : expr located}
-
-and top_level_expr = Let of binding located
 
 and program = {bindings : binding located list}
 [@@deriving show {with_path = false}, make]
