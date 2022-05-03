@@ -2,8 +2,8 @@
 %token EQUALS
 %token <string> IDENT
 %token EOF
-%token LBRACKET LPAREN
-%token RBRACKET RPAREN
+%token LBRACE LPAREN
+%token RBRACE RPAREN
 %token COMMA
 %token COLON RARROW SEMICOLON
 %token <Z.t> INT
@@ -132,7 +132,7 @@ let function_definition(name) :=
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   RARROW;
   returns = located(fexpr);
-  exprs = option(delimited(LBRACKET, list(located(stmt)), RBRACKET));
+  exprs = option(delimited(LBRACE, list(located(stmt)), RBRACE));
   { (n, Function (make_function_definition ~params: params ~returns: returns 
                     ?exprs: exprs ())) } 
 
@@ -213,7 +213,7 @@ let fexpr :=
 let type_definition(name) ==
   TYPE;
   n = name;
-  (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACKET, type_fields, COMMA, list(sugared_function_definition), RBRACKET);
+  (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, type_fields, COMMA, list(sugared_function_definition), RBRACE);
   { (n, Type (make_type_definition ~fields: fields ~type_bindings: bindings  ())) }
 
 (* Type field
@@ -236,7 +236,7 @@ let type_fields ==
 let interface_definition(name) ==
   INTERFACE;
   n = name;
-  bindings = delimited(LBRACKET, list(located(function_signature_binding)), RBRACKET);
+  bindings = delimited(LBRACE, list(located(function_signature_binding)), RBRACE);
   { (n, Interface (make_interface_definition ~interface_members: bindings ())) }
 
 (* Identifier *)
@@ -262,7 +262,7 @@ let ident ==
 let enum_definition(name) ==
   ENUM;
   n = name;
-  (members, bindings) = delimited_separated_trailing_list_followed_by(LBRACKET, enum_member, COMMA, list(sugared_function_definition), RBRACKET);
+  (members, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, enum_member, COMMA, list(sugared_function_definition), RBRACE);
   { (n, Enum (make_enum_definition ~enum_members: members ~enum_bindings: bindings ())) }
 
  (* Enum member
@@ -293,7 +293,7 @@ let enum_member ==
 let union_definition(name) ==
   UNION;
   n = name;
-  (members, bindings) = delimited_separated_trailing_list_followed_by(LBRACKET, located(union_member), COMMA, list(sugared_function_definition), RBRACKET);  
+  (members, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, located(union_member), COMMA, list(sugared_function_definition), RBRACE);  
   { (n, Union (make_union_definition ~union_members: members ~union_bindings: bindings ())) }
 
 let union_member :=

@@ -30,8 +30,8 @@ rule token = parse
  | ':' { COLON }
  | ';' { SEMICOLON }
  | "->" { RARROW }
- | '{' { LBRACKET }
- | '}' { RBRACKET }
+ | '{' { LBRACE }
+ | '}' { RBRACE }
  | '(' { LPAREN }
  | ')' { RPAREN }
  | '=' { EQUALS }
