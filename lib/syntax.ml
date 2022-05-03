@@ -50,6 +50,7 @@ and union_definition =
 and expr =
   | Let of binding located
   | Type of type_definition
+  | TypeConstructor of (ident located * expr located) list
   | Interface of interface_definition
   | Enum of enum_definition
   | Union of union_definition

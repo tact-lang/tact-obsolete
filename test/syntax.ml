@@ -73,6 +73,57 @@ let test_type () =
     | _ ->
         false )
 
+let test_type_constructor () =
+  let source =
+    {|
+  type MyType { 
+     a: Int257,
+     b: Int257
+  }
+  let my = MyType {
+    a: 0,
+    b: 1
+  };
+  |}
+  in
+  Alcotest.(check bool)
+    "type binding" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "MyType"; _};
+                  binding_expr =
+                    { value =
+                        Type
+                          { fields =
+                              [ { value =
+                                    { field_name = {value = Ident "a"; _};
+                                      field_type =
+                                        {value = Reference (Ident "Int257"); _}
+                                    };
+                                  _ };
+                                { value =
+                                    { field_name = {value = Ident "b"; _};
+                                      field_type =
+                                        {value = Reference (Ident "Int257"); _}
+                                    };
+                                  _ } ];
+                            _ };
+                      _ } };
+              _ };
+            { value =
+                { binding_name = {value = Ident "my"; _};
+                  binding_expr =
+                    { value =
+                        TypeConstructor
+                          [ ({value = Ident "a"; _}, {value = Int _; _});
+                            ({value = Ident "b"; _}, {value = Int _; _}) ];
+                      _ } };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
 let test_type_param () =
   let source = {|
   type MyType(T: Type) {}
@@ -681,6 +732,7 @@ let () =
     [ ("empty file", [test_case "Empty file" `Quick test_empty]);
       ( "type",
         [ test_case "let syntax for type" `Quick test_let_type;
+          test_case "type constructor" `Quick test_type_constructor;
           test_case "let syntax for parameterized type" `Quick
             test_let_type_param;
           test_case "shorthand syntax for type" `Quick test_type;

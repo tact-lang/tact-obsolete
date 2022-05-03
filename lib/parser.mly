@@ -193,18 +193,21 @@ let stmt :=
 (* Expression *)
 let expr :=
  | expr_
+ (* can be a type constructor *)
+ | type_constructor
  (* can be a function definition *)
  | (_, f) = function_definition(nothing); { f }
 
 let fexpr :=
  | expr_
- (* can be a function definition *)
+  (* can be a type constructor, in parens *)
+ | delimited(LPAREN, type_constructor, RPAREN)
+ (* can be a function definition, in parens *)
  | (_, f) = delimited(LPAREN, function_definition(nothing), RPAREN); { f }
-
  let expr_ ==
  (* can be a `type` definition *)
  | (_, s) = type_definition(nothing); { s }
- (* can be an `interface` definition *)
+  (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)
  | (_, e) = enum_definition(nothing); { e }
@@ -247,6 +250,18 @@ let type_definition(name) ==
 let type_fields ==
 | located ( name = located(ident); COLON; typ = located(expr); { make_type_field ~field_name: name ~field_type: typ () } )
 | located ( name = located(ident); { make_type_field ~field_name: name ~field_type: { loc = name.loc; value = Reference name.value } () } )
+
+(* Type constructor 
+ *
+ * MyType {
+ *   field_name: 1
+ * }
+ *
+ * *)
+let type_constructor :=
+  IDENT;
+  ~ = delimited_separated_trailing_list(LBRACE, separated_pair(located(ident), COLON, located(expr)), COMMA, RBRACE);
+  <TypeConstructor>
 
 (* Interface
 
