@@ -36,7 +36,8 @@ let program :=
 (* Top level statement *)
 let top_level_stmt ==
   (* can be a `let` binding definition *)
-  | ~= binding; SEMICOLON; <Let>
+  | ~= let_binding; SEMICOLON; <Let>
+  | ~= shorthand_binding; <Let>
 
 (* Binding definition
 
@@ -61,7 +62,7 @@ let S(T: Type) = type {v: T}
 Same applies to enums, interfaces, unions and fns
 
 *)
-let binding ==
+let let_binding ==
 | located (
   LET;
   name = located(ident);
@@ -83,6 +84,7 @@ let binding ==
         ()
   }
 )
+let shorthand_binding ==
 | sugared_function_definition
 | located( (name, expr) = type_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
 | located( ((name, params), expr) = type_definition(located_ident_with_params); {
@@ -104,6 +106,7 @@ let binding ==
   make_binding ~binding_name: name ~binding_expr: {
     loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
   } () })
+
 
 let located_ident_with_params ==
    ~ = located(ident);
@@ -166,7 +169,7 @@ let function_call :=
 (* Statement (they are separated expressions / control flow, but ultimately not very different) *)
 let stmt :=
   |  expr
-  | ~= binding; <Let>
+  | ~= let_binding; <Let>
 
 (* Expression *)
 let expr :=

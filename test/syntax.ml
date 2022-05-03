@@ -58,7 +58,7 @@ let test_let_type_param () =
 
 let test_type () =
   let source = {|
-  type MyType {};
+  type MyType {}
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -75,7 +75,7 @@ let test_type () =
 
 let test_type_param () =
   let source = {|
-  type MyType(T: Type) {};
+  type MyType(T: Type) {}
   |} in
   Alcotest.(check bool)
     "type binding" true
@@ -110,7 +110,7 @@ let test_type_fields_source =
   type MyType {
     a: Int257,
     f: get_type()
-  };
+  }
   |}
 
 let test_type_fields_trailing_comma_source =
@@ -118,7 +118,7 @@ let test_type_fields_trailing_comma_source =
   type MyType {
     a: Int257,
     f: get_type(),
-  };
+  }
   |}
 
 let test_type_fields source () =
@@ -163,7 +163,7 @@ let test_type_shorthand_fields () =
     type MyType {
       A,
       B
-    };
+    }
   |} in
   Alcotest.(check bool)
     "type fields" true
@@ -198,7 +198,7 @@ let test_type_methods () =
     type MyType {
       fn test() -> Bool {}
       fn todo() -> Int257
-    };
+    }
   |}
   in
   Alcotest.(check bool)
@@ -253,7 +253,7 @@ let test_type_with_fields_and_methods_source =
     type MyType {
       a: Int257
       fn test() -> Bool {}
-    };
+    }
   |}
 
 let test_type_with_fields_and_methods_trailing_comma_source =
@@ -261,7 +261,7 @@ let test_type_with_fields_and_methods_trailing_comma_source =
     type MyType {
       a: Int257,
       fn test() -> Bool {}
-    };
+    }
   |}
 
 let test_type_with_fields_and_methods source () =
@@ -298,6 +298,72 @@ let test_type_with_fields_and_methods source () =
                                           _ } };
                                   _ } ] };
                       _ } };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_fn () =
+  let source = {|
+  let F = fn (A: T) -> P(1) {};
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "F"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params =
+                              [ { value =
+                                    ( {value = Ident "A"; _},
+                                      {value = Reference (Ident "T"); _} );
+                                  _ } ];
+                            exprs = Some [];
+                            returns =
+                              { value =
+                                  FunctionCall
+                                    { fn = {value = Reference (Ident "P"); _};
+                                      arguments = [{value = Int _; _}] };
+                                _ } };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_fn_shorthand () =
+  let source = {|
+  fn F(A: T) -> P(1) {}
+  |} in
+  Alcotest.(check bool)
+    "function signature" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_name = {value = Ident "F"; _};
+                  binding_expr =
+                    { value =
+                        Function
+                          { name = None;
+                            params =
+                              [ { value =
+                                    ( {value = Ident "A"; _},
+                                      {value = Reference (Ident "T"); _} );
+                                  _ } ];
+                            exprs = Some [];
+                            returns =
+                              { value =
+                                  FunctionCall
+                                    { fn = {value = Reference (Ident "P"); _};
+                                      arguments = [{value = Int _; _}] };
+                                _ } };
+                      _ };
+                  _ };
               _ } ] } ->
         true
     | _ ->
@@ -553,7 +619,9 @@ let () =
             (test_type_with_fields_and_methods
                test_type_with_fields_and_methods_trailing_comma_source ) ] );
       ( "functions",
-        [ test_case "function signature over function call" `Quick
+        [ test_case "function definition" `Quick test_fn;
+          test_case "shorthand function definition" `Quick test_fn_shorthand;
+          test_case "function signature over function call" `Quick
             test_fn_sig_over_call;
           test_case "function signature returning function signature" `Quick
             test_fn_sig_returns_fn_sig;
