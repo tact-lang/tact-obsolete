@@ -57,6 +57,9 @@ and expr =
   | FunctionCall of function_call
   | Function of function_definition
   | Int of zt
+  | CodeBlock of code_block
+  | If of if_
+  | Return of expr
 
 and type_field = {field_name : ident located; field_type : expr located}
 
@@ -69,6 +72,13 @@ and function_definition =
     exprs : expr located list option }
 
 and binding = {binding_name : ident located; binding_expr : expr located}
+
+and code_block = {block_exprs : expr located list}
+
+and if_ =
+  { condition : expr located;
+    body : expr located list;
+    else_ : expr located option }
 
 and program = {bindings : binding located list}
 [@@deriving show {with_path = false}, make]
