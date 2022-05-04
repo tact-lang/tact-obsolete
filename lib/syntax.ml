@@ -46,6 +46,7 @@ module type T = sig
     | CodeBlock of code_block
     | If of if_
     | Return of expr
+    | MutRef of ident located
 
   and struct_constructor =
     { constructor_id : expr located option;
@@ -121,6 +122,7 @@ functor
       | CodeBlock of code_block
       | If of if_
       | Return of expr
+      | MutRef of ident located
 
     and struct_constructor =
       { constructor_id : expr located option; [@sexp.option]

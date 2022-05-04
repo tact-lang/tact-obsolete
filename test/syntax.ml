@@ -489,3 +489,16 @@ let%expect_test "struct construction over an anonymous type's function call" =
                         (field_type (Reference (Ident T)))))))))))))
               (arguments ((Reference (Ident X)))))))
            (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
+
+let%expect_test "mut var" =
+  let source = {|
+    fn test() -> A {
+      ~var;
+    }
+    |} in
+  pp source ; [%expect {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A))) (exprs ((MutRef (Ident var))))))))))) |}]

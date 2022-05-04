@@ -35,6 +35,7 @@ rule token = parse
  | '(' { LPAREN }
  | ')' { RPAREN }
  | '=' { EQUALS }
+ | '~' { TILDA }
  | "let" { LET }
  | "type" { TYPE }
  | "struct" { STRUCT }

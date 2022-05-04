@@ -1,5 +1,4 @@
 %parameter<Syntax : Syntax.T>
-
 %start <Syntax.program> program
 
 %{              
@@ -225,6 +224,8 @@ let fexpr :=
  | function_call
  (* can be an integer *)
  | ~= INT; <Int>
+ (* can be mutation ref *)
+ | TILDA; ~= located(ident); <MutRef>
 
 let params ==
     delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
