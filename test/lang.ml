@@ -36,6 +36,32 @@ let test_scope_resolution () =
     | _ ->
         false )
 
+let test_scope_resolution_stripped () =
+  let source =
+    {|
+  let I = Int257;
+  let I_ = I;
+  let n = 1;
+  let n_ = n;
+  |}
+  in
+  Alcotest.(check bool)
+    "reference resolution" true
+    ( match parse_program source |> build_program with
+    | Ok env ->
+        let scope =
+          ((new resolved_references_stripper env)#visit_env () env).scope
+        in
+        [%matches? Some (Builtin "Int257")]
+          (in_amap scope (fun m -> Map.find m "I"))
+        && [%matches? Some (Builtin "Int257")]
+             (in_amap scope (fun m -> Map.find m "I_"))
+        && [%matches? Some (Integer _)] (in_amap scope (fun m -> Map.find m "n"))
+        && [%matches? Some (Integer _)]
+             (in_amap scope (fun m -> Map.find m "n_"))
+    | _ ->
+        false )
+
 let test_recursive_scope_resolution () =
   let source = {|
   let A = B;
@@ -161,6 +187,8 @@ let () =
   run "Lang"
     [ ( "identifiers",
         [ test_case "name resolution in the scope" `Quick test_scope_resolution;
+          test_case "stripped name resolution in the scope" `Quick
+            test_scope_resolution_stripped;
           test_case "recursive name resolution in the scope" `Quick
             test_recursive_scope_resolution ] );
       ( "type",

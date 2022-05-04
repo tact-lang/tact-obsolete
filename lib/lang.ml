@@ -136,6 +136,16 @@ class ['s] reference_resolver ((env, errors) : env * elist) =
           ReferenceKind ref
   end
 
+(* Strips resolved references types *)
+class ['s] resolved_references_stripper (env : env) =
+  object (_ : 's)
+    inherit ['s] map
+
+    val p_env = env
+
+    method! visit_ResolvedReference _env _ t = t
+  end
+
 let rec env_from_program (stx : Syntax.program) (elist : elist) =
   let scope = scope_from_bindings stx.bindings elist in
   (* Resolve references inside *)
