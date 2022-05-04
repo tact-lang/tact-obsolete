@@ -26,10 +26,13 @@ let test_scope_resolution () =
     "reference resolution" true
     ( match parse_program source |> build_program with
     | Ok {scope; _} ->
-        [%matches? Some (Builtin "Int257")] (Map.find scope "I")
-        && [%matches? Some (Builtin "Int257")] (Map.find scope "I_")
-        && [%matches? Some (Integer _)] (Map.find scope "n")
-        && [%matches? Some (Integer _)] (Map.find scope "n_")
+        [%matches? Some (ResolvedReference ("Int257", Builtin "Int257"))]
+          (in_amap scope (fun m -> Map.find m "I"))
+        && [%matches? Some (ResolvedReference ("I", Builtin "Int257"))]
+             (in_amap scope (fun m -> Map.find m "I_"))
+        && [%matches? Some (Integer _)] (in_amap scope (fun m -> Map.find m "n"))
+        && [%matches? Some (ResolvedReference ("n", Integer _))]
+             (in_amap scope (fun m -> Map.find m "n_"))
     | _ ->
         false )
 
@@ -42,7 +45,7 @@ let test_recursive_scope_resolution () =
   Alcotest.(check bool)
     "reference resolution" true
     ( match parse_program source |> build_program with
-    | Error (Recursive_Reference "A") ->
+    | Error (Recursive_Reference "C") ->
         true
     | _ ->
         false )
@@ -60,20 +63,20 @@ let test_type () =
     "type binding" true
     ( match parse_program source |> build_program with
     | Ok {scope; _} -> (
-      match Map.find scope "MyType" with
+      match in_amap scope (fun m -> Map.find m "MyType") with
       | Some (Type s) ->
           [%matches?
             Some
               { field_type =
                   ResolvedReferenceKind ("Int257", BuiltinKind "Int257");
                 _ }]
-            (Map.find s.type_fields "a")
+            (in_amap s.type_fields (fun m -> Map.find m "a"))
           && [%matches?
                Some
                  { field_type =
                      ResolvedReferenceKind ("Bool", BuiltinKind "Bool");
                    _ }]
-               (Map.find s.type_fields "b")
+               (in_amap s.type_fields (fun m -> Map.find m "b"))
       | _ ->
           false )
     | _ ->
@@ -126,7 +129,7 @@ let test_function () =
     "function" true
     ( match parse_program source |> build_program with
     | Ok {scope; _} -> (
-      match Map.find scope "test" with
+      match in_amap scope (fun m -> Map.find m "test") with
       | Some (Function f) ->
           [%matches?
             {function_params; _} when [%matches?
@@ -137,7 +140,7 @@ let test_function () =
                                           ( "b",
                                             ResolvedReferenceKind
                                               ("Bool", BuiltinKind "Bool") ) ]]
-                                        (Map.to_alist function_params)]
+                                        function_params]
             f
           && [%matches?
                { function_returns =

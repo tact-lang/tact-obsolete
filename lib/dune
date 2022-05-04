@@ -1,7 +1,7 @@
 (library
- (libraries base menhirLib ppx_show.runtime zarith)
+ (libraries base menhirLib ppx_show.runtime zarith visitors.runtime)
  (preprocess
-  (staged_pps ppx_import ppx_show ppx_make ppx_compare))
+  (staged_pps ppx_import ppx_show ppx_make ppx_compare visitors.ppx))
  (modules parser lexer syntax unitActionsParser parserMessages lang)
  (name tact))
 
