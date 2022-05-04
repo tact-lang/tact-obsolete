@@ -494,7 +494,9 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN RARROW IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -536,7 +538,7 @@ program: LET IDENT EQUALS LPAREN TYPE
 ## type_expr -> LPAREN . ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE RPAREN [ LBRACE ]
 ## type_expr -> LPAREN . UNION LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE RPAREN [ LBRACE ]
 ## type_expr -> LPAREN . UNION LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE RPAREN [ LBRACE ]
-## type_expr -> LPAREN . IDENT RPAREN [ LBRACE ]
+## type_expr -> LPAREN . reference RPAREN [ LBRACE ]
 ## type_expr -> LPAREN . function_call RPAREN [ LBRACE ]
 ## type_expr -> LPAREN . INT RPAREN [ LBRACE ]
 ## type_expr -> LPAREN . TILDA IDENT RPAREN [ LBRACE ]
@@ -672,8 +674,8 @@ program: LET IDENT EQUALS IDENT UNION
 ##
 ## Ends in an error in state: 60.
 ##
-## expr -> IDENT . [ SEMICOLON RPAREN RBRACE FN COMMA ]
-## fexpr -> IDENT . [ LPAREN ]
+## reference -> IDENT . [ SEMICOLON RPAREN RBRACE LPAREN FN COMMA ]
+## reference -> IDENT . DOT loption(separated_nonempty_list(DOT,located(ident))) [ SEMICOLON RPAREN RBRACE LPAREN FN COMMA ]
 ## type_expr -> IDENT . [ LBRACE ]
 ##
 ## The known suffix of the stack is as follows:
@@ -682,9 +684,46 @@ program: LET IDENT EQUALS IDENT UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: LET IDENT EQUALS FN UNION
+program: LET IDENT EQUALS IDENT DOT TYPE
 ##
 ## Ends in an error in state: 61.
+##
+## reference -> IDENT DOT . loption(separated_nonempty_list(DOT,located(ident))) [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
+##
+## The known suffix of the stack is as follows:
+## IDENT DOT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: LET IDENT EQUALS IDENT DOT IDENT TYPE
+##
+## Ends in an error in state: 62.
+##
+## separated_nonempty_list(DOT,located(ident)) -> IDENT . [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
+## separated_nonempty_list(DOT,located(ident)) -> IDENT . DOT separated_nonempty_list(DOT,located(ident)) [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
+##
+## The known suffix of the stack is as follows:
+## IDENT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: LET IDENT EQUALS IDENT DOT IDENT DOT UNION
+##
+## Ends in an error in state: 63.
+##
+## separated_nonempty_list(DOT,located(ident)) -> IDENT DOT . separated_nonempty_list(DOT,located(ident)) [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
+##
+## The known suffix of the stack is as follows:
+## IDENT DOT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: LET IDENT EQUALS FN UNION
+##
+## Ends in an error in state: 67.
 ##
 ## function_definition(nothing) -> FN . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## function_definition(nothing) -> FN . LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
@@ -697,7 +736,7 @@ program: LET IDENT EQUALS FN UNION
 
 program: LET IDENT EQUALS FN LPAREN UNION
 ##
-## Ends in an error in state: 62.
+## Ends in an error in state: 68.
 ##
 ## function_definition(nothing) -> FN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## function_definition(nothing) -> FN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
@@ -710,7 +749,7 @@ program: LET IDENT EQUALS FN LPAREN UNION
 
 program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 64.
+## Ends in an error in state: 70.
 ##
 ## function_definition(nothing) -> FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ##
@@ -722,7 +761,7 @@ program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN RARROW IDENT UNION
 ##
-## Ends in an error in state: 65.
+## Ends in an error in state: 71.
 ##
 ## function_definition(nothing) -> FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) . option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ##
@@ -733,14 +772,16 @@ program: LET IDENT EQUALS FN LPAREN IDENT COLON IDENT COMMA RPAREN RARROW IDENT 
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS FN LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 69.
+## Ends in an error in state: 75.
 ##
 ## function_definition(nothing) -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ##
@@ -752,7 +793,7 @@ program: LET IDENT EQUALS FN LPAREN RPAREN UNION
 
 program: LET IDENT EQUALS FN LPAREN RPAREN RARROW IDENT UNION
 ##
-## Ends in an error in state: 70.
+## Ends in an error in state: 76.
 ##
 ## function_definition(nothing) -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) . option(code_block) [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ##
@@ -763,14 +804,16 @@ program: LET IDENT EQUALS FN LPAREN RPAREN RARROW IDENT UNION
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS ENUM UNION
 ##
-## Ends in an error in state: 72.
+## Ends in an error in state: 78.
 ##
 ## expr -> ENUM . LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## expr -> ENUM . LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
@@ -785,7 +828,7 @@ program: LET IDENT EQUALS ENUM UNION
 
 program: LET IDENT EQUALS ENUM LBRACE UNION
 ##
-## Ends in an error in state: 73.
+## Ends in an error in state: 79.
 ##
 ## expr -> ENUM LBRACE . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## expr -> ENUM LBRACE . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
@@ -800,7 +843,7 @@ program: LET IDENT EQUALS ENUM LBRACE UNION
 
 program: ENUM IDENT LBRACE IDENT UNION
 ##
-## Ends in an error in state: 74.
+## Ends in an error in state: 80.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT . COMMA [ RBRACE FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT . EQUALS expr COMMA [ RBRACE FN ]
@@ -819,7 +862,7 @@ program: ENUM IDENT LBRACE IDENT UNION
 
 program: ENUM IDENT LBRACE IDENT EQUALS TYPE
 ##
-## Ends in an error in state: 75.
+## Ends in an error in state: 81.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS . expr COMMA [ RBRACE FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS . expr COMMA nonempty_list(terminated(enum_member,COMMA)) [ RBRACE FN ]
@@ -834,7 +877,7 @@ program: ENUM IDENT LBRACE IDENT EQUALS TYPE
 
 program: LET IDENT EQUALS LPAREN IDENT RPAREN UNION
 ##
-## Ends in an error in state: 76.
+## Ends in an error in state: 82.
 ##
 ## struct_constructor -> type_expr . LBRACE nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## struct_constructor -> type_expr . LBRACE loption(separated_nonempty_list(COMMA,separated_pair(located(ident),COLON,located(expr)))) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
@@ -847,7 +890,7 @@ program: LET IDENT EQUALS LPAREN IDENT RPAREN UNION
 
 program: LET IDENT EQUALS IDENT LBRACE UNION
 ##
-## Ends in an error in state: 77.
+## Ends in an error in state: 83.
 ##
 ## struct_constructor -> type_expr LBRACE . nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## struct_constructor -> type_expr LBRACE . loption(separated_nonempty_list(COMMA,separated_pair(located(ident),COLON,located(expr)))) RBRACE [ SEMICOLON RPAREN RBRACE FN COMMA ]
@@ -860,7 +903,7 @@ program: LET IDENT EQUALS IDENT LBRACE UNION
 
 program: LET IDENT EQUALS IDENT LBRACE IDENT UNION
 ##
-## Ends in an error in state: 78.
+## Ends in an error in state: 84.
 ##
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT . COLON expr COMMA [ RBRACE ]
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT . COLON expr COMMA nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) [ RBRACE ]
@@ -875,7 +918,7 @@ program: LET IDENT EQUALS IDENT LBRACE IDENT UNION
 
 program: LET IDENT EQUALS IDENT LBRACE IDENT COLON TYPE
 ##
-## Ends in an error in state: 79.
+## Ends in an error in state: 85.
 ##
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT COLON . expr COMMA [ RBRACE ]
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT COLON . expr COMMA nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) [ RBRACE ]
@@ -888,9 +931,29 @@ program: LET IDENT EQUALS IDENT LBRACE IDENT COLON TYPE
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
+program: LET IDENT EQUALS IDENT DOT UNION
+##
+## Ends in an error in state: 87.
+##
+## expr -> reference . [ SEMICOLON RPAREN RBRACE FN COMMA ]
+## fexpr -> reference . [ LPAREN ]
+##
+## The known suffix of the stack is as follows:
+## reference
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 61, spurious reduction of production loption(separated_nonempty_list(DOT,located(ident))) ->
+## In state 66, spurious reduction of production reference -> IDENT DOT loption(separated_nonempty_list(DOT,located(ident)))
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
 program: LET IDENT EQUALS IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 82.
+## Ends in an error in state: 89.
 ##
 ## expr -> function_call . [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## fexpr -> function_call . [ LPAREN ]
@@ -902,9 +965,9 @@ program: LET IDENT EQUALS IDENT LPAREN RPAREN UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: FN IDENT LPAREN RPAREN RARROW LPAREN INT UNION
+program: FN IDENT LPAREN RPAREN RARROW LPAREN INT TYPE
 ##
-## Ends in an error in state: 83.
+## Ends in an error in state: 90.
 ##
 ## function_call -> fexpr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ SEMICOLON RPAREN RBRACE LPAREN LBRACE FN COMMA ]
 ## function_call -> fexpr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ SEMICOLON RPAREN RBRACE LPAREN LBRACE FN COMMA ]
@@ -917,7 +980,7 @@ program: FN IDENT LPAREN RPAREN RARROW LPAREN INT UNION
 
 program: LET IDENT EQUALS IDENT LPAREN TYPE
 ##
-## Ends in an error in state: 84.
+## Ends in an error in state: 91.
 ##
 ## function_call -> fexpr LPAREN . nonempty_list(terminated(located(expr),COMMA)) RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## function_call -> fexpr LPAREN . loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -930,7 +993,7 @@ program: LET IDENT EQUALS IDENT LPAREN TYPE
 
 program: LET IDENT EQUALS IDENT LPAREN IDENT SEMICOLON
 ##
-## Ends in an error in state: 90.
+## Ends in an error in state: 97.
 ##
 ## nonempty_list(terminated(located(expr),COMMA)) -> expr . COMMA [ RPAREN ]
 ## nonempty_list(terminated(located(expr),COMMA)) -> expr . COMMA nonempty_list(terminated(located(expr),COMMA)) [ RPAREN ]
@@ -944,14 +1007,15 @@ program: LET IDENT EQUALS IDENT LPAREN IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS IDENT LPAREN IDENT COMMA TYPE
 ##
-## Ends in an error in state: 91.
+## Ends in an error in state: 98.
 ##
 ## nonempty_list(terminated(located(expr),COMMA)) -> expr COMMA . [ RPAREN ]
 ## nonempty_list(terminated(located(expr),COMMA)) -> expr COMMA . nonempty_list(terminated(located(expr),COMMA)) [ RPAREN ]
@@ -965,7 +1029,7 @@ program: LET IDENT EQUALS IDENT LPAREN IDENT COMMA TYPE
 
 program: LET IDENT EQUALS IDENT LBRACE IDENT COLON IDENT SEMICOLON
 ##
-## Ends in an error in state: 94.
+## Ends in an error in state: 101.
 ##
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT COLON expr . COMMA [ RBRACE ]
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT COLON expr . COMMA nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) [ RBRACE ]
@@ -979,14 +1043,15 @@ program: LET IDENT EQUALS IDENT LBRACE IDENT COLON IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS IDENT LBRACE IDENT COLON IDENT COMMA UNION
 ##
-## Ends in an error in state: 95.
+## Ends in an error in state: 102.
 ##
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT COLON expr COMMA . [ RBRACE ]
 ## nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) -> IDENT COLON expr COMMA . nonempty_list(terminated(separated_pair(located(ident),COLON,located(expr)),COMMA)) [ RBRACE ]
@@ -1000,7 +1065,7 @@ program: LET IDENT EQUALS IDENT LBRACE IDENT COLON IDENT COMMA UNION
 
 program: ENUM IDENT LBRACE IDENT EQUALS IDENT SEMICOLON
 ##
-## Ends in an error in state: 103.
+## Ends in an error in state: 110.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS expr . COMMA [ RBRACE FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS expr . COMMA nonempty_list(terminated(enum_member,COMMA)) [ RBRACE FN ]
@@ -1014,14 +1079,15 @@ program: ENUM IDENT LBRACE IDENT EQUALS IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: ENUM IDENT LBRACE IDENT EQUALS IDENT COMMA UNION
 ##
-## Ends in an error in state: 104.
+## Ends in an error in state: 111.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS expr COMMA . [ RBRACE FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT EQUALS expr COMMA . nonempty_list(terminated(enum_member,COMMA)) [ RBRACE FN ]
@@ -1035,7 +1101,7 @@ program: ENUM IDENT LBRACE IDENT EQUALS IDENT COMMA UNION
 
 program: ENUM IDENT LBRACE IDENT COMMA UNION
 ##
-## Ends in an error in state: 107.
+## Ends in an error in state: 114.
 ##
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT COMMA . [ RBRACE FN ]
 ## nonempty_list(terminated(enum_member,COMMA)) -> IDENT COMMA . nonempty_list(terminated(enum_member,COMMA)) [ RBRACE FN ]
@@ -1049,7 +1115,7 @@ program: ENUM IDENT LBRACE IDENT COMMA UNION
 
 program: LET IDENT EQUALS ENUM LBRACE IDENT COMMA RBRACE UNION
 ##
-## Ends in an error in state: 113.
+## Ends in an error in state: 120.
 ##
 ## expr -> ENUM LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE . [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## fexpr -> ENUM LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE . [ LPAREN ]
@@ -1062,7 +1128,7 @@ program: LET IDENT EQUALS ENUM LBRACE IDENT COMMA RBRACE UNION
 
 program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 114.
+## Ends in an error in state: 121.
 ##
 ## list(sugared_function_definition) -> function_definition(located_ident_with_params) . list(sugared_function_definition) [ RBRACE ]
 ##
@@ -1073,16 +1139,16 @@ program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN UNION
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 281, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
-## In state 282, spurious reduction of production option(code_block) ->
-## In state 283, spurious reduction of production function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
+## In state 288, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
+## In state 289, spurious reduction of production option(code_block) ->
+## In state 290, spurious reduction of production function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 116.
+## Ends in an error in state: 123.
 ##
 ## list(sugared_function_definition) -> function_definition(located(ident)) . list(sugared_function_definition) [ RBRACE ]
 ##
@@ -1093,16 +1159,16 @@ program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN UNION
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 274, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
-## In state 224, spurious reduction of production option(code_block) ->
-## In state 225, spurious reduction of production function_definition(located(ident)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
+## In state 281, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
+## In state 231, spurious reduction of production option(code_block) ->
+## In state 232, spurious reduction of production function_definition(located(ident)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS ENUM LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 120.
+## Ends in an error in state: 127.
 ##
 ## expr -> ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE . [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## fexpr -> ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE . [ LPAREN ]
@@ -1115,7 +1181,7 @@ program: LET IDENT EQUALS ENUM LBRACE RBRACE UNION
 
 program: UNION IDENT LBRACE ENUM UNION
 ##
-## Ends in an error in state: 125.
+## Ends in an error in state: 132.
 ##
 ## union_member -> ENUM . LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ RBRACE FN COMMA ]
 ## union_member -> ENUM . LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ RBRACE FN COMMA ]
@@ -1128,7 +1194,7 @@ program: UNION IDENT LBRACE ENUM UNION
 
 program: UNION IDENT LBRACE ENUM LBRACE UNION
 ##
-## Ends in an error in state: 126.
+## Ends in an error in state: 133.
 ##
 ## union_member -> ENUM LBRACE . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ RBRACE FN COMMA ]
 ## union_member -> ENUM LBRACE . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ RBRACE FN COMMA ]
@@ -1141,7 +1207,7 @@ program: UNION IDENT LBRACE ENUM LBRACE UNION
 
 program: UNION IDENT LBRACE UNION LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 133.
+## Ends in an error in state: 140.
 ##
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member . COMMA [ RBRACE FN ]
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member . COMMA nonempty_list(terminated(located(union_member),COMMA)) [ RBRACE FN ]
@@ -1156,7 +1222,7 @@ program: UNION IDENT LBRACE UNION LBRACE RBRACE UNION
 
 program: UNION IDENT LBRACE IDENT COMMA TYPE
 ##
-## Ends in an error in state: 134.
+## Ends in an error in state: 141.
 ##
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member COMMA . [ RBRACE FN ]
 ## nonempty_list(terminated(located(union_member),COMMA)) -> union_member COMMA . nonempty_list(terminated(located(union_member),COMMA)) [ RBRACE FN ]
@@ -1170,7 +1236,7 @@ program: UNION IDENT LBRACE IDENT COMMA TYPE
 
 program: LET IDENT EQUALS LPAREN UNION LBRACE IDENT COMMA RBRACE UNION
 ##
-## Ends in an error in state: 140.
+## Ends in an error in state: 147.
 ##
 ## fexpr -> UNION LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE . [ LPAREN ]
 ## type_expr -> LPAREN UNION LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE . RPAREN [ LBRACE ]
@@ -1183,7 +1249,7 @@ program: LET IDENT EQUALS LPAREN UNION LBRACE IDENT COMMA RBRACE UNION
 
 program: LET IDENT EQUALS LPAREN UNION LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 144.
+## Ends in an error in state: 151.
 ##
 ## fexpr -> UNION LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE . [ LPAREN ]
 ## type_expr -> LPAREN UNION LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE . RPAREN [ LBRACE ]
@@ -1196,7 +1262,7 @@ program: LET IDENT EQUALS LPAREN UNION LBRACE RBRACE UNION
 
 program: LET IDENT EQUALS LPAREN TILDA UNION
 ##
-## Ends in an error in state: 146.
+## Ends in an error in state: 153.
 ##
 ## fexpr -> TILDA . IDENT [ LPAREN ]
 ## type_expr -> LPAREN TILDA . IDENT RPAREN [ LBRACE ]
@@ -1209,7 +1275,7 @@ program: LET IDENT EQUALS LPAREN TILDA UNION
 
 program: LET IDENT EQUALS LPAREN TILDA IDENT UNION
 ##
-## Ends in an error in state: 147.
+## Ends in an error in state: 154.
 ##
 ## fexpr -> TILDA IDENT . [ LPAREN ]
 ## type_expr -> LPAREN TILDA IDENT . RPAREN [ LBRACE ]
@@ -1222,7 +1288,7 @@ program: LET IDENT EQUALS LPAREN TILDA IDENT UNION
 
 program: LET IDENT EQUALS LPAREN STRUCT UNION
 ##
-## Ends in an error in state: 149.
+## Ends in an error in state: 156.
 ##
 ## fexpr -> STRUCT . option(params) LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE [ LPAREN ]
 ## fexpr -> STRUCT . option(params) LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE [ LPAREN ]
@@ -1237,7 +1303,7 @@ program: LET IDENT EQUALS LPAREN STRUCT UNION
 
 program: LET IDENT EQUALS LPAREN STRUCT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 150.
+## Ends in an error in state: 157.
 ##
 ## fexpr -> STRUCT option(params) . LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE [ LPAREN ]
 ## fexpr -> STRUCT option(params) . LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE [ LPAREN ]
@@ -1252,7 +1318,7 @@ program: LET IDENT EQUALS LPAREN STRUCT LPAREN RPAREN UNION
 
 program: LET IDENT EQUALS LPAREN STRUCT LBRACE UNION
 ##
-## Ends in an error in state: 151.
+## Ends in an error in state: 158.
 ##
 ## fexpr -> STRUCT option(params) LBRACE . nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE [ LPAREN ]
 ## fexpr -> STRUCT option(params) LBRACE . loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE [ LPAREN ]
@@ -1267,7 +1333,7 @@ program: LET IDENT EQUALS LPAREN STRUCT LBRACE UNION
 
 program: LET IDENT EQUALS LPAREN STRUCT LBRACE IDENT COMMA RBRACE UNION
 ##
-## Ends in an error in state: 154.
+## Ends in an error in state: 161.
 ##
 ## fexpr -> STRUCT option(params) LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE . [ LPAREN ]
 ## type_expr -> LPAREN STRUCT option(params) LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE . RPAREN [ LBRACE ]
@@ -1280,7 +1346,7 @@ program: LET IDENT EQUALS LPAREN STRUCT LBRACE IDENT COMMA RBRACE UNION
 
 program: LET IDENT EQUALS LPAREN STRUCT LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 158.
+## Ends in an error in state: 165.
 ##
 ## fexpr -> STRUCT option(params) LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE . [ LPAREN ]
 ## type_expr -> LPAREN STRUCT option(params) LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE . RPAREN [ LBRACE ]
@@ -1293,7 +1359,7 @@ program: LET IDENT EQUALS LPAREN STRUCT LBRACE RBRACE UNION
 
 program: LET IDENT EQUALS LPAREN INTERFACE UNION
 ##
-## Ends in an error in state: 160.
+## Ends in an error in state: 167.
 ##
 ## fexpr -> INTERFACE . LBRACE list(located(function_signature_binding)) RBRACE [ LPAREN ]
 ## type_expr -> LPAREN INTERFACE . LBRACE list(located(function_signature_binding)) RBRACE RPAREN [ LBRACE ]
@@ -1306,7 +1372,7 @@ program: LET IDENT EQUALS LPAREN INTERFACE UNION
 
 program: LET IDENT EQUALS LPAREN INTERFACE LBRACE UNION
 ##
-## Ends in an error in state: 161.
+## Ends in an error in state: 168.
 ##
 ## fexpr -> INTERFACE LBRACE . list(located(function_signature_binding)) RBRACE [ LPAREN ]
 ## type_expr -> LPAREN INTERFACE LBRACE . list(located(function_signature_binding)) RBRACE RPAREN [ LBRACE ]
@@ -1319,7 +1385,7 @@ program: LET IDENT EQUALS LPAREN INTERFACE LBRACE UNION
 
 program: LET IDENT EQUALS LPAREN INTERFACE LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 163.
+## Ends in an error in state: 170.
 ##
 ## fexpr -> INTERFACE LBRACE list(located(function_signature_binding)) RBRACE . [ LPAREN ]
 ## type_expr -> LPAREN INTERFACE LBRACE list(located(function_signature_binding)) RBRACE . RPAREN [ LBRACE ]
@@ -1332,7 +1398,7 @@ program: LET IDENT EQUALS LPAREN INTERFACE LBRACE RBRACE UNION
 
 program: LET IDENT EQUALS LPAREN INT UNION
 ##
-## Ends in an error in state: 165.
+## Ends in an error in state: 172.
 ##
 ## fexpr -> INT . [ LPAREN ]
 ## type_expr -> LPAREN INT . RPAREN [ LBRACE ]
@@ -1343,23 +1409,9 @@ program: LET IDENT EQUALS LPAREN INT UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: LET IDENT EQUALS LPAREN IDENT UNION
-##
-## Ends in an error in state: 167.
-##
-## fexpr -> IDENT . [ LPAREN ]
-## type_expr -> LPAREN IDENT . RPAREN [ LBRACE ]
-## type_expr -> IDENT . [ LBRACE ]
-##
-## The known suffix of the stack is as follows:
-## LPAREN IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 program: LET IDENT EQUALS LPAREN ENUM UNION
 ##
-## Ends in an error in state: 169.
+## Ends in an error in state: 174.
 ##
 ## fexpr -> ENUM . LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ LPAREN ]
 ## fexpr -> ENUM . LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ LPAREN ]
@@ -1374,7 +1426,7 @@ program: LET IDENT EQUALS LPAREN ENUM UNION
 
 program: LET IDENT EQUALS LPAREN ENUM LBRACE UNION
 ##
-## Ends in an error in state: 170.
+## Ends in an error in state: 175.
 ##
 ## fexpr -> ENUM LBRACE . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ LPAREN ]
 ## fexpr -> ENUM LBRACE . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ LPAREN ]
@@ -1389,7 +1441,7 @@ program: LET IDENT EQUALS LPAREN ENUM LBRACE UNION
 
 program: LET IDENT EQUALS LPAREN ENUM LBRACE IDENT COMMA RBRACE UNION
 ##
-## Ends in an error in state: 173.
+## Ends in an error in state: 178.
 ##
 ## fexpr -> ENUM LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE . [ LPAREN ]
 ## type_expr -> LPAREN ENUM LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE . RPAREN [ LBRACE ]
@@ -1402,7 +1454,7 @@ program: LET IDENT EQUALS LPAREN ENUM LBRACE IDENT COMMA RBRACE UNION
 
 program: LET IDENT EQUALS LPAREN ENUM LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 177.
+## Ends in an error in state: 182.
 ##
 ## fexpr -> ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE . [ LPAREN ]
 ## type_expr -> LPAREN ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE . RPAREN [ LBRACE ]
@@ -1415,7 +1467,7 @@ program: LET IDENT EQUALS LPAREN ENUM LBRACE RBRACE UNION
 
 program: LET IDENT EQUALS LPAREN IDENT LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 179.
+## Ends in an error in state: 184.
 ##
 ## fexpr -> LPAREN struct_constructor . RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ##
@@ -1425,9 +1477,28 @@ program: LET IDENT EQUALS LPAREN IDENT LBRACE RBRACE UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
+program: LET IDENT EQUALS LPAREN IDENT SEMICOLON
+##
+## Ends in an error in state: 186.
+##
+## fexpr -> reference . [ LPAREN ]
+## type_expr -> LPAREN reference . RPAREN [ LBRACE ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN reference
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 60, spurious reduction of production reference -> IDENT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
 program: LET IDENT EQUALS LPAREN FN LPAREN RPAREN SEMICOLON
 ##
-## Ends in an error in state: 181.
+## Ends in an error in state: 188.
 ##
 ## fexpr -> LPAREN function_definition(nothing) . RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ##
@@ -1438,16 +1509,16 @@ program: LET IDENT EQUALS LPAREN FN LPAREN RPAREN SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 69, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
-## In state 70, spurious reduction of production option(code_block) ->
-## In state 71, spurious reduction of production function_definition(nothing) -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
+## In state 75, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
+## In state 76, spurious reduction of production option(code_block) ->
+## In state 77, spurious reduction of production function_definition(nothing) -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS LPAREN IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 183.
+## Ends in an error in state: 190.
 ##
 ## fexpr -> function_call . [ LPAREN ]
 ## type_expr -> LPAREN function_call . RPAREN [ LBRACE ]
@@ -1461,7 +1532,7 @@ program: LET IDENT EQUALS LPAREN IDENT LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LBRACE RETURN IDENT RPAREN
 ##
-## Ends in an error in state: 185.
+## Ends in an error in state: 192.
 ##
 ## stmt -> RETURN expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1472,14 +1543,15 @@ program: FN IDENT LPAREN RPAREN LBRACE RETURN IDENT RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN LBRACE LET UNION
 ##
-## Ends in an error in state: 187.
+## Ends in an error in state: 194.
 ##
 ## stmt -> LET . IDENT EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ## stmt -> LET . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
@@ -1493,7 +1565,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET UNION
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT UNION
 ##
-## Ends in an error in state: 188.
+## Ends in an error in state: 195.
 ##
 ## stmt -> LET IDENT . EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ## stmt -> LET IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
@@ -1507,7 +1579,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT UNION
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN UNION
 ##
-## Ends in an error in state: 189.
+## Ends in an error in state: 196.
 ##
 ## stmt -> LET IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ## stmt -> LET IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
@@ -1520,7 +1592,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 191.
+## Ends in an error in state: 198.
 ##
 ## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1532,7 +1604,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA 
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS TYPE
 ##
-## Ends in an error in state: 192.
+## Ends in an error in state: 199.
 ##
 ## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS . expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1544,7 +1616,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA 
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 193.
+## Ends in an error in state: 200.
 ##
 ## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1555,14 +1627,15 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA 
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 196.
+## Ends in an error in state: 203.
 ##
 ## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1574,7 +1647,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN EQUALS TYPE
 ##
-## Ends in an error in state: 197.
+## Ends in an error in state: 204.
 ##
 ## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS . expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1586,7 +1659,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN EQUALS TYPE
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 198.
+## Ends in an error in state: 205.
 ##
 ## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1597,14 +1670,15 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN EQUALS IDENT RPAR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT EQUALS TYPE
 ##
-## Ends in an error in state: 200.
+## Ends in an error in state: 207.
 ##
 ## stmt -> LET IDENT EQUALS . expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1616,7 +1690,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT EQUALS TYPE
 
 program: FN IDENT LPAREN RPAREN LBRACE LET IDENT EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 201.
+## Ends in an error in state: 208.
 ##
 ## stmt -> LET IDENT EQUALS expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1627,14 +1701,15 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT EQUALS IDENT RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN LBRACE IF UNION
 ##
-## Ends in an error in state: 203.
+## Ends in an error in state: 210.
 ##
 ## if_ -> IF . LPAREN expr RPAREN code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1646,7 +1721,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF UNION
 
 program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN TYPE
 ##
-## Ends in an error in state: 204.
+## Ends in an error in state: 211.
 ##
 ## if_ -> IF LPAREN . expr RPAREN code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1658,7 +1733,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN TYPE
 
 program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT SEMICOLON
 ##
-## Ends in an error in state: 205.
+## Ends in an error in state: 212.
 ##
 ## if_ -> IF LPAREN expr . RPAREN code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1669,14 +1744,15 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN UNION
 ##
-## Ends in an error in state: 206.
+## Ends in an error in state: 213.
 ##
 ## if_ -> IF LPAREN expr RPAREN . code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1688,7 +1764,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 207.
+## Ends in an error in state: 214.
 ##
 ## if_ -> IF LPAREN expr RPAREN code_block . option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1700,7 +1776,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN LBRACE RBRACE TYPE
 
 program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN LBRACE RBRACE ELSE UNION
 ##
-## Ends in an error in state: 208.
+## Ends in an error in state: 215.
 ##
 ## else_ -> ELSE . if_ [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ## else_ -> ELSE . code_block [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
@@ -1713,7 +1789,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN LBRACE RBRACE ELSE
 
 program: FN IDENT LPAREN RPAREN LBRACE LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 213.
+## Ends in an error in state: 220.
 ##
 ## list(located(stmt)) -> stmt . list(located(stmt)) [ RBRACE ]
 ##
@@ -1725,7 +1801,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LBRACE RBRACE TYPE
 
 program: FN IDENT LPAREN RPAREN LBRACE IDENT RPAREN
 ##
-## Ends in an error in state: 216.
+## Ends in an error in state: 223.
 ##
 ## stmt -> expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
@@ -1736,14 +1812,15 @@ program: FN IDENT LPAREN RPAREN LBRACE IDENT RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: INTERFACE IDENT LBRACE FN IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 223.
+## Ends in an error in state: 230.
 ##
 ## function_definition(located(ident)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ RBRACE FN ]
 ##
@@ -1755,7 +1832,7 @@ program: INTERFACE IDENT LBRACE FN IDENT LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN RARROW IDENT SEMICOLON
 ##
-## Ends in an error in state: 224.
+## Ends in an error in state: 231.
 ##
 ## function_definition(located(ident)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) . option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -1766,14 +1843,16 @@ program: FN IDENT LPAREN RPAREN RARROW IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN RARROW TILDA UNION
 ##
-## Ends in an error in state: 234.
+## Ends in an error in state: 241.
 ##
 ## fexpr -> TILDA . IDENT [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ##
@@ -1785,7 +1864,7 @@ program: FN IDENT LPAREN RPAREN RARROW TILDA UNION
 
 program: FN IDENT LPAREN RPAREN RARROW STRUCT UNION
 ##
-## Ends in an error in state: 236.
+## Ends in an error in state: 243.
 ##
 ## fexpr -> STRUCT . option(params) LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## fexpr -> STRUCT . option(params) LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -1798,7 +1877,7 @@ program: FN IDENT LPAREN RPAREN RARROW STRUCT UNION
 
 program: FN IDENT LPAREN RPAREN RARROW STRUCT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 237.
+## Ends in an error in state: 244.
 ##
 ## fexpr -> STRUCT option(params) . LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## fexpr -> STRUCT option(params) . LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -1811,7 +1890,7 @@ program: FN IDENT LPAREN RPAREN RARROW STRUCT LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN RARROW STRUCT LBRACE UNION
 ##
-## Ends in an error in state: 238.
+## Ends in an error in state: 245.
 ##
 ## fexpr -> STRUCT option(params) LBRACE . nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## fexpr -> STRUCT option(params) LBRACE . loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -1824,7 +1903,7 @@ program: FN IDENT LPAREN RPAREN RARROW STRUCT LBRACE UNION
 
 program: FN IDENT LPAREN RPAREN RARROW LPAREN TYPE
 ##
-## Ends in an error in state: 245.
+## Ends in an error in state: 252.
 ##
 ## fexpr -> LPAREN . struct_constructor RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## fexpr -> LPAREN . function_definition(nothing) RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -1837,7 +1916,7 @@ program: FN IDENT LPAREN RPAREN RARROW LPAREN TYPE
 
 program: FN IDENT LPAREN RPAREN RARROW INTERFACE UNION
 ##
-## Ends in an error in state: 246.
+## Ends in an error in state: 253.
 ##
 ## fexpr -> INTERFACE . LBRACE list(located(function_signature_binding)) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ##
@@ -1849,7 +1928,7 @@ program: FN IDENT LPAREN RPAREN RARROW INTERFACE UNION
 
 program: FN IDENT LPAREN RPAREN RARROW INTERFACE LBRACE UNION
 ##
-## Ends in an error in state: 247.
+## Ends in an error in state: 254.
 ##
 ## fexpr -> INTERFACE LBRACE . list(located(function_signature_binding)) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ##
@@ -1859,22 +1938,9 @@ program: FN IDENT LPAREN RPAREN RARROW INTERFACE LBRACE UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: FN IDENT LPAREN RPAREN RARROW LPAREN IDENT UNION
-##
-## Ends in an error in state: 251.
-##
-## fexpr -> IDENT . [ LPAREN ]
-## type_expr -> IDENT . [ LBRACE ]
-##
-## The known suffix of the stack is as follows:
-## IDENT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
 program: FN IDENT LPAREN RPAREN RARROW ENUM UNION
 ##
-## Ends in an error in state: 252.
+## Ends in an error in state: 258.
 ##
 ## fexpr -> ENUM . LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## fexpr -> ENUM . LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -1887,7 +1953,7 @@ program: FN IDENT LPAREN RPAREN RARROW ENUM UNION
 
 program: FN IDENT LPAREN RPAREN RARROW ENUM LBRACE UNION
 ##
-## Ends in an error in state: 253.
+## Ends in an error in state: 259.
 ##
 ## fexpr -> ENUM LBRACE . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## fexpr -> ENUM LBRACE . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -1900,7 +1966,7 @@ program: FN IDENT LPAREN RPAREN RARROW ENUM LBRACE UNION
 
 program: FN IDENT LPAREN RPAREN RARROW LPAREN IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 260.
+## Ends in an error in state: 267.
 ##
 ## fexpr -> function_call . [ LPAREN ]
 ## type_expr -> function_call . [ LBRACE ]
@@ -1913,7 +1979,20 @@ program: FN IDENT LPAREN RPAREN RARROW LPAREN IDENT LPAREN RPAREN UNION
 
 program: FN IDENT LPAREN RPAREN RARROW IDENT TYPE
 ##
-## Ends in an error in state: 263.
+## Ends in an error in state: 268.
+##
+## reference -> IDENT . [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
+## reference -> IDENT . DOT loption(separated_nonempty_list(DOT,located(ident))) [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
+##
+## The known suffix of the stack is as follows:
+## IDENT
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+program: FN IDENT LPAREN RPAREN RARROW INT TYPE
+##
+## Ends in an error in state: 270.
 ##
 ## function_call -> fexpr . LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
 ## function_call -> fexpr . LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM COMMA ]
@@ -1927,7 +2006,7 @@ program: FN IDENT LPAREN RPAREN RARROW IDENT TYPE
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN UNION
 ##
-## Ends in an error in state: 264.
+## Ends in an error in state: 271.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
@@ -1940,7 +2019,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN UNION
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN TYPE
 ##
-## Ends in an error in state: 266.
+## Ends in an error in state: 273.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -1952,7 +2031,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN RARROW IDENT SEMICOLON
 ##
-## Ends in an error in state: 267.
+## Ends in an error in state: 274.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) . option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -1963,14 +2042,16 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN IDENT COLON IDENT
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN TYPE
 ##
-## Ends in an error in state: 270.
+## Ends in an error in state: 277.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -1982,7 +2063,7 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN TYPE
 
 program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN RARROW IDENT SEMICOLON
 ##
-## Ends in an error in state: 271.
+## Ends in an error in state: 278.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) . option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -1993,14 +2074,16 @@ program: FN IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LPAREN RPAREN RARROW IDE
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN TYPE
 ##
-## Ends in an error in state: 274.
+## Ends in an error in state: 281.
 ##
 ## function_definition(located(ident)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
@@ -2014,7 +2097,7 @@ program: FN IDENT LPAREN RPAREN TYPE
 
 program: FN IDENT LPAREN RPAREN LPAREN UNION
 ##
-## Ends in an error in state: 275.
+## Ends in an error in state: 282.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
@@ -2027,7 +2110,7 @@ program: FN IDENT LPAREN RPAREN LPAREN UNION
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN TYPE
 ##
-## Ends in an error in state: 277.
+## Ends in an error in state: 284.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -2039,7 +2122,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN TYPE
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN RARROW IDENT SEMICOLON
 ##
-## Ends in an error in state: 278.
+## Ends in an error in state: 285.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) . option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -2050,14 +2133,16 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON IDENT COMMA RPAREN RARROW IDE
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN TYPE
 ##
-## Ends in an error in state: 281.
+## Ends in an error in state: 288.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . option(preceded(RARROW,located(fexpr))) option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -2069,7 +2154,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN TYPE
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN RARROW IDENT SEMICOLON
 ##
-## Ends in an error in state: 282.
+## Ends in an error in state: 289.
 ##
 ## function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) . option(code_block) [ UNION STRUCT RBRACE LET INTERFACE FN EOF ENUM ]
 ##
@@ -2080,14 +2165,16 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN RARROW IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 263, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
+## In state 268, spurious reduction of production reference -> IDENT
+## In state 266, spurious reduction of production fexpr -> reference
+## In state 270, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS STRUCT LBRACE IDENT COMMA RBRACE UNION
 ##
-## Ends in an error in state: 285.
+## Ends in an error in state: 292.
 ##
 ## expr -> STRUCT option(params) LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE . [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## fexpr -> STRUCT option(params) LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE . [ LPAREN ]
@@ -2100,7 +2187,7 @@ program: LET IDENT EQUALS STRUCT LBRACE IDENT COMMA RBRACE UNION
 
 program: LET IDENT EQUALS STRUCT LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 288.
+## Ends in an error in state: 295.
 ##
 ## expr -> STRUCT option(params) LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE . [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## fexpr -> STRUCT option(params) LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE . [ LPAREN ]
@@ -2113,7 +2200,7 @@ program: LET IDENT EQUALS STRUCT LBRACE RBRACE UNION
 
 program: STRUCT IDENT LBRACE IDENT COLON IDENT SEMICOLON
 ##
-## Ends in an error in state: 289.
+## Ends in an error in state: 296.
 ##
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON expr . COMMA [ RBRACE FN ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON expr . COMMA nonempty_list(terminated(struct_fields,COMMA)) [ RBRACE FN ]
@@ -2127,14 +2214,15 @@ program: STRUCT IDENT LBRACE IDENT COLON IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: STRUCT IDENT LBRACE IDENT COLON IDENT COMMA UNION
 ##
-## Ends in an error in state: 290.
+## Ends in an error in state: 297.
 ##
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON expr COMMA . [ RBRACE FN ]
 ## nonempty_list(terminated(struct_fields,COMMA)) -> IDENT COLON expr COMMA . nonempty_list(terminated(struct_fields,COMMA)) [ RBRACE FN ]
@@ -2148,7 +2236,7 @@ program: STRUCT IDENT LBRACE IDENT COLON IDENT COMMA UNION
 
 program: LET IDENT EQUALS UNION LBRACE IDENT COMMA RBRACE UNION
 ##
-## Ends in an error in state: 307.
+## Ends in an error in state: 314.
 ##
 ## expr -> UNION LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE . [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## fexpr -> UNION LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE . [ LPAREN ]
@@ -2161,7 +2249,7 @@ program: LET IDENT EQUALS UNION LBRACE IDENT COMMA RBRACE UNION
 
 program: LET IDENT EQUALS UNION LBRACE RBRACE UNION
 ##
-## Ends in an error in state: 310.
+## Ends in an error in state: 317.
 ##
 ## expr -> UNION LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE . [ SEMICOLON RPAREN RBRACE FN COMMA ]
 ## fexpr -> UNION LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE . [ LPAREN ]
@@ -2174,7 +2262,7 @@ program: LET IDENT EQUALS UNION LBRACE RBRACE UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT SEMICOLON
 ##
-## Ends in an error in state: 311.
+## Ends in an error in state: 318.
 ##
 ## nonempty_list(terminated(function_param,COMMA)) -> IDENT COLON expr . COMMA [ RPAREN ]
 ## nonempty_list(terminated(function_param,COMMA)) -> IDENT COLON expr . COMMA nonempty_list(terminated(function_param,COMMA)) [ RPAREN ]
@@ -2188,14 +2276,15 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT SEMICOLON
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA UNION
 ##
-## Ends in an error in state: 312.
+## Ends in an error in state: 319.
 ##
 ## nonempty_list(terminated(function_param,COMMA)) -> IDENT COLON expr COMMA . [ RPAREN ]
 ## nonempty_list(terminated(function_param,COMMA)) -> IDENT COLON expr COMMA . nonempty_list(terminated(function_param,COMMA)) [ RPAREN ]
@@ -2209,7 +2298,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA UNION
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 316.
+## Ends in an error in state: 323.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2222,7 +2311,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE TYPE
 ##
-## Ends in an error in state: 317.
+## Ends in an error in state: 324.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE . nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE . loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2235,7 +2324,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE TYPE
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 320.
+## Ends in an error in state: 327.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2247,7 +2336,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE IDENT COMMA RB
 
 program: STRUCT UNION
 ##
-## Ends in an error in state: 321.
+## Ends in an error in state: 328.
 ##
 ## list(top_level_stmt) -> STRUCT . IDENT LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT . IDENT LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2264,7 +2353,7 @@ program: STRUCT UNION
 
 program: STRUCT IDENT UNION
 ##
-## Ends in an error in state: 322.
+## Ends in an error in state: 329.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT . LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT IDENT . LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2281,7 +2370,7 @@ program: STRUCT IDENT UNION
 
 program: STRUCT IDENT LPAREN UNION
 ##
-## Ends in an error in state: 323.
+## Ends in an error in state: 330.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2296,7 +2385,7 @@ program: STRUCT IDENT LPAREN UNION
 
 program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 325.
+## Ends in an error in state: 332.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2309,7 +2398,7 @@ program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE UNION
 ##
-## Ends in an error in state: 326.
+## Ends in an error in state: 333.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE . nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE . loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2322,7 +2411,7 @@ program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE UNION
 
 program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 329.
+## Ends in an error in state: 336.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2334,7 +2423,7 @@ program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE IDENT COMMA R
 
 program: LET UNION
 ##
-## Ends in an error in state: 330.
+## Ends in an error in state: 337.
 ##
 ## list(top_level_stmt) -> LET . IDENT EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> LET . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
@@ -2348,7 +2437,7 @@ program: LET UNION
 
 program: LET IDENT UNION
 ##
-## Ends in an error in state: 331.
+## Ends in an error in state: 338.
 ##
 ## list(top_level_stmt) -> LET IDENT . EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> LET IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
@@ -2362,7 +2451,7 @@ program: LET IDENT UNION
 
 program: LET IDENT LPAREN UNION
 ##
-## Ends in an error in state: 332.
+## Ends in an error in state: 339.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> LET IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
@@ -2375,7 +2464,7 @@ program: LET IDENT LPAREN UNION
 
 program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 334.
+## Ends in an error in state: 341.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2387,7 +2476,7 @@ program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS TYPE
 ##
-## Ends in an error in state: 335.
+## Ends in an error in state: 342.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS . expr SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2399,7 +2488,7 @@ program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS TYPE
 
 program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 336.
+## Ends in an error in state: 343.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr . SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2410,14 +2499,15 @@ program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS IDENT RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS IDENT SEMICOLON TYPE
 ##
-## Ends in an error in state: 337.
+## Ends in an error in state: 344.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON . list(top_level_stmt) [ EOF ]
 ##
@@ -2429,7 +2519,7 @@ program: LET IDENT LPAREN IDENT COLON IDENT COMMA RPAREN EQUALS IDENT SEMICOLON 
 
 program: INTERFACE UNION
 ##
-## Ends in an error in state: 338.
+## Ends in an error in state: 345.
 ##
 ## list(top_level_stmt) -> INTERFACE . IDENT LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> INTERFACE . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
@@ -2443,7 +2533,7 @@ program: INTERFACE UNION
 
 program: INTERFACE IDENT UNION
 ##
-## Ends in an error in state: 339.
+## Ends in an error in state: 346.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT . LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> INTERFACE IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
@@ -2457,7 +2547,7 @@ program: INTERFACE IDENT UNION
 
 program: INTERFACE IDENT LPAREN UNION
 ##
-## Ends in an error in state: 340.
+## Ends in an error in state: 347.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
@@ -2470,7 +2560,7 @@ program: INTERFACE IDENT LPAREN UNION
 
 program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 342.
+## Ends in an error in state: 349.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ##
@@ -2482,7 +2572,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE UNION
 ##
-## Ends in an error in state: 343.
+## Ends in an error in state: 350.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE . list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ##
@@ -2494,7 +2584,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE UNION
 
 program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 345.
+## Ends in an error in state: 352.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE list(located(function_signature_binding)) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2506,7 +2596,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYP
 
 program: ENUM UNION
 ##
-## Ends in an error in state: 346.
+## Ends in an error in state: 353.
 ##
 ## list(top_level_stmt) -> ENUM . IDENT LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM . IDENT LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2523,7 +2613,7 @@ program: ENUM UNION
 
 program: ENUM IDENT UNION
 ##
-## Ends in an error in state: 347.
+## Ends in an error in state: 354.
 ##
 ## list(top_level_stmt) -> ENUM IDENT . LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM IDENT . LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2540,7 +2630,7 @@ program: ENUM IDENT UNION
 
 program: ENUM IDENT LPAREN UNION
 ##
-## Ends in an error in state: 348.
+## Ends in an error in state: 355.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2555,7 +2645,7 @@ program: ENUM IDENT LPAREN UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 ##
-## Ends in an error in state: 350.
+## Ends in an error in state: 357.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2568,7 +2658,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE UNION
 ##
-## Ends in an error in state: 351.
+## Ends in an error in state: 358.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2581,7 +2671,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE UNION
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 354.
+## Ends in an error in state: 361.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2593,7 +2683,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE IDENT COMMA RBR
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN RBRACE
 ##
-## Ends in an error in state: 356.
+## Ends in an error in state: 363.
 ##
 ## list(top_level_stmt) -> function_definition(located_ident_with_params) . list(top_level_stmt) [ EOF ]
 ##
@@ -2604,16 +2694,16 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN RBRACE
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 281, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
-## In state 282, spurious reduction of production option(code_block) ->
-## In state 283, spurious reduction of production function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
+## In state 288, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
+## In state 289, spurious reduction of production option(code_block) ->
+## In state 290, spurious reduction of production function_definition(located_ident_with_params) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: FN IDENT LPAREN RPAREN RBRACE
 ##
-## Ends in an error in state: 358.
+## Ends in an error in state: 365.
 ##
 ## list(top_level_stmt) -> function_definition(located(ident)) . list(top_level_stmt) [ EOF ]
 ##
@@ -2624,16 +2714,16 @@ program: FN IDENT LPAREN RPAREN RBRACE
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 274, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
-## In state 224, spurious reduction of production option(code_block) ->
-## In state 225, spurious reduction of production function_definition(located(ident)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
+## In state 281, spurious reduction of production option(preceded(RARROW,located(fexpr))) ->
+## In state 231, spurious reduction of production option(code_block) ->
+## In state 232, spurious reduction of production function_definition(located(ident)) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) option(code_block)
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 362.
+## Ends in an error in state: 369.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2645,7 +2735,7 @@ program: ENUM IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYPE
 
 program: ENUM IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 365.
+## Ends in an error in state: 372.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2658,7 +2748,7 @@ program: ENUM IDENT LPAREN RPAREN UNION
 
 program: ENUM IDENT LPAREN RPAREN LBRACE UNION
 ##
-## Ends in an error in state: 366.
+## Ends in an error in state: 373.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2671,7 +2761,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACE UNION
 
 program: ENUM IDENT LPAREN RPAREN LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 369.
+## Ends in an error in state: 376.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2683,7 +2773,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACE IDENT COMMA RBRACE TYPE
 
 program: ENUM IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 373.
+## Ends in an error in state: 380.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2695,7 +2785,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 
 program: ENUM IDENT LBRACE UNION
 ##
-## Ends in an error in state: 375.
+## Ends in an error in state: 382.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LBRACE . nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> ENUM IDENT LBRACE . loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2708,7 +2798,7 @@ program: ENUM IDENT LBRACE UNION
 
 program: ENUM IDENT LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 378.
+## Ends in an error in state: 385.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2720,7 +2810,7 @@ program: ENUM IDENT LBRACE IDENT COMMA RBRACE TYPE
 
 program: ENUM IDENT LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 382.
+## Ends in an error in state: 389.
 ##
 ## list(top_level_stmt) -> ENUM IDENT LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2732,7 +2822,7 @@ program: ENUM IDENT LBRACE RBRACE TYPE
 
 program: INTERFACE IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 386.
+## Ends in an error in state: 393.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACE list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ##
@@ -2744,7 +2834,7 @@ program: INTERFACE IDENT LPAREN RPAREN UNION
 
 program: INTERFACE IDENT LPAREN RPAREN LBRACE UNION
 ##
-## Ends in an error in state: 387.
+## Ends in an error in state: 394.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE . list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ##
@@ -2756,7 +2846,7 @@ program: INTERFACE IDENT LPAREN RPAREN LBRACE UNION
 
 program: INTERFACE IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 389.
+## Ends in an error in state: 396.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE list(located(function_signature_binding)) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2768,7 +2858,7 @@ program: INTERFACE IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 
 program: INTERFACE IDENT LBRACE UNION
 ##
-## Ends in an error in state: 391.
+## Ends in an error in state: 398.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LBRACE . list(located(function_signature_binding)) RBRACE list(top_level_stmt) [ EOF ]
 ##
@@ -2780,7 +2870,7 @@ program: INTERFACE IDENT LBRACE UNION
 
 program: INTERFACE IDENT LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 393.
+## Ends in an error in state: 400.
 ##
 ## list(top_level_stmt) -> INTERFACE IDENT LBRACE list(located(function_signature_binding)) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2792,7 +2882,7 @@ program: INTERFACE IDENT LBRACE RBRACE TYPE
 
 program: LET IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 397.
+## Ends in an error in state: 404.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . EQUALS expr SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2804,7 +2894,7 @@ program: LET IDENT LPAREN RPAREN UNION
 
 program: LET IDENT LPAREN RPAREN EQUALS TYPE
 ##
-## Ends in an error in state: 398.
+## Ends in an error in state: 405.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS . expr SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2816,7 +2906,7 @@ program: LET IDENT LPAREN RPAREN EQUALS TYPE
 
 program: LET IDENT LPAREN RPAREN EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 399.
+## Ends in an error in state: 406.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr . SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2827,14 +2917,15 @@ program: LET IDENT LPAREN RPAREN EQUALS IDENT RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT LPAREN RPAREN EQUALS IDENT SEMICOLON TYPE
 ##
-## Ends in an error in state: 400.
+## Ends in an error in state: 407.
 ##
 ## list(top_level_stmt) -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON . list(top_level_stmt) [ EOF ]
 ##
@@ -2846,7 +2937,7 @@ program: LET IDENT LPAREN RPAREN EQUALS IDENT SEMICOLON TYPE
 
 program: LET IDENT EQUALS TYPE
 ##
-## Ends in an error in state: 402.
+## Ends in an error in state: 409.
 ##
 ## list(top_level_stmt) -> LET IDENT EQUALS . expr SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2858,7 +2949,7 @@ program: LET IDENT EQUALS TYPE
 
 program: LET IDENT EQUALS IDENT RPAREN
 ##
-## Ends in an error in state: 403.
+## Ends in an error in state: 410.
 ##
 ## list(top_level_stmt) -> LET IDENT EQUALS expr . SEMICOLON list(top_level_stmt) [ EOF ]
 ##
@@ -2869,14 +2960,15 @@ program: LET IDENT EQUALS IDENT RPAREN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 60, spurious reduction of production expr -> IDENT
+## In state 60, spurious reduction of production reference -> IDENT
+## In state 87, spurious reduction of production expr -> reference
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
 program: LET IDENT EQUALS IDENT SEMICOLON TYPE
 ##
-## Ends in an error in state: 404.
+## Ends in an error in state: 411.
 ##
 ## list(top_level_stmt) -> LET IDENT EQUALS expr SEMICOLON . list(top_level_stmt) [ EOF ]
 ##
@@ -2888,7 +2980,7 @@ program: LET IDENT EQUALS IDENT SEMICOLON TYPE
 
 program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 409.
+## Ends in an error in state: 416.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2900,7 +2992,7 @@ program: STRUCT IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYPE
 
 program: STRUCT IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 412.
+## Ends in an error in state: 419.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2913,7 +3005,7 @@ program: STRUCT IDENT LPAREN RPAREN UNION
 
 program: STRUCT IDENT LPAREN RPAREN LBRACE UNION
 ##
-## Ends in an error in state: 413.
+## Ends in an error in state: 420.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE . nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE . loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2926,7 +3018,7 @@ program: STRUCT IDENT LPAREN RPAREN LBRACE UNION
 
 program: STRUCT IDENT LPAREN RPAREN LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 416.
+## Ends in an error in state: 423.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2938,7 +3030,7 @@ program: STRUCT IDENT LPAREN RPAREN LBRACE IDENT COMMA RBRACE TYPE
 
 program: STRUCT IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 420.
+## Ends in an error in state: 427.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2950,7 +3042,7 @@ program: STRUCT IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 
 program: STRUCT IDENT LBRACE UNION
 ##
-## Ends in an error in state: 422.
+## Ends in an error in state: 429.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LBRACE . nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> STRUCT IDENT LBRACE . loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -2963,7 +3055,7 @@ program: STRUCT IDENT LBRACE UNION
 
 program: STRUCT IDENT LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 425.
+## Ends in an error in state: 432.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LBRACE nonempty_list(terminated(struct_fields,COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2975,7 +3067,7 @@ program: STRUCT IDENT LBRACE IDENT COMMA RBRACE TYPE
 
 program: STRUCT IDENT LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 429.
+## Ends in an error in state: 436.
 ##
 ## list(top_level_stmt) -> STRUCT IDENT LBRACE loption(separated_nonempty_list(COMMA,struct_fields)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2987,7 +3079,7 @@ program: STRUCT IDENT LBRACE RBRACE TYPE
 
 program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 434.
+## Ends in an error in state: 441.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -2999,7 +3091,7 @@ program: UNION IDENT LPAREN IDENT COLON IDENT COMMA RPAREN LBRACE RBRACE TYPE
 
 program: UNION IDENT LPAREN RPAREN UNION
 ##
-## Ends in an error in state: 437.
+## Ends in an error in state: 444.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -3012,7 +3104,7 @@ program: UNION IDENT LPAREN RPAREN UNION
 
 program: UNION IDENT LPAREN RPAREN LBRACE TYPE
 ##
-## Ends in an error in state: 438.
+## Ends in an error in state: 445.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE . nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE . loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -3025,7 +3117,7 @@ program: UNION IDENT LPAREN RPAREN LBRACE TYPE
 
 program: UNION IDENT LPAREN RPAREN LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 441.
+## Ends in an error in state: 448.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -3037,7 +3129,7 @@ program: UNION IDENT LPAREN RPAREN LBRACE IDENT COMMA RBRACE TYPE
 
 program: UNION IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 445.
+## Ends in an error in state: 452.
 ##
 ## list(top_level_stmt) -> UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -3049,7 +3141,7 @@ program: UNION IDENT LPAREN RPAREN LBRACE RBRACE TYPE
 
 program: UNION IDENT LBRACE TYPE
 ##
-## Ends in an error in state: 447.
+## Ends in an error in state: 454.
 ##
 ## list(top_level_stmt) -> UNION IDENT LBRACE . nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
 ## list(top_level_stmt) -> UNION IDENT LBRACE . loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE list(top_level_stmt) [ EOF ]
@@ -3062,7 +3154,7 @@ program: UNION IDENT LBRACE TYPE
 
 program: UNION IDENT LBRACE IDENT COMMA RBRACE TYPE
 ##
-## Ends in an error in state: 450.
+## Ends in an error in state: 457.
 ##
 ## list(top_level_stmt) -> UNION IDENT LBRACE nonempty_list(terminated(located(union_member),COMMA)) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##
@@ -3074,7 +3166,7 @@ program: UNION IDENT LBRACE IDENT COMMA RBRACE TYPE
 
 program: UNION IDENT LBRACE RBRACE TYPE
 ##
-## Ends in an error in state: 454.
+## Ends in an error in state: 461.
 ##
 ## list(top_level_stmt) -> UNION IDENT LBRACE loption(separated_nonempty_list(COMMA,located(union_member))) list(sugared_function_definition) RBRACE . list(top_level_stmt) [ EOF ]
 ##

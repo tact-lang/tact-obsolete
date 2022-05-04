@@ -6,7 +6,7 @@
 %token RBRACE RPAREN
 %token COMMA
 %token COLON RARROW SEMICOLON
-%token TILDA
+%token TILDA DOT
 %token <Z.t> INT
 
 %%

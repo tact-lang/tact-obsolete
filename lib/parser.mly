@@ -73,6 +73,7 @@ let let_binding ==
       ~binding_expr:
       (make_located ~loc: $loc ~value: (expand_fn_sugar params $loc (Reference (Ident "Type")) expr) ()) 
       ()
+
   }
 )
 let shorthand_binding ==
@@ -112,6 +113,7 @@ let sugared_function_definition ==
                      ~value: (expand_fn_sugar params $loc (Reference (Ident "Function")) (make_located ~loc: $loc ~value: expr ()))
                      () (* FIXME: Function type is a temp punt *)
        ) () })
+
 
 (* Function definition
 
@@ -219,7 +221,7 @@ let fexpr :=
  (* can be an `union` definition *)
  | (_, u) = union_definition(nothing); { u }
   (* can be an identifier, as a reference to some identifier *)
- | ~= ident; <Reference>
+ | reference
  (* can be a function call *)
  | function_call
  (* can be an integer *)
@@ -229,6 +231,11 @@ let fexpr :=
 
 let params ==
     delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
+
+let reference :=
+  | ident = located(ident); {Reference (make_path ~first_elem:ident ~last_elems:[] ()) }
+  | ident = located(ident); DOT; idents = separated_list(DOT, located(ident)); 
+    {Reference (make_path ~first_elem:ident ~last_elems:idents ())}
 
 (* Struct
 
@@ -260,6 +267,7 @@ let struct_definition(name) ==
 let struct_fields ==
 | located ( name = located(ident); COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
 | located ( name = located(ident); { make_struct_field ~field_name: name ~field_type: (make_located ~loc: (loc name) ~value: (Reference (value name)) ()) () } )
+
 
 (* Struct constructor 
  *
@@ -362,7 +370,7 @@ let union_member :=
  (* can be an `union` definition *)
  | (_, u) = union_definition(nothing); { u }
  (* can be an identifier, as a reference to some identifier *)
- | ~= ident; <Reference>
+ | ident = located(ident); {Reference (make_path ~first_elem:ident ~last_elems:[] ()) }
  (* can be a function call [by identifier only] *)
  | fn = located(ident);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
