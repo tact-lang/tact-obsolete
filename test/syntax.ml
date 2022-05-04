@@ -734,7 +734,6 @@ let test_type_construction_function_call () =
   let source = {|
   let a = A(X) { field: value };
   |} in
-  Caml.print_string (Tact.Syntax.show_program (parse_program source)) ;
   Alcotest.(check bool)
     "type construction function call" true
     ( match parse_program source with
@@ -764,7 +763,6 @@ let test_type_construction_type_declaration () =
   let source = {|
   let a = (type { field: Int257 }) { field: value };
   |} in
-  Caml.print_string (Tact.Syntax.show_program (parse_program source)) ;
   Alcotest.(check bool)
     "type construction type declaration" true
     ( match parse_program source with

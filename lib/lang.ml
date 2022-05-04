@@ -18,12 +18,12 @@ class ['s] base_map =
 
 type 'a named_map = (string * 'a) list
 
-and value =
+and term =
   | Type of type_
   | Function of function_
   | Integer of (Z.t[@visitors.name "z"])
   | Reference of string
-  | ResolvedReference of string * value
+  | ResolvedReference of string * term
   | Builtin of builtin
   | Invalid
 
@@ -35,7 +35,7 @@ and kind =
   | TypeKind of type_
   | FunctionKind of function_
   | ReferenceKind of string
-  | UnsupportedKind of value
+  | UnsupportedKind of term
 
 and function_ =
   { function_loc : Syntax.loc; [@visitors.opaque]
@@ -43,7 +43,7 @@ and function_ =
     function_returns : kind;
     function_body : code_expr list option }
 
-and code_expr = Return of value | Value of value
+and code_expr = Return of term | Value of term
 
 and type_ =
   { type_loc : Syntax.loc; [@visitors.opaque]
@@ -54,7 +54,7 @@ and type_field = {field_type : kind}
 
 and env = {scope : scope}
 
-and scope = value named_map
+and scope = term named_map
 [@@deriving
   visitors
     { variety = "map";
@@ -68,7 +68,7 @@ let as_amap (l : 'a named_map) f =
 
 let in_amap (l : 'a named_map) f = f (Map.of_alist_exn (module String) l)
 
-let value_to_kind value =
+let term_to_kind value =
   match value with
   | Reference value ->
       ReferenceKind value
@@ -82,7 +82,7 @@ let value_to_kind value =
       UnsupportedKind value
 
 type error =
-  | Duplicate_Identifier of string * value
+  | Duplicate_Identifier of string * term
   | Duplicate_Field of string * type_
   | Duplicate_Param of string * function_
   | Invalid_Param_Kind of string * function_
@@ -130,7 +130,7 @@ class ['s] reference_resolver ((env, errors) : env * elist) =
     method! visit_ReferenceKind _env ref =
       match in_amap p_env.scope (fun m -> Map.find m ref) with
       | Some (ResolvedReference (_, t)) | Some t ->
-          ResolvedReferenceKind (ref, value_to_kind t)
+          ResolvedReferenceKind (ref, term_to_kind t)
       | None ->
           new_error (Unresolved ref) p_errors ;
           ReferenceKind ref
@@ -212,7 +212,7 @@ and type_to_type s loc elist =
               expr_to_value field.value.field_type.value
                 field.value.field_type.loc elist
             in
-            match Result.map value ~f:value_to_kind with
+            match Result.map value ~f:term_to_kind with
             | Ok value ->
                 { s' with
                   type_fields =
@@ -253,7 +253,7 @@ and function_to_function f loc elist =
   let f' =
     { f' with
       function_returns =
-        ( match value_to_kind return with
+        ( match term_to_kind return with
         | UnsupportedKind _value ->
             new_error (Invalid_Return_Kind f') elist ;
             f'.function_returns
@@ -272,7 +272,7 @@ and function_to_function f loc elist =
             f'
         | None -> (
             let value = expr_to_value expr.value expr.loc elist in
-            match Result.map value ~f:value_to_kind with
+            match Result.map value ~f:term_to_kind with
             | Ok (UnsupportedKind _) ->
                 new_error (Invalid_Param_Kind (ident, f')) elist ;
                 f'
