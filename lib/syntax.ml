@@ -50,7 +50,7 @@ and union_definition =
 and expr =
   | Let of binding located
   | Type of type_definition
-  | TypeConstructor of (ident located * expr located) list
+  | TypeConstructor of type_constructor
   | Interface of interface_definition
   | Enum of enum_definition
   | Union of union_definition
@@ -61,6 +61,10 @@ and expr =
   | CodeBlock of code_block
   | If of if_
   | Return of expr
+
+and type_constructor =
+  { constructor_id : expr located option;
+    fields_construction : (ident located * expr located) list }
 
 and type_field = {field_name : ident located; field_type : expr located}
 
