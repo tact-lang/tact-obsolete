@@ -163,7 +163,7 @@ let () =
       ( "type",
         [ test_case "type definition" `Quick test_type;
           test_case "duplicate type definition" `Quick test_type_duplicate;
-          test_case "duplicate type definition (with a non-typeure)" `Quick
+          test_case "duplicate type definition (with a non-type)" `Quick
             test_type_duplicate_non_type;
           test_case "duplicate type field" `Quick test_type_duplicate_field ] );
       ("function", [test_case "function definition" `Quick test_function]) ]
