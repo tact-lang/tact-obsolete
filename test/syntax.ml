@@ -116,8 +116,12 @@ let test_type_constructor () =
                   binding_expr =
                     { value =
                         TypeConstructor
-                          [ ({value = Ident "a"; _}, {value = Int _; _});
-                            ({value = Ident "b"; _}, {value = Int _; _}) ];
+                          { constructor_id =
+                              Some {value = Reference (Ident "MyType"); _};
+                            fields_construction =
+                              [ ({value = Ident "a"; _}, {value = Int _; _});
+                                ({value = Ident "b"; _}, {value = Int _; _}) ]
+                          };
                       _ } };
               _ } ] } ->
         true
@@ -726,6 +730,73 @@ let test_if_with_else_if () =
     | _ ->
         false )
 
+let test_type_construction_function_call () =
+  let source = {|
+  let a = A(X) { field: value };
+  |} in
+  Caml.print_string (Tact.Syntax.show_program (parse_program source)) ;
+  Alcotest.(check bool)
+    "type construction function call" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_expr =
+                    { value =
+                        TypeConstructor
+                          { constructor_id =
+                              Some
+                                { value =
+                                    FunctionCall
+                                      { fn = {value = Reference (Ident "A"); _};
+                                        arguments =
+                                          [{value = Reference (Ident "X"); _}];
+                                        _ };
+                                  _ };
+                            fields_construction = _ };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
+let test_type_construction_type_declaration () =
+  let source = {|
+  let a = (type { field: Int257 }) { field: value };
+  |} in
+  Caml.print_string (Tact.Syntax.show_program (parse_program source)) ;
+  Alcotest.(check bool)
+    "type construction type declaration" true
+    ( match parse_program source with
+    | { bindings =
+          [ { value =
+                { binding_expr =
+                    { value =
+                        TypeConstructor
+                          { constructor_id =
+                              Some
+                                { value =
+                                    Type
+                                      { fields =
+                                          [ { value =
+                                                { field_name =
+                                                    {value = Ident "field"; _};
+                                                  field_type =
+                                                    { value =
+                                                        Reference
+                                                          (Ident "Int257");
+                                                      _ } };
+                                              _ } ];
+                                        _ };
+                                  _ };
+                            fields_construction = _ };
+                      _ };
+                  _ };
+              _ } ] } ->
+        true
+    | _ ->
+        false )
+
 let () =
   let open Alcotest in
   run "Syntax"
@@ -769,4 +840,9 @@ let () =
             test_if_empty_body_no_else;
           test_case "if expr has body with else" `Quick
             test_if_has_body_with_else;
-          test_case "if expr with else if" `Quick test_if_with_else_if ] ) ]
+          test_case "if expr with else if" `Quick test_if_with_else_if ] );
+      ( "type construction",
+        [ test_case "type construction function call" `Quick
+            test_type_construction_function_call;
+          test_case "type construction type declaration" `Quick
+            test_type_construction_type_declaration ] ) ]

@@ -190,6 +190,20 @@ let stmt :=
   | code_block
   | ~ = delimited(RETURN, expr, SEMICOLON); <Return>
 
+(* Type expression
+  
+   Difference between type expression and simple expression is that in type expression
+   it is not allowed to use exprs with brackets such as `if {}`, `type {}` and `fn() {}`.
+ 
+*)
+let type_expr :=
+  (* can be any expr delimited by () *)
+  | expr = delimited(LPAREN, expr_, RPAREN); {expr}
+  (* can be an ident *)
+  | ~= ident; <Reference>
+  (* can be a function call *)
+  | function_call
+
 (* Expression *)
 let expr :=
  | expr_
@@ -204,6 +218,7 @@ let fexpr :=
  | delimited(LPAREN, type_constructor, RPAREN)
  (* can be a function definition, in parens *)
  | (_, f) = delimited(LPAREN, function_definition(nothing), RPAREN); { f }
+
  let expr_ ==
  (* can be a `type` definition *)
  | (_, s) = type_definition(nothing); { s }
@@ -259,9 +274,17 @@ let type_fields ==
  *
  * *)
 let type_constructor :=
-  IDENT;
-  ~ = delimited_separated_trailing_list(LBRACE, separated_pair(located(ident), COLON, located(expr)), COMMA, RBRACE);
-  <TypeConstructor>
+  constructor_id = located(type_expr);
+  fields_construction = delimited_separated_trailing_list(
+    LBRACE, 
+    separated_pair(
+      located(ident), 
+      COLON, 
+      located(expr)
+    ), 
+    COMMA, 
+    RBRACE);
+  {TypeConstructor ({constructor_id=Some(constructor_id); fields_construction=fields_construction})}
 
 (* Interface
 
