@@ -178,7 +178,7 @@ let if_ :=
   { If (make_if_ ~condition ~body: (match body with CodeBlock({block_exprs;}) -> block_exprs | _ -> []) ?else_ ()) }
 
 let code_block :=
-  block_exprs = delimited(LBRACE, list(located(stmt)), RBRACE);
+  block_exprs = delimited(LBRACE, nonempty_list(located(stmt)), RBRACE);
   {CodeBlock (make_code_block ~block_exprs ())}
 
 
@@ -274,7 +274,7 @@ let type_fields ==
  *
  * *)
 let type_constructor :=
-  constructor_id = located(type_expr);
+  constructor_id = option(located(type_expr));
   fields_construction = delimited_separated_trailing_list(
     LBRACE, 
     separated_pair(
@@ -284,7 +284,7 @@ let type_constructor :=
     ), 
     COMMA, 
     RBRACE);
-  {TypeConstructor ({constructor_id=Some(constructor_id); fields_construction=fields_construction})}
+  {TypeConstructor ({constructor_id=constructor_id; fields_construction=fields_construction})}
 
 (* Interface
 
