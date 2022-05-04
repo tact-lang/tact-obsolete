@@ -41,9 +41,9 @@ and function_ =
   { function_loc : Syntax.loc; [@visitors.opaque]
     function_params : kind named_map;
     function_returns : kind;
-    function_body : code_expr list option }
+    function_body : stmt list option }
 
-and code_expr = Return of term | Value of term
+and stmt = Return of term | Term of term
 
 and type_ =
   { type_loc : Syntax.loc; [@visitors.opaque]
@@ -190,12 +190,12 @@ and expr_to_value expr loc elist =
   | _ ->
       Error Unsupported
 
-and expr_to_code_expr expr loc elist =
+and expr_to_stmt expr loc elist =
   match expr with
   | Syntax.Return expr' ->
       Result.map (expr_to_value expr' loc elist) ~f:(fun v -> Return v)
   | _ ->
-      Result.map (expr_to_value expr loc elist) ~f:(fun v -> Value v)
+      Result.map (expr_to_value expr loc elist) ~f:(fun v -> Term v)
 
 and type_to_type s loc elist =
   let s' = {type_loc = loc; type_fields = []; type_methods = []} in
@@ -243,7 +243,7 @@ and function_to_function f loc elist =
               Result.map
                 (List.fold_result ~init:[]
                    ~f:(fun acc expr ->
-                     Result.map (expr_to_code_expr expr.value expr.loc elist)
+                     Result.map (expr_to_stmt expr.value expr.loc elist)
                        ~f:(fun e -> e :: acc) )
                    exprs )
                 ~f:List.rev

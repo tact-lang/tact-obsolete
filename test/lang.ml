@@ -174,7 +174,7 @@ let test_function () =
                  _ }]
                f
           && [%matches?
-               {function_body = Some [Value (Integer i); Value (Integer i')]; _} when 
+               {function_body = Some [Term (Integer i); Term (Integer i')]; _} when 
                equal (Z.to_int i) 1 && equal (Z.to_int i') 2]
                f
       | _ ->
