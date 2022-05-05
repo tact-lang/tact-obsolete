@@ -193,8 +193,6 @@ functor
               fn p_env args
           | _ ->
               FunctionCall (f, args)
-
-        method! visit_ResolvedReferenceKind _env _ k = k
       end
 
     let rec env_from_program (stx : Syntax.program) (elist : elist) =
