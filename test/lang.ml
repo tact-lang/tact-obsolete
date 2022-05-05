@@ -19,12 +19,14 @@ let print_sexp e =
   Sexplib.Sexp.pp_hum Format.std_formatter
     (Result.sexp_of_t Lang.sexp_of_env Lang.sexp_of_error e)
 
-let pp s = parse_program s |> build_program |> print_sexp
+let pp s =
+  Result.map (parse_program s |> build_program) ~f:Lang.eval_env |> print_sexp
 
 let pp_stripped s =
   Result.map
     (parse_program s |> build_program)
-    ~f:(fun env -> (new resolved_references_stripper env)#visit_env () env)
+    ~f:(fun env ->
+      Lang.eval_env ((new resolved_references_stripper env)#visit_env () env) )
   |> print_sexp
 
 let%expect_test "scope resolution" =
@@ -219,10 +221,12 @@ let%expect_test "compile-time evaluation" =
         (println (Function (BuiltinFn <fun>))) (v (Integer 1)))))) |}]
 
 let%expect_test "parametric type instantiation" =
-  let source = {|
+  let source =
+    {|
       type T(A: Type) { a: A }
       let TA = T(Int257);
-   |} in
+   |}
+  in
   pp_stripped source ;
   [%expect
     {|
@@ -241,8 +245,7 @@ let%expect_test "parametric type instantiation" =
                    (type_methods ()))))))))))
           (TA
            (Type
-            ((type_fields
-              ((a ((field_type (ResolvedReferenceKind A (BuiltinKind Int257)))))))
+            ((type_fields ((a ((field_type (BuiltinKind Int257))))))
              (type_methods ()))))
           (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
  |}]

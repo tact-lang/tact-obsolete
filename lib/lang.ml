@@ -32,6 +32,8 @@ functor
 
     let sexp_of_z z = Sexplib.Sexp.of_string (Z.to_string z)
 
+    let equal_z = Z.equal
+
     type 'a named_map = ((string * 'a) list[@sexp.list])
 
     and term =
@@ -61,7 +63,7 @@ functor
         function_returns : kind;
         function_body : stmt list option [@sexp.option] }
 
-    and builtin_fn = (env -> term list -> term[@visitors.opaque])
+    and builtin_fn = (env -> term list -> term[@visitors.opaque] [@equal.ignore])
 
     and function_ = Fn of fn | BuiltinFn of builtin_fn
 
@@ -76,7 +78,8 @@ functor
 
     and scope = term named_map
     [@@deriving
-      sexp_of,
+      equal,
+        sexp_of,
         visitors
           { variety = "map";
             polymorphic = true;
@@ -211,25 +214,6 @@ functor
                 ReferenceKind ref
       end
 
-    let interpret_function env fn args =
-      let args' =
-        List.map (List.zip_exn fn.function_params args) ~f:(fun ((n, _), a) ->
-            (n, a) )
-      in
-      let env' = {scope = args' @ env.scope} in
-      List.fold_until ~init:Void
-        ~f:
-          (fun _ -> function
-            | Return term ->
-                Stop term
-            | Term term ->
-                Continue term )
-        ~finish:(fun state -> state)
-        (List.map (Option.value fn.function_body ~default:[]) ~f:(fun stmt ->
-             (new reference_resolver
-                (env', {warnings = ref []; errors = ref []}) )
-               #visit_stmt () stmt ) )
-
     (* Strips resolved references types *)
     class ['s] resolved_references_stripper (env : env) =
       object (_ : 's)
@@ -241,6 +225,34 @@ functor
 
         method! visit_ResolvedReferenceKind _env _ k = k
       end
+
+    let interpret_function env fn args =
+      let args' =
+        List.map (List.zip_exn fn.function_params args) ~f:(fun ((n, _), a) ->
+            (n, a) )
+      in
+      let env' = {scope = args' @ env.scope} in
+      let stripped =
+        equal_env env'
+          ((new resolved_references_stripper env)#visit_env () env')
+      in
+      List.fold_until ~init:Void
+        ~f:
+          (fun _ -> function
+            | Return term ->
+                Stop term
+            | Term term ->
+                Continue term )
+        ~finish:(fun state -> state)
+        (List.map (Option.value fn.function_body ~default:[]) ~f:(fun stmt ->
+             let stmt =
+               (new reference_resolver
+                  (env', {warnings = ref []; errors = ref []}) )
+                 #visit_stmt () stmt
+             in
+             if stripped then
+               (new resolved_references_stripper env')#visit_stmt () stmt
+             else stmt ) )
 
     (* Evaluates compile-time function calls *)
     class ['s] function_call_evaluator (env : env) =
@@ -279,11 +291,11 @@ functor
         let resolver = new reference_resolver (env, elist) in
         resolver#visit_env () env
       in
-      let env =
-        let evaluator = new function_call_evaluator env in
-        evaluator#visit_env () env
-      in
       env
+
+    and eval_env env =
+      let evaluator = new function_call_evaluator env in
+      evaluator#visit_env () env
 
     and scope_from_bindings bindings elist =
       let scope = empty_scope in
