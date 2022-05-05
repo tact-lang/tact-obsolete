@@ -125,6 +125,7 @@ functor
 
     let empty_scope =
       [ ("Void", Void);
+        ("Type", Builtin "Type");
         ("Int257", Builtin "Int257");
         ("Bool", Builtin "Bool");
         ("println", Function (BuiltinFn comptime_println)) ]
@@ -157,11 +158,11 @@ functor
       let _env' = {scope = args' @ env.scope} in
       List.fold_until ~init:Void
         ~f:
-          (fun state -> function
+          (fun _ -> function
             | Return term ->
                 Stop term
-            | Term _ ->
-                Continue state )
+            | Term term ->
+                Continue term )
         ~finish:(fun state -> state)
         (Option.value fn.function_body ~default:[])
 

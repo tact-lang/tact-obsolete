@@ -43,7 +43,8 @@ let%expect_test "scope resolution" =
      ((scope
        ((Bool (Builtin Bool)) (I (ResolvedReference Int257 (Builtin Int257)))
         (I_ (ResolvedReference I (Builtin Int257))) (Int257 (Builtin Int257))
-        (Void Void) (n (Integer 1)) (n_ (ResolvedReference n (Integer 1)))
+        (Type (Builtin Type)) (Void Void) (n (Integer 1))
+        (n_ (ResolvedReference n (Integer 1)))
         (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "stripping scope resolution" =
@@ -61,8 +62,8 @@ let%expect_test "stripping scope resolution" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (I (Builtin Int257)) (I_ (Builtin Int257))
-        (Int257 (Builtin Int257)) (Void Void) (n (Integer 1)) (n_ (Integer 1))
-        (println (Function (BuiltinFn <fun>))))))) |}]
+        (Int257 (Builtin Int257)) (Type (Builtin Type)) (Void Void)
+        (n (Integer 1)) (n_ (Integer 1)) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "scope resolution within functions" =
   let source =
@@ -79,8 +80,8 @@ let%expect_test "scope resolution within functions" =
     {|
     (Ok
      ((scope
-       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void)
-        (i (ResolvedReference Int257 (Builtin Int257)))
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (Void Void) (i (ResolvedReference Int257 (Builtin Int257)))
         (println (Function (BuiltinFn <fun>)))
         (test
          (Function
@@ -119,7 +120,7 @@ let%expect_test "type definition" =
             ((a ((field_type (BuiltinKind Int257))))
              (b ((field_type (BuiltinKind Bool))))))
            (type_methods ()))))
-        (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
+        (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "duplicate type" =
   let source = {|
@@ -172,8 +173,8 @@ let%expect_test "function" =
     {|
     (Ok
      ((scope
-       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void)
-        (println (Function (BuiltinFn <fun>)))
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (Void Void) (println (Function (BuiltinFn <fun>)))
         (test
          (Function
           (Fn
@@ -191,8 +192,8 @@ let%expect_test "compile-time printing" =
     (Integer 1)
     (Ok
      ((scope
-       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void) (a Void)
-        (println (Function (BuiltinFn <fun>))))))) |}]
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (Void Void) (a Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "compile-time evaluation" =
   let source =
@@ -208,10 +209,41 @@ let%expect_test "compile-time evaluation" =
     {|
     (Ok
      ((scope
-       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void)
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (Void Void)
         (a
          (Function
           (Fn
            ((function_params ()) (function_returns (BuiltinKind Int257))
             (function_body ((Return (Integer 1))))))))
         (println (Function (BuiltinFn <fun>))) (v (Integer 1)))))) |}]
+
+let%expect_test "parametric type instantiation" =
+  let source =
+    {|
+      type T(A: Int257) { a: Int257 }
+      let TA = T(1);
+   |}
+  in
+  pp_stripped source ;
+  [%expect
+    {|
+      (Ok
+       ((scope
+         ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
+          (T
+           (Function
+            (Fn
+             ((function_params ((A (BuiltinKind Int257))))
+              (function_returns (BuiltinKind Type))
+              (function_body
+               ((Term
+                 (Type
+                  ((type_fields ((a ((field_type (BuiltinKind Int257))))))
+                   (type_methods ()))))))))))
+          (TA
+           (Type
+            ((type_fields ((a ((field_type (ReferenceKind Int257))))))
+             (type_methods ()))))
+          (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
+ |}]
