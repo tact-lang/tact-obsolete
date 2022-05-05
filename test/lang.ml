@@ -43,7 +43,7 @@ let%expect_test "scope resolution" =
      ((scope
        ((Bool (Builtin Bool)) (I (ResolvedReference Int257 (Builtin Int257)))
         (I_ (ResolvedReference I (Builtin Int257))) (Int257 (Builtin Int257))
-        (n (Integer 1)) (n_ (ResolvedReference n (Integer 1)))
+        (Void Void) (n (Integer 1)) (n_ (ResolvedReference n (Integer 1)))
         (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "stripping scope resolution" =
@@ -61,8 +61,34 @@ let%expect_test "stripping scope resolution" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (I (Builtin Int257)) (I_ (Builtin Int257))
-        (Int257 (Builtin Int257)) (n (Integer 1)) (n_ (Integer 1))
+        (Int257 (Builtin Int257)) (Void Void) (n (Integer 1)) (n_ (Integer 1))
         (println (Function (BuiltinFn <fun>))))))) |}]
+
+let%expect_test "scope resolution within functions" =
+  let source =
+    {|
+    let i = Int257;
+    fn test(i: Int257) -> Void {
+      i;
+    }
+  |}
+  in
+  pp source ;
+  (* The idea here is that `i` inside of `test` won't resolve to the top-level `i` *)
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void)
+        (i (ResolvedReference Int257 (Builtin Int257)))
+        (println (Function (BuiltinFn <fun>)))
+        (test
+         (Function
+          (Fn
+           ((function_params
+             ((i (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))
+            (function_returns (ResolvedReferenceKind Void VoidKind))
+            (function_body ((Term (Reference i)))))))))))) |}]
 
 let%expect_test "recursive scope resolution" =
   let source = {|
@@ -93,7 +119,7 @@ let%expect_test "type definition" =
             ((a ((field_type (BuiltinKind Int257))))
              (b ((field_type (BuiltinKind Bool))))))
            (type_methods ()))))
-        (println (Function (BuiltinFn <fun>))))))) |}]
+        (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "duplicate type" =
   let source = {|
@@ -146,7 +172,7 @@ let%expect_test "function" =
     {|
     (Ok
      ((scope
-       ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void)
         (println (Function (BuiltinFn <fun>)))
         (test
          (Function
@@ -165,5 +191,5 @@ let%expect_test "compile-time printing" =
     (Integer 1)
     (Ok
      ((scope
-       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (a Void)
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void) (a Void)
         (println (Function (BuiltinFn <fun>))))))) |}]
