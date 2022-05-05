@@ -43,7 +43,8 @@ let%expect_test "scope resolution" =
      ((scope
        ((Bool (Builtin Bool)) (I (ResolvedReference Int257 (Builtin Int257)))
         (I_ (ResolvedReference I (Builtin Int257))) (Int257 (Builtin Int257))
-        (n (Integer 1)) (n_ (ResolvedReference n (Integer 1))))))) |}]
+        (n (Integer 1)) (n_ (ResolvedReference n (Integer 1)))
+        (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "stripping scope resolution" =
   let source =
@@ -60,7 +61,8 @@ let%expect_test "stripping scope resolution" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (I (Builtin Int257)) (I_ (Builtin Int257))
-        (Int257 (Builtin Int257)) (n (Integer 1)) (n_ (Integer 1)))))) |}]
+        (Int257 (Builtin Int257)) (n (Integer 1)) (n_ (Integer 1))
+        (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "recursive scope resolution" =
   let source = {|
@@ -90,7 +92,8 @@ let%expect_test "type definition" =
           ((type_fields
             ((a ((field_type (BuiltinKind Int257))))
              (b ((field_type (BuiltinKind Bool))))))
-           (type_methods ())))))))) |}]
+           (type_methods ()))))
+        (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "duplicate type" =
   let source = {|
@@ -144,8 +147,23 @@ let%expect_test "function" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
+        (println (Function (BuiltinFn <fun>)))
         (test
          (Function
-          ((function_params ((a (BuiltinKind Int257)) (b (BuiltinKind Bool))))
-           (function_returns (BuiltinKind Int257))
-           (function_body ((Term (Integer 1)) (Term (Integer 2))))))))))) |}]
+          (Fn
+           ((function_params ((a (BuiltinKind Int257)) (b (BuiltinKind Bool))))
+            (function_returns (BuiltinKind Int257))
+            (function_body ((Term (Integer 1)) (Term (Integer 2)))))))))))) |}]
+
+let%expect_test "compile-time printing" =
+  let source = {|
+    let a = println(1);
+   |} in
+  pp_stripped source ;
+  [%expect
+    {|
+    (Integer 1)
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (a Void)
+        (println (Function (BuiltinFn <fun>))))))) |}]

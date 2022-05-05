@@ -8,7 +8,7 @@ let fastpath filename =
   let text, lexbuf = L.read filename in
   match Parser.program Tact.Lexer.token lexbuf with
   | result ->
-      Sexplib.Sexp.pp_hum Format.std_formatter (Syntax.sexp_of_program result);
+      Sexplib.Sexp.pp_hum Format.std_formatter (Syntax.sexp_of_program result) ;
       exit 0
   | exception Tact.Lexer.Error msg ->
       eprintf "lexing error: %s" msg ;

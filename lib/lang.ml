@@ -35,8 +35,10 @@ functor
     type 'a named_map = ((string * 'a) list[@sexp.list])
 
     and term =
+      | Void
       | Type of type_
       | Function of function_
+      | FunctionCall of term * term list
       | Integer of (z[@visitors.name "z"])
       | Reference of string
       | ResolvedReference of string * term
@@ -53,10 +55,14 @@ functor
       | ReferenceKind of string
       | UnsupportedKind of term
 
-    and function_ =
+    and fn =
       { function_params : kind named_map;
         function_returns : kind;
         function_body : stmt list option [@sexp.option] }
+
+    and builtin_fn = (env -> term list -> term[@visitors.opaque])
+
+    and function_ = Fn of fn | BuiltinFn of builtin_fn
 
     and stmt = Return of term | Term of term
 
@@ -108,7 +114,16 @@ functor
 
     type elist = (string, error) error_list
 
-    let empty_scope = [("Int257", Builtin "Int257"); ("Bool", Builtin "Bool")]
+    let comptime_println _env args =
+      let f = Caml.Format.std_formatter in
+      List.iter args ~f:(fun x -> Sexplib.Sexp.pp_hum f (sexp_of_term x)) ;
+      Caml.Format.pp_print_newline f () ;
+      Void
+
+    let empty_scope =
+      [ ("Int257", Builtin "Int257");
+        ("Bool", Builtin "Bool");
+        ("println", Function (BuiltinFn comptime_println)) ]
 
     (* Resolves referenced types *)
     class ['s] reference_resolver ((env, errors) : env * elist) =
@@ -163,6 +178,25 @@ functor
         method! visit_ResolvedReferenceKind _env _ k = k
       end
 
+    (* Evaluates compile-time function calls *)
+    (* NB: Currently handles builtin functions only *)
+    class ['s] function_call_evaluator (env : env) =
+      object (_ : 's)
+        inherit ['s] map
+
+        val p_env = env
+
+        method! visit_FunctionCall _env f args =
+          match f with
+          | Function (BuiltinFn fn)
+          | ResolvedReference (_, Function (BuiltinFn fn)) ->
+              fn p_env args
+          | _ ->
+              FunctionCall (f, args)
+
+        method! visit_ResolvedReferenceKind _env _ k = k
+      end
+
     let rec env_from_program (stx : Syntax.program) (elist : elist) =
       let scope = scope_from_bindings stx.bindings elist in
       (* Resolve references inside *)
@@ -170,6 +204,10 @@ functor
         let env = {scope} in
         let resolver = new reference_resolver (env, elist) in
         resolver#visit_env () env
+      in
+      let env =
+        let evaluator = new function_call_evaluator env in
+        evaluator#visit_env () env
       in
       env
 
@@ -183,7 +221,7 @@ functor
           in
           match in_amap scope (fun m -> Map.find m ident) with
           | None -> (
-            match binding_to_value binding elist with
+            match binding_to_term binding elist with
             | Ok data ->
                 as_amap scope (fun m -> Map.set m ~key:ident ~data)
             | Error e ->
@@ -193,10 +231,10 @@ functor
               scope )
         bindings
 
-    and binding_to_value binding elist =
-      expr_to_value (Syntax.value binding.binding_expr) () elist
+    and binding_to_term binding elist =
+      expr_to_term (Syntax.value binding.binding_expr) () elist
 
-    and expr_to_value expr loc elist =
+    and expr_to_term expr loc elist =
       match expr with
       | Type s ->
           Ok (type_to_type s loc elist)
@@ -206,15 +244,17 @@ functor
           Ok (Reference (Syntax.ident_to_string ref))
       | Function f ->
           Ok (function_to_function f loc elist)
+      | FunctionCall fc ->
+          Ok (function_call_to_function_call fc elist)
       | _ ->
           Error Unsupported
 
     and expr_to_stmt expr loc elist =
       match expr with
       | Syntax.Return expr' ->
-          Result.map (expr_to_value expr' loc elist) ~f:(fun v -> Return v)
+          Result.map (expr_to_term expr' loc elist) ~f:(fun v -> Return v)
       | _ ->
-          Result.map (expr_to_value expr loc elist) ~f:(fun v -> Term v)
+          Result.map (expr_to_term expr loc elist) ~f:(fun v -> Term v)
 
     and type_to_type s _loc elist =
       let s' = {type_fields = []; type_methods = []} in
@@ -231,7 +271,7 @@ functor
                 s'
             | None -> (
                 let value =
-                  expr_to_value
+                  expr_to_term
                     ((Syntax.value field).field_type |> Syntax.value)
                     () elist
                 in
@@ -250,7 +290,7 @@ functor
     and function_to_function f _loc elist =
       (* return kind *)
       let return =
-        match expr_to_value (Syntax.value f.returns) () elist with
+        match expr_to_term (Syntax.value f.returns) () elist with
         | Ok v ->
             v
         | Error err ->
@@ -278,7 +318,7 @@ functor
           function_returns =
             ( match term_to_kind return with
             | UnsupportedKind _value ->
-                new_error (Invalid_Return_Kind f') elist ;
+                new_error (Invalid_Return_Kind (Fn f')) elist ;
                 f'.function_returns
             | kind ->
                 kind ) }
@@ -291,13 +331,13 @@ functor
             let ident = Syntax.ident_to_string (Syntax.value name) in
             match in_amap f'.function_params (fun m -> Map.find m ident) with
             | Some _ ->
-                new_error (Duplicate_Param (ident, f')) elist ;
+                new_error (Duplicate_Param (ident, Fn f')) elist ;
                 f'
             | None -> (
-                let value = expr_to_value (Syntax.value expr) () elist in
+                let value = expr_to_term (Syntax.value expr) () elist in
                 match Result.map value ~f:term_to_kind with
                 | Ok (UnsupportedKind _) ->
-                    new_error (Invalid_Param_Kind (ident, f')) elist ;
+                    new_error (Invalid_Param_Kind (ident, Fn f')) elist ;
                     f'
                 | Ok kind ->
                     { f' with
@@ -308,5 +348,16 @@ functor
                     new_error e elist ; f' ) )
           f.params
       in
-      Function f
+      Function (Fn f)
+
+    and function_call_to_function_call fc elist =
+      let args =
+        List.map fc.arguments ~f:(fun x ->
+            result_to_term (expr_to_term (Syntax.value x) () elist) elist )
+      in
+      FunctionCall
+        (result_to_term (expr_to_term (Syntax.value fc.fn) () elist) elist, args)
+
+    and result_to_term r elist =
+      match r with Ok t -> t | Error e -> new_error e elist ; Invalid
   end
