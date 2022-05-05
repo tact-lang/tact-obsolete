@@ -24,6 +24,8 @@
    (base (>= 0.15.0))
    (ppx_jane (>= 0.15.0))
    (visitors (= 20210608))
+   (core (and :with-test (>= 0.15.0)))
+   (ppx_expect (and :with-test (>= 0.15.0)))
    (ppx_matches (and :with-test (>= 0.1)))
    (alcotest (and :with-test (>= 1.5.0)))
    (utop (and :build (>= 2.9.1)))

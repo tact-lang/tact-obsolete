@@ -1,0 +1,11 @@
+%token LET INTERFACE TYPE ENUM UNION FN IF ELSE RETURN
+%token EQUALS
+%token <string> IDENT
+%token EOF
+%token LBRACE LPAREN
+%token RBRACE RPAREN
+%token COMMA
+%token COLON RARROW SEMICOLON
+%token <Z.t> INT
+
+%%

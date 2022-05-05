@@ -1,79 +1,49 @@
-let parse_program s =
-  Tact.Parser.program Tact.Lexer.token (Lexing.from_string s)
+open Core
+module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
+module Parser = Tact.Parser.Make (Syntax)
 
-let test_empty () =
+let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
+
+let print_sexp p =
+  Sexplib.Sexp.pp_hum Format.std_formatter (Syntax.sexp_of_program p)
+
+let pp s = parse_program s |> print_sexp
+
+let%expect_test "empty" =
   let source = {||} in
-  Alcotest.(check bool)
-    "no bindings" true
-    (match parse_program source with {bindings = []} -> true | _ -> false)
+  pp source ; [%expect {| () |}]
 
-let test_let_type () =
+let%expect_test "let type" =
   let source = {|
-  let MyType = type {};
-  |} in
-  Alcotest.(check bool)
-    "type binding" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    {value = Type {fields = []; type_bindings = []}; _} };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+    let MyType = type {};
+    |} in
+  pp source ;
+  [%expect
+    {| ((bindings (((binding_name (Ident MyType)) (binding_expr (Type ())))))) |}]
 
-let test_let_type_param () =
+let%expect_test "let type with parameter (shorthand)" =
   let source = {|
   let MyType(T: Type) = type {};
   |} in
-  Alcotest.(check bool)
-    "type binding" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params =
-                              [ { value =
-                                    ( {value = Ident "T"; _},
-                                      {value = Reference (Ident "Type"); _} );
-                                  _ } ];
-                            returns = {value = Reference (Ident "Type"); _};
-                            exprs =
-                              Some
-                                [ { value =
-                                      Type {fields = []; type_bindings = []};
-                                    _ } ];
-                            _ };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Function
+          ((params (((Ident T) (Reference (Ident Type)))))
+           (returns (Reference (Ident Type))) (exprs ((Type ())))))))))) |}]
 
-let test_type () =
+let%expect_test "type definition (shorthand)" =
   let source = {|
   type MyType {}
   |} in
-  Alcotest.(check bool)
-    "type binding" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    {value = Type {fields = []; type_bindings = []}; _} };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {| ((bindings (((binding_name (Ident MyType)) (binding_expr (Type ())))))) |}]
 
-let test_type_constructor () =
+let%expect_test "type construction" =
   let source =
     {|
   type MyType { 
@@ -86,168 +56,93 @@ let test_type_constructor () =
   };
   |}
   in
-  Alcotest.(check bool)
-    "type binding" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    { value =
-                        Type
-                          { fields =
-                              [ { value =
-                                    { field_name = {value = Ident "a"; _};
-                                      field_type =
-                                        {value = Reference (Ident "Int257"); _}
-                                    };
-                                  _ };
-                                { value =
-                                    { field_name = {value = Ident "b"; _};
-                                      field_type =
-                                        {value = Reference (Ident "Int257"); _}
-                                    };
-                                  _ } ];
-                            _ };
-                      _ } };
-              _ };
-            { value =
-                { binding_name = {value = Ident "my"; _};
-                  binding_expr =
-                    { value =
-                        TypeConstructor
-                          { constructor_id =
-                              Some {value = Reference (Ident "MyType"); _};
-                            fields_construction =
-                              [ ({value = Ident "a"; _}, {value = Int _; _});
-                                ({value = Ident "b"; _}, {value = Int _; _}) ]
-                          };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+      ((bindings
+        (((binding_name (Ident MyType))
+          (binding_expr
+           (Type
+            ((fields
+              (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
+               ((field_name (Ident b)) (field_type (Reference (Ident Int257))))))))))
+         ((binding_name (Ident my))
+          (binding_expr
+           (TypeConstructor
+            ((constructor_id (Reference (Ident MyType)))
+             (fields_construction (((Ident a) (Int 0)) ((Ident b) (Int 1))))))))))) |}]
 
-let test_type_param () =
+let%expect_test "parameterized type shorthand" =
   let source = {|
   type MyType(T: Type) {}
   |} in
-  Alcotest.(check bool)
-    "type binding" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params =
-                              [ { value =
-                                    ( {value = Ident "T"; _},
-                                      {value = Reference (Ident "Type"); _} );
-                                  _ } ];
-                            returns = {value = Reference (Ident "Type"); _};
-                            exprs =
-                              Some
-                                [ { value =
-                                      Type {fields = []; type_bindings = []};
-                                    _ } ];
-                            _ };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Function
+          ((params (((Ident T) (Reference (Ident Type)))))
+           (returns (Reference (Ident Type))) (exprs ((Type ())))))))))) |}]
 
-let test_type_fields_source =
-  {|
+let%expect_test "type fields" =
+  let source = {|
   type MyType {
     a: Int257,
     f: get_type()
   }
-  |}
+  |} in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Type
+          ((fields
+            (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
+             ((field_name (Ident f))
+              (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))))))))) |}]
 
-let test_type_fields_trailing_comma_source =
-  {|
+let%expect_test "type fields with a trailing comma" =
+  let source = {|
   type MyType {
     a: Int257,
     f: get_type(),
   }
-  |}
+  |} in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Type
+          ((fields
+            (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
+             ((field_name (Ident f))
+              (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))))))))) |}]
 
-let test_type_fields source () =
-  Alcotest.(check bool)
-    "type fields" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    { value =
-                        Type
-                          { fields =
-                              [ { value =
-                                    { field_name = {value = Ident "a"; _};
-                                      field_type =
-                                        {value = Reference (Ident "Int257"); _}
-                                    };
-                                  _ };
-                                { value =
-                                    { field_name = {value = Ident "f"; _};
-                                      field_type =
-                                        { value =
-                                            FunctionCall
-                                              { fn =
-                                                  { value =
-                                                      Reference
-                                                        (Ident "get_type");
-                                                    _ };
-                                                arguments = [] };
-                                          _ } };
-                                  _ } ];
-                            type_bindings = [] };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
-
-let test_type_shorthand_fields () =
+let%expect_test "type fields with shorthand names" =
   let source = {|
     type MyType {
       A,
       B
     }
   |} in
-  Alcotest.(check bool)
-    "type fields" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    { value =
-                        Type
-                          { fields =
-                              [ { value =
-                                    { field_name = {value = Ident "A"; _};
-                                      field_type =
-                                        {value = Reference (Ident "A"); _} };
-                                  _ };
-                                { value =
-                                    { field_name = {value = Ident "B"; _};
-                                      field_type =
-                                        {value = Reference (Ident "B"); _} };
-                                  _ } ];
-                            type_bindings = [] };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Type
+          ((fields
+            (((field_name (Ident A)) (field_type (Reference (Ident A))))
+             ((field_name (Ident B)) (field_type (Reference (Ident B))))))))))))) |}]
 
-let test_type_methods () =
+let%expect_test "type methods" =
   let source =
     {|
     type MyType {
@@ -256,335 +151,175 @@ let test_type_methods () =
     }
   |}
   in
-  Alcotest.(check bool)
-    "type methods" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    { value =
-                        Type
-                          { fields = [];
-                            type_bindings =
-                              [ { value =
-                                    { binding_name = {value = Ident "test"; _};
-                                      binding_expr =
-                                        { value =
-                                            Function
-                                              { name = None;
-                                                params = [];
-                                                exprs = Some [];
-                                                returns =
-                                                  { value =
-                                                      Reference (Ident "Bool");
-                                                    _ };
-                                                _ };
-                                          _ } };
-                                  _ };
-                                { value =
-                                    { binding_name = {value = Ident "todo"; _};
-                                      binding_expr =
-                                        { value =
-                                            Function
-                                              { name = None;
-                                                params = [];
-                                                exprs = None;
-                                                returns =
-                                                  { value =
-                                                      Reference (Ident "Int257");
-                                                    _ };
-                                                _ };
-                                          _ } };
-                                  _ } ] };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Type
+          ((type_bindings
+            (((binding_name (Ident test))
+              (binding_expr
+               (Function ((returns (Reference (Ident Bool))) (exprs ())))))
+             ((binding_name (Ident todo))
+              (binding_expr (Function ((returns (Reference (Ident Int257)))))))))))))))) |}]
 
-let test_type_with_fields_and_methods_source =
-  {|
+let%expect_test "type with fields and methods" =
+  let source =
+    {|
     type MyType {
       a: Int257
       fn test() -> Bool {}
     }
   |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Type
+          ((fields
+            (((field_name (Ident a)) (field_type (Reference (Ident Int257))))))
+           (type_bindings
+            (((binding_name (Ident test))
+              (binding_expr
+               (Function ((returns (Reference (Ident Bool))) (exprs ())))))))))))))) |}]
 
-let test_type_with_fields_and_methods_trailing_comma_source =
-  {|
+let%expect_test "type with fields and methods, separated by a comma" =
+  let source =
+    {|
     type MyType {
       a: Int257,
       fn test() -> Bool {}
     }
   |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident MyType))
+        (binding_expr
+         (Type
+          ((fields
+            (((field_name (Ident a)) (field_type (Reference (Ident Int257))))))
+           (type_bindings
+            (((binding_name (Ident test))
+              (binding_expr
+               (Function ((returns (Reference (Ident Bool))) (exprs ())))))))))))))) |}]
 
-let test_type_with_fields_and_methods source () =
-  Alcotest.(check bool)
-    "type methods" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "MyType"; _};
-                  binding_expr =
-                    { value =
-                        Type
-                          { fields =
-                              [ { value =
-                                    { field_name = {value = Ident "a"; _};
-                                      field_type =
-                                        {value = Reference (Ident "Int257"); _}
-                                    };
-                                  _ } ];
-                            type_bindings =
-                              [ { value =
-                                    { binding_name = {value = Ident "test"; _};
-                                      binding_expr =
-                                        { value =
-                                            Function
-                                              { name = None;
-                                                params = [];
-                                                exprs = Some [];
-                                                returns =
-                                                  { value =
-                                                      Reference (Ident "Bool");
-                                                    _ };
-                                                _ };
-                                          _ } };
-                                  _ } ] };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
-
-let test_fn () =
+let%expect_test "let function definition" =
   let source = {|
   let F = fn (A: T) -> P(1) {};
   |} in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "F"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params =
-                              [ { value =
-                                    ( {value = Ident "A"; _},
-                                      {value = Reference (Ident "T"); _} );
-                                  _ } ];
-                            exprs = Some [];
-                            returns =
-                              { value =
-                                  FunctionCall
-                                    { fn = {value = Reference (Ident "P"); _};
-                                      arguments = [{value = Int _; _}] };
-                                _ } };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident F))
+        (binding_expr
+         (Function
+          ((params (((Ident A) (Reference (Ident T)))))
+           (returns
+            (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1))))))
+           (exprs ())))))))) |}]
 
-let test_fn_shorthand () =
+let%expect_test "function definition shorthand" =
   let source = {|
   fn F(A: T) -> P(1) {}
   |} in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "F"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params =
-                              [ { value =
-                                    ( {value = Ident "A"; _},
-                                      {value = Reference (Ident "T"); _} );
-                                  _ } ];
-                            exprs = Some [];
-                            returns =
-                              { value =
-                                  FunctionCall
-                                    { fn = {value = Reference (Ident "P"); _};
-                                      arguments = [{value = Int _; _}] };
-                                _ } };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident F))
+        (binding_expr
+         (Function
+          ((params (((Ident A) (Reference (Ident T)))))
+           (returns
+            (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1))))))
+           (exprs ())))))))) |}]
 
-let test_fn_sig_over_call () =
+let%expect_test "parse parameterized return type as part of function \
+                 signature, not a function call" =
   let source = {|
   let F = fn (A: T) -> P(1);
   |} in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "F"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params =
-                              [ { value =
-                                    ( {value = Ident "A"; _},
-                                      {value = Reference (Ident "T"); _} );
-                                  _ } ];
-                            exprs = None;
-                            returns =
-                              { value =
-                                  FunctionCall
-                                    { fn = {value = Reference (Ident "P"); _};
-                                      arguments = [{value = Int _; _}] };
-                                _ } };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident F))
+        (binding_expr
+         (Function
+          ((params (((Ident A) (Reference (Ident T)))))
+           (returns
+            (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1))))))))))))) |}]
 
-let test_fn_sig_returns_fn_sig () =
+let%expect_test "fn signature returning function signature" =
   let source = {|
   let F = fn (A: T) -> (fn () -> T);
   |} in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "F"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params =
-                              [ { value =
-                                    ( {value = Ident "A"; _},
-                                      {value = Reference (Ident "T"); _} );
-                                  _ } ];
-                            exprs = None;
-                            returns =
-                              { value =
-                                  Function
-                                    { name = None;
-                                      params = [];
-                                      returns =
-                                        {value = Reference (Ident "T"); _};
-                                      exprs = None };
-                                _ } };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident F))
+        (binding_expr
+         (Function
+          ((params (((Ident A) (Reference (Ident T)))))
+           (returns (Function ((returns (Reference (Ident T))))))))))))) |}]
 
-let test_fn_call_over_sig () =
+let%expect_test "enforcing precedence of a function call over a signature" =
   let source = {|
   let F = (fn (A: T) -> P)(1);
   |} in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "F"; _};
-                  binding_expr =
-                    { value =
-                        FunctionCall
-                          { fn =
-                              { value =
-                                  Function
-                                    { name = None;
-                                      params =
-                                        [ { value =
-                                              ( {value = Ident "A"; _},
-                                                { value = Reference (Ident "T");
-                                                  _ } );
-                                            _ } ];
-                                      exprs = None;
-                                      returns =
-                                        {value = Reference (Ident "P"); _} };
-                                _ };
-                            arguments = [{value = Int _; _}] };
-                      _ } };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident F))
+        (binding_expr
+         (FunctionCall
+          ((fn
+            (Function
+             ((params (((Ident A) (Reference (Ident T)))))
+              (returns (Reference (Ident P))))))
+           (arguments ((Int 1)))))))))) |}]
 
-let test_function_call () =
+let%expect_test "function call" =
   let source = {|
   let F = func(1);
   |} in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "F"; _};
-                  binding_expr =
-                    { value =
-                        FunctionCall
-                          { fn = {value = Reference (Ident "func"); _};
-                            arguments = [{value = Int _; _}];
-                            _ };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident F))
+        (binding_expr
+         (FunctionCall ((fn (Reference (Ident func))) (arguments ((Int 1)))))))))) |}]
 
-let test_function_call_in_alist_of_expr () =
+let%expect_test "function call in a list of statements" =
   let source = {|
   let F = fn() -> T { 
        func(1);
   };
-  |} in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "F"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params = [];
-                            exprs =
-                              Some
-                                [ { value =
-                                      FunctionCall
-                                        { fn =
-                                            {value = Reference (Ident "func"); _};
-                                          arguments = [{value = Int _; _}];
-                                          _ };
-                                    _ } ];
-                            returns = {value = Reference (Ident "T"); _} };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+|} in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident F))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident T)))
+           (exprs
+            ((FunctionCall ((fn (Reference (Ident func))) (arguments ((Int 1)))))))))))))) |}]
 
-let test_let_in_function_body () =
+let%expect_test "let in function body" =
   let source =
     {|
   let f = fn() -> Int257 { 
@@ -593,69 +328,34 @@ let test_let_in_function_body () =
   };
   |}
   in
-  Alcotest.(check bool)
-    "function signature" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "f"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { name = None;
-                            params = [];
-                            exprs =
-                              Some
-                                [ { value =
-                                      Let
-                                        { value =
-                                            { binding_name =
-                                                {value = Ident "a"; _};
-                                              binding_expr = {value = Int _; _}
-                                            };
-                                          _ };
-                                    _ };
-                                  {value = Return (Reference (Ident "a")); _} ];
-                            returns = {value = Reference (Ident "Int257"); _} };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident f))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident Int257)))
+           (exprs
+            ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+             (Return (Reference (Ident a)))))))))))) |}]
 
-let test_if_empty_body_no_else () =
+let%expect_test "if with an empty body and no else statement" =
   let source = {|
   fn test() -> A {
     if (1) {}
   }
   |} in
-  Alcotest.(check bool)
-    "if expr empty body no else" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "test"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { exprs =
-                              Some
-                                [ { value =
-                                      If
-                                        { condition = {value = Int _; _};
-                                          body = [];
-                                          else_ = None };
-                                    _ } ];
-                            _ };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A))) (exprs ((If ((condition (Int 1))))))))))))) |}]
 
-let test_if_has_body_with_else () =
+let%expect_test "if with a body and an empty else" =
   let source =
     {|
           fn test() -> A {
@@ -666,37 +366,20 @@ let test_if_has_body_with_else () =
           }
           |}
   in
-  Alcotest.(check bool)
-    "if expr has body with else" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "test"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { exprs =
-                              Some
-                                [ { value =
-                                      If
-                                        { condition = {value = Int _; _};
-                                          body =
-                                            [{value = Reference (Ident "a"); _}];
-                                          else_ =
-                                            Some
-                                              { value =
-                                                  CodeBlock {block_exprs = []};
-                                                _ } };
-                                    _ } ];
-                            _ };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A)))
+           (exprs
+            ((If
+              ((condition (Int 1)) (body ((Reference (Ident a))))
+               (else_ (CodeBlock ()))))))))))))) |}]
 
-let test_if_with_else_if () =
+let%expect_test "if with else if" =
   let source =
     {|
     fn test() -> A {
@@ -705,220 +388,74 @@ let test_if_with_else_if () =
     }
     |}
   in
-  Alcotest.(check bool)
-    "if expr with else if" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_name = {value = Ident "test"; _};
-                  binding_expr =
-                    { value =
-                        Function
-                          { exprs =
-                              Some
-                                [ { value =
-                                      If
-                                        { condition = {value = Int _; _};
-                                          body = [];
-                                          else_ = Some {value = If _; _} };
-                                    _ } ];
-                            _ };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A)))
+           (exprs
+            ((If ((condition (Int 1)) (else_ (If ((condition (Int 10)))))))))))))))) |}]
 
-let test_type_construction_function_call () =
+let%expect_test "type construction over a parameterized type" =
   let source = {|
   let a = A(X) { field: value };
   |} in
-  Alcotest.(check bool)
-    "type construction function call" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_expr =
-                    { value =
-                        TypeConstructor
-                          { constructor_id =
-                              Some
-                                { value =
-                                    FunctionCall
-                                      { fn = {value = Reference (Ident "A"); _};
-                                        arguments =
-                                          [{value = Reference (Ident "X"); _}];
-                                        _ };
-                                  _ };
-                            fields_construction = _ };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident a))
+        (binding_expr
+         (TypeConstructor
+          ((constructor_id
+            (FunctionCall
+             ((fn (Reference (Ident A))) (arguments ((Reference (Ident X)))))))
+           (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
 
-let test_type_construction_type_anonymous () =
+let%expect_test "type construction over an anonymous type" =
   let source = {|
   let a = (type { field: Int257 }) { field: value };
   |} in
-  Alcotest.(check bool)
-    "type construction type declaration" true
-    ( match parse_program source with
-    | { bindings =
-          [ { value =
-                { binding_expr =
-                    { value =
-                        TypeConstructor
-                          { constructor_id =
-                              Some
-                                { value =
-                                    Type
-                                      { fields =
-                                          [ { value =
-                                                { field_name =
-                                                    {value = Ident "field"; _};
-                                                  field_type =
-                                                    { value =
-                                                        Reference
-                                                          (Ident "Int257");
-                                                      _ } };
-                                              _ } ];
-                                        _ };
-                                  _ };
-                            fields_construction = _ };
-                      _ };
-                  _ };
-              _ } ] } ->
-        true
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident a))
+        (binding_expr
+         (TypeConstructor
+          ((constructor_id
+            (Type
+             ((fields
+               (((field_name (Ident field))
+                 (field_type (Reference (Ident Int257)))))))))
+           (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
 
-let test_type_construction_type_anonymous_function_call () =
+let%expect_test "type construction over an anonymous type's function call" =
   let source =
     {|
   let a = type(T: Type) { field: T }(X) { field: value };
   |}
   in
-  Alcotest.(check bool)
-    "type construction type declaration" true
-    ( Caml.print_string (Tact.Syntax.show_program (parse_program source)) ;
-      match parse_program source with
-      | { bindings =
-            [ { value =
-                  { binding_expr =
-                      { value =
-                          TypeConstructor
-                            { constructor_id =
-                                Some
-                                  { value =
-                                      FunctionCall
-                                        { fn =
-                                            { value =
-                                                Function
-                                                  { name = None;
-                                                    params =
-                                                      [ { value =
-                                                            ( { value = Ident "T";
-                                                                _ },
-                                                              { value =
-                                                                  Reference
-                                                                    (Ident
-                                                                      "Type" );
-                                                                _ } );
-                                                          _ } ];
-                                                    returns =
-                                                      { value =
-                                                          Reference
-                                                            (Ident "Type");
-                                                        _ };
-                                                    exprs =
-                                                      Some
-                                                        [ { value =
-                                                              Type
-                                                                { fields =
-                                                                    [ { value =
-                                                                          { field_name =
-                                                                              { value =
-                                                                                Ident
-                                                                                "field";
-                                                                                _
-                                                                              };
-                                                                            field_type =
-                                                                              { value =
-                                                                                Reference
-                                                                                (Ident
-                                                                                "T"
-                                                                                );
-                                                                                _
-                                                                              }
-                                                                          };
-                                                                        _ } ];
-                                                                  type_bindings =
-                                                                    [] };
-                                                            _ } ] };
-                                              _ };
-                                          arguments =
-                                            [{value = Reference (Ident "X"); _}];
-                                          _ };
-                                    _ };
-                              fields_construction = _ };
-                        _ };
-                    _ };
-                _ } ] } ->
-          true
-      | _ ->
-          false )
-
-let () =
-  let open Alcotest in
-  run "Syntax"
-    [ ("empty file", [test_case "Empty file" `Quick test_empty]);
-      ( "type",
-        [ test_case "let syntax for type" `Quick test_let_type;
-          test_case "type constructor" `Quick test_type_constructor;
-          test_case "let syntax for parameterized type" `Quick
-            test_let_type_param;
-          test_case "shorthand syntax for type" `Quick test_type;
-          test_case "shorthand syntax for parameterized type" `Quick
-            test_type_param;
-          test_case "type fields" `Quick
-            (test_type_fields test_type_fields_source);
-          test_case "type fields with a trailing comma" `Quick
-            (test_type_fields test_type_fields_trailing_comma_source);
-          test_case "type shorthand fields" `Quick test_type_shorthand_fields;
-          test_case "type methods" `Quick test_type_methods;
-          test_case "type with fields and methods" `Quick
-            (test_type_with_fields_and_methods
-               test_type_with_fields_and_methods_source );
-          test_case "type with fields and methods with a trailing comma" `Quick
-            (test_type_with_fields_and_methods
-               test_type_with_fields_and_methods_trailing_comma_source ) ] );
-      ( "functions",
-        [ test_case "function definition" `Quick test_fn;
-          test_case "shorthand function definition" `Quick test_fn_shorthand;
-          test_case "function signature over function call" `Quick
-            test_fn_sig_over_call;
-          test_case "function signature returning function signature" `Quick
-            test_fn_sig_returns_fn_sig;
-          test_case "function call over function signature" `Quick
-            test_fn_call_over_sig;
-          test_case "let in function body" `Quick test_let_in_function_body ] );
-      ( "function calls",
-        [ test_case "function call" `Quick test_function_call;
-          test_case "function call in a list of exprs" `Quick
-            test_function_call_in_alist_of_expr ] );
-      ( "if stmts",
-        [ test_case "if expr empty body no else" `Quick
-            test_if_empty_body_no_else;
-          test_case "if expr has body with else" `Quick
-            test_if_has_body_with_else;
-          test_case "if expr with else if" `Quick test_if_with_else_if ] );
-      ( "type construction",
-        [ test_case "functional type construction" `Quick
-            test_type_construction_function_call;
-          test_case "anonymous type construction" `Quick
-            test_type_construction_type_anonymous;
-          test_case "anonymous functional type construction" `Quick
-            test_type_construction_type_anonymous_function_call ] ) ]
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident a))
+        (binding_expr
+         (TypeConstructor
+          ((constructor_id
+            (FunctionCall
+             ((fn
+               (Function
+                ((params (((Ident T) (Reference (Ident Type)))))
+                 (returns (Reference (Ident Type)))
+                 (exprs
+                  ((Type
+                    ((fields
+                      (((field_name (Ident field))
+                        (field_type (Reference (Ident T)))))))))))))
+              (arguments ((Reference (Ident X)))))))
+           (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]

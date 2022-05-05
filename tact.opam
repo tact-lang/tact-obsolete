@@ -19,6 +19,8 @@ depends: [
   "base" {>= "0.15.0"}
   "ppx_jane" {>= "0.15.0"}
   "visitors" {= "20210608"}
+  "core" {with-test & >= "0.15.0"}
+  "ppx_expect" {with-test & >= "0.15.0"}
   "ppx_matches" {with-test & >= "0.1"}
   "alcotest" {with-test & >= "1.5.0"}
   "utop" {build & >= "2.9.1"}

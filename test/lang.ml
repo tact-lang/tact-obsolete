@@ -1,19 +1,33 @@
-open Base
-open Tact.Lang
+module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
+module Parser = Tact.Parser.Make (Syntax)
+module Lang = Tact.Lang.Make (Syntax)
+open Lang
+open Core
 
-let parse_program s =
-  Tact.Parser.program Tact.Lexer.token (Lexing.from_string s)
+let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program stx =
   let elist = make_error_list ~warnings:(ref []) ~errors:(ref []) () in
-  let env = Tact.Lang.env_from_program stx elist in
+  let env = env_from_program stx elist in
   match (!(elist.errors), !(elist.warnings)) with
-  | error :: _, _ ->
-      Error error
-  | _ ->
+  | [], _ ->
       Ok env
+  | errors :: _, _ ->
+      Error errors
 
-let test_scope_resolution () =
+let print_sexp e =
+  Sexplib.Sexp.pp_hum Format.std_formatter
+    (Result.sexp_of_t Lang.sexp_of_env Lang.sexp_of_error e)
+
+let pp s = parse_program s |> build_program |> print_sexp
+
+let pp_stripped s =
+  Result.map
+    (parse_program s |> build_program)
+    ~f:(fun env -> (new resolved_references_stripper env)#visit_env () env)
+  |> print_sexp
+
+let%expect_test "scope resolution" =
   let source =
     {|
   let I = Int257;
@@ -22,21 +36,16 @@ let test_scope_resolution () =
   let n_ = n;
   |}
   in
-  Alcotest.(check bool)
-    "reference resolution" true
-    ( match parse_program source |> build_program with
-    | Ok {scope; _} ->
-        [%matches? Some (ResolvedReference ("Int257", Builtin "Int257"))]
-          (in_amap scope (fun m -> Map.find m "I"))
-        && [%matches? Some (ResolvedReference ("I", Builtin "Int257"))]
-             (in_amap scope (fun m -> Map.find m "I_"))
-        && [%matches? Some (Integer _)] (in_amap scope (fun m -> Map.find m "n"))
-        && [%matches? Some (ResolvedReference ("n", Integer _))]
-             (in_amap scope (fun m -> Map.find m "n_"))
-    | _ ->
-        false )
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (I (ResolvedReference Int257 (Builtin Int257)))
+        (I_ (ResolvedReference I (Builtin Int257))) (Int257 (Builtin Int257))
+        (n (Integer 1)) (n_ (ResolvedReference n (Integer 1))))))) |}]
 
-let test_scope_resolution_stripped () =
+let%expect_test "stripping scope resolution" =
   let source =
     {|
   let I = Int257;
@@ -45,38 +54,23 @@ let test_scope_resolution_stripped () =
   let n_ = n;
   |}
   in
-  Alcotest.(check bool)
-    "reference resolution" true
-    ( match parse_program source |> build_program with
-    | Ok env ->
-        let scope =
-          ((new resolved_references_stripper env)#visit_env () env).scope
-        in
-        [%matches? Some (Builtin "Int257")]
-          (in_amap scope (fun m -> Map.find m "I"))
-        && [%matches? Some (Builtin "Int257")]
-             (in_amap scope (fun m -> Map.find m "I_"))
-        && [%matches? Some (Integer _)] (in_amap scope (fun m -> Map.find m "n"))
-        && [%matches? Some (Integer _)]
-             (in_amap scope (fun m -> Map.find m "n_"))
-    | _ ->
-        false )
+  pp_stripped source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (I (Builtin Int257)) (I_ (Builtin Int257))
+        (Int257 (Builtin Int257)) (n (Integer 1)) (n_ (Integer 1)))))) |}]
 
-let test_recursive_scope_resolution () =
+let%expect_test "recursive scope resolution" =
   let source = {|
   let A = B;
   let B = C;
   let C = A;
   |} in
-  Alcotest.(check bool)
-    "reference resolution" true
-    ( match parse_program source |> build_program with
-    | Error (Recursive_Reference "C") ->
-        true
-    | _ ->
-        false )
+  pp source ; [%expect {| (Error (Recursive_Reference C)) |}]
 
-let test_type () =
+let%expect_test "type definition" =
   let source =
     {|
   let MyType = type {
@@ -85,50 +79,40 @@ let test_type () =
   };
   |}
   in
-  Alcotest.(check bool)
-    "type binding" true
-    ( match parse_program source |> build_program with
-    | Ok {scope; _} -> (
-      match in_amap scope (fun m -> Map.find m "MyType") with
-      | Some (Type s) ->
-          [%matches?
-            Some
-              { field_type =
-                  ResolvedReferenceKind ("Int257", BuiltinKind "Int257");
-                _ }]
-            (in_amap s.type_fields (fun m -> Map.find m "a"))
-          && [%matches?
-               Some
-                 { field_type =
-                     ResolvedReferenceKind ("Bool", BuiltinKind "Bool");
-                   _ }]
-               (in_amap s.type_fields (fun m -> Map.find m "b"))
-      | _ ->
-          false )
-    | _ ->
-        false )
+  pp_stripped source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
+        (MyType
+         (Type
+          ((type_fields
+            ((a ((field_type (BuiltinKind Int257))))
+             (b ((field_type (BuiltinKind Bool))))))
+           (type_methods ())))))))) |}]
 
-let test_type_duplicate () =
+let%expect_test "duplicate type" =
   let source = {|
   let MyType = type {};
   let MyType = type {};
   |} in
-  Alcotest.(check bool)
-    "type binding" true
-    ([%matches? Error (Duplicate_Identifier ("MyType", Type _))]
-       (parse_program source |> build_program) )
+  pp source ;
+  [%expect
+    {|
+    (Error
+     (Duplicate_Identifier MyType (Type ((type_fields ()) (type_methods ()))))) |}]
 
-let test_type_duplicate_non_type () =
+let%expect_test "duplicate but of a different kind" =
   let source = {|
   let MyType = 1;
   let MyType = type {};
   |} in
-  Alcotest.(check bool)
-    "type binding" true
-    ([%matches? Error (Duplicate_Identifier ("MyType", Integer _))]
-       (parse_program source |> build_program) )
+  pp source ;
+  [%expect {|
+    (Error (Duplicate_Identifier MyType (Integer 1))) |}]
 
-let test_type_duplicate_field () =
+let%expect_test "duplicate type field" =
   let source =
     {|
   let MyType = type {
@@ -137,12 +121,15 @@ let test_type_duplicate_field () =
   };
   |}
   in
-  Alcotest.(check bool)
-    "type binding" true
-    ([%matches? Error (Duplicate_Field ("a", _))]
-       (parse_program source |> build_program) )
+  pp source ;
+  [%expect
+    {|
+    (Error
+     (Duplicate_Field a
+      ((type_fields ((a ((field_type (ReferenceKind Int257))))))
+       (type_methods ())))) |}]
 
-let test_function () =
+let%expect_test "function" =
   let source =
     {|
       fn test(a: Int257, b: Bool) -> Int257 {
@@ -151,50 +138,14 @@ let test_function () =
       }
   |}
   in
-  Alcotest.(check bool)
-    "function" true
-    ( match parse_program source |> build_program with
-    | Ok {scope; _} -> (
-      match in_amap scope (fun m -> Map.find m "test") with
-      | Some (Function f) ->
-          [%matches?
-            {function_params; _} when [%matches?
-                                        [ ( "a",
-                                            ResolvedReferenceKind
-                                              ("Int257", BuiltinKind "Int257")
-                                          );
-                                          ( "b",
-                                            ResolvedReferenceKind
-                                              ("Bool", BuiltinKind "Bool") ) ]]
-                                        function_params]
-            f
-          && [%matches?
-               { function_returns =
-                   ResolvedReferenceKind ("Int257", BuiltinKind "Int257");
-                 _ }]
-               f
-          && [%matches?
-               {function_body = Some [Term (Integer i); Term (Integer i')]; _} when 
-               equal (Z.to_int i) 1 && equal (Z.to_int i') 2]
-               f
-      | _ ->
-          false )
-    | _ ->
-        false )
-
-let () =
-  let open Alcotest in
-  run "Lang"
-    [ ( "identifiers",
-        [ test_case "name resolution in the scope" `Quick test_scope_resolution;
-          test_case "stripped name resolution in the scope" `Quick
-            test_scope_resolution_stripped;
-          test_case "recursive name resolution in the scope" `Quick
-            test_recursive_scope_resolution ] );
-      ( "type",
-        [ test_case "type definition" `Quick test_type;
-          test_case "duplicate type definition" `Quick test_type_duplicate;
-          test_case "duplicate type definition (with a non-type)" `Quick
-            test_type_duplicate_non_type;
-          test_case "duplicate type field" `Quick test_type_duplicate_field ] );
-      ("function", [test_case "function definition" `Quick test_function]) ]
+  pp_stripped source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
+        (test
+         (Function
+          ((function_params ((a (BuiltinKind Int257)) (b (BuiltinKind Bool))))
+           (function_returns (BuiltinKind Int257))
+           (function_body ((Term (Integer 1)) (Term (Integer 2))))))))))) |}]

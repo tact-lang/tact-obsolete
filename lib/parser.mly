@@ -1,21 +1,15 @@
-%token LET INTERFACE TYPE ENUM UNION FN IF ELSE RETURN
-%token EQUALS
-%token <string> IDENT
-%token EOF
-%token LBRACE LPAREN
-%token RBRACE RPAREN
-%token COMMA
-%token COLON RARROW SEMICOLON
-%token <Z.t> INT
+%parameter<Syntax : Syntax.T>
 
 %start <Syntax.program> program
 
-%{ open Syntax %}
+%{              
+   open Syntax
+%}
 
 %{
   let expand_fn_sugar params loc typ expr =
     Function (make_function_definition ~params: params
-                                           ~returns: {loc; value = typ}
+                                           ~returns: (make_located ~loc ~value: typ ())
                                            ~exprs: [expr]
                                            ())
   %}
@@ -78,34 +72,32 @@ let let_binding ==
   expr = located(expr);
   { make_binding ~binding_name: name
       ~binding_expr:
-        { loc = $loc;
-          value = expand_fn_sugar params $loc (Reference (Ident "Type")) expr
-        }
-        ()
+      (make_located ~loc: $loc ~value: (expand_fn_sugar params $loc (Reference (Ident "Type")) expr) ()) 
+      ()
   }
 )
 let shorthand_binding ==
 | sugared_function_definition
-| located( (name, expr) = type_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
+| located( (name, expr) = type_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ())  () })
 | located( ((name, params), expr) = type_definition(located_ident_with_params); {
-  make_binding ~binding_name: name ~binding_expr: {
-    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
-  } () })
-| located( (name, expr) = interface_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
+  make_binding ~binding_name: name ~binding_expr: (
+    make_located ~loc: $loc ~value: (expand_fn_sugar params $loc (Reference (Ident "Type")) (make_located ~loc: $loc ~value: expr ())) ()
+  ) () })
+| located( (name, expr) = interface_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ()) () })
 | located( ((name, params), expr) = interface_definition(located_ident_with_params); {
-  make_binding ~binding_name: name ~binding_expr: {
-    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Interface")) { loc = $loc; value = expr }
-    } () })
-| located( (name, expr) = enum_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
+  make_binding ~binding_name: name ~binding_expr: (
+    make_located ~loc: $loc ~value: (expand_fn_sugar params $loc (Reference (Ident "Interface")) (make_located ~loc: $loc ~value: expr ())) ()
+  ) () })
+| located( (name, expr) = enum_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ()) () })
 | located( ((name, params), expr) = enum_definition(located_ident_with_params); {
-  make_binding ~binding_name: name ~binding_expr: {
-    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
-  } () })
-| located( (name, expr) = union_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
+  make_binding ~binding_name: name ~binding_expr: ( 
+    make_located ~loc: $loc ~value: (expand_fn_sugar params $loc (Reference (Ident "Type")) (make_located ~loc: $loc ~value: expr ())) ()
+  ) () })
+| located( (name, expr) = union_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ()) () })
 | located( ((name, params), expr) = union_definition(located_ident_with_params); {
-  make_binding ~binding_name: name ~binding_expr: {
-    loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Type")) { loc = $loc; value = expr }
-  } () })
+  make_binding ~binding_name: name ~binding_expr: (
+    make_located ~loc: $loc ~value: (expand_fn_sugar params $loc (Reference (Ident "Type")) (make_located ~loc: $loc ~value: expr ())) ()
+  ) () })
 
 
 let located_ident_with_params ==
@@ -114,11 +106,13 @@ let located_ident_with_params ==
    <>
 
 let sugared_function_definition ==
-   | located( (name, expr) = function_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: { loc = $loc; value = expr } () })
+   | located( (name, expr) = function_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ()) () })
    | located( ((name, params), expr) = function_definition(located_ident_with_params); {
-     make_binding ~binding_name: name ~binding_expr: {
-       loc = $loc; value = expand_fn_sugar params $loc (Reference (Ident "Function")) { loc = $loc; value = expr } (* FIXME: Function type is a temp punt *)
-       } () })
+     make_binding ~binding_name: name ~binding_expr: 
+       (make_located ~loc: $loc
+                     ~value: (expand_fn_sugar params $loc (Reference (Ident "Function")) (make_located ~loc: $loc ~value: expr ()))
+                     () (* FIXME: Function type is a temp punt *)
+       ) () })
 
 (* Function definition
 
@@ -141,9 +135,7 @@ let function_definition(name) :=
 
 let function_signature_binding ==
     (n, f) = function_definition(located(ident)); {
-    make_binding ~binding_name: n ~binding_expr: { loc = $loc; 
-                                                   value = f }
-      ()
+    make_binding ~binding_name: n ~binding_expr: (make_located ~loc: $loc ~value: f ()) ()
   }
 
 let function_param ==
@@ -221,7 +213,7 @@ let fexpr :=
 
  let expr_ ==
  (* can be a `type` definition *)
- | (n, s) = type_definition(option(params)); { match n with None -> s | Some(params) -> expand_fn_sugar params $loc (Reference (Ident "Type")) { value = s; loc = $loc} }
+ | (n, s) = type_definition(option(params)); { match n with None -> s | Some(params) -> expand_fn_sugar params $loc (Reference (Ident "Type")) (make_located ~value: s ~loc: $loc ()) }
   (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)
@@ -267,7 +259,7 @@ let type_definition(name) ==
 *)
 let type_fields ==
 | located ( name = located(ident); COLON; typ = located(expr); { make_type_field ~field_name: name ~field_type: typ () } )
-| located ( name = located(ident); { make_type_field ~field_name: name ~field_type: { loc = name.loc; value = Reference name.value } () } )
+| located ( name = located(ident); { make_type_field ~field_name: name ~field_type: (make_located ~loc: (loc name) ~value: (Reference (value name)) ()) () } )
 
 (* Type constructor 
  *
@@ -374,7 +366,7 @@ let union_member :=
  (* can be a function call [by identifier only] *)
  | fn = located(ident);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
-  { FunctionCall (make_function_call ~fn: { loc = fn.loc; value = (Reference fn.value) } ~arguments: arguments ()) }
+  { FunctionCall (make_function_call ~fn: (make_located ~loc: (loc fn) ~value: (Reference (value fn)) ()) ~arguments: arguments ()) }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==
@@ -388,6 +380,6 @@ let delimited_separated_trailing_list_followed_by(opening, x, sep, next, closing
 
 (* Wraps into an `'a located` record *)
 let located(x) ==
-  ~ = x; { { loc = $loc; value = x } }
+  ~ = x; { make_located ~loc: $loc ~value: x () }
 
 let nothing == { None }

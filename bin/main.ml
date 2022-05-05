@@ -1,18 +1,20 @@
 open Printf
 module E = MenhirLib.ErrorReports
 module L = MenhirLib.LexerUtil
+module Syntax = Tact.Syntax.Make (Tact.Located.Enabled)
+module Parser = Tact.Parser.Make (Syntax)
 
 let fastpath filename =
   let text, lexbuf = L.read filename in
-  match Tact.Parser.program Tact.Lexer.token lexbuf with
+  match Parser.program Tact.Lexer.token lexbuf with
   | result ->
-      print_endline (Tact.Syntax.show_program result) ;
+      print_endline (Syntax.show_program result) ;
       flush stdout ;
       exit 0
   | exception Tact.Lexer.Error msg ->
       eprintf "lexing error: %s" msg ;
       exit 1
-  | exception Tact.Parser.Error ->
+  | exception Parser.Error ->
       text
 
 module I = Tact.UnitActionsParser.MenhirInterpreter

@@ -1,288 +1,312 @@
 open Base
 
-(* Error management *)
-type ('w, 'e) error_list =
-  {mutable warnings : 'w list ref; mutable errors : 'e list ref}
-[@@deriving make]
+module Make =
+functor
+  (Syntax : Syntax.T)
+  ->
+  struct
+    (* Error management *)
+    type ('w, 'e) error_list =
+      {mutable warnings : 'w list ref; mutable errors : 'e list ref}
+    [@@deriving make]
 
-let new_warn warn errors = errors.warnings := !(errors.warnings) @ [warn]
+    let new_warn warn errors = errors.warnings := !(errors.warnings) @ [warn]
 
-let new_error error errors = errors.errors := !(errors.errors) @ [error]
+    let new_error error errors = errors.errors := !(errors.errors) @ [error]
 
-(* *)
+    (* *)
 
-class ['s] base_map =
-  object (_ : 's)
-    method visit_z : 'env. 'env -> Z.t -> Z.t = fun _env z -> z
-  end
+    class ['s] base_map =
+      object (_ : 's)
+        method visit_z : 'env. 'env -> Z.t -> Z.t = fun _env z -> z
+      end
 
-type 'a named_map = (string * 'a) list
+    (* Z wrapper to enable show derivation *)
+    module Z' = struct
+      type t = [%import: Z.t]
 
-and term =
-  | Type of type_
-  | Function of function_
-  | Integer of (Z.t[@visitors.name "z"])
-  | Reference of string
-  | ResolvedReference of string * term
-  | Builtin of builtin
-  | Invalid
+      let pp = Z.pp_print
+    end
 
-and builtin = string
+    type z = Z'.t [@@deriving show {with_path = false}]
 
-and kind =
-  | ResolvedReferenceKind of string * kind
-  | BuiltinKind of builtin
-  | TypeKind of type_
-  | FunctionKind of function_
-  | ReferenceKind of string
-  | UnsupportedKind of term
+    let sexp_of_z z = Sexplib.Sexp.of_string (Z.to_string z)
 
-and function_ =
-  { function_loc : Syntax.loc; [@visitors.opaque]
-    function_params : kind named_map;
-    function_returns : kind;
-    function_body : stmt list option }
+    type 'a named_map = ((string * 'a) list[@sexp.list])
 
-and stmt = Return of term | Term of term
+    and term =
+      | Type of type_
+      | Function of function_
+      | Integer of (z[@visitors.name "z"])
+      | Reference of string
+      | ResolvedReference of string * term
+      | Builtin of builtin
+      | Invalid
 
-and type_ =
-  { type_loc : Syntax.loc; [@visitors.opaque]
-    type_fields : type_field named_map;
-    type_methods : function_ named_map }
+    and builtin = string
 
-and type_field = {field_type : kind}
+    and kind =
+      | ResolvedReferenceKind of string * kind
+      | BuiltinKind of builtin
+      | TypeKind of type_
+      | FunctionKind of function_
+      | ReferenceKind of string
+      | UnsupportedKind of term
 
-and env = {scope : scope}
+    and function_ =
+      { function_params : kind named_map;
+        function_returns : kind;
+        function_body : stmt list option [@sexp.option] }
 
-and scope = term named_map
-[@@deriving
-  visitors
-    { variety = "map";
-      polymorphic = true;
-      concrete = true;
-      ancestors = ["base_map"] },
-    equal]
+    and stmt = Return of term | Term of term
 
-let as_amap (l : 'a named_map) f =
-  Map.to_alist (f (Map.of_alist_exn (module String) l))
+    and type_ =
+      {type_fields : type_field named_map; type_methods : function_ named_map}
 
-let in_amap (l : 'a named_map) f = f (Map.of_alist_exn (module String) l)
+    and type_field = {field_type : kind}
 
-let term_to_kind value =
-  match value with
-  | Reference value ->
-      ReferenceKind value
-  | Type type_ ->
-      TypeKind type_
-  | Function function_ ->
-      FunctionKind function_
-  | Builtin builtin ->
-      BuiltinKind builtin
-  | _ ->
-      UnsupportedKind value
+    and env = {scope : scope}
 
-type error =
-  | Duplicate_Identifier of string * term
-  | Duplicate_Field of string * type_
-  | Duplicate_Param of string * function_
-  | Invalid_Param_Kind of string * function_
-  | Invalid_Return_Kind of function_
-  | Unresolved of string
-  | Recursive_Reference of string
-  | Unsupported
+    and scope = term named_map
+    [@@deriving
+      sexp_of,
+        visitors
+          { variety = "map";
+            polymorphic = true;
+            concrete = true;
+            ancestors = ["base_map"] }]
 
-type elist = (string, error) error_list
+    let as_amap (l : 'a named_map) f =
+      Map.to_alist (f (Map.of_alist_exn (module String) l))
 
-let empty_scope = [("Int257", Builtin "Int257"); ("Bool", Builtin "Bool")]
+    let in_amap (l : 'a named_map) f = f (Map.of_alist_exn (module String) l)
 
-(* Resolves referenced types *)
-class ['s] reference_resolver ((env, errors) : env * elist) =
-  object (s : 's)
-    inherit ['s] map
+    let term_to_kind value =
+      match value with
+      | Reference value ->
+          ReferenceKind value
+      | Type type_ ->
+          TypeKind type_
+      | Function function_ ->
+          FunctionKind function_
+      | Builtin builtin ->
+          BuiltinKind builtin
+      | _ ->
+          UnsupportedKind value
+      [@@deriving sexp_of]
 
-    val p_env = env
+    type error =
+      | Duplicate_Identifier of string * term
+      | Duplicate_Field of string * type_
+      | Duplicate_Param of string * function_
+      | Invalid_Param_Kind of string * function_
+      | Invalid_Return_Kind of function_
+      | Unresolved of string
+      | Recursive_Reference of string
+      | Unsupported
+    [@@deriving sexp_of]
 
-    val p_errors = errors
+    type elist = (string, error) error_list
 
-    val lookup_path = ref []
+    let empty_scope = [("Int257", Builtin "Int257"); ("Bool", Builtin "Bool")]
 
-    method! visit_Reference env ref =
-      match in_amap p_env.scope (fun m -> Map.find m ref) with
-      | Some (Reference ref') ->
-          if List.exists !lookup_path ~f:(String.equal ref) then (
-            new_error (Recursive_Reference ref) p_errors ;
-            Reference ref )
-          else (
-            lookup_path := ref' :: !lookup_path ;
-            let ref_ = s#visit_Reference env ref' in
-            lookup_path := List.drop !lookup_path 1 ;
-            match ref_ with
-            | ResolvedReference (_, v) ->
-                ResolvedReference (ref, v)
-            | v ->
-                v )
-      | Some (ResolvedReference (_, t)) | Some t ->
-          ResolvedReference (ref, t)
-      | None ->
-          new_error (Unresolved ref) p_errors ;
-          Reference ref
+    (* Resolves referenced types *)
+    class ['s] reference_resolver ((env, errors) : env * elist) =
+      object (s : 's)
+        inherit ['s] map
 
-    method! visit_ReferenceKind _env ref =
-      match in_amap p_env.scope (fun m -> Map.find m ref) with
-      | Some (ResolvedReference (_, t)) | Some t ->
-          ResolvedReferenceKind (ref, term_to_kind t)
-      | None ->
-          new_error (Unresolved ref) p_errors ;
-          ReferenceKind ref
-  end
+        val p_env = env
 
-(* Strips resolved references types *)
-class ['s] resolved_references_stripper (env : env) =
-  object (_ : 's)
-    inherit ['s] map
+        val p_errors = errors
 
-    val p_env = env
+        val lookup_path = ref []
 
-    method! visit_ResolvedReference _env _ t = t
-  end
+        method! visit_Reference env ref =
+          match in_amap p_env.scope (fun m -> Map.find m ref) with
+          | Some (Reference ref') ->
+              if List.exists !lookup_path ~f:(String.equal ref) then (
+                new_error (Recursive_Reference ref) p_errors ;
+                Reference ref )
+              else (
+                lookup_path := ref' :: !lookup_path ;
+                let ref_ = s#visit_Reference env ref' in
+                lookup_path := List.drop !lookup_path 1 ;
+                match ref_ with
+                | ResolvedReference (_, v) ->
+                    ResolvedReference (ref, v)
+                | v ->
+                    v )
+          | Some (ResolvedReference (_, t)) | Some t ->
+              ResolvedReference (ref, t)
+          | None ->
+              new_error (Unresolved ref) p_errors ;
+              Reference ref
 
-let rec env_from_program (stx : Syntax.program) (elist : elist) =
-  let scope = scope_from_bindings stx.bindings elist in
-  (* Resolve references inside *)
-  let env =
-    let env = {scope} in
-    let resolver = new reference_resolver (env, elist) in
-    resolver#visit_env () env
-  in
-  env
+        method! visit_ReferenceKind _env ref =
+          match in_amap p_env.scope (fun m -> Map.find m ref) with
+          | Some (ResolvedReference (_, t)) | Some t ->
+              ResolvedReferenceKind (ref, term_to_kind t)
+          | None ->
+              new_error (Unresolved ref) p_errors ;
+              ReferenceKind ref
+      end
 
-and scope_from_bindings bindings elist =
-  let scope = empty_scope in
-  List.fold ~init:scope
-    ~f:(fun scope binding ->
-      let binding = binding.value in
-      let ident = Syntax.ident_to_string binding.binding_name.value in
-      match in_amap scope (fun m -> Map.find m ident) with
-      | None -> (
-        match binding_to_value binding elist with
-        | Ok data ->
-            as_amap scope (fun m -> Map.set m ~key:ident ~data)
-        | Error e ->
-            new_error e elist ; scope )
-      | Some existing ->
-          new_error (Duplicate_Identifier (ident, existing)) elist ;
-          scope )
-    bindings
+    (* Strips resolved references types *)
+    class ['s] resolved_references_stripper (env : env) =
+      object (_ : 's)
+        inherit ['s] map
 
-and binding_to_value binding elist =
-  expr_to_value binding.binding_expr.value binding.binding_expr.loc elist
+        val p_env = env
 
-and expr_to_value expr loc elist =
-  match expr with
-  | Type s ->
-      Ok (type_to_type s loc elist)
-  | Int i ->
-      Ok (Integer i)
-  | Reference ref ->
-      Ok (Reference (Syntax.ident_to_string ref))
-  | Function f ->
-      Ok (function_to_function f loc elist)
-  | _ ->
-      Error Unsupported
+        method! visit_ResolvedReference _env _ t = t
 
-and expr_to_stmt expr loc elist =
-  match expr with
-  | Syntax.Return expr' ->
-      Result.map (expr_to_value expr' loc elist) ~f:(fun v -> Return v)
-  | _ ->
-      Result.map (expr_to_value expr loc elist) ~f:(fun v -> Term v)
+        method! visit_ResolvedReferenceKind _env _ k = k
+      end
 
-and type_to_type s loc elist =
-  let s' = {type_loc = loc; type_fields = []; type_methods = []} in
-  let s =
-    List.fold ~init:s'
-      ~f:(fun s' field ->
-        let ident = Syntax.ident_to_string field.value.field_name.value in
-        match in_amap s'.type_fields (fun m -> Map.find m ident) with
-        | Some _ ->
-            new_error (Duplicate_Field (ident, s')) elist ;
-            s'
-        | None -> (
-            let value =
-              expr_to_value field.value.field_type.value
-                field.value.field_type.loc elist
-            in
-            match Result.map value ~f:term_to_kind with
-            | Ok value ->
-                { s' with
-                  type_fields =
-                    as_amap s'.type_fields (fun m ->
-                        Map.set m ~key:ident ~data:{field_type = value} ) }
+    let rec env_from_program (stx : Syntax.program) (elist : elist) =
+      let scope = scope_from_bindings stx.bindings elist in
+      (* Resolve references inside *)
+      let env =
+        let env = {scope} in
+        let resolver = new reference_resolver (env, elist) in
+        resolver#visit_env () env
+      in
+      env
+
+    and scope_from_bindings bindings elist =
+      let scope = empty_scope in
+      List.fold ~init:scope
+        ~f:(fun scope binding ->
+          let binding = Syntax.value binding in
+          let ident =
+            Syntax.ident_to_string (Syntax.value binding.binding_name)
+          in
+          match in_amap scope (fun m -> Map.find m ident) with
+          | None -> (
+            match binding_to_value binding elist with
+            | Ok data ->
+                as_amap scope (fun m -> Map.set m ~key:ident ~data)
             | Error e ->
-                new_error e elist ; s' ) )
-      s.fields
-  in
-  Type s
+                new_error e elist ; scope )
+          | Some existing ->
+              new_error (Duplicate_Identifier (ident, existing)) elist ;
+              scope )
+        bindings
 
-and function_to_function f loc elist =
-  (* return kind *)
-  let return =
-    match expr_to_value f.returns.value f.returns.loc elist with
-    | Ok v ->
-        v
-    | Error err ->
-        new_error err elist ; Invalid
-  in
-  let f' =
-    { function_loc = loc;
-      function_params = [];
-      function_returns = UnsupportedKind return;
-      function_body =
-        Option.map f.exprs ~f:(fun exprs ->
-            let code =
-              Result.map
-                (List.fold_result ~init:[]
-                   ~f:(fun acc expr ->
-                     Result.map (expr_to_stmt expr.value expr.loc elist)
-                       ~f:(fun e -> e :: acc) )
-                   exprs )
-                ~f:List.rev
+    and binding_to_value binding elist =
+      expr_to_value (Syntax.value binding.binding_expr) () elist
+
+    and expr_to_value expr loc elist =
+      match expr with
+      | Type s ->
+          Ok (type_to_type s loc elist)
+      | Int i ->
+          Ok (Integer i)
+      | Reference ref ->
+          Ok (Reference (Syntax.ident_to_string ref))
+      | Function f ->
+          Ok (function_to_function f loc elist)
+      | _ ->
+          Error Unsupported
+
+    and expr_to_stmt expr loc elist =
+      match expr with
+      | Syntax.Return expr' ->
+          Result.map (expr_to_value expr' loc elist) ~f:(fun v -> Return v)
+      | _ ->
+          Result.map (expr_to_value expr loc elist) ~f:(fun v -> Term v)
+
+    and type_to_type s _loc elist =
+      let s' = {type_fields = []; type_methods = []} in
+      let s =
+        List.fold ~init:s'
+          ~f:(fun s' field ->
+            let ident =
+              Syntax.ident_to_string
+                ((Syntax.value field).field_name |> Syntax.value)
             in
-            match code with Ok code -> code | Error _ -> [] ) }
-  in
-  let f' =
-    { f' with
-      function_returns =
-        ( match term_to_kind return with
-        | UnsupportedKind _value ->
-            new_error (Invalid_Return_Kind f') elist ;
-            f'.function_returns
-        | kind ->
-            kind ) }
-  in
-  (* collect params *)
-  let f =
-    List.fold ~init:f'
-      ~f:(fun f' param ->
-        let name, expr = param.value in
-        let ident = Syntax.ident_to_string name.value in
-        match in_amap f'.function_params (fun m -> Map.find m ident) with
-        | Some _ ->
-            new_error (Duplicate_Param (ident, f')) elist ;
-            f'
-        | None -> (
-            let value = expr_to_value expr.value expr.loc elist in
-            match Result.map value ~f:term_to_kind with
-            | Ok (UnsupportedKind _) ->
-                new_error (Invalid_Param_Kind (ident, f')) elist ;
+            match in_amap s'.type_fields (fun m -> Map.find m ident) with
+            | Some _ ->
+                new_error (Duplicate_Field (ident, s')) elist ;
+                s'
+            | None -> (
+                let value =
+                  expr_to_value
+                    ((Syntax.value field).field_type |> Syntax.value)
+                    () elist
+                in
+                match Result.map value ~f:term_to_kind with
+                | Ok value ->
+                    { s' with
+                      type_fields =
+                        as_amap s'.type_fields (fun m ->
+                            Map.set m ~key:ident ~data:{field_type = value} ) }
+                | Error e ->
+                    new_error e elist ; s' ) )
+          s.fields
+      in
+      Type s
+
+    and function_to_function f _loc elist =
+      (* return kind *)
+      let return =
+        match expr_to_value (Syntax.value f.returns) () elist with
+        | Ok v ->
+            v
+        | Error err ->
+            new_error err elist ; Invalid
+      in
+      let f' =
+        { function_params = [];
+          function_returns = UnsupportedKind return;
+          function_body =
+            Option.map f.exprs ~f:(fun exprs ->
+                let code =
+                  Result.map
+                    (List.fold_result ~init:[]
+                       ~f:(fun acc expr ->
+                         Result.map
+                           (expr_to_stmt (Syntax.value expr) () elist)
+                           ~f:(fun e -> e :: acc) )
+                       exprs )
+                    ~f:List.rev
+                in
+                match code with Ok code -> code | Error _ -> [] ) }
+      in
+      let f' =
+        { f' with
+          function_returns =
+            ( match term_to_kind return with
+            | UnsupportedKind _value ->
+                new_error (Invalid_Return_Kind f') elist ;
+                f'.function_returns
+            | kind ->
+                kind ) }
+      in
+      (* collect params *)
+      let f =
+        List.fold ~init:f'
+          ~f:(fun f' param ->
+            let name, expr = Syntax.value param in
+            let ident = Syntax.ident_to_string (Syntax.value name) in
+            match in_amap f'.function_params (fun m -> Map.find m ident) with
+            | Some _ ->
+                new_error (Duplicate_Param (ident, f')) elist ;
                 f'
-            | Ok kind ->
-                { f' with
-                  function_params =
-                    as_amap f'.function_params (fun m ->
-                        Map.set m ~key:ident ~data:kind ) }
-            | Error e ->
-                new_error e elist ; f' ) )
-      f.params
-  in
-  Function f
+            | None -> (
+                let value = expr_to_value (Syntax.value expr) () elist in
+                match Result.map value ~f:term_to_kind with
+                | Ok (UnsupportedKind _) ->
+                    new_error (Invalid_Param_Kind (ident, f')) elist ;
+                    f'
+                | Ok kind ->
+                    { f' with
+                      function_params =
+                        as_amap f'.function_params (fun m ->
+                            Map.set m ~key:ident ~data:kind ) }
+                | Error e ->
+                    new_error e elist ; f' ) )
+          f.params
+      in
+      Function f
+  end

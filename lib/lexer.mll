@@ -1,5 +1,5 @@
 {
-  open Parser
+  open Tokens
   open Lexing
   exception Error of string
 
