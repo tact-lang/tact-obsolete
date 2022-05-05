@@ -1,4 +1,5 @@
 %parameter<Syntax : Syntax.T>
+
 %start <Syntax.program> program
 
 %{              
@@ -219,8 +220,10 @@ let fexpr :=
  | (_, e) = enum_definition(nothing); { e }
  (* can be an `union` definition *)
  | (_, u) = union_definition(nothing); { u }
-  (* can be an identifier, as a reference to some identifier *)
- | reference
+ (* can be an identifier, as a reference to some identifier *)
+ | ~= ident; <Reference>
+ (* can be access to the field via dot *)
+ | field_access
  (* can be a function call *)
  | function_call
  (* can be an integer *)
@@ -231,9 +234,8 @@ let fexpr :=
 let params ==
     delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
 
-let reference :=
-  | ident = located(ident); {FieldAccess (make_path ~first_elem:ident ~last_elems:[] ()) }
-  | ident = located(ident); DOT; idents = separated_list(DOT, located(ident)); 
+let field_access := 
+  ident = located(ident); DOT; idents = separated_list(DOT, located(ident)); 
     {FieldAccess (make_path ~first_elem:ident ~last_elems:idents ())}
 
 (* Struct

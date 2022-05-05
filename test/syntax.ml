@@ -490,15 +490,34 @@ let%expect_test "struct construction over an anonymous type's function call" =
               (arguments ((Reference (Ident X)))))))
            (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
 
-let%expect_test "mut var" =
+let%expect_test "tilda syntax" =
   let source = {|
     fn test() -> A {
       ~var;
     }
     |} in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     ((bindings
       (((binding_name (Ident test))
         (binding_expr
          (Function
           ((returns (Reference (Ident A))) (exprs ((MutRef (Ident var))))))))))) |}]
+
+let%expect_test "field access syntax" =
+  let source = {|
+    fn test() -> A {
+      foo.bar;
+    }
+    |} in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A)))
+           (exprs
+            ((FieldAccess ((first_elem (Ident foo)) (last_elems ((Ident bar)))))))))))))) |}]
