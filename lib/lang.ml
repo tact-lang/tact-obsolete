@@ -129,6 +129,42 @@ functor
         ("Bool", Builtin "Bool");
         ("println", Function (BuiltinFn comptime_println)) ]
 
+    let is_immediate_term = function
+      | Void ->
+          true
+      | Type _ ->
+          true
+      | Function _ ->
+          true
+      | FunctionCall _ ->
+          false
+      | Integer _ ->
+          true
+      | Reference _ ->
+          false
+      | ResolvedReference _ ->
+          false
+      | Builtin _ ->
+          true
+      | Invalid ->
+          false
+
+    let interpret_function env fn args =
+      let args' =
+        List.map (List.zip_exn fn.function_params args) ~f:(fun ((n, _), a) ->
+            (n, a) )
+      in
+      let _env' = {scope = args' @ env.scope} in
+      List.fold_until ~init:Void
+        ~f:
+          (fun state -> function
+            | Return term ->
+                Stop term
+            | Term _ ->
+                Continue state )
+        ~finish:(fun state -> state)
+        (Option.value fn.function_body ~default:[])
+
     (* Resolves referenced types *)
     class ['s] reference_resolver ((env, errors) : env * elist) =
       object (s : 's)
@@ -145,7 +181,8 @@ functor
         method! visit_fn env fn =
           let scoped_identifiers' = scoped_identifiers in
           scoped_identifiers <-
-            List.map fn.function_params ~f:(fun (n, _) -> n) :: scoped_identifiers' ;
+            List.map fn.function_params ~f:(fun (n, _) -> n)
+            :: scoped_identifiers' ;
           let fn' = super#visit_fn env fn in
           scoped_identifiers <- scoped_identifiers' ;
           fn'
@@ -199,7 +236,6 @@ functor
       end
 
     (* Evaluates compile-time function calls *)
-    (* NB: Currently handles builtin functions only *)
     class ['s] function_call_evaluator (env : env) =
       object (_ : 's)
         inherit ['s] map
@@ -207,10 +243,23 @@ functor
         val p_env = env
 
         method! visit_FunctionCall _env f args =
+          let rewrite_fn fn =
+            let immediate_arguments =
+              Option.is_none
+                (List.find args ~f:(fun a -> not (is_immediate_term a)))
+            and has_body = Option.is_some fn.function_body in
+            if immediate_arguments && has_body then
+              interpret_function p_env fn args
+            else FunctionCall (Function (Fn fn), args)
+          in
           match f with
           | Function (BuiltinFn fn)
           | ResolvedReference (_, Function (BuiltinFn fn)) ->
               fn p_env args
+          | Function (Fn fn) ->
+              rewrite_fn fn
+          | ResolvedReference (n, Function (Fn fn)) ->
+              ResolvedReference (n, rewrite_fn fn)
           | _ ->
               FunctionCall (f, args)
       end

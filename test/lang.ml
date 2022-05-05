@@ -193,3 +193,25 @@ let%expect_test "compile-time printing" =
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void) (a Void)
         (println (Function (BuiltinFn <fun>))))))) |}]
+
+let%expect_test "compile-time evaluation" =
+  let source =
+    {|
+    fn a() -> Int257 {
+       return 1;
+    }
+    let v = a();
+   |}
+  in
+  pp_stripped source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Void Void)
+        (a
+         (Function
+          (Fn
+           ((function_params ()) (function_returns (BuiltinKind Int257))
+            (function_body ((Return (Integer 1))))))))
+        (println (Function (BuiltinFn <fun>))) (v (Integer 1)))))) |}]
