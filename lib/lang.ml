@@ -54,7 +54,7 @@ functor
       | TypeKind of type_
       | FunctionKind of function_
       | ReferenceKind of string
-      | UnsupportedKind of term
+      | TermKind of term
 
     and fn =
       { function_params : kind named_map;
@@ -101,7 +101,7 @@ functor
       | Void ->
           VoidKind
       | _ ->
-          UnsupportedKind value
+          TermKind value
       [@@deriving sexp_of]
 
     type error =
@@ -130,7 +130,7 @@ functor
         ("Bool", Builtin "Bool");
         ("println", Function (BuiltinFn comptime_println)) ]
 
-    let is_immediate_term = function
+    let rec is_immediate_term = function
       | Void ->
           true
       | Type _ ->
@@ -143,28 +143,12 @@ functor
           true
       | Reference _ ->
           false
-      | ResolvedReference _ ->
-          false
+      | ResolvedReference (_, t) ->
+          is_immediate_term t
       | Builtin _ ->
           true
       | Invalid ->
           false
-
-    let interpret_function env fn args =
-      let args' =
-        List.map (List.zip_exn fn.function_params args) ~f:(fun ((n, _), a) ->
-            (n, a) )
-      in
-      let _env' = {scope = args' @ env.scope} in
-      List.fold_until ~init:Void
-        ~f:
-          (fun _ -> function
-            | Return term ->
-                Stop term
-            | Term term ->
-                Continue term )
-        ~finish:(fun state -> state)
-        (Option.value fn.function_body ~default:[])
 
     (* Resolves referenced types *)
     class ['s] reference_resolver ((env, errors) : env * elist) =
@@ -188,12 +172,13 @@ functor
           scoped_identifiers <- scoped_identifiers' ;
           fn'
 
+        method private scoped_identifier ref =
+          Option.is_some
+            (List.find scoped_identifiers ~f:(fun terms ->
+                 Option.is_some (List.find terms ~f:(String.equal ref)) ) )
+
         method! visit_Reference env ref =
-          if
-            Option.is_some
-              (List.find scoped_identifiers ~f:(fun terms ->
-                   Option.is_some (List.find terms ~f:(String.equal ref)) ) )
-          then Reference ref
+          if s#scoped_identifier ref then Reference ref
           else
             match in_amap p_env.scope (fun m -> Map.find m ref) with
             | Some (Reference ref') ->
@@ -216,13 +201,34 @@ functor
                 Reference ref
 
         method! visit_ReferenceKind _env ref =
-          match in_amap p_env.scope (fun m -> Map.find m ref) with
-          | Some (ResolvedReference (_, t)) | Some t ->
-              ResolvedReferenceKind (ref, term_to_kind t)
-          | None ->
-              new_error (Unresolved ref) p_errors ;
-              ReferenceKind ref
+          if s#scoped_identifier ref then ReferenceKind ref
+          else
+            match in_amap p_env.scope (fun m -> Map.find m ref) with
+            | Some (ResolvedReference (_, t)) | Some t ->
+                ResolvedReferenceKind (ref, term_to_kind t)
+            | None ->
+                new_error (Unresolved ref) p_errors ;
+                ReferenceKind ref
       end
+
+    let interpret_function env fn args =
+      let args' =
+        List.map (List.zip_exn fn.function_params args) ~f:(fun ((n, _), a) ->
+            (n, a) )
+      in
+      let env' = {scope = args' @ env.scope} in
+      List.fold_until ~init:Void
+        ~f:
+          (fun _ -> function
+            | Return term ->
+                Stop term
+            | Term term ->
+                Continue term )
+        ~finish:(fun state -> state)
+        (List.map (Option.value fn.function_body ~default:[]) ~f:(fun stmt ->
+             (new reference_resolver
+                (env', {warnings = ref []; errors = ref []}) )
+               #visit_stmt () stmt ) )
 
     (* Strips resolved references types *)
     class ['s] resolved_references_stripper (env : env) =
@@ -366,7 +372,7 @@ functor
       in
       let f' =
         { function_params = [];
-          function_returns = UnsupportedKind return;
+          function_returns = TermKind return;
           function_body =
             Option.map f.exprs ~f:(fun exprs ->
                 let code =
@@ -385,7 +391,7 @@ functor
         { f' with
           function_returns =
             ( match term_to_kind return with
-            | UnsupportedKind _value ->
+            | TermKind _value ->
                 new_error (Invalid_Return_Kind (Fn f')) elist ;
                 f'.function_returns
             | kind ->
@@ -404,7 +410,7 @@ functor
             | None -> (
                 let value = expr_to_term (Syntax.value expr) () elist in
                 match Result.map value ~f:term_to_kind with
-                | Ok (UnsupportedKind _) ->
+                | Ok (TermKind _) ->
                     new_error (Invalid_Param_Kind (ident, Fn f')) elist ;
                     f'
                 | Ok kind ->

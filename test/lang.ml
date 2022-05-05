@@ -219,12 +219,10 @@ let%expect_test "compile-time evaluation" =
         (println (Function (BuiltinFn <fun>))) (v (Integer 1)))))) |}]
 
 let%expect_test "parametric type instantiation" =
-  let source =
-    {|
-      type T(A: Int257) { a: Int257 }
-      let TA = T(1);
-   |}
-  in
+  let source = {|
+      type T(A: Type) { a: A }
+      let TA = T(Int257);
+   |} in
   pp_stripped source ;
   [%expect
     {|
@@ -234,16 +232,17 @@ let%expect_test "parametric type instantiation" =
           (T
            (Function
             (Fn
-             ((function_params ((A (BuiltinKind Int257))))
+             ((function_params ((A (BuiltinKind Type))))
               (function_returns (BuiltinKind Type))
               (function_body
                ((Term
                  (Type
-                  ((type_fields ((a ((field_type (BuiltinKind Int257))))))
+                  ((type_fields ((a ((field_type (ReferenceKind A))))))
                    (type_methods ()))))))))))
           (TA
            (Type
-            ((type_fields ((a ((field_type (ReferenceKind Int257))))))
+            ((type_fields
+              ((a ((field_type (ResolvedReferenceKind A (BuiltinKind Int257)))))))
              (type_methods ()))))
           (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
  |}]
