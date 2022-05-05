@@ -759,7 +759,7 @@ let test_type_construction_function_call () =
     | _ ->
         false )
 
-let test_type_construction_type_declaration () =
+let test_type_construction_type_anonymous () =
   let source = {|
   let a = (type { field: Int257 }) { field: value };
   |} in
@@ -794,6 +794,82 @@ let test_type_construction_type_declaration () =
         true
     | _ ->
         false )
+
+let test_type_construction_type_anonymous_function_call () =
+  let source =
+    {|
+  let a = type(T: Type) { field: T }(X) { field: value };
+  |}
+  in
+  Alcotest.(check bool)
+    "type construction type declaration" true
+    ( Caml.print_string (Tact.Syntax.show_program (parse_program source)) ;
+      match parse_program source with
+      | { bindings =
+            [ { value =
+                  { binding_expr =
+                      { value =
+                          TypeConstructor
+                            { constructor_id =
+                                Some
+                                  { value =
+                                      FunctionCall
+                                        { fn =
+                                            { value =
+                                                Function
+                                                  { name = None;
+                                                    params =
+                                                      [ { value =
+                                                            ( { value = Ident "T";
+                                                                _ },
+                                                              { value =
+                                                                  Reference
+                                                                    (Ident
+                                                                      "Type" );
+                                                                _ } );
+                                                          _ } ];
+                                                    returns =
+                                                      { value =
+                                                          Reference
+                                                            (Ident "Type");
+                                                        _ };
+                                                    exprs =
+                                                      Some
+                                                        [ { value =
+                                                              Type
+                                                                { fields =
+                                                                    [ { value =
+                                                                          { field_name =
+                                                                              { value =
+                                                                                Ident
+                                                                                "field";
+                                                                                _
+                                                                              };
+                                                                            field_type =
+                                                                              { value =
+                                                                                Reference
+                                                                                (Ident
+                                                                                "T"
+                                                                                );
+                                                                                _
+                                                                              }
+                                                                          };
+                                                                        _ } ];
+                                                                  type_bindings =
+                                                                    [] };
+                                                            _ } ] };
+                                              _ };
+                                          arguments =
+                                            [{value = Reference (Ident "X"); _}];
+                                          _ };
+                                    _ };
+                              fields_construction = _ };
+                        _ };
+                    _ };
+                _ } ] } ->
+          true
+      | _ ->
+          false )
 
 let () =
   let open Alcotest in
@@ -840,7 +916,9 @@ let () =
             test_if_has_body_with_else;
           test_case "if expr with else if" `Quick test_if_with_else_if ] );
       ( "type construction",
-        [ test_case "type construction function call" `Quick
+        [ test_case "functional type construction" `Quick
             test_type_construction_function_call;
-          test_case "type construction type declaration" `Quick
-            test_type_construction_type_declaration ] ) ]
+          test_case "anonymous type construction" `Quick
+            test_type_construction_type_anonymous;
+          test_case "anonymous functional type construction" `Quick
+            test_type_construction_type_anonymous_function_call ] ) ]

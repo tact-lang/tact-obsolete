@@ -110,7 +110,7 @@ let shorthand_binding ==
 
 let located_ident_with_params ==
    ~ = located(ident);
-   ~ = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
+   ~ = params;
    <>
 
 let sugared_function_definition ==
@@ -221,7 +221,7 @@ let fexpr :=
 
  let expr_ ==
  (* can be a `type` definition *)
- | (_, s) = type_definition(nothing); { s }
+ | (n, s) = type_definition(option(params)); { match n with None -> s | Some(params) -> expand_fn_sugar params $loc (Reference (Ident "Type")) { value = s; loc = $loc} }
   (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)
@@ -234,6 +234,9 @@ let fexpr :=
  | function_call
  (* can be an integer *)
  | ~= INT; <Int>
+
+let params ==
+    delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
 
 (* Type
 
@@ -284,7 +287,7 @@ let type_constructor :=
     ), 
     COMMA, 
     RBRACE);
-  {TypeConstructor ({constructor_id=Some(constructor_id); fields_construction=fields_construction})}
+  {TypeConstructor (make_type_constructor ~constructor_id ~fields_construction ())}
 
 (* Interface
 
