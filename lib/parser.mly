@@ -116,7 +116,7 @@ let sugared_function_definition ==
 
 (* Function definition
 
-fn (arg: Type, ...) -> Type [{
+ fn (arg: Type, ...) [-> Type] [{
   expr
   expr
   ...
@@ -127,10 +127,9 @@ let function_definition(name) :=
   FN;
   n = name;
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
-  RARROW;
-  returns = located(fexpr);
+  returns = option(preceded(RARROW, located(fexpr)));
   body = option(code_block);
-  { (n, Function (make_function_definition ~params: params ~returns: returns 
+  { (n, Function (make_function_definition ~params: params ?returns: returns
                     ?exprs: (match body with Some(CodeBlock({block_exprs;_})) -> Some(block_exprs) | _ -> None) ())) } 
 
 let function_signature_binding ==

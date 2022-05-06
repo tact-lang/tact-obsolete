@@ -58,7 +58,7 @@ module type T = sig
   and function_definition =
     { name : ident located option;
       params : function_param located list;
-      returns : expr located;
+      returns : expr located option;
       exprs : expr located list option }
 
   and binding = {binding_name : ident located; binding_expr : expr located}
@@ -134,7 +134,7 @@ functor
     and function_definition =
       { name : ident located option; [@sexp.option]
         params : function_param located list; [@sexp.list]
-        returns : expr located;
+        returns : expr located option; [@sexp.option]
         exprs : expr located list option [@sexp.option] }
 
     and binding = {binding_name : ident located; binding_expr : expr located}

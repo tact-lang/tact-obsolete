@@ -276,3 +276,22 @@ let%expect_test "parametric type instantiation" =
              (type_methods ()) (id <opaque>))))
           (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
  |}]
+
+let%expect_test "function without a return type" =
+  let source = {|
+    fn f() { return 1;}
+    let a = f();
+    |} in
+  pp_stripped source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (Void Void) (a (Integer 1))
+        (f
+         (Function
+          (Fn
+           ((function_params ()) (function_returns HoleKind)
+            (function_body ((Return (Integer 1))))))))
+        (println (Function (BuiltinFn <fun>))))))) |}]

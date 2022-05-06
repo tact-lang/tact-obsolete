@@ -46,6 +46,7 @@ functor
       | ResolvedReference of string * term
       | Builtin of builtin
       | Invalid
+      | Hole
 
     and builtin = string
 
@@ -57,6 +58,7 @@ functor
       | FunctionKind of function_
       | ReferenceKind of string
       | TermKind of term
+      | HoleKind
 
     and fn =
       { function_params : kind named_map;
@@ -105,6 +107,8 @@ functor
           BuiltinKind builtin
       | Void ->
           VoidKind
+      | Hole ->
+          HoleKind
       | _ ->
           TermKind value
       [@@deriving sexp_of]
@@ -152,6 +156,8 @@ functor
           is_immediate_term t
       | Builtin _ ->
           true
+      | Hole ->
+          false
       | Invalid ->
           false
 
@@ -396,7 +402,11 @@ functor
     and function_to_function f _loc elist =
       (* return kind *)
       let return =
-        match expr_to_term (Syntax.value f.returns) () elist with
+        match
+          Option.map f.returns ~f:(fun e ->
+              expr_to_term (Syntax.value e) () elist )
+          |> Option.value ~default:(Ok Hole)
+        with
         | Ok v ->
             v
         | Error err ->

@@ -243,6 +243,34 @@ let%expect_test "function definition shorthand" =
             (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1))))))
            (exprs ())))))))) |}]
 
+let%expect_test "function without a return type" =
+  let source =
+    {|
+    let f1 = fn(t: Int257);
+    let f2 = fn(t: Int257) {};
+    fn f3(t: Int257)
+    fn f4(t: Int257) {}
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident f1))
+        (binding_expr
+         (Function ((params (((Ident t) (Reference (Ident Int257)))))))))
+       ((binding_name (Ident f2))
+        (binding_expr
+         (Function
+          ((params (((Ident t) (Reference (Ident Int257))))) (exprs ())))))
+       ((binding_name (Ident f3))
+        (binding_expr
+         (Function ((params (((Ident t) (Reference (Ident Int257)))))))))
+       ((binding_name (Ident f4))
+        (binding_expr
+         (Function
+          ((params (((Ident t) (Reference (Ident Int257))))) (exprs ())))))))) |}]
+
 let%expect_test "parse parameterized return type as part of function \
                  signature, not a function call" =
   let source = {|
