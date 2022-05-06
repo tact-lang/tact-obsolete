@@ -162,7 +162,7 @@ functor
 
         val p_errors = errors
 
-        val lookup_path = ref []
+        val mutable lookup_path = []
 
         val mutable scoped_identifiers = []
 
@@ -180,33 +180,38 @@ functor
             (List.find scoped_identifiers ~f:(fun terms ->
                  Option.is_some (List.find terms ~f:(String.equal ref)) ) )
 
+        method private find_ref : 'env. 'env -> string -> term option =
+          fun env ref ->
+            match in_amap p_env.scope (fun m -> Map.find m ref) with
+            | Some (Reference ref') ->
+                if List.exists lookup_path ~f:(String.equal ref') then (
+                  new_error (Recursive_Reference ref) p_errors ;
+                  None )
+                else
+                  let path = lookup_path in
+                  lookup_path <- ref :: lookup_path ;
+                  let t = s#find_ref env ref' in
+                  lookup_path <- path ;
+                  t
+            | Some (ResolvedReference (_, t)) | Some t ->
+                Some (s#visit_term env t)
+            | other ->
+                other
+
         method! visit_Reference env ref =
           if s#scoped_identifier ref then Reference ref
           else
-            match in_amap p_env.scope (fun m -> Map.find m ref) with
-            | Some (Reference ref') ->
-                if List.exists !lookup_path ~f:(String.equal ref) then (
-                  new_error (Recursive_Reference ref) p_errors ;
-                  Reference ref )
-                else (
-                  lookup_path := ref' :: !lookup_path ;
-                  let ref_ = s#visit_Reference env ref' in
-                  lookup_path := List.drop !lookup_path 1 ;
-                  match ref_ with
-                  | ResolvedReference (_, v) ->
-                      ResolvedReference (ref, v)
-                  | v ->
-                      v )
+            match s#find_ref env ref with
             | Some (ResolvedReference (_, t)) | Some t ->
                 ResolvedReference (ref, t)
             | None ->
                 new_error (Unresolved ref) p_errors ;
                 Reference ref
 
-        method! visit_ReferenceKind _env ref =
+        method! visit_ReferenceKind env ref =
           if s#scoped_identifier ref then ReferenceKind ref
           else
-            match in_amap p_env.scope (fun m -> Map.find m ref) with
+            match s#find_ref env ref with
             | Some (ResolvedReference (_, t)) | Some t ->
                 ResolvedReferenceKind (ref, term_to_kind t)
             | None ->
@@ -216,14 +221,14 @@ functor
 
     (* Strips resolved references types *)
     class ['s] resolved_references_stripper (env : env) =
-      object (_ : 's)
+      object (s : 's)
         inherit ['s] map
 
         val p_env = env
 
-        method! visit_ResolvedReference _env _ t = t
+        method! visit_ResolvedReference env _ t = s#visit_term env t
 
-        method! visit_ResolvedReferenceKind _env _ k = k
+        method! visit_ResolvedReferenceKind env _ k = s#visit_kind env k
       end
 
     let interpret_function env fn args =

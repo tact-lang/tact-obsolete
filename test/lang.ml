@@ -49,6 +49,32 @@ let%expect_test "scope resolution" =
         (n_ (ResolvedReference n (Integer 1)))
         (println (Function (BuiltinFn <fun>))))))) |}]
 
+let%expect_test "deep resolution" =
+  let source = {|
+      let T = type {a: Int257};
+      let T1 = T;
+    |} in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
+        (T
+         (Type
+          ((type_fields
+            ((a
+              ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
+           (type_methods ()))))
+        (T1
+         (ResolvedReference T
+          (Type
+           ((type_fields
+             ((a
+               ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
+            (type_methods ())))))
+        (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
+
 let%expect_test "stripping scope resolution" =
   let source =
     {|
@@ -99,7 +125,7 @@ let%expect_test "recursive scope resolution" =
   let B = C;
   let C = A;
   |} in
-  pp source ; [%expect {| (Error (Recursive_Reference C)) |}]
+  pp source ; [%expect {| (Error (Recursive_Reference A)) |}]
 
 let%expect_test "type definition" =
   let source =
