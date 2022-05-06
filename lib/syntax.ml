@@ -40,7 +40,7 @@ module type T = sig
     | Enum of enum_definition
     | Union of union_definition
     | Reference of ident
-    | FieldAccess of path
+    | FieldAccess of field_access
     | FunctionCall of function_call
     | Function of function_definition
     | Int of zt
@@ -72,7 +72,7 @@ module type T = sig
       body : expr located list;
       else_ : expr located option }
 
-  and path = {first_elem : ident located; last_elems : ident located list}
+  and field_access = {from_expr : expr located; to_field : ident located}
 
   and program = {bindings : binding located list}
   [@@deriving show, make, sexp_of]
@@ -119,7 +119,7 @@ functor
       | Enum of enum_definition
       | Union of union_definition
       | Reference of ident
-      | FieldAccess of path
+      | FieldAccess of field_access
       | FunctionCall of function_call
       | Function of function_definition
       | Int of zt
@@ -152,7 +152,7 @@ functor
         body : expr located list; [@sexp.list]
         else_ : expr located option [@sexp.option] }
 
-    and path = {first_elem : ident located; last_elems : ident located list}
+    and field_access = {from_expr : expr located; to_field : ident located}
 
     and program = {bindings : binding located list [@sexp.list]}
     [@@deriving show {with_path = false}, make, sexp_of]

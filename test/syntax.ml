@@ -520,4 +520,34 @@ let%expect_test "field access syntax" =
          (Function
           ((returns (Reference (Ident A)))
            (exprs
-            ((FieldAccess ((first_elem (Ident foo)) (last_elems ((Ident bar)))))))))))))) |}]
+            ((FieldAccess
+              ((from_expr (Reference (Ident foo))) (to_field (Ident bar))))))))))))) |}]
+
+let%expect_test "field access over other expressions" =
+  let source =
+    {|
+    fn test() -> A {
+      ~foo.bar;
+      Struct{field: value}.field.other_field;
+    }
+    |}
+  in
+  pp source ; [%expect {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A)))
+           (exprs
+            ((FieldAccess
+              ((from_expr (MutRef (Ident foo))) (to_field (Ident bar))))
+             (FieldAccess
+              ((from_expr
+                (FieldAccess
+                 ((from_expr
+                   (StructConstructor
+                    ((constructor_id (Reference (Ident Struct)))
+                     (fields_construction
+                      (((Ident field) (Reference (Ident value))))))))
+                  (to_field (Ident field)))))
+               (to_field (Ident other_field))))))))))))) |}]

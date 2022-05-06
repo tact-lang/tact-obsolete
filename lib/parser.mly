@@ -199,6 +199,9 @@ let type_expr :=
 (* Expression *)
 let expr :=
  | expr_
+ (* can be access to the field via dot *)
+ | from_expr = located(expr); DOT; to_field = located(ident); 
+    {FieldAccess (make_field_access ~from_expr ~to_field ())}
  (* can be a type constructor *)
  | struct_constructor
  (* can be a function definition *)
@@ -222,8 +225,6 @@ let fexpr :=
  | (_, u) = union_definition(nothing); { u }
  (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
- (* can be access to the field via dot *)
- | field_access
  (* can be a function call *)
  | function_call
  (* can be an integer *)
@@ -233,10 +234,6 @@ let fexpr :=
 
 let params ==
     delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
-
-let field_access := 
-  ident = located(ident); DOT; idents = separated_list(DOT, located(ident)); 
-    {FieldAccess (make_path ~first_elem:ident ~last_elems:idents ())}
 
 (* Struct
 
