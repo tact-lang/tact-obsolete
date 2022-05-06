@@ -38,7 +38,7 @@ functor
 
     and term =
       | Void
-      | Type of type_
+      | Struct of struct_
       | Function of function_
       | FunctionCall of term * term list
       | Integer of (z[@visitors.name "z"])
@@ -50,19 +50,19 @@ functor
 
     and builtin = string
 
-    and kind =
-      | VoidKind
-      | ResolvedReferenceKind of string * kind
-      | BuiltinKind of builtin
-      | TypeKind of type_
-      | FunctionKind of function_
-      | ReferenceKind of string
-      | TermKind of term
-      | HoleKind
+    and type_ =
+      | VoidType
+      | ResolvedReferenceType of string * type_
+      | BuiltinType of builtin
+      | StructType of struct_
+      | FunctionType of function_
+      | ReferenceType of string
+      | TermType of term
+      | HoleType
 
     and fn =
-      { function_params : kind named_map;
-        function_returns : kind;
+      { function_params : type_ named_map;
+        function_returns : type_;
         function_body : stmt list option [@sexp.option] }
 
     and builtin_fn = (env -> term list -> term[@visitors.opaque] [@equal.ignore])
@@ -71,12 +71,12 @@ functor
 
     and stmt = Return of term | Term of term
 
-    and type_ =
-      { type_fields : type_field named_map;
-        type_methods : function_ named_map;
+    and struct_ =
+      { struct_fields : struct_field named_map;
+        struct_methods : function_ named_map;
         id : (int[@sexp.opaque]) }
 
-    and type_field = {field_type : kind}
+    and struct_field = {field_type : type_}
 
     and env = {scope : scope}
 
@@ -95,30 +95,30 @@ functor
 
     let in_amap (l : 'a named_map) f = f (Map.of_alist_exn (module String) l)
 
-    let term_to_kind value =
+    let term_to_type value =
       match value with
       | Reference value ->
-          ReferenceKind value
-      | Type type_ ->
-          TypeKind type_
+          ReferenceType value
+      | Struct struct_ ->
+          StructType struct_
       | Function function_ ->
-          FunctionKind function_
+          FunctionType function_
       | Builtin builtin ->
-          BuiltinKind builtin
+          BuiltinType builtin
       | Void ->
-          VoidKind
+          VoidType
       | Hole ->
-          HoleKind
+          HoleType
       | _ ->
-          TermKind value
+          TermType value
       [@@deriving sexp_of]
 
     type error =
       | Duplicate_Identifier of string * term
-      | Duplicate_Field of string * type_
+      | Duplicate_Field of string * struct_
       | Duplicate_Param of string * function_
-      | Invalid_Param_Kind of string * function_
-      | Invalid_Return_Kind of function_
+      | Invalid_Param_Type of string * function_
+      | Invalid_Return_Type of function_
       | Unresolved of string
       | Recursive_Reference of string
       | Unsupported
@@ -142,7 +142,7 @@ functor
     let rec is_immediate_term = function
       | Void ->
           true
-      | Type _ ->
+      | Struct _ ->
           true
       | Function _ ->
           true
@@ -216,15 +216,15 @@ functor
                 new_error (Unresolved ref) p_errors ;
                 Reference ref
 
-        method! visit_ReferenceKind env ref =
-          if s#scoped_identifier ref then ReferenceKind ref
+        method! visit_ReferenceType env ref =
+          if s#scoped_identifier ref then ReferenceType ref
           else
             match s#find_ref env ref with
             | Some (ResolvedReference (_, t)) | Some t ->
-                ResolvedReferenceKind (ref, term_to_kind t)
+                ResolvedReferenceType (ref, term_to_type t)
             | None ->
                 new_error (Unresolved ref) p_errors ;
-                ReferenceKind ref
+                ReferenceType ref
       end
 
     (* Strips resolved references types *)
@@ -236,7 +236,7 @@ functor
 
         method! visit_ResolvedReference env _ t = s#visit_term env t
 
-        method! visit_ResolvedReferenceKind env _ k = s#visit_kind env k
+        method! visit_ResolvedReferenceType env _ k = s#visit_type_ env k
       end
 
     let interpret_function env fn args =
@@ -297,7 +297,7 @@ functor
       end
 
     (* Assigns unique identifiers to types *)
-    class ['s] type_unique_id_assigner (env : env) =
+    class ['s] struct_unique_id_assigner (env : env) =
       object (_ : 's)
         inherit ['s] map
 
@@ -305,7 +305,7 @@ functor
 
         val mutable counter = 0
 
-        method! visit_type_ _env t =
+        method! visit_struct_ _env t =
           let t' = {t with id = counter} in
           counter <- counter + 1 ;
           t'
@@ -315,7 +315,7 @@ functor
       let scope = scope_from_bindings stx.bindings elist in
       (* Resolve references inside *)
       let env = {scope} in
-      let env = (new type_unique_id_assigner env)#visit_env () env in
+      let env = (new struct_unique_id_assigner env)#visit_env () env in
       let env = (new reference_resolver (env, elist))#visit_env () env in
       env
 
@@ -348,8 +348,8 @@ functor
 
     and expr_to_term expr loc elist =
       match expr with
-      | Type s ->
-          Ok (type_to_type s loc elist)
+      | Struct s ->
+          Ok (struct_to_struct s loc elist)
       | Int i ->
           Ok (Integer i)
       | Reference ref ->
@@ -368,8 +368,8 @@ functor
       | _ ->
           Result.map (expr_to_term expr loc elist) ~f:(fun v -> Term v)
 
-    and type_to_type s _loc elist =
-      let s' = {type_fields = []; type_methods = []; id = 0} in
+    and struct_to_struct s _loc elist =
+      let s' = {struct_fields = []; struct_methods = []; id = 0} in
       let s =
         List.fold ~init:s'
           ~f:(fun s' field ->
@@ -377,7 +377,7 @@ functor
               Syntax.ident_to_string
                 ((Syntax.value field).field_name |> Syntax.value)
             in
-            match in_amap s'.type_fields (fun m -> Map.find m ident) with
+            match in_amap s'.struct_fields (fun m -> Map.find m ident) with
             | Some _ ->
                 new_error (Duplicate_Field (ident, s')) elist ;
                 s'
@@ -387,20 +387,20 @@ functor
                     ((Syntax.value field).field_type |> Syntax.value)
                     () elist
                 in
-                match Result.map value ~f:term_to_kind with
+                match Result.map value ~f:term_to_type with
                 | Ok value ->
                     { s' with
-                      type_fields =
-                        as_amap s'.type_fields (fun m ->
+                      struct_fields =
+                        as_amap s'.struct_fields (fun m ->
                             Map.set m ~key:ident ~data:{field_type = value} ) }
                 | Error e ->
                     new_error e elist ; s' ) )
           s.fields
       in
-      Type s
+      Struct s
 
     and function_to_function f _loc elist =
-      (* return kind *)
+      (* return type *)
       let return =
         match
           Option.map f.returns ~f:(fun e ->
@@ -414,7 +414,7 @@ functor
       in
       let f' =
         { function_params = [];
-          function_returns = TermKind return;
+          function_returns = TermType return;
           function_body =
             Option.map f.exprs ~f:(fun exprs ->
                 let code =
@@ -432,12 +432,12 @@ functor
       let f' =
         { f' with
           function_returns =
-            ( match term_to_kind return with
-            | TermKind _value ->
-                new_error (Invalid_Return_Kind (Fn f')) elist ;
+            ( match term_to_type return with
+            | TermType _value ->
+                new_error (Invalid_Return_Type (Fn f')) elist ;
                 f'.function_returns
-            | kind ->
-                kind ) }
+            | type_ ->
+                type_ ) }
       in
       (* collect params *)
       let f =
@@ -451,15 +451,15 @@ functor
                 f'
             | None -> (
                 let value = expr_to_term (Syntax.value expr) () elist in
-                match Result.map value ~f:term_to_kind with
-                | Ok (TermKind _) ->
-                    new_error (Invalid_Param_Kind (ident, Fn f')) elist ;
+                match Result.map value ~f:term_to_type with
+                | Ok (TermType _) ->
+                    new_error (Invalid_Param_Type (ident, Fn f')) elist ;
                     f'
-                | Ok kind ->
+                | Ok type_ ->
                     { f' with
                       function_params =
                         as_amap f'.function_params (fun m ->
-                            Map.set m ~key:ident ~data:kind ) }
+                            Map.set m ~key:ident ~data:type_ ) }
                 | Error e ->
                     new_error e elist ; f' ) )
           f.params

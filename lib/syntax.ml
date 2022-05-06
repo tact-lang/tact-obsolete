@@ -16,8 +16,8 @@ module type T = sig
 
   type ident = Ident of string
 
-  and type_definition =
-    {fields : type_field located list; type_bindings : binding located list}
+  and struct_definition =
+    {fields : struct_field located list; struct_bindings : binding located list}
 
   and interface_definition = {interface_members : binding located list}
 
@@ -34,8 +34,8 @@ module type T = sig
 
   and expr =
     | Let of binding located
-    | Type of type_definition
-    | TypeConstructor of type_constructor
+    | Struct of struct_definition
+    | StructConstructor of struct_constructor
     | Interface of interface_definition
     | Enum of enum_definition
     | Union of union_definition
@@ -47,11 +47,11 @@ module type T = sig
     | If of if_
     | Return of expr
 
-  and type_constructor =
+  and struct_constructor =
     { constructor_id : expr located option;
       fields_construction : (ident located * expr located) list }
 
-  and type_field = {field_name : ident located; field_type : expr located}
+  and struct_field = {field_name : ident located; field_type : expr located}
 
   and function_param = ident located * expr located
 
@@ -85,9 +85,9 @@ functor
 
     type ident = Ident of string
 
-    and type_definition =
-      { fields : type_field located list; [@sexp.list]
-        type_bindings : binding located list [@sexp.list] }
+    and struct_definition =
+      { fields : struct_field located list; [@sexp.list]
+        struct_bindings : binding located list [@sexp.list] }
 
     and interface_definition =
       {interface_members : binding located list [@sexp.list]}
@@ -109,8 +109,8 @@ functor
 
     and expr =
       | Let of binding located
-      | Type of type_definition
-      | TypeConstructor of type_constructor
+      | Struct of struct_definition
+      | StructConstructor of struct_constructor
       | Interface of interface_definition
       | Enum of enum_definition
       | Union of union_definition
@@ -122,12 +122,12 @@ functor
       | If of if_
       | Return of expr
 
-    and type_constructor =
+    and struct_constructor =
       { constructor_id : expr located option; [@sexp.option]
         fields_construction : (ident located * expr located) list [@sexp.list]
       }
 
-    and type_field = {field_name : ident located; field_type : expr located}
+    and struct_field = {field_name : ident located; field_type : expr located}
 
     and function_param = ident located * expr located
 

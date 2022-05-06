@@ -30,7 +30,7 @@ let compile s =
 
 let test_alias () =
   let source = {|
-  type T { a: Int257 }
+  struct T { a: Int257 }
   let T1 = T; 
   |} in
   Alcotest.(check bool)
@@ -46,8 +46,8 @@ let test_alias () =
 
 let test_carbon_copy () =
   let source = {|
-  type T { a: Int257 }
-  type T1 { a: Int257 }
+  struct T { a: Int257 }
+  struct T1 { a: Int257 }
   |} in
   Alcotest.(check bool)
     "carbon copy types are not the same" false
@@ -63,7 +63,7 @@ let test_carbon_copy () =
 let test_parameterized () =
   let source =
     {|
-  type T(X: Type) { a: X }
+  struct T(X: Type) { a: X }
   let T1 = T(Int257);
   let T2 = T(Bool);
   let T3 = T(Int257);
