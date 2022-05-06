@@ -532,7 +532,9 @@ let%expect_test "field access over other expressions" =
     }
     |}
   in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     ((bindings
       (((binding_name (Ident test))
         (binding_expr
