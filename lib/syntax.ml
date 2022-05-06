@@ -61,15 +61,16 @@ module type T = sig
     { name : ident located option;
       params : function_param located list;
       returns : expr located option;
-      exprs : expr located list option }
+      exprs : code_block option }
 
   and binding = {binding_name : ident located; binding_expr : expr located}
 
-  and code_block = {block_exprs : expr located list}
+  and code_block =
+    {block_exprs : expr located list; return_value : expr located option}
 
   and if_ =
     { condition : expr located;
-      body : expr located list;
+      body : code_block located;
       else_ : expr located option }
 
   and field_access = {from_expr : expr located; to_field : ident located}
@@ -141,16 +142,18 @@ functor
       { name : ident located option; [@sexp.option]
         params : function_param located list; [@sexp.list]
         returns : expr located option; [@sexp.option]
-        exprs : expr located list option [@sexp.option] }
+        exprs : code_block option }
 
     and binding = {binding_name : ident located; binding_expr : expr located}
 
-    and code_block = {block_exprs : expr located list [@sexp.list]}
+    and code_block =
+      { block_exprs : expr located list; [@sexp.list]
+        return_value : expr located option [@sexp.option] }
 
     and if_ =
       { condition : expr located;
-        body : expr located list; [@sexp.list]
-        else_ : expr located option [@sexp.option] }
+        body : code_block located;
+        else_ : expr located option }
 
     and field_access = {from_expr : expr located; to_field : ident located}
 

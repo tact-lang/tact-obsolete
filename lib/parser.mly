@@ -10,7 +10,7 @@
   let expand_fn_sugar params loc typ expr =
     Function (make_function_definition ~params: params
                                            ~returns: (make_located ~loc ~value: typ ())
-                                           ~exprs: [expr]
+                                           ~exprs:(make_code_block ~block_exprs:[expr] ())
                                            ())
   %}
 
@@ -130,8 +130,7 @@ let function_definition(name) :=
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   returns = option(preceded(RARROW, located(fexpr)));
   body = option(code_block);
-  { (n, Function (make_function_definition ~params: params ?returns: returns
-                    ?exprs: (match body with Some(CodeBlock({block_exprs;_})) -> Some(block_exprs) | _ -> None) ())) } 
+  { (n, Function (make_function_definition ~params:params ?returns:returns ?exprs:body ())) } 
 
 let function_signature_binding ==
     (n, f) = function_definition(located(ident)); {
@@ -160,27 +159,43 @@ let function_call :=
 
 let else_ :=
   | ELSE; ~= if_; <>
-  | ELSE; ~= code_block; <>
+  | ELSE; ~= code_block; <CodeBlock>
 
 let if_ :=
   IF;
   condition = delimited(LPAREN, located(expr), RPAREN);
-  body = code_block;
+  body = located(code_block);
   else_ = option(located(else_));
-  { If (make_if_ ~condition ~body: (match body with CodeBlock({block_exprs;}) -> block_exprs | _ -> []) ?else_ ()) }
+  { If (make_if_ ~condition ~body ?else_ ()) }
 
 let code_block :=
-  block_exprs = delimited(LBRACE, list(located(stmt)), RBRACE);
-  {CodeBlock (make_code_block ~block_exprs ())}
+  | code_block = delimited(LBRACE, block_stmt, RBRACE);
+    { code_block }
+  | LBRACE; RBRACE; { make_code_block ~block_exprs:[] () }
+
+let block_stmt :=
+  | left = located(non_semicolon_stmt); right = block_stmt;
+    { make_code_block ~block_exprs:(left :: right.block_exprs) ?return_value:(right.return_value) () }
+  | left = located(semicolon_stmt); SEMICOLON; right = block_stmt; 
+    { make_code_block ~block_exprs:(left :: right.block_exprs) ?return_value:(right.return_value) () }
+  | left = located(semicolon_stmt); SEMICOLON; 
+    { make_code_block ~block_exprs:[left] () }
+  | left = located(stmt);
+    { make_code_block ~block_exprs:[] ~return_value:left () }
 
 
-(* Statement (they are separated expressions / control flow, but ultimately not very different) *)
-let stmt :=
-  | terminated(expr, SEMICOLON)
-  | ~= terminated(let_binding, SEMICOLON); <Let>
+let stmt := 
+  | semicolon_stmt 
+  | non_semicolon_stmt
+
+let semicolon_stmt :=
+  | expr
+  | ~= let_binding; <Let>
+  | RETURN; ~= expr; <Return>
+
+let non_semicolon_stmt :=
   | if_
-  | code_block
-  | ~ = delimited(RETURN, expr, SEMICOLON); <Return>
+  | ~= code_block; <CodeBlock>
 
 (* Type expression
   
