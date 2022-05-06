@@ -64,14 +64,14 @@ let%expect_test "deep resolution" =
          (Struct
           ((struct_fields
             ((a
-              ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
+              ((field_type (ResolvedReferenceType Int257 (BuiltinType Int257)))))))
            (struct_methods ()) (id <opaque>))))
         (T1
          (ResolvedReference T
           (Struct
            ((struct_fields
              ((a
-               ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
+               ((field_type (ResolvedReferenceType Int257 (BuiltinType Int257)))))))
             (struct_methods ()) (id <opaque>)))))
         (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
@@ -115,8 +115,8 @@ let%expect_test "scope resolution within functions" =
          (Function
           (Fn
            ((function_params
-             ((i (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))
-            (function_returns (ResolvedReferenceKind Void VoidKind))
+             ((i (ResolvedReferenceType Int257 (BuiltinType Int257)))))
+            (function_returns (ResolvedReferenceType Void VoidType))
             (function_body ((Term (Reference i)))))))))))) |}]
 
 let%expect_test "recursive scope resolution" =
@@ -145,8 +145,8 @@ let%expect_test "struct definition" =
         (MyType
          (Struct
           ((struct_fields
-            ((a ((field_type (BuiltinKind Int257))))
-             (b ((field_type (BuiltinKind Bool))))))
+            ((a ((field_type (BuiltinType Int257))))
+             (b ((field_type (BuiltinType Bool))))))
            (struct_methods ()) (id <opaque>))))
         (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
@@ -185,7 +185,7 @@ let%expect_test "duplicate type field" =
     {|
     (Error
      (Duplicate_Field a
-      ((struct_fields ((a ((field_type (ReferenceKind Int257))))))
+      ((struct_fields ((a ((field_type (ReferenceType Int257))))))
        (struct_methods ()) (id <opaque>)))) |}]
 
 let%expect_test "function" =
@@ -207,8 +207,8 @@ let%expect_test "function" =
         (test
          (Function
           (Fn
-           ((function_params ((a (BuiltinKind Int257)) (b (BuiltinKind Bool))))
-            (function_returns (BuiltinKind Int257))
+           ((function_params ((a (BuiltinType Int257)) (b (BuiltinType Bool))))
+            (function_returns (BuiltinType Int257))
             (function_body ((Term (Integer 1)) (Term (Integer 2)))))))))))) |}]
 
 let%expect_test "compile-time printing" =
@@ -243,7 +243,7 @@ let%expect_test "compile-time evaluation" =
         (a
          (Function
           (Fn
-           ((function_params ()) (function_returns (BuiltinKind Int257))
+           ((function_params ()) (function_returns (BuiltinType Int257))
             (function_body ((Return (Integer 1))))))))
         (println (Function (BuiltinFn <fun>))) (v (Integer 1)))))) |}]
 
@@ -263,16 +263,16 @@ let%expect_test "parametric struct instantiation" =
           (T
            (Function
             (Fn
-             ((function_params ((A (BuiltinKind Type))))
-              (function_returns (BuiltinKind Type))
+             ((function_params ((A (BuiltinType Type))))
+              (function_returns (BuiltinType Type))
               (function_body
                ((Term
                  (Struct
-                  ((struct_fields ((a ((field_type (ReferenceKind A))))))
+                  ((struct_fields ((a ((field_type (ReferenceType A))))))
                    (struct_methods ()) (id <opaque>))))))))))
           (TA
            (Struct
-            ((struct_fields ((a ((field_type (BuiltinKind Int257))))))
+            ((struct_fields ((a ((field_type (BuiltinType Int257))))))
              (struct_methods ()) (id <opaque>))))
           (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
  |}]
@@ -292,6 +292,6 @@ let%expect_test "function without a return type" =
         (f
          (Function
           (Fn
-           ((function_params ()) (function_returns HoleKind)
+           ((function_params ()) (function_returns HoleType)
             (function_body ((Return (Integer 1))))))))
         (println (Function (BuiltinFn <fun>))))))) |}]
