@@ -94,6 +94,6 @@ let () =
   let open Alcotest in
   run "Lang Types"
     [ ( "equality",
-        [ test_case "aliases type" `Quick test_alias;
+        [ test_case "aliased type" `Quick test_alias;
           test_case "carbon copy (same definition)" `Quick test_carbon_copy;
           test_case "parameterized types" `Quick test_parameterized ] ) ]
