@@ -219,28 +219,28 @@ program: STRUCT IDENT LBRACE IDENT COLON TYPE
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: LET IDENT EQUALS TILDA UNION
+program: LET IDENT EQUALS TILDE UNION
 ##
 ## Ends in an error in state: 17.
 ##
-## expr -> TILDA . IDENT [ SEMICOLON RPAREN RBRACE FN DOT COMMA ]
-## fexpr -> TILDA . IDENT [ LPAREN ]
+## expr -> TILDE . IDENT [ SEMICOLON RPAREN RBRACE FN DOT COMMA ]
+## fexpr -> TILDE . IDENT [ LPAREN ]
 ##
 ## The known suffix of the stack is as follows:
-## TILDA
+## TILDE
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: LET IDENT EQUALS TILDA IDENT UNION
+program: LET IDENT EQUALS TILDE IDENT UNION
 ##
 ## Ends in an error in state: 18.
 ##
-## expr -> TILDA IDENT . [ SEMICOLON RPAREN RBRACE FN DOT COMMA ]
-## fexpr -> TILDA IDENT . [ LPAREN ]
+## expr -> TILDE IDENT . [ SEMICOLON RPAREN RBRACE FN DOT COMMA ]
+## fexpr -> TILDE IDENT . [ LPAREN ]
 ##
 ## The known suffix of the stack is as follows:
-## TILDA IDENT
+## TILDE IDENT
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -503,7 +503,7 @@ program: FN IDENT LPAREN RPAREN LBRACE TYPE
 ##
 ## Ends in an error in state: 46.
 ##
-## code_block -> LBRACE . list(located(stmt)) RBRACE [ UNION TILDA STRUCT SEMICOLON RPAREN RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN EOF ENUM ELSE DOT COMMA ]
+## code_block -> LBRACE . list(located(stmt)) RBRACE [ UNION TILDE STRUCT SEMICOLON RPAREN RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN EOF ENUM ELSE DOT COMMA ]
 ##
 ## The known suffix of the stack is as follows:
 ## LBRACE
@@ -515,7 +515,7 @@ program: FN IDENT LPAREN RPAREN LBRACE RETURN TYPE
 ##
 ## Ends in an error in state: 47.
 ##
-## stmt -> RETURN . expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> RETURN . expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## RETURN
@@ -539,7 +539,7 @@ program: LET IDENT EQUALS LPAREN TYPE
 ## type_expr -> LPAREN . IDENT RPAREN [ LBRACE ]
 ## type_expr -> LPAREN . function_call RPAREN [ LBRACE ]
 ## type_expr -> LPAREN . INT RPAREN [ LBRACE ]
-## type_expr -> LPAREN . TILDA IDENT RPAREN [ LBRACE ]
+## type_expr -> LPAREN . TILDE IDENT RPAREN [ LBRACE ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAREN
@@ -1209,28 +1209,28 @@ program: LET IDENT EQUALS LPAREN UNION LBRACE RBRACE UNION
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: LET IDENT EQUALS LPAREN TILDA UNION
+program: LET IDENT EQUALS LPAREN TILDE UNION
 ##
 ## Ends in an error in state: 148.
 ##
-## fexpr -> TILDA . IDENT [ LPAREN ]
-## type_expr -> LPAREN TILDA . IDENT RPAREN [ LBRACE ]
+## fexpr -> TILDE . IDENT [ LPAREN ]
+## type_expr -> LPAREN TILDE . IDENT RPAREN [ LBRACE ]
 ##
 ## The known suffix of the stack is as follows:
-## LPAREN TILDA
+## LPAREN TILDE
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: LET IDENT EQUALS LPAREN TILDA IDENT UNION
+program: LET IDENT EQUALS LPAREN TILDE IDENT UNION
 ##
 ## Ends in an error in state: 149.
 ##
-## fexpr -> TILDA IDENT . [ LPAREN ]
-## type_expr -> LPAREN TILDA IDENT . RPAREN [ LBRACE ]
+## fexpr -> TILDE IDENT . [ LPAREN ]
+## type_expr -> LPAREN TILDE IDENT . RPAREN [ LBRACE ]
 ##
 ## The known suffix of the stack is as follows:
-## LPAREN TILDA IDENT
+## LPAREN TILDE IDENT
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
@@ -1479,7 +1479,7 @@ program: FN IDENT LPAREN RPAREN LBRACE RETURN IDENT RPAREN
 ## Ends in an error in state: 187.
 ##
 ## expr -> expr . DOT IDENT [ SEMICOLON DOT ]
-## stmt -> RETURN expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> RETURN expr . SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## RETURN expr
@@ -1497,9 +1497,9 @@ program: FN IDENT LPAREN RPAREN LBRACE LET UNION
 ##
 ## Ends in an error in state: 189.
 ##
-## stmt -> LET . IDENT EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
-## stmt -> LET . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
-## stmt -> LET . IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET . IDENT EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET . IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET
@@ -1511,9 +1511,9 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT UNION
 ##
 ## Ends in an error in state: 190.
 ##
-## stmt -> LET IDENT . EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
-## stmt -> LET IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
-## stmt -> LET IDENT . LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT . EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT . LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT . LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT
@@ -1525,8 +1525,8 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN UNION
 ##
 ## Ends in an error in state: 191.
 ##
-## stmt -> LET IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
-## stmt -> LET IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN . nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN . loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT LPAREN
@@ -1538,7 +1538,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA 
 ##
 ## Ends in an error in state: 193.
 ##
-## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN . EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
@@ -1550,7 +1550,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA 
 ##
 ## Ends in an error in state: 194.
 ##
-## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS . expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS . expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS
@@ -1563,7 +1563,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN IDENT COLON IDENT COMMA 
 ## Ends in an error in state: 195.
 ##
 ## expr -> expr . DOT IDENT [ SEMICOLON DOT ]
-## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr . SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr
@@ -1581,7 +1581,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN UNION
 ##
 ## Ends in an error in state: 198.
 ##
-## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . EQUALS expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN . EQUALS expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
@@ -1593,7 +1593,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN EQUALS TYPE
 ##
 ## Ends in an error in state: 199.
 ##
-## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS . expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS . expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS
@@ -1606,7 +1606,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT LPAREN RPAREN EQUALS IDENT RPAR
 ## Ends in an error in state: 200.
 ##
 ## expr -> expr . DOT IDENT [ SEMICOLON DOT ]
-## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr . SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr
@@ -1624,7 +1624,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT EQUALS TYPE
 ##
 ## Ends in an error in state: 202.
 ##
-## stmt -> LET IDENT EQUALS . expr SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT EQUALS . expr SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT EQUALS
@@ -1637,7 +1637,7 @@ program: FN IDENT LPAREN RPAREN LBRACE LET IDENT EQUALS IDENT RPAREN
 ## Ends in an error in state: 203.
 ##
 ## expr -> expr . DOT IDENT [ SEMICOLON DOT ]
-## stmt -> LET IDENT EQUALS expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> LET IDENT EQUALS expr . SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET IDENT EQUALS expr
@@ -1655,7 +1655,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF UNION
 ##
 ## Ends in an error in state: 205.
 ##
-## if_ -> IF . LPAREN expr RPAREN code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## if_ -> IF . LPAREN expr RPAREN code_block option(located(else_)) [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF
@@ -1667,7 +1667,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN TYPE
 ##
 ## Ends in an error in state: 206.
 ##
-## if_ -> IF LPAREN . expr RPAREN code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## if_ -> IF LPAREN . expr RPAREN code_block option(located(else_)) [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF LPAREN
@@ -1680,7 +1680,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT SEMICOLON
 ## Ends in an error in state: 207.
 ##
 ## expr -> expr . DOT IDENT [ RPAREN DOT ]
-## if_ -> IF LPAREN expr . RPAREN code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## if_ -> IF LPAREN expr . RPAREN code_block option(located(else_)) [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF LPAREN expr
@@ -1698,7 +1698,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN UNION
 ##
 ## Ends in an error in state: 208.
 ##
-## if_ -> IF LPAREN expr RPAREN . code_block option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## if_ -> IF LPAREN expr RPAREN . code_block option(located(else_)) [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF LPAREN expr RPAREN
@@ -1710,7 +1710,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN LBRACE RBRACE TYPE
 ##
 ## Ends in an error in state: 209.
 ##
-## if_ -> IF LPAREN expr RPAREN code_block . option(located(else_)) [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## if_ -> IF LPAREN expr RPAREN code_block . option(located(else_)) [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## IF LPAREN expr RPAREN code_block
@@ -1722,8 +1722,8 @@ program: FN IDENT LPAREN RPAREN LBRACE IF LPAREN IDENT RPAREN LBRACE RBRACE ELSE
 ##
 ## Ends in an error in state: 210.
 ##
-## else_ -> ELSE . if_ [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
-## else_ -> ELSE . code_block [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## else_ -> ELSE . if_ [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## else_ -> ELSE . code_block [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## ELSE
@@ -1748,7 +1748,7 @@ program: FN IDENT LPAREN RPAREN LBRACE IDENT RPAREN
 ## Ends in an error in state: 218.
 ##
 ## expr -> expr . DOT IDENT [ SEMICOLON DOT ]
-## stmt -> expr . SEMICOLON [ UNION TILDA STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
+## stmt -> expr . SEMICOLON [ UNION TILDE STRUCT RETURN RBRACE LPAREN LET LBRACE INTERFACE INT IF IDENT FN ENUM ]
 ##
 ## The known suffix of the stack is as follows:
 ## expr
@@ -1792,14 +1792,14 @@ program: FN IDENT LPAREN RPAREN RARROW IDENT SEMICOLON
 
 <YOUR SYNTAX ERROR MESSAGE HERE>
 
-program: FN IDENT LPAREN RPAREN RARROW TILDA UNION
+program: FN IDENT LPAREN RPAREN RARROW TILDE UNION
 ##
 ## Ends in an error in state: 236.
 ##
-## fexpr -> TILDA . IDENT [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM DOT COMMA ]
+## fexpr -> TILDE . IDENT [ UNION STRUCT SEMICOLON RPAREN RBRACE LPAREN LET LBRACE INTERFACE FN EOF ENUM DOT COMMA ]
 ##
 ## The known suffix of the stack is as follows:
-## TILDA
+## TILDE
 ##
 
 <YOUR SYNTAX ERROR MESSAGE HERE>

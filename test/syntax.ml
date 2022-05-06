@@ -490,7 +490,7 @@ let%expect_test "struct construction over an anonymous type's function call" =
               (arguments ((Reference (Ident X)))))))
            (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
 
-let%expect_test "tilda syntax" =
+let%expect_test "tilde syntax" =
   let source = {|
     fn test() -> A {
       ~var;
