@@ -37,6 +37,7 @@ rule token = parse
  | '=' { EQUALS }
  | "let" { LET }
  | "type" { TYPE }
+ | "struct" { STRUCT }
  | "enum" { ENUM }
  | "interface" { INTERFACE }
  | "union" { UNION }

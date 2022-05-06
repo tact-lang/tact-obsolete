@@ -13,17 +13,17 @@ let%expect_test "empty" =
   let source = {||} in
   pp source ; [%expect {| () |}]
 
-let%expect_test "let type" =
+let%expect_test "let struct" =
   let source = {|
-    let MyType = type {};
+    let MyType = struct {};
     |} in
   pp source ;
   [%expect
-    {| ((bindings (((binding_name (Ident MyType)) (binding_expr (Type ())))))) |}]
+    {| ((bindings (((binding_name (Ident MyType)) (binding_expr (Struct ())))))) |}]
 
-let%expect_test "let type with parameter (shorthand)" =
+let%expect_test "let struct with parameter (shorthand)" =
   let source = {|
-  let MyType(T: Type) = type {};
+  let MyType(T: Type) = struct {};
   |} in
   pp source ;
   [%expect
@@ -33,20 +33,20 @@ let%expect_test "let type with parameter (shorthand)" =
         (binding_expr
          (Function
           ((params (((Ident T) (Reference (Ident Type)))))
-           (returns (Reference (Ident Type))) (exprs ((Type ())))))))))) |}]
+           (returns (Reference (Ident Type))) (exprs ((Struct ())))))))))) |}]
 
-let%expect_test "type definition (shorthand)" =
+let%expect_test "struct definition (shorthand)" =
   let source = {|
-  type MyType {}
+  struct MyType {}
   |} in
   pp source ;
   [%expect
-    {| ((bindings (((binding_name (Ident MyType)) (binding_expr (Type ())))))) |}]
+    {| ((bindings (((binding_name (Ident MyType)) (binding_expr (Struct ())))))) |}]
 
-let%expect_test "type construction" =
+let%expect_test "struct construction" =
   let source =
     {|
-  type MyType { 
+    struct MyType { 
      a: Int257,
      b: Int257
   }
@@ -62,19 +62,19 @@ let%expect_test "type construction" =
       ((bindings
         (((binding_name (Ident MyType))
           (binding_expr
-           (Type
+           (Struct
             ((fields
               (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
                ((field_name (Ident b)) (field_type (Reference (Ident Int257))))))))))
          ((binding_name (Ident my))
           (binding_expr
-           (TypeConstructor
+           (StructConstructor
             ((constructor_id (Reference (Ident MyType)))
              (fields_construction (((Ident a) (Int 0)) ((Ident b) (Int 1))))))))))) |}]
 
-let%expect_test "parameterized type shorthand" =
+let%expect_test "parameterized struct shorthand" =
   let source = {|
-  type MyType(T: Type) {}
+  struct MyType(T: Type) {}
   |} in
   pp source ;
   [%expect
@@ -84,11 +84,11 @@ let%expect_test "parameterized type shorthand" =
         (binding_expr
          (Function
           ((params (((Ident T) (Reference (Ident Type)))))
-           (returns (Reference (Ident Type))) (exprs ((Type ())))))))))) |}]
+           (returns (Reference (Ident Type))) (exprs ((Struct ())))))))))) |}]
 
-let%expect_test "type fields" =
+let%expect_test "struct fields" =
   let source = {|
-  type MyType {
+  struct MyType {
     a: Int257,
     f: get_type()
   }
@@ -99,34 +99,36 @@ let%expect_test "type fields" =
     ((bindings
       (((binding_name (Ident MyType))
         (binding_expr
-         (Type
+         (Struct
           ((fields
             (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
              ((field_name (Ident f))
               (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))))))))) |}]
 
-let%expect_test "type fields with a trailing comma" =
-  let source = {|
-  type MyType {
+let%expect_test "struct fields with a trailing comma" =
+  let source =
+    {|
+  struct MyType {
     a: Int257,
     f: get_type(),
   }
-  |} in
+  |}
+  in
   pp source ;
   [%expect
     {|
     ((bindings
       (((binding_name (Ident MyType))
         (binding_expr
-         (Type
+         (Struct
           ((fields
             (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
              ((field_name (Ident f))
               (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))))))))) |}]
 
-let%expect_test "type fields with shorthand names" =
+let%expect_test "struct fields with shorthand names" =
   let source = {|
-    type MyType {
+    struct MyType {
       A,
       B
     }
@@ -137,15 +139,15 @@ let%expect_test "type fields with shorthand names" =
     ((bindings
       (((binding_name (Ident MyType))
         (binding_expr
-         (Type
+         (Struct
           ((fields
             (((field_name (Ident A)) (field_type (Reference (Ident A))))
              ((field_name (Ident B)) (field_type (Reference (Ident B))))))))))))) |}]
 
-let%expect_test "type methods" =
+let%expect_test "struct methods" =
   let source =
     {|
-    type MyType {
+    struct MyType {
       fn test() -> Bool {}
       fn todo() -> Int257
     }
@@ -157,18 +159,18 @@ let%expect_test "type methods" =
     ((bindings
       (((binding_name (Ident MyType))
         (binding_expr
-         (Type
-          ((type_bindings
+         (Struct
+          ((struct_bindings
             (((binding_name (Ident test))
               (binding_expr
                (Function ((returns (Reference (Ident Bool))) (exprs ())))))
              ((binding_name (Ident todo))
               (binding_expr (Function ((returns (Reference (Ident Int257)))))))))))))))) |}]
 
-let%expect_test "type with fields and methods" =
+let%expect_test "struct with fields and methods" =
   let source =
     {|
-    type MyType {
+    struct MyType {
       a: Int257
       fn test() -> Bool {}
     }
@@ -180,18 +182,18 @@ let%expect_test "type with fields and methods" =
     ((bindings
       (((binding_name (Ident MyType))
         (binding_expr
-         (Type
+         (Struct
           ((fields
             (((field_name (Ident a)) (field_type (Reference (Ident Int257))))))
-           (type_bindings
+           (struct_bindings
             (((binding_name (Ident test))
               (binding_expr
                (Function ((returns (Reference (Ident Bool))) (exprs ())))))))))))))) |}]
 
-let%expect_test "type with fields and methods, separated by a comma" =
+let%expect_test "struct with fields and methods, separated by a comma" =
   let source =
     {|
-    type MyType {
+    struct MyType {
       a: Int257,
       fn test() -> Bool {}
     }
@@ -203,10 +205,10 @@ let%expect_test "type with fields and methods, separated by a comma" =
     ((bindings
       (((binding_name (Ident MyType))
         (binding_expr
-         (Type
+         (Struct
           ((fields
             (((field_name (Ident a)) (field_type (Reference (Ident Int257))))))
-           (type_bindings
+           (struct_bindings
             (((binding_name (Ident test))
               (binding_expr
                (Function ((returns (Reference (Ident Bool))) (exprs ())))))))))))))) |}]
@@ -427,7 +429,7 @@ let%expect_test "if with else if" =
            (exprs
             ((If ((condition (Int 1)) (else_ (If ((condition (Int 10)))))))))))))))) |}]
 
-let%expect_test "type construction over a parameterized type" =
+let%expect_test "struct construction over a parameterized type" =
   let source = {|
   let a = A(X) { field: value };
   |} in
@@ -437,15 +439,15 @@ let%expect_test "type construction over a parameterized type" =
     ((bindings
       (((binding_name (Ident a))
         (binding_expr
-         (TypeConstructor
+         (StructConstructor
           ((constructor_id
             (FunctionCall
              ((fn (Reference (Ident A))) (arguments ((Reference (Ident X)))))))
            (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
 
-let%expect_test "type construction over an anonymous type" =
+let%expect_test "struct construction over an anonymous type" =
   let source = {|
-  let a = (type { field: Int257 }) { field: value };
+  let a = (struct { field: Int257 }) { field: value };
   |} in
   pp source ;
   [%expect
@@ -453,18 +455,18 @@ let%expect_test "type construction over an anonymous type" =
     ((bindings
       (((binding_name (Ident a))
         (binding_expr
-         (TypeConstructor
+         (StructConstructor
           ((constructor_id
-            (Type
+            (Struct
              ((fields
                (((field_name (Ident field))
                  (field_type (Reference (Ident Int257)))))))))
            (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
 
-let%expect_test "type construction over an anonymous type's function call" =
+let%expect_test "struct construction over an anonymous type's function call" =
   let source =
     {|
-  let a = type(T: Type) { field: T }(X) { field: value };
+  let a = struct(T: Type) { field: T }(X) { field: value };
   |}
   in
   pp source ;
@@ -473,15 +475,15 @@ let%expect_test "type construction over an anonymous type's function call" =
     ((bindings
       (((binding_name (Ident a))
         (binding_expr
-         (TypeConstructor
+         (StructConstructor
           ((constructor_id
             (FunctionCall
              ((fn
                (Function
                 ((params (((Ident T) (Reference (Ident Type)))))
-                 (returns (Reference (Ident Type)))
+                 (returns (Reference (Ident Struct)))
                  (exprs
-                  ((Type
+                  ((Struct
                     ((fields
                       (((field_name (Ident field))
                         (field_type (Reference (Ident T)))))))))))))

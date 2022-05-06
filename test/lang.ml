@@ -51,7 +51,7 @@ let%expect_test "scope resolution" =
 
 let%expect_test "deep resolution" =
   let source = {|
-      let T = type {a: Int257};
+      let T = struct {a: Int257};
       let T1 = T;
     |} in
   pp source ;
@@ -61,18 +61,18 @@ let%expect_test "deep resolution" =
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
         (T
-         (Type
-          ((type_fields
+         (Struct
+          ((struct_fields
             ((a
               ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
-           (type_methods ()) (id <opaque>))))
+           (struct_methods ()) (id <opaque>))))
         (T1
          (ResolvedReference T
-          (Type
-           ((type_fields
+          (Struct
+           ((struct_fields
              ((a
                ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
-            (type_methods ()) (id <opaque>)))))
+            (struct_methods ()) (id <opaque>)))))
         (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "stripping scope resolution" =
@@ -127,10 +127,10 @@ let%expect_test "recursive scope resolution" =
   |} in
   pp source ; [%expect {| (Error (Recursive_Reference A)) |}]
 
-let%expect_test "type definition" =
+let%expect_test "struct definition" =
   let source =
     {|
-  let MyType = type {
+  let MyType = struct {
        a: Int257,
        b: Bool
   };
@@ -143,29 +143,29 @@ let%expect_test "type definition" =
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257))
         (MyType
-         (Type
-          ((type_fields
+         (Struct
+          ((struct_fields
             ((a ((field_type (BuiltinKind Int257))))
              (b ((field_type (BuiltinKind Bool))))))
-           (type_methods ()) (id <opaque>))))
+           (struct_methods ()) (id <opaque>))))
         (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "duplicate type" =
   let source = {|
-  let MyType = type {};
-  let MyType = type {};
+  let MyType = struct {};
+  let MyType = struct {};
   |} in
   pp source ;
   [%expect
     {|
     (Error
      (Duplicate_Identifier MyType
-      (Type ((type_fields ()) (type_methods ()) (id <opaque>))))) |}]
+      (Struct ((struct_fields ()) (struct_methods ()) (id <opaque>))))) |}]
 
 let%expect_test "duplicate but of a different kind" =
   let source = {|
   let MyType = 1;
-  let MyType = type {};
+  let MyType = struct {};
   |} in
   pp source ;
   [%expect {|
@@ -174,7 +174,7 @@ let%expect_test "duplicate but of a different kind" =
 let%expect_test "duplicate type field" =
   let source =
     {|
-  let MyType = type {
+  let MyType = struct {
       a: Int257,
       a: Bool
   };
@@ -185,8 +185,8 @@ let%expect_test "duplicate type field" =
     {|
     (Error
      (Duplicate_Field a
-      ((type_fields ((a ((field_type (ReferenceKind Int257))))))
-       (type_methods ()) (id <opaque>)))) |}]
+      ((struct_fields ((a ((field_type (ReferenceKind Int257))))))
+       (struct_methods ()) (id <opaque>)))) |}]
 
 let%expect_test "function" =
   let source =
@@ -247,10 +247,10 @@ let%expect_test "compile-time evaluation" =
             (function_body ((Return (Integer 1))))))))
         (println (Function (BuiltinFn <fun>))) (v (Integer 1)))))) |}]
 
-let%expect_test "parametric type instantiation" =
+let%expect_test "parametric struct instantiation" =
   let source =
     {|
-      type T(A: Type) { a: A }
+      struct T(A: Type) { a: A }
       let TA = T(Int257);
    |}
   in
@@ -267,13 +267,13 @@ let%expect_test "parametric type instantiation" =
               (function_returns (BuiltinKind Type))
               (function_body
                ((Term
-                 (Type
-                  ((type_fields ((a ((field_type (ReferenceKind A))))))
-                   (type_methods ()) (id <opaque>))))))))))
+                 (Struct
+                  ((struct_fields ((a ((field_type (ReferenceKind A))))))
+                   (struct_methods ()) (id <opaque>))))))))))
           (TA
-           (Type
-            ((type_fields ((a ((field_type (BuiltinKind Int257))))))
-             (type_methods ()) (id <opaque>))))
+           (Struct
+            ((struct_fields ((a ((field_type (BuiltinKind Int257))))))
+             (struct_methods ()) (id <opaque>))))
           (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
  |}]
 

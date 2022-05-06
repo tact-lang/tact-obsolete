@@ -39,18 +39,18 @@ let Name = <expression>
 
 See Expression
 
-There is another "sugared" form of bindings for types and functions:
+There is another "sugared" form of bindings for structs and functions:
 
 ```
-type S{ ... }
-type S(T: Type){v: T}
+struct S{ ... }
+struct S(T: Type){v: T}
 ```
 
 They are equivalent to these:
 
 ```
-let S = type { ... }
-let S(T: Type) = type {v: T}
+let S = struct { ... }
+let S(T: Type) = struct {v: T}
 ```
 
 Same applies to enums, interfaces, unions and fns
@@ -78,8 +78,8 @@ let let_binding ==
 )
 let shorthand_binding ==
 | sugared_function_definition
-| located( (name, expr) = type_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ())  () })
-| located( ((name, params), expr) = type_definition(located_ident_with_params); {
+| located( (name, expr) = struct_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ())  () })
+| located( ((name, params), expr) = struct_definition(located_ident_with_params); {
   make_binding ~binding_name: name ~binding_expr: (
     make_located ~loc: $loc ~value: (expand_fn_sugar params $loc (Reference (Ident "Type")) (make_located ~loc: $loc ~value: expr ())) ()
   ) () })
@@ -199,20 +199,20 @@ let type_expr :=
 let expr :=
  | expr_
  (* can be a type constructor *)
- | type_constructor
+ | struct_constructor
  (* can be a function definition *)
  | (_, f) = function_definition(nothing); { f }
 
 let fexpr :=
  | expr_
   (* can be a type constructor, in parens *)
- | delimited(LPAREN, type_constructor, RPAREN)
+ | delimited(LPAREN, struct_constructor, RPAREN)
  (* can be a function definition, in parens *)
  | (_, f) = delimited(LPAREN, function_definition(nothing), RPAREN); { f }
 
  let expr_ ==
- (* can be a `type` definition *)
- | (n, s) = type_definition(option(params)); { match n with None -> s | Some(params) -> expand_fn_sugar params $loc (Reference (Ident "Type")) (make_located ~value: s ~loc: $loc ()) }
+ (* can be a `struct` definition *)
+ | (n, s) = struct_definition(option(params)); { match n with None -> s | Some(params) -> expand_fn_sugar params $loc (Reference (Ident "Struct")) (make_located ~value: s ~loc: $loc ()) }
   (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)
@@ -229,9 +229,9 @@ let fexpr :=
 let params ==
     delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
 
-(* Type
+(* Struct
 
-   type {
+   struct {
     field_name: <expression>,
     // or a shorthand version for a type-named field:
     Type,
@@ -241,33 +241,33 @@ let params ==
     ...
   }
 
-  * Empty types are allowed
+  * Empty structs are allowed
   * Trailing commas are allowed
 
 *)
-let type_definition(name) ==
-  TYPE;
+let struct_definition(name) ==
+  STRUCT;
   n = name;
-  (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, type_fields, COMMA, list(sugared_function_definition), RBRACE);
-  { (n, Type (make_type_definition ~fields: fields ~type_bindings: bindings  ())) }
+  (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, struct_fields, COMMA, list(sugared_function_definition), RBRACE);
+  { (n, Struct (make_struct_definition ~fields: fields ~struct_bindings: bindings  ())) }
 
-(* Type field
+(* Struct field
 
    field_name: <expression>
    FieldName
 *)
-let type_fields ==
-| located ( name = located(ident); COLON; typ = located(expr); { make_type_field ~field_name: name ~field_type: typ () } )
-| located ( name = located(ident); { make_type_field ~field_name: name ~field_type: (make_located ~loc: (loc name) ~value: (Reference (value name)) ()) () } )
+let struct_fields ==
+| located ( name = located(ident); COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
+| located ( name = located(ident); { make_struct_field ~field_name: name ~field_type: (make_located ~loc: (loc name) ~value: (Reference (value name)) ()) () } )
 
-(* Type constructor 
+(* Struct constructor 
  *
- * MyType {
+ * MyStruct {
  *   field_name: 1
  * }
  *
  * *)
-let type_constructor :=
+let struct_constructor :=
   constructor_id = located(type_expr);
   fields_construction = delimited_separated_trailing_list(
     LBRACE, 
@@ -278,7 +278,7 @@ let type_constructor :=
     ), 
     COMMA, 
     RBRACE);
-  {TypeConstructor (make_type_constructor ~constructor_id ~fields_construction ())}
+  {StructConstructor (make_struct_constructor ~constructor_id ~fields_construction ())}
 
 (* Interface
 
@@ -352,8 +352,8 @@ let union_definition(name) ==
   { (n, Union (make_union_definition ~union_members: members ~union_bindings: bindings ())) }
 
 let union_member :=
- (* can be a type definition *)
- | (_, s) = type_definition(nothing); { s }
+ (* can be a struct definition *)
+ | (_, s) = struct_definition(nothing); { s }
  (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)

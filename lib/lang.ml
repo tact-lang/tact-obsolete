@@ -38,7 +38,7 @@ functor
 
     and term =
       | Void
-      | Type of type_
+      | Struct of struct_
       | Function of function_
       | FunctionCall of term * term list
       | Integer of (z[@visitors.name "z"])
@@ -54,7 +54,7 @@ functor
       | VoidKind
       | ResolvedReferenceKind of string * kind
       | BuiltinKind of builtin
-      | TypeKind of type_
+      | StructKind of struct_
       | FunctionKind of function_
       | ReferenceKind of string
       | TermKind of term
@@ -71,12 +71,12 @@ functor
 
     and stmt = Return of term | Term of term
 
-    and type_ =
-      { type_fields : type_field named_map;
-        type_methods : function_ named_map;
+    and struct_ =
+      { struct_fields : struct_field named_map;
+        struct_methods : function_ named_map;
         id : (int[@sexp.opaque]) }
 
-    and type_field = {field_type : kind}
+    and struct_field = {field_type : kind}
 
     and env = {scope : scope}
 
@@ -99,8 +99,8 @@ functor
       match value with
       | Reference value ->
           ReferenceKind value
-      | Type type_ ->
-          TypeKind type_
+      | Struct struct_ ->
+          StructKind struct_
       | Function function_ ->
           FunctionKind function_
       | Builtin builtin ->
@@ -115,7 +115,7 @@ functor
 
     type error =
       | Duplicate_Identifier of string * term
-      | Duplicate_Field of string * type_
+      | Duplicate_Field of string * struct_
       | Duplicate_Param of string * function_
       | Invalid_Param_Kind of string * function_
       | Invalid_Return_Kind of function_
@@ -142,7 +142,7 @@ functor
     let rec is_immediate_term = function
       | Void ->
           true
-      | Type _ ->
+      | Struct _ ->
           true
       | Function _ ->
           true
@@ -297,7 +297,7 @@ functor
       end
 
     (* Assigns unique identifiers to types *)
-    class ['s] type_unique_id_assigner (env : env) =
+    class ['s] struct_unique_id_assigner (env : env) =
       object (_ : 's)
         inherit ['s] map
 
@@ -305,7 +305,7 @@ functor
 
         val mutable counter = 0
 
-        method! visit_type_ _env t =
+        method! visit_struct_ _env t =
           let t' = {t with id = counter} in
           counter <- counter + 1 ;
           t'
@@ -315,7 +315,7 @@ functor
       let scope = scope_from_bindings stx.bindings elist in
       (* Resolve references inside *)
       let env = {scope} in
-      let env = (new type_unique_id_assigner env)#visit_env () env in
+      let env = (new struct_unique_id_assigner env)#visit_env () env in
       let env = (new reference_resolver (env, elist))#visit_env () env in
       env
 
@@ -348,8 +348,8 @@ functor
 
     and expr_to_term expr loc elist =
       match expr with
-      | Type s ->
-          Ok (type_to_type s loc elist)
+      | Struct s ->
+          Ok (struct_to_struct s loc elist)
       | Int i ->
           Ok (Integer i)
       | Reference ref ->
@@ -368,8 +368,8 @@ functor
       | _ ->
           Result.map (expr_to_term expr loc elist) ~f:(fun v -> Term v)
 
-    and type_to_type s _loc elist =
-      let s' = {type_fields = []; type_methods = []; id = 0} in
+    and struct_to_struct s _loc elist =
+      let s' = {struct_fields = []; struct_methods = []; id = 0} in
       let s =
         List.fold ~init:s'
           ~f:(fun s' field ->
@@ -377,7 +377,7 @@ functor
               Syntax.ident_to_string
                 ((Syntax.value field).field_name |> Syntax.value)
             in
-            match in_amap s'.type_fields (fun m -> Map.find m ident) with
+            match in_amap s'.struct_fields (fun m -> Map.find m ident) with
             | Some _ ->
                 new_error (Duplicate_Field (ident, s')) elist ;
                 s'
@@ -390,14 +390,14 @@ functor
                 match Result.map value ~f:term_to_kind with
                 | Ok value ->
                     { s' with
-                      type_fields =
-                        as_amap s'.type_fields (fun m ->
+                      struct_fields =
+                        as_amap s'.struct_fields (fun m ->
                             Map.set m ~key:ident ~data:{field_type = value} ) }
                 | Error e ->
                     new_error e elist ; s' ) )
           s.fields
       in
-      Type s
+      Struct s
 
     and function_to_function f _loc elist =
       (* return kind *)
