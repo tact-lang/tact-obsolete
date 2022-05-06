@@ -56,14 +56,13 @@
     %{dep:parser.mly}
     --base
     parser
-    --unused-token TYPE
+    --unused-token
+    TYPE
     --only-preprocess-u))))
 
 (menhir
  (modules unitActionsParser)
- (flags --table --external-tokens Tokens 
-        --unused-token TYPE
- ))
+ (flags --table --external-tokens Tokens --unused-token TYPE))
 
 ;; -----------------------------------------------------------------------------
 
@@ -84,7 +83,8 @@
     %{dep:parser.mly}
     --base
     parser
-    --unused-token TYPE
+    --unused-token
+    TYPE
     --compile-errors
     %{dep:parserMessages.messages}))))
 
@@ -100,7 +100,8 @@
    %{dep:parser.mly}
    --base
    parser
-    --unused-token TYPE
+   --unused-token
+   TYPE
    --list-errors)))
 
 ;; This rule implements the completeness check. It checks that every error
@@ -117,7 +118,8 @@
    %{dep:parser.mly}
    --base
    parser
-   --unused-token TYPE
+   --unused-token
+   TYPE
    --compare-errors
    %{dep:parserMessages.auto.messages}
    --compare-errors
