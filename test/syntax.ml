@@ -489,3 +489,65 @@ let%expect_test "struct construction over an anonymous type's function call" =
                         (field_type (Reference (Ident T)))))))))))))
               (arguments ((Reference (Ident X)))))))
            (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
+
+let%expect_test "tilda syntax" =
+  let source = {|
+    fn test() -> A {
+      ~var;
+    }
+    |} in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A))) (exprs ((MutRef (Ident var))))))))))) |}]
+
+let%expect_test "field access syntax" =
+  let source = {|
+    fn test() -> A {
+      foo.bar;
+    }
+    |} in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A)))
+           (exprs
+            ((FieldAccess
+              ((from_expr (Reference (Ident foo))) (to_field (Ident bar))))))))))))) |}]
+
+let%expect_test "field access over other expressions" =
+  let source =
+    {|
+    fn test() -> A {
+      ~foo.bar;
+      Struct{field: value}.field.other_field;
+    }
+    |}
+  in
+  pp source ; [%expect {|
+    ((bindings
+      (((binding_name (Ident test))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident A)))
+           (exprs
+            ((FieldAccess
+              ((from_expr (MutRef (Ident foo))) (to_field (Ident bar))))
+             (FieldAccess
+              ((from_expr
+                (FieldAccess
+                 ((from_expr
+                   (StructConstructor
+                    ((constructor_id (Reference (Ident Struct)))
+                     (fields_construction
+                      (((Ident field) (Reference (Ident value))))))))
+                  (to_field (Ident field)))))
+               (to_field (Ident other_field))))))))))))) |}]

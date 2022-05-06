@@ -114,6 +114,7 @@ let sugared_function_definition ==
                      () (* FIXME: Function type is a temp punt *)
        ) () })
 
+
 (* Function definition
 
  fn (arg: Type, ...) [-> Type] [{
@@ -198,6 +199,9 @@ let type_expr :=
 (* Expression *)
 let expr :=
  | expr_
+ (* can be access to the field via dot *)
+ | from_expr = located(expr); DOT; to_field = located(ident); 
+    {FieldAccess (make_field_access ~from_expr ~to_field ())}
  (* can be a type constructor *)
  | struct_constructor
  (* can be a function definition *)
@@ -219,12 +223,14 @@ let fexpr :=
  | (_, e) = enum_definition(nothing); { e }
  (* can be an `union` definition *)
  | (_, u) = union_definition(nothing); { u }
-  (* can be an identifier, as a reference to some identifier *)
+ (* can be an identifier, as a reference to some identifier *)
  | ~= ident; <Reference>
  (* can be a function call *)
  | function_call
  (* can be an integer *)
  | ~= INT; <Int>
+ (* can be mutation ref *)
+ | TILDA; ~= located(ident); <MutRef>
 
 let params ==
     delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
@@ -361,7 +367,7 @@ let union_member :=
  (* can be an `union` definition *)
  | (_, u) = union_definition(nothing); { u }
  (* can be an identifier, as a reference to some identifier *)
- | ~= ident; <Reference>
+ | ident = ident; {Reference ident }
  (* can be a function call [by identifier only] *)
  | fn = located(ident);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);

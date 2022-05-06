@@ -40,12 +40,14 @@ module type T = sig
     | Enum of enum_definition
     | Union of union_definition
     | Reference of ident
+    | FieldAccess of field_access
     | FunctionCall of function_call
     | Function of function_definition
     | Int of zt
     | CodeBlock of code_block
     | If of if_
     | Return of expr
+    | MutRef of ident located
 
   and struct_constructor =
     { constructor_id : expr located option;
@@ -69,6 +71,8 @@ module type T = sig
     { condition : expr located;
       body : expr located list;
       else_ : expr located option }
+
+  and field_access = {from_expr : expr located; to_field : ident located}
 
   and program = {bindings : binding located list}
   [@@deriving show, make, sexp_of]
@@ -115,12 +119,14 @@ functor
       | Enum of enum_definition
       | Union of union_definition
       | Reference of ident
+      | FieldAccess of field_access
       | FunctionCall of function_call
       | Function of function_definition
       | Int of zt
       | CodeBlock of code_block
       | If of if_
       | Return of expr
+      | MutRef of ident located
 
     and struct_constructor =
       { constructor_id : expr located option; [@sexp.option]
@@ -145,6 +151,8 @@ functor
       { condition : expr located;
         body : expr located list; [@sexp.list]
         else_ : expr located option [@sexp.option] }
+
+    and field_access = {from_expr : expr located; to_field : ident located}
 
     and program = {bindings : binding located list [@sexp.list]}
     [@@deriving show {with_path = false}, make, sexp_of]
