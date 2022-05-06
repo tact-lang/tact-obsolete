@@ -65,14 +65,14 @@ let%expect_test "deep resolution" =
           ((type_fields
             ((a
               ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
-           (type_methods ()))))
+           (type_methods ()) (id <opaque>))))
         (T1
          (ResolvedReference T
           (Type
            ((type_fields
              ((a
                ((field_type (ResolvedReferenceKind Int257 (BuiltinKind Int257)))))))
-            (type_methods ())))))
+            (type_methods ()) (id <opaque>)))))
         (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "stripping scope resolution" =
@@ -147,7 +147,7 @@ let%expect_test "type definition" =
           ((type_fields
             ((a ((field_type (BuiltinKind Int257))))
              (b ((field_type (BuiltinKind Bool))))))
-           (type_methods ()))))
+           (type_methods ()) (id <opaque>))))
         (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
 
 let%expect_test "duplicate type" =
@@ -159,7 +159,8 @@ let%expect_test "duplicate type" =
   [%expect
     {|
     (Error
-     (Duplicate_Identifier MyType (Type ((type_fields ()) (type_methods ()))))) |}]
+     (Duplicate_Identifier MyType
+      (Type ((type_fields ()) (type_methods ()) (id <opaque>))))) |}]
 
 let%expect_test "duplicate but of a different kind" =
   let source = {|
@@ -185,7 +186,7 @@ let%expect_test "duplicate type field" =
     (Error
      (Duplicate_Field a
       ((type_fields ((a ((field_type (ReferenceKind Int257))))))
-       (type_methods ())))) |}]
+       (type_methods ()) (id <opaque>)))) |}]
 
 let%expect_test "function" =
   let source =
@@ -268,10 +269,10 @@ let%expect_test "parametric type instantiation" =
                ((Term
                  (Type
                   ((type_fields ((a ((field_type (ReferenceKind A))))))
-                   (type_methods ()))))))))))
+                   (type_methods ()) (id <opaque>))))))))))
           (TA
            (Type
             ((type_fields ((a ((field_type (BuiltinKind Int257))))))
-             (type_methods ()))))
+             (type_methods ()) (id <opaque>))))
           (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
  |}]

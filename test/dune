@@ -6,9 +6,9 @@
  (modules syntax lang)
  (libraries tact core sexplib))
 
-;(tests
-; (preprocess
-;  (staged_pps ppx_matches))
-; (names tbd)
-; (modules tbd)
-; (libraries tact alcotest ppx_matches core sexplib))
+(tests
+ (preprocess
+  (staged_pps ppx_matches))
+ (names lang_types)
+ (modules lang_types)
+ (libraries tact alcotest ppx_matches core))

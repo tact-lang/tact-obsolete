@@ -70,7 +70,9 @@ functor
     and stmt = Return of term | Term of term
 
     and type_ =
-      {type_fields : type_field named_map; type_methods : function_ named_map}
+      { type_fields : type_field named_map;
+        type_methods : function_ named_map;
+        id : (int[@sexp.opaque]) }
 
     and type_field = {field_type : kind}
 
@@ -288,14 +290,27 @@ functor
               FunctionCall (f, args)
       end
 
+    (* Assigns unique identifiers to types *)
+    class ['s] type_unique_id_assigner (env : env) =
+      object (_ : 's)
+        inherit ['s] map
+
+        val p_env = env
+
+        val mutable counter = 0
+
+        method! visit_type_ _env t =
+          let t' = {t with id = counter} in
+          counter <- counter + 1 ;
+          t'
+      end
+
     let rec env_from_program (stx : Syntax.program) (elist : elist) =
       let scope = scope_from_bindings stx.bindings elist in
       (* Resolve references inside *)
-      let env =
-        let env = {scope} in
-        let resolver = new reference_resolver (env, elist) in
-        resolver#visit_env () env
-      in
+      let env = {scope} in
+      let env = (new type_unique_id_assigner env)#visit_env () env in
+      let env = (new reference_resolver (env, elist))#visit_env () env in
       env
 
     and eval_env env =
@@ -348,7 +363,7 @@ functor
           Result.map (expr_to_term expr loc elist) ~f:(fun v -> Term v)
 
     and type_to_type s _loc elist =
-      let s' = {type_fields = []; type_methods = []} in
+      let s' = {type_fields = []; type_methods = []; id = 0} in
       let s =
         List.fold ~init:s'
           ~f:(fun s' field ->
