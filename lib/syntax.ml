@@ -121,7 +121,7 @@ functor
       | FunctionCall of function_call
       | Function of function_definition
       | Int of zt
-      | CodeBlock of expr located list
+      | CodeBlock of (expr located list[@sexp.list])
       | If of if_
       | Return of expr
       | MutRef of ident located
@@ -139,14 +139,14 @@ functor
       { name : ident located option; [@sexp.option]
         params : function_param located list; [@sexp.list]
         returns : expr located option; [@sexp.option]
-        exprs : expr located list option }
+        exprs : expr located list option [@sexp.option] }
 
     and binding = {binding_name : ident located; binding_expr : expr located}
 
     and if_ =
       { condition : expr located;
-        body : expr located list located;
-        else_ : expr located option }
+        body : (expr located list[@sexp.list]) located;
+        else_ : expr located option [@sexp.option] }
 
     and field_access = {from_expr : expr located; to_field : ident located}
 
