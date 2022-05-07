@@ -33,8 +33,7 @@ let%expect_test "let struct with parameter (shorthand)" =
         (binding_expr
          (Function
           ((params (((Ident T) (Reference (Ident Type)))))
-           (returns (Reference (Ident Type)))
-           (exprs (((block_exprs ((Struct ()))))))))))))) |}]
+           (returns (Reference (Ident Type))) (exprs (((Struct ()))))))))))) |}]
 
 let%expect_test "struct definition (shorthand)" =
   let source = {|
@@ -85,8 +84,7 @@ let%expect_test "parameterized struct shorthand" =
         (binding_expr
          (Function
           ((params (((Ident T) (Reference (Ident Type)))))
-           (returns (Reference (Ident Type)))
-           (exprs (((block_exprs ((Struct ()))))))))))))) |}]
+           (returns (Reference (Ident Type))) (exprs (((Struct ()))))))))))) |}]
 
 let%expect_test "struct fields" =
   let source = {|
@@ -354,9 +352,8 @@ let%expect_test "function call in a list of statements" =
          (Function
           ((returns (Reference (Ident T)))
            (exprs
-            (((block_exprs
-               ((FunctionCall
-                 ((fn (Reference (Ident func))) (arguments ((Int 1))))))))))))))))) |}]
+            (((FunctionCall
+               ((fn (Reference (Ident func))) (arguments ((Int 1))))))))))))))) |}]
 
 let%expect_test "let in function body" =
   let source =
@@ -376,9 +373,8 @@ let%expect_test "let in function body" =
          (Function
           ((returns (Reference (Ident Int257)))
            (exprs
-            (((block_exprs
-               ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
-                (Return (Reference (Ident a))))))))))))))) |}]
+            (((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+              (Return (Reference (Ident a))))))))))))) |}]
 
 let%expect_test "code block without trailing semicolon" =
   let source =
@@ -396,9 +392,8 @@ let%expect_test "code block without trailing semicolon" =
          (Function
           ((returns (Reference (Ident Int257)))
            (exprs
-            (((block_exprs
-               ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))))
-              (return_value (Reference (Ident a))))))))))))) |}]
+            (((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+              (Return (Reference (Ident a))))))))))))) |}]
 
 let%expect_test "if with an empty body and no else statement" =
   let source = {|
@@ -414,8 +409,7 @@ let%expect_test "if with an empty body and no else statement" =
         (binding_expr
          (Function
           ((returns (Reference (Ident A)))
-           (exprs
-            (((return_value (If ((condition (Int 1)) (body ()) (else_ ())))))))))))))) |}]
+           (exprs (((Return (If ((condition (Int 1)) (body ()) (else_ ())))))))))))))) |}]
 
 let%expect_test "if with a body and an empty else" =
   let source =
@@ -437,10 +431,9 @@ let%expect_test "if with a body and an empty else" =
          (Function
           ((returns (Reference (Ident A)))
            (exprs
-            (((return_value
+            (((Return
                (If
-                ((condition (Int 1))
-                 (body ((block_exprs ((Reference (Ident a))))))
+                ((condition (Int 1)) (body ((Reference (Ident a))))
                  (else_ ((CodeBlock ())))))))))))))))) |}]
 
 let%expect_test "if with else if" =
@@ -461,7 +454,7 @@ let%expect_test "if with else if" =
          (Function
           ((returns (Reference (Ident A)))
            (exprs
-            (((return_value
+            (((Return
                (If
                 ((condition (Int 1)) (body ())
                  (else_ ((If ((condition (Int 10)) (body ()) (else_ ())))))))))))))))))) |}]
@@ -520,11 +513,10 @@ let%expect_test "struct construction over an anonymous type's function call" =
                 ((params (((Ident T) (Reference (Ident Type)))))
                  (returns (Reference (Ident Struct)))
                  (exprs
-                  (((block_exprs
-                     ((Struct
-                       ((fields
-                         (((field_name (Ident field))
-                           (field_type (Reference (Ident T))))))))))))))))
+                  (((Struct
+                     ((fields
+                       (((field_name (Ident field))
+                         (field_type (Reference (Ident T))))))))))))))
               (arguments ((Reference (Ident X)))))))
            (fields_construction (((Ident field) (Reference (Ident value)))))))))))) |}]
 
@@ -541,8 +533,7 @@ let%expect_test "tilde syntax" =
       (((binding_name (Ident test))
         (binding_expr
          (Function
-          ((returns (Reference (Ident A)))
-           (exprs (((block_exprs ((MutRef (Ident var)))))))))))))) |}]
+          ((returns (Reference (Ident A))) (exprs (((MutRef (Ident var)))))))))))) |}]
 
 let%expect_test "field access syntax" =
   let source = {|
@@ -559,9 +550,8 @@ let%expect_test "field access syntax" =
          (Function
           ((returns (Reference (Ident A)))
            (exprs
-            (((block_exprs
-               ((FieldAccess
-                 ((from_expr (Reference (Ident foo))) (to_field (Ident bar)))))))))))))))) |}]
+            (((FieldAccess
+               ((from_expr (Reference (Ident foo))) (to_field (Ident bar)))))))))))))) |}]
 
 let%expect_test "field access over other expressions" =
   let source =
@@ -581,16 +571,15 @@ let%expect_test "field access over other expressions" =
          (Function
           ((returns (Reference (Ident A)))
            (exprs
-            (((block_exprs
-               ((FieldAccess
-                 ((from_expr (MutRef (Ident foo))) (to_field (Ident bar))))
-                (FieldAccess
-                 ((from_expr
-                   (FieldAccess
-                    ((from_expr
-                      (StructConstructor
-                       ((constructor_id (Reference (Ident Struct)))
-                        (fields_construction
-                         (((Ident field) (Reference (Ident value))))))))
-                     (to_field (Ident field)))))
-                  (to_field (Ident other_field)))))))))))))))) |}]
+            (((FieldAccess
+               ((from_expr (MutRef (Ident foo))) (to_field (Ident bar))))
+              (FieldAccess
+               ((from_expr
+                 (FieldAccess
+                  ((from_expr
+                    (StructConstructor
+                     ((constructor_id (Reference (Ident Struct)))
+                      (fields_construction
+                       (((Ident field) (Reference (Ident value))))))))
+                   (to_field (Ident field)))))
+                (to_field (Ident other_field)))))))))))))) |}]

@@ -10,7 +10,7 @@
   let expand_fn_sugar params loc typ expr =
     Function (make_function_definition ~params: params
                                            ~returns: (make_located ~loc ~value: typ ())
-                                           ~exprs:(make_code_block ~block_exprs:[expr] ())
+                                           ~exprs:[expr]
                                            ())
   %}
 
@@ -171,17 +171,17 @@ let if_ :=
 let code_block :=
   | code_block = delimited(LBRACE, block_stmt, RBRACE);
     { code_block }
-  | LBRACE; RBRACE; { make_code_block ~block_exprs:[] () }
+  | LBRACE; RBRACE; { [] }
 
 let block_stmt :=
   | left = located(non_semicolon_stmt); right = block_stmt;
-    { make_code_block ~block_exprs:(left :: right.block_exprs) ?return_value:(right.return_value) () }
+    { left :: right }
   | left = located(semicolon_stmt); SEMICOLON; right = block_stmt; 
-    { make_code_block ~block_exprs:(left :: right.block_exprs) ?return_value:(right.return_value) () }
+    { left :: right }
   | left = located(semicolon_stmt); SEMICOLON; 
-    { make_code_block ~block_exprs:[left] () }
+    { [left] }
   | left = located(stmt);
-    { make_code_block ~block_exprs:[] ~return_value:left () }
+    { [make_located ~value:(Return (value left)) ~loc:(loc left) ()] }
 
 
 let stmt := 
