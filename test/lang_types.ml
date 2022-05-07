@@ -14,12 +14,12 @@ let build_program stx =
   match (!(elist.errors), !(elist.warnings)) with
   | [], _ ->
       Ok env
-  | errors :: _, _ ->
+  | errors, _ ->
       Error errors
 
 let pp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
-exception Exn of Lang.error
+exception Exn of Lang.error list
 
 let compile s =
   let env =

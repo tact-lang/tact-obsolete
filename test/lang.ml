@@ -14,7 +14,7 @@ let result_of_errors elist t =
   match (!(elist.errors), !(elist.warnings)) with
   | [], _ ->
       Ok t
-  | errors :: _, _ ->
+  | errors, _ ->
       Error errors
 
 let build_program ?(env = default_env) stx =
@@ -24,7 +24,7 @@ let build_program ?(env = default_env) stx =
 
 let print_sexp e =
   Sexplib.Sexp.pp_hum Format.std_formatter
-    (Result.sexp_of_t Lang.sexp_of_env Lang.sexp_of_error e)
+    (Result.sexp_of_t Lang.sexp_of_env (List.sexp_of_t Lang.sexp_of_error) e)
 
 let pp ?(env = default_env) s =
   let errors = make_errors () in
@@ -141,7 +141,10 @@ let%expect_test "recursive scope resolution" =
   let B = C;
   let C = A;
   |} in
-  pp source ; [%expect {| (Error (Recursive_Reference A)) |}]
+  pp source ; [%expect {|
+    (Error
+     ((Recursive_Reference A) (Unresolved B) (Recursive_Reference B)
+      (Unresolved C) (Recursive_Reference C) (Unresolved A))) |}]
 
 let%expect_test "struct definition" =
   let source =
@@ -175,8 +178,8 @@ let%expect_test "duplicate type" =
   [%expect
     {|
     (Error
-     (Duplicate_Identifier MyType
-      (Struct ((struct_fields ()) (struct_methods ()) (id <opaque>))))) |}]
+     ((Duplicate_Identifier MyType
+       (Struct ((struct_fields ()) (struct_methods ()) (id <opaque>)))))) |}]
 
 let%expect_test "duplicate but of a different kind" =
   let source = {|
@@ -185,7 +188,7 @@ let%expect_test "duplicate but of a different kind" =
   |} in
   pp source ;
   [%expect {|
-    (Error (Duplicate_Identifier MyType (Integer 1))) |}]
+    (Error ((Duplicate_Identifier MyType (Integer 1)))) |}]
 
 let%expect_test "duplicate type field" =
   let source =
@@ -200,9 +203,9 @@ let%expect_test "duplicate type field" =
   [%expect
     {|
     (Error
-     (Duplicate_Field a
-      ((struct_fields ((a ((field_type (ReferenceType Int257))))))
-       (struct_methods ()) (id <opaque>)))) |}]
+     ((Duplicate_Field a
+       ((struct_fields ((a ((field_type (ReferenceType Int257))))))
+        (struct_methods ()) (id <opaque>))))) |}]
 
 let%expect_test "function" =
   let source =
