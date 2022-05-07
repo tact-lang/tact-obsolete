@@ -6,9 +6,11 @@ open Core
 
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
-let build_program stx =
+let default_env = {scope = Lang.empty_scope}
+
+let build_program ?(env = default_env) stx =
   let elist = make_error_list ~warnings:(ref []) ~errors:(ref []) () in
-  let env = env_from_program stx elist in
+  let env = env_from_program ~env stx elist in
   match (!(elist.errors), !(elist.warnings)) with
   | [], _ ->
       Ok env
@@ -19,12 +21,13 @@ let print_sexp e =
   Sexplib.Sexp.pp_hum Format.std_formatter
     (Result.sexp_of_t Lang.sexp_of_env Lang.sexp_of_error e)
 
-let pp s =
-  Result.map (parse_program s |> build_program) ~f:Lang.eval_env |> print_sexp
+let pp ?(env = default_env) s =
+  Result.map (parse_program s |> build_program ~env) ~f:Lang.eval_env
+  |> print_sexp
 
-let pp_stripped s =
+let pp_stripped ?(env = default_env) s =
   Result.map
-    (parse_program s |> build_program)
+    (parse_program s |> build_program ~env)
     ~f:(fun env ->
       Lang.eval_env ((new resolved_references_stripper env)#visit_env () env) )
   |> print_sexp
@@ -227,13 +230,21 @@ let%expect_test "compile-time printing" =
 let%expect_test "compile-time evaluation" =
   let source =
     {|
-    fn a() -> Int257 {
-       return 1;
+    fn a(i: Int257) -> Int257 {
+       f(i);
+       return i;
     }
-    let v = a();
+    let v = a(1);
+    let v1 = a(2);
    |}
   in
-  pp_stripped source ;
+  let received = ref [] in
+  let f _env args =
+    received := args @ !received ;
+    Void
+  in
+  let env = {scope = ("f", Function (BuiltinFn f)) :: default_env.scope} in
+  pp_stripped ~env source ;
   [%expect
     {|
     (Ok
@@ -243,9 +254,20 @@ let%expect_test "compile-time evaluation" =
         (a
          (Function
           (Fn
-           ((function_params ()) (function_returns (BuiltinType Int257))
-            (function_body ((Return (Integer 1))))))))
-        (println (Function (BuiltinFn <fun>))) (v (Integer 1)))))) |}]
+           ((function_params ((i (BuiltinType Int257))))
+            (function_returns (BuiltinType Int257))
+            (function_body
+             ((Term (FunctionCall (Function (BuiltinFn <fun>)) ((Reference i))))
+              (Return (Reference i))))))))
+        (f (Function (BuiltinFn <fun>))) (println (Function (BuiltinFn <fun>)))
+        (v (Integer 1)) (v1 (Integer 2)))))) |}] ;
+  let received =
+    List.sort !received ~compare:(fun a b ->
+        match (a, b) with Integer a, Integer b -> Z.compare a b | _ -> 0 )
+  in
+  Sexplib.Sexp.pp_hum Format.std_formatter
+    (List.sexp_of_t Lang.sexp_of_term received) ;
+  [%expect {| ((Integer 1) (Integer 2)) |}]
 
 let%expect_test "parametric struct instantiation" =
   let source =

@@ -139,6 +139,8 @@ functor
         ("Bool", Builtin "Bool");
         ("println", Function (BuiltinFn comptime_println)) ]
 
+    let default_env = {scope = empty_scope}
+
     let rec is_immediate_term = function
       | Void ->
           true
@@ -239,54 +241,64 @@ functor
         method! visit_ResolvedReferenceType env _ k = s#visit_type_ env k
       end
 
-    let interpret_function env fn args =
-      let args' =
-        List.map (List.zip_exn fn.function_params args) ~f:(fun ((n, _), a) ->
-            (n, a) )
-      in
-      let env' = {scope = args' @ env.scope} in
-      let stripped =
-        equal_env env'
-          ((new resolved_references_stripper env)#visit_env () env')
-      in
-      List.fold_until ~init:Void
-        ~f:
-          (fun _ -> function
-            | Return term ->
-                Stop term
-            | Term term ->
-                Continue term )
-        ~finish:(fun state -> state)
-        (List.map (Option.value fn.function_body ~default:[]) ~f:(fun stmt ->
-             let stmt =
-               (new reference_resolver
-                  (env', {warnings = ref []; errors = ref []}) )
-                 #visit_stmt () stmt
-             in
-             if stripped then
-               (new resolved_references_stripper env')#visit_stmt () stmt
-             else stmt ) )
-
     (* Evaluates compile-time function calls *)
     class ['s] function_call_evaluator (env : env) =
-      object (_ : 's)
+      object (s : 's)
         inherit ['s] map
 
         val p_env = env
 
+        method private interpret_function fn args =
+          let eval_term _env = function term -> term in
+          let env = p_env in
+          let args' =
+            List.map (List.zip_exn fn.function_params args)
+              ~f:(fun ((n, _), a) -> (n, a))
+          in
+          let env' = {scope = args' @ env.scope} in
+          let stripped =
+            equal_env env'
+              ((new resolved_references_stripper env)#visit_env () env')
+          in
+          let statements =
+            List.map (Option.value fn.function_body ~default:[]) ~f:(fun stmt ->
+                let stmt =
+                  (new reference_resolver
+                     (env', {warnings = ref []; errors = ref []}) )
+                    #visit_stmt () stmt
+                in
+                let stmt =
+                  if stripped then
+                    (new resolved_references_stripper env')#visit_stmt () stmt
+                  else stmt
+                in
+                let fce : 's = new function_call_evaluator env' in
+                fce#visit_stmt () stmt )
+          in
+          List.fold_until ~init:Void
+            ~f:
+              (fun _ -> function
+                | Return term ->
+                    Stop (eval_term env' term)
+                | Term term ->
+                    Continue (eval_term env' term) )
+            ~finish:(fun state -> state)
+            statements
+
         method! visit_FunctionCall _env f args =
+          let immediate_arguments =
+            Option.is_none
+              (List.find args ~f:(fun a -> not (is_immediate_term a)))
+          in
           let rewrite_fn fn =
-            let immediate_arguments =
-              Option.is_none
-                (List.find args ~f:(fun a -> not (is_immediate_term a)))
-            and has_body = Option.is_some fn.function_body in
-            if immediate_arguments && has_body then
-              interpret_function p_env fn args
+            let has_body = Option.is_some fn.function_body in
+            if immediate_arguments && has_body then s#interpret_function fn args
             else FunctionCall (Function (Fn fn), args)
           in
           match f with
           | Function (BuiltinFn fn)
-          | ResolvedReference (_, Function (BuiltinFn fn)) ->
+          | ResolvedReference (_, Function (BuiltinFn fn))
+            when immediate_arguments ->
               fn p_env args
           | Function (Fn fn) ->
               rewrite_fn fn
@@ -311,10 +323,11 @@ functor
           t'
       end
 
-    let rec env_from_program (stx : Syntax.program) (elist : elist) =
-      let scope = scope_from_bindings stx.bindings elist in
-      (* Resolve references inside *)
+    let rec env_from_program ?(env = default_env) (stx : Syntax.program)
+        (elist : elist) =
+      let scope = scope_from_bindings stx.bindings elist ~scope:env.scope in
       let env = {scope} in
+      (* Resolve references inside *)
       let env = (new struct_unique_id_assigner env)#visit_env () env in
       let env = (new reference_resolver (env, elist))#visit_env () env in
       env
@@ -323,8 +336,7 @@ functor
       let evaluator = new function_call_evaluator env in
       evaluator#visit_env () env
 
-    and scope_from_bindings bindings elist =
-      let scope = empty_scope in
+    and scope_from_bindings ?(scope = empty_scope) bindings elist =
       List.fold ~init:scope
         ~f:(fun scope binding ->
           let binding = Syntax.value binding in
