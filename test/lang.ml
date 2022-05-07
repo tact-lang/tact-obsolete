@@ -63,7 +63,11 @@ let%expect_test "scope resolution" =
         (I_ (ResolvedReference I (Builtin Int257))) (Int257 (Builtin Int257))
         (Type (Builtin Type)) (Void Void) (n (Integer 1))
         (n_ (ResolvedReference n (Integer 1)))
-        (println (Function (BuiltinFn <fun>))))))) |}]
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>))))))))) |}]
 
 let%expect_test "deep resolution" =
   let source = {|
@@ -89,7 +93,12 @@ let%expect_test "deep resolution" =
              ((a
                ((field_type (ResolvedReferenceType Int257 (BuiltinType Int257)))))))
             (struct_methods ()) (id <opaque>)))))
-        (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
+        (Type (Builtin Type)) (Void Void)
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>))))))))) |}]
 
 let%expect_test "stripping scope resolution" =
   let source =
@@ -107,7 +116,12 @@ let%expect_test "stripping scope resolution" =
      ((scope
        ((Bool (Builtin Bool)) (I (Builtin Int257)) (I_ (Builtin Int257))
         (Int257 (Builtin Int257)) (Type (Builtin Type)) (Void Void)
-        (n (Integer 1)) (n_ (Integer 1)) (println (Function (BuiltinFn <fun>))))))) |}]
+        (n (Integer 1)) (n_ (Integer 1))
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>))))))))) |}]
 
 let%expect_test "scope resolution within functions" =
   let source =
@@ -126,14 +140,18 @@ let%expect_test "scope resolution within functions" =
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
         (Void Void) (i (ResolvedReference Int257 (Builtin Int257)))
-        (println (Function (BuiltinFn <fun>)))
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>)))))
         (test
          (Function
           (Fn
            ((function_params
              ((i (ResolvedReferenceType Int257 (BuiltinType Int257)))))
             (function_returns (ResolvedReferenceType Void VoidType))
-            (function_body ((Term (Reference i)))))))))))) |}]
+            (function_impl (((Term (Reference i))))))))))))) |}]
 
 let%expect_test "recursive scope resolution" =
   let source = {|
@@ -169,7 +187,12 @@ let%expect_test "struct definition" =
             ((a ((field_type (BuiltinType Int257))))
              (b ((field_type (BuiltinType Bool))))))
            (struct_methods ()) (id <opaque>))))
-        (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>))))))) |}]
+        (Type (Builtin Type)) (Void Void)
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>))))))))) |}]
 
 let%expect_test "duplicate type" =
   let source = {|
@@ -224,13 +247,18 @@ let%expect_test "function" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
-        (Void Void) (println (Function (BuiltinFn <fun>)))
+        (Void Void)
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>)))))
         (test
          (Function
           (Fn
            ((function_params ((a (BuiltinType Int257)) (b (BuiltinType Bool))))
             (function_returns (BuiltinType Int257))
-            (function_body ((Term (Integer 1)) (Term (Integer 2)))))))))))) |}]
+            (function_impl (((Term (Integer 1)) (Term (Integer 2))))))))))))) |}]
 
 let%expect_test "compile-time printing" =
   let source = {|
@@ -243,7 +271,12 @@ let%expect_test "compile-time printing" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
-        (Void Void) (a Void) (println (Function (BuiltinFn <fun>))))))) |}]
+        (Void Void) (a Void)
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>))))))))) |}]
 
 let%expect_test "compile-time evaluation" =
   let source =
@@ -261,7 +294,16 @@ let%expect_test "compile-time evaluation" =
     received := args @ !received ;
     Void
   in
-  let env = {scope = ("f", Function (BuiltinFn f)) :: default_env.scope} in
+  let env =
+    { scope =
+        ( "f",
+          Function
+            (BuiltinFn
+               { function_params = [("i", BuiltinType "Int257")];
+                 function_returns = VoidType;
+                 function_impl = f } ) )
+        :: default_env.scope }
+  in
   pp_stripped ~env source ;
   [%expect
     {|
@@ -274,10 +316,25 @@ let%expect_test "compile-time evaluation" =
           (Fn
            ((function_params ((i (BuiltinType Int257))))
             (function_returns (BuiltinType Int257))
-            (function_body
-             ((Term (FunctionCall (Function (BuiltinFn <fun>)) ((Reference i))))
-              (Return (Reference i))))))))
-        (f (Function (BuiltinFn <fun>))) (println (Function (BuiltinFn <fun>)))
+            (function_impl
+             (((Term
+                (FunctionCall
+                 (Function
+                  (BuiltinFn
+                   ((function_params ((i (BuiltinType Int257))))
+                    (function_returns VoidType) (function_impl <fun>))))
+                 ((Reference i))))
+               (Return (Reference i)))))))))
+        (f
+         (Function
+          (BuiltinFn
+           ((function_params ((i (BuiltinType Int257))))
+            (function_returns VoidType) (function_impl <fun>)))))
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>)))))
         (v (Integer 1)) (v1 (Integer 2)))))) |}] ;
   let received =
     List.sort !received ~compare:(fun a b ->
@@ -305,16 +362,21 @@ let%expect_test "parametric struct instantiation" =
             (Fn
              ((function_params ((A (BuiltinType Type))))
               (function_returns (BuiltinType Type))
-              (function_body
-               ((Term
-                 (Struct
-                  ((struct_fields ((a ((field_type (ReferenceType A))))))
-                   (struct_methods ()) (id <opaque>))))))))))
+              (function_impl
+               (((Term
+                  (Struct
+                   ((struct_fields ((a ((field_type (ReferenceType A))))))
+                    (struct_methods ()) (id <opaque>)))))))))))
           (TA
            (Struct
             ((struct_fields ((a ((field_type (BuiltinType Int257))))))
              (struct_methods ()) (id <opaque>))))
-          (Type (Builtin Type)) (Void Void) (println (Function (BuiltinFn <fun>)))))))
+          (Type (Builtin Type)) (Void Void)
+          (println
+           (Function
+            (BuiltinFn
+             ((function_params ((value HoleType))) (function_returns VoidType)
+              (function_impl <fun>)))))))))
  |}]
 
 let%expect_test "function without a return type" =
@@ -333,8 +395,12 @@ let%expect_test "function without a return type" =
          (Function
           (Fn
            ((function_params ()) (function_returns HoleType)
-            (function_body ((Return (Integer 1))))))))
-        (println (Function (BuiltinFn <fun>))))))) |}]
+            (function_impl (((Return (Integer 1)))))))))
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>))))))))) |}]
 
 let%expect_test "scoping that `let` introduces in code" =
   let source =
@@ -358,5 +424,9 @@ let%expect_test "scoping that `let` introduces in code" =
           (Fn
            ((function_params ((i (BuiltinType Int257))))
             (function_returns HoleType)
-            (function_body ((Let a (Reference i) ((Return (Reference a))))))))))
-        (println (Function (BuiltinFn <fun>))))))) |}]
+            (function_impl (((Let a (Reference i) ((Return (Reference a)))))))))))
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>))))))))) |}]

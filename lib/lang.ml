@@ -60,12 +60,19 @@ functor
       | TermType of term
       | HoleType
 
-    and fn =
+    and 'a typed_fn =
       { function_params : type_ named_map;
         function_returns : type_;
-        function_body : stmt list option [@sexp.option] }
+        function_impl : 'a }
 
-    and builtin_fn = (env -> term list -> term[@visitors.opaque] [@equal.ignore])
+    and function_body = (stmt list option[@sexp.option])
+
+    and fn = function_body typed_fn
+
+    and native_function =
+      (env -> term list -> term[@visitors.opaque] [@equal.ignore])
+
+    and builtin_fn = native_function typed_fn
 
     and function_ = Fn of fn | BuiltinFn of builtin_fn
 
@@ -129,18 +136,26 @@ functor
 
     type elist = (string, error) error_list
 
-    let comptime_println _env args =
-      let f = Caml.Format.std_formatter in
-      List.iter args ~f:(fun x -> Sexplib.Sexp.pp_hum f (sexp_of_term x)) ;
-      Caml.Format.pp_print_newline f () ;
-      Void
+    let comptime_println _env = function
+      | [arg] ->
+          let f = Caml.Format.std_formatter in
+          Sexplib.Sexp.pp_hum f (sexp_of_term arg) ;
+          Caml.Format.pp_print_newline f () ;
+          Void
+      | _ ->
+          Void
 
     let empty_scope =
       [ ("Void", Void);
         ("Type", Builtin "Type");
         ("Int257", Builtin "Int257");
         ("Bool", Builtin "Bool");
-        ("println", Function (BuiltinFn comptime_println)) ]
+        ( "println",
+          Function
+            (BuiltinFn
+               { function_params = [("value", HoleType)];
+                 function_returns = VoidType;
+                 function_impl = comptime_println } ) ) ]
 
     let default_env = {scope = empty_scope}
 
@@ -273,7 +288,7 @@ functor
               ((new resolved_references_stripper env)#visit_env () env')
           in
           let statements =
-            List.map (Option.value fn.function_body ~default:[]) ~f:(fun stmt ->
+            List.map (Option.value fn.function_impl ~default:[]) ~f:(fun stmt ->
                 let stmt =
                   (new reference_resolver
                      (env', {warnings = ref []; errors = ref []}) )
@@ -324,15 +339,15 @@ functor
               (List.find args ~f:(fun a -> not (is_immediate_term a)))
           in
           let rewrite_fn fn =
-            let has_body = Option.is_some fn.function_body in
+            let has_body = Option.is_some fn.function_impl in
             if immediate_arguments && has_body then s#interpret_function fn args
             else FunctionCall (Function (Fn fn), args)
           in
           match f with
-          | Function (BuiltinFn fn)
-          | ResolvedReference (_, Function (BuiltinFn fn))
+          | Function (BuiltinFn {function_impl; _})
+          | ResolvedReference (_, Function (BuiltinFn {function_impl; _}))
             when immediate_arguments ->
-              fn p_env args
+              function_impl p_env args
           | Function (Fn fn) ->
               rewrite_fn fn
           | ResolvedReference (n, Function (Fn fn)) ->
@@ -480,7 +495,7 @@ functor
       let f' =
         { function_params = [];
           function_returns = TermType return;
-          function_body =
+          function_impl =
             Option.map f.exprs ~f:(fun exprs ->
                 block_to_stmts (List.map exprs ~f:Syntax.value) elist ) }
       in
