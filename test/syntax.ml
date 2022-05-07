@@ -385,7 +385,9 @@ let%expect_test "code block without trailing semicolon" =
     };
     |}
   in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     ((bindings
       (((binding_name (Ident f))
         (binding_expr
