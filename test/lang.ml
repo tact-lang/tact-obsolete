@@ -141,7 +141,9 @@ let%expect_test "recursive scope resolution" =
   let B = C;
   let C = A;
   |} in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Error
      ((Recursive_Reference A) (Unresolved B) (Recursive_Reference B)
       (Unresolved C) (Recursive_Reference C) (Unresolved A))) |}]
