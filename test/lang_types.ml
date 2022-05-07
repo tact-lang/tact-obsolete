@@ -4,10 +4,12 @@ module Lang = Tact.Lang.Make (Syntax)
 open Lang
 open Core
 
+let make_errors () = make_error_list ~warnings:(ref []) ~errors:(ref []) ()
+
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program stx =
-  let elist = make_error_list ~warnings:(ref []) ~errors:(ref []) () in
+  let elist = make_errors () in
   let env = env_from_program stx elist in
   match (!(elist.errors), !(elist.warnings)) with
   | [], _ ->
@@ -35,7 +37,7 @@ let test_alias () =
   |} in
   Alcotest.(check bool)
     "aliased types are the same" true
-    (let scope = (compile source).scope in
+    (let scope = (compile source (make_errors ())).scope in
      let t = Lang.in_amap scope (fun m -> Map.find m "T") |> Option.value_exn
      and t1 =
        Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
@@ -51,7 +53,7 @@ let test_carbon_copy () =
   |} in
   Alcotest.(check bool)
     "carbon copy types are not the same" false
-    (let scope = (compile source).scope in
+    (let scope = (compile source (make_errors ())).scope in
      let t = Lang.in_amap scope (fun m -> Map.find m "T") |> Option.value_exn
      and t1 =
        Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
@@ -71,7 +73,7 @@ let test_parameterized () =
   in
   Alcotest.(check bool)
     "differently parameterized types are not the same" false
-    (let scope = (compile source).scope in
+    (let scope = (compile source (make_errors ())).scope in
      let t1 = Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
      and t2 =
        Lang.in_amap scope (fun m -> Map.find m "T2") |> Option.value_exn
@@ -81,7 +83,7 @@ let test_parameterized () =
      Lang.equal_term t1 t2 ) ;
   Alcotest.(check bool)
     "equally parameterized types are the same" true
-    (let scope = (compile source).scope in
+    (let scope = (compile source (make_errors ())).scope in
      let t1 = Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
      and t3 =
        Lang.in_amap scope (fun m -> Map.find m "T3") |> Option.value_exn

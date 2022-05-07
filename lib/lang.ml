@@ -69,7 +69,10 @@ functor
 
     and function_ = Fn of fn | BuiltinFn of builtin_fn
 
-    and stmt = Return of term | Term of term
+    and stmt =
+      | Let of string * term * (stmt list[@sexp.list])
+      | Return of term
+      | Term of term
 
     and struct_ =
       { struct_fields : struct_field named_map;
@@ -205,8 +208,8 @@ functor
                   t
             | Some (ResolvedReference (_, t)) | Some t ->
                 Some (s#visit_term env t)
-            | other ->
-                other
+            | None ->
+                None
 
         method! visit_Reference env ref =
           if s#scoped_identifier ref then Reference ref
@@ -227,6 +230,16 @@ functor
             | None ->
                 new_error (Unresolved ref) p_errors ;
                 ReferenceType ref
+
+        method! visit_Let env name term stmts =
+          let scoped_identifiers' = scoped_identifiers in
+          scoped_identifiers <- [name] :: scoped_identifiers ;
+          let name = s#visit_string env name in
+          let term = s#visit_term env term in
+          let stmts = List.map stmts ~f:(s#visit_stmt env) in
+          let let_ = Let (name, term, stmts) in
+          scoped_identifiers <- scoped_identifiers' ;
+          let_
       end
 
     (* Strips resolved references types *)
@@ -242,14 +255,13 @@ functor
       end
 
     (* Evaluates compile-time function calls *)
-    class ['s] function_call_evaluator (env : env) =
+    class ['s] function_call_evaluator ((env, errors) : env * elist) =
       object (s : 's)
         inherit ['s] map
 
         val p_env = env
 
         method private interpret_function fn args =
-          let eval_term _env = function term -> term in
           let env = p_env in
           let args' =
             List.map (List.zip_exn fn.function_params args)
@@ -272,18 +284,39 @@ functor
                     (new resolved_references_stripper env')#visit_stmt () stmt
                   else stmt
                 in
-                let fce : 's = new function_call_evaluator env' in
+                let fce : 's = new function_call_evaluator (env', errors) in
                 fce#visit_stmt () stmt )
           in
-          List.fold_until ~init:Void
-            ~f:
-              (fun _ -> function
-                | Return term ->
-                    Stop (eval_term env' term)
-                | Term term ->
-                    Continue (eval_term env' term) )
-            ~finish:(fun state -> state)
-            statements
+          let rec iterate statements env =
+            List.fold_until ~init:Void
+              ~f:
+                (fun _ -> function
+                  | Let (name, term, statements) ->
+                      Continue
+                        (iterate statements
+                           {scope = (name, eval_term env term) :: env.scope} )
+                  | Return term ->
+                      Stop (eval_term env term)
+                  | Term term ->
+                      Continue (eval_term env term) )
+              ~finish:(fun state -> state)
+              statements
+          and resolve_ref env term =
+            let term =
+              (new reference_resolver (env, errors))#visit_term () term
+            in
+            let term =
+              (new resolved_references_stripper env)#visit_term () term
+            in
+            term
+          and eval_term env term =
+            match term with
+            | Reference ref ->
+                resolve_ref env (Reference ref)
+            | term ->
+                term
+          in
+          iterate statements env'
 
         method! visit_FunctionCall _env f args =
           let immediate_arguments =
@@ -332,8 +365,8 @@ functor
       let env = (new reference_resolver (env, elist))#visit_env () env in
       env
 
-    and eval_env env =
-      let evaluator = new function_call_evaluator env in
+    and eval_env env errors =
+      let evaluator = new function_call_evaluator (env, errors) in
       evaluator#visit_env () env
 
     and scope_from_bindings ?(scope = empty_scope) bindings elist =
@@ -373,13 +406,6 @@ functor
       | _ ->
           Error Unsupported
 
-    and expr_to_stmt expr loc elist =
-      match expr with
-      | Syntax.Return expr' ->
-          Result.map (expr_to_term expr' loc elist) ~f:(fun v -> Return v)
-      | _ ->
-          Result.map (expr_to_term expr loc elist) ~f:(fun v -> Term v)
-
     and struct_to_struct s _loc elist =
       let s' = {struct_fields = []; struct_methods = []; id = 0} in
       let s =
@@ -411,6 +437,33 @@ functor
       in
       Struct s
 
+    and block_to_stmts exprs elist =
+      match exprs with
+      | Syntax.Let binding :: rest -> (
+          let binding = Syntax.value binding in
+          match expr_to_term (Syntax.value binding.binding_expr) () elist with
+          | Ok t ->
+              [ Let
+                  ( Syntax.ident_to_string (Syntax.value binding.binding_name),
+                    t,
+                    List.rev (block_to_stmts rest elist) ) ]
+          | Error _ ->
+              [] )
+      | Syntax.Return expr :: rest -> (
+        match expr_to_term expr () elist with
+        | Ok t ->
+            Return t :: block_to_stmts rest elist
+        | Error _ ->
+            block_to_stmts rest elist )
+      | expr :: rest -> (
+        match expr_to_term expr () elist with
+        | Ok t ->
+            Term t :: block_to_stmts rest elist
+        | Error _ ->
+            block_to_stmts rest elist )
+      | [] ->
+          []
+
     and function_to_function f _loc elist =
       (* return type *)
       let return =
@@ -429,17 +482,7 @@ functor
           function_returns = TermType return;
           function_body =
             Option.map f.exprs ~f:(fun exprs ->
-                let code =
-                  Result.map
-                    (List.fold_result ~init:[]
-                       ~f:(fun acc expr ->
-                         Result.map
-                           (expr_to_stmt (Syntax.value expr) () elist)
-                           ~f:(fun e -> e :: acc) )
-                       exprs )
-                    ~f:List.rev
-                in
-                match code with Ok code -> code | Error _ -> [] ) }
+                block_to_stmts (List.map exprs ~f:Syntax.value) elist ) }
       in
       let f' =
         { f' with

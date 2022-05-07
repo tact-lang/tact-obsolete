@@ -4,32 +4,45 @@ module Lang = Tact.Lang.Make (Syntax)
 open Lang
 open Core
 
+let make_errors () = make_error_list ~warnings:(ref []) ~errors:(ref []) ()
+
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let default_env = {scope = Lang.empty_scope}
 
-let build_program ?(env = default_env) stx =
-  let elist = make_error_list ~warnings:(ref []) ~errors:(ref []) () in
-  let env = env_from_program ~env stx elist in
+let result_of_errors elist t =
   match (!(elist.errors), !(elist.warnings)) with
   | [], _ ->
-      Ok env
+      Ok t
   | errors :: _, _ ->
       Error errors
+
+let build_program ?(env = default_env) stx =
+  let elist = make_errors () in
+  let env = env_from_program ~env stx elist in
+  result_of_errors elist env
 
 let print_sexp e =
   Sexplib.Sexp.pp_hum Format.std_formatter
     (Result.sexp_of_t Lang.sexp_of_env Lang.sexp_of_error e)
 
 let pp ?(env = default_env) s =
-  Result.map (parse_program s |> build_program ~env) ~f:Lang.eval_env
+  let errors = make_errors () in
+  Result.bind
+    (parse_program s |> build_program ~env)
+    ~f:(fun env ->
+      let env = Lang.eval_env env errors in
+      result_of_errors errors env )
   |> print_sexp
 
 let pp_stripped ?(env = default_env) s =
-  Result.map
+  let errors = make_errors () in
+  Result.bind
     (parse_program s |> build_program ~env)
     ~f:(fun env ->
-      Lang.eval_env ((new resolved_references_stripper env)#visit_env () env) )
+      let env = (new resolved_references_stripper env)#visit_env () env in
+      let env = Lang.eval_env env errors in
+      result_of_errors errors env )
   |> print_sexp
 
 let%expect_test "scope resolution" =
@@ -316,4 +329,29 @@ let%expect_test "function without a return type" =
           (Fn
            ((function_params ()) (function_returns HoleType)
             (function_body ((Return (Integer 1))))))))
+        (println (Function (BuiltinFn <fun>))))))) |}]
+
+let%expect_test "scoping that `let` introduces in code" =
+  let source =
+    {|
+    fn f(i: Int257) {
+      let a = i;
+      return a;
+    }
+    let b = f(1);
+    |}
+  in
+  pp_stripped source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (Void Void) (b (Integer 1))
+        (f
+         (Function
+          (Fn
+           ((function_params ((i (BuiltinType Int257))))
+            (function_returns HoleType)
+            (function_body ((Let a (Reference i) ((Return (Reference a))))))))))
         (println (Function (BuiltinFn <fun>))))))) |}]
