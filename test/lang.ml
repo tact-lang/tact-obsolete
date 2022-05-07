@@ -250,7 +250,7 @@ let%expect_test "compile-time evaluation" =
     {|
     fn a(i: Int257) -> Int257 {
        f(i);
-       return i;
+       i
     }
     let v = a(1);
     let v1 = a(2);
@@ -319,7 +319,7 @@ let%expect_test "parametric struct instantiation" =
 
 let%expect_test "function without a return type" =
   let source = {|
-    fn f() { return 1;}
+    fn f() { 1 }
     let a = f();
     |} in
   pp_stripped source ;
@@ -341,7 +341,7 @@ let%expect_test "scoping that `let` introduces in code" =
     {|
     fn f(i: Int257) {
       let a = i;
-      return a;
+      a
     }
     let b = f(1);
     |}

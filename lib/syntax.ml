@@ -44,7 +44,7 @@ module type T = sig
     | FunctionCall of function_call
     | Function of function_definition
     | Int of zt
-    | CodeBlock of code_block
+    | CodeBlock of expr located list
     | If of if_
     | Return of expr
     | MutRef of ident located
@@ -65,12 +65,10 @@ module type T = sig
 
   and binding = {binding_name : ident located; binding_expr : expr located}
 
-  and code_block = {block_exprs : expr located list}
-
   and if_ =
     { condition : expr located;
-      body : expr located list;
-      else_ : expr located option }
+      body : expr located list located;
+      else_ : expr located option [@sexp.option] }
 
   and field_access = {from_expr : expr located; to_field : ident located}
 
@@ -123,7 +121,7 @@ functor
       | FunctionCall of function_call
       | Function of function_definition
       | Int of zt
-      | CodeBlock of code_block
+      | CodeBlock of (expr located list[@sexp.list])
       | If of if_
       | Return of expr
       | MutRef of ident located
@@ -145,11 +143,9 @@ functor
 
     and binding = {binding_name : ident located; binding_expr : expr located}
 
-    and code_block = {block_exprs : expr located list [@sexp.list]}
-
     and if_ =
       { condition : expr located;
-        body : expr located list; [@sexp.list]
+        body : (expr located list[@sexp.list]) located;
         else_ : expr located option [@sexp.option] }
 
     and field_access = {from_expr : expr located; to_field : ident located}

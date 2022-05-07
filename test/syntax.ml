@@ -370,6 +370,27 @@ let%expect_test "let in function body" =
             ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
              (Return (Reference (Ident a)))))))))))) |}]
 
+let%expect_test "code block without trailing semicolon" =
+  let source =
+    {|
+    let f = fn() -> Int257 { 
+      let a = 1;
+      a
+    };
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((bindings
+      (((binding_name (Ident f))
+        (binding_expr
+         (Function
+          ((returns (Reference (Ident Int257)))
+           (exprs
+            ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+             (Return (Reference (Ident a)))))))))))) |}]
+
 let%expect_test "if with an empty body and no else statement" =
   let source = {|
   fn test() -> A {
@@ -383,7 +404,8 @@ let%expect_test "if with an empty body and no else statement" =
       (((binding_name (Ident test))
         (binding_expr
          (Function
-          ((returns (Reference (Ident A))) (exprs ((If ((condition (Int 1))))))))))))) |}]
+          ((returns (Reference (Ident A)))
+           (exprs ((Return (If ((condition (Int 1)) (body ()))))))))))))) |}]
 
 let%expect_test "if with a body and an empty else" =
   let source =
@@ -405,9 +427,10 @@ let%expect_test "if with a body and an empty else" =
          (Function
           ((returns (Reference (Ident A)))
            (exprs
-            ((If
-              ((condition (Int 1)) (body ((Reference (Ident a))))
-               (else_ (CodeBlock ()))))))))))))) |}]
+            ((Return
+              (If
+               ((condition (Int 1)) (body ((Reference (Ident a))))
+                (else_ (CodeBlock ())))))))))))))) |}]
 
 let%expect_test "if with else if" =
   let source =
@@ -427,7 +450,10 @@ let%expect_test "if with else if" =
          (Function
           ((returns (Reference (Ident A)))
            (exprs
-            ((If ((condition (Int 1)) (else_ (If ((condition (Int 10)))))))))))))))) |}]
+            ((Return
+              (If
+               ((condition (Int 1)) (body ())
+                (else_ (If ((condition (Int 10)) (body ())))))))))))))))) |}]
 
 let%expect_test "struct construction over a parameterized type" =
   let source = {|

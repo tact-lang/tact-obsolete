@@ -38,7 +38,6 @@ rule token = parse
  | '~' { TILDE }
  | '.' { DOT }
  | "let" { LET }
- | "type" { TYPE }
  | "struct" { STRUCT }
  | "enum" { ENUM }
  | "interface" { INTERFACE }
