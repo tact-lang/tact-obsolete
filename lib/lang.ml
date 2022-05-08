@@ -36,29 +36,35 @@ functor
 
     type 'a named_map = ((string * 'a) list[@sexp.list])
 
+    and function_call = term * term list
+
     and term =
       | Void
       | Struct of struct_
       | Function of function_
-      | FunctionCall of term * term list
+      | FunctionCall of function_call
       | Integer of (z[@visitors.name "z"])
       | Reference of string
       | ResolvedReference of string * term
       | Builtin of builtin
       | Invalid
       | Hole
+      | Type of type_
 
     and builtin = string
 
     and type_ =
       | VoidType
-      | ResolvedReferenceType of string * type_
       | BuiltinType of builtin
       | StructType of struct_
       | FunctionType of function_
       | ReferenceType of string
+      | ResolvedReferenceType of string * type_
+      | PendingType of function_call
       | TermType of term
       | HoleType
+      | InvalidType
+      | IntegerType
 
     and 'a typed_fn =
       { function_params : type_ named_map;
@@ -119,6 +125,10 @@ functor
           VoidType
       | Hole ->
           HoleType
+      | FunctionCall fc ->
+          PendingType fc
+      | Integer _ ->
+          IntegerType
       | _ ->
           TermType value
       [@@deriving sexp_of]
@@ -137,19 +147,31 @@ functor
     type elist = (string, error) error_list
 
     let comptime_println _env = function
-      | [arg] ->
+      | arg :: _ ->
           let f = Caml.Format.std_formatter in
           Sexplib.Sexp.pp_hum f (sexp_of_term arg) ;
           Caml.Format.pp_print_newline f () ;
           Void
       | _ ->
-          Void
+          Invalid
 
-    let empty_scope =
+    let comptime_typeof _env = function
+      | arg :: _ ->
+          Type (term_to_type arg)
+      | _ ->
+          Invalid
+
+    let default_scope =
       [ ("Void", Void);
         ("Type", Builtin "Type");
         ("Int257", Builtin "Int257");
         ("Bool", Builtin "Bool");
+        ( "TypeOf",
+          Function
+            (BuiltinFn
+               { function_params = [("value", HoleType)];
+                 function_returns = BuiltinType "Type";
+                 function_impl = comptime_typeof } ) );
         ( "println",
           Function
             (BuiltinFn
@@ -157,7 +179,7 @@ functor
                  function_returns = VoidType;
                  function_impl = comptime_println } ) ) ]
 
-    let default_env = {scope = empty_scope}
+    let default_env = {scope = default_scope}
 
     let rec is_immediate_term = function
       | Void ->
@@ -178,6 +200,8 @@ functor
           true
       | Hole ->
           false
+      | Type _ ->
+          true
       | Invalid ->
           false
 
@@ -333,7 +357,8 @@ functor
           in
           iterate statements env'
 
-        method! visit_FunctionCall _env f args =
+        method! visit_FunctionCall env (f, args) =
+          let f, args = s#visit_function_call env (f, args) in
           let immediate_arguments =
             Option.is_none
               (List.find args ~f:(fun a -> not (is_immediate_term a)))
@@ -354,6 +379,13 @@ functor
               ResolvedReference (n, rewrite_fn fn)
           | _ ->
               FunctionCall (f, args)
+
+        method! visit_PendingType env fc =
+          match s#visit_FunctionCall env fc with
+          | Type t ->
+              t
+          | _ ->
+              InvalidType
       end
 
     (* Assigns unique identifiers to types *)
@@ -384,7 +416,7 @@ functor
       let evaluator = new function_call_evaluator (env, errors) in
       evaluator#visit_env () env
 
-    and scope_from_bindings ?(scope = empty_scope) bindings elist =
+    and scope_from_bindings ?(scope = default_scope) bindings elist =
       List.fold ~init:scope
         ~f:(fun scope binding ->
           let binding = Syntax.value binding in
