@@ -8,7 +8,7 @@ let make_errors () = make_error_list ~warnings:(ref []) ~errors:(ref []) ()
 
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
-let default_env = {scope = Lang.empty_scope}
+let default_env = {scope = Lang.default_scope}
 
 let result_of_errors elist t =
   match (!(elist.errors), !(elist.warnings)) with
@@ -61,8 +61,13 @@ let%expect_test "scope resolution" =
      ((scope
        ((Bool (Builtin Bool)) (I (ResolvedReference Int257 (Builtin Int257)))
         (I_ (ResolvedReference I (Builtin Int257))) (Int257 (Builtin Int257))
-        (Type (Builtin Type)) (Void Void) (n (Integer 1))
-        (n_ (ResolvedReference n (Integer 1)))
+        (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
+        (Void Void) (n (Integer 1)) (n_ (ResolvedReference n (Integer 1)))
         (println
          (Function
           (BuiltinFn
@@ -93,7 +98,13 @@ let%expect_test "deep resolution" =
              ((a
                ((field_type (ResolvedReferenceType Int257 (BuiltinType Int257)))))))
             (struct_methods ()) (id <opaque>)))))
-        (Type (Builtin Type)) (Void Void)
+        (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
+        (Void Void)
         (println
          (Function
           (BuiltinFn
@@ -115,8 +126,13 @@ let%expect_test "stripping scope resolution" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (I (Builtin Int257)) (I_ (Builtin Int257))
-        (Int257 (Builtin Int257)) (Type (Builtin Type)) (Void Void)
-        (n (Integer 1)) (n_ (Integer 1))
+        (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
+        (Void Void) (n (Integer 1)) (n_ (Integer 1))
         (println
          (Function
           (BuiltinFn
@@ -139,6 +155,11 @@ let%expect_test "scope resolution within functions" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
         (Void Void) (i (ResolvedReference Int257 (Builtin Int257)))
         (println
          (Function
@@ -187,7 +208,13 @@ let%expect_test "struct definition" =
             ((a ((field_type (BuiltinType Int257))))
              (b ((field_type (BuiltinType Bool))))))
            (struct_methods ()) (id <opaque>))))
-        (Type (Builtin Type)) (Void Void)
+        (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
+        (Void Void)
         (println
          (Function
           (BuiltinFn
@@ -247,6 +274,11 @@ let%expect_test "function" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
         (Void Void)
         (println
          (Function
@@ -271,6 +303,11 @@ let%expect_test "compile-time printing" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
         (Void Void) (a Void)
         (println
          (Function
@@ -310,6 +347,11 @@ let%expect_test "compile-time evaluation" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
         (Void Void)
         (a
          (Function
@@ -319,11 +361,11 @@ let%expect_test "compile-time evaluation" =
             (function_impl
              (((Term
                 (FunctionCall
-                 (Function
-                  (BuiltinFn
-                   ((function_params ((i (BuiltinType Int257))))
-                    (function_returns VoidType) (function_impl <fun>))))
-                 ((Reference i))))
+                 ((Function
+                   (BuiltinFn
+                    ((function_params ((i (BuiltinType Int257))))
+                     (function_returns VoidType) (function_impl <fun>))))
+                  ((Reference i)))))
                (Return (Reference i)))))))))
         (f
          (Function
@@ -371,7 +413,13 @@ let%expect_test "parametric struct instantiation" =
            (Struct
             ((struct_fields ((a ((field_type (BuiltinType Int257))))))
              (struct_methods ()) (id <opaque>))))
-          (Type (Builtin Type)) (Void Void)
+          (Type (Builtin Type))
+          (TypeOf
+           (Function
+            (BuiltinFn
+             ((function_params ((value HoleType)))
+              (function_returns (BuiltinType Type)) (function_impl <fun>)))))
+          (Void Void)
           (println
            (Function
             (BuiltinFn
@@ -390,6 +438,11 @@ let%expect_test "function without a return type" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
         (Void Void) (a (Integer 1))
         (f
          (Function
@@ -418,6 +471,11 @@ let%expect_test "scoping that `let` introduces in code" =
     (Ok
      ((scope
        ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
         (Void Void) (b (Integer 1))
         (f
          (Function
@@ -430,3 +488,52 @@ let%expect_test "scoping that `let` introduces in code" =
           (BuiltinFn
            ((function_params ((value HoleType))) (function_returns VoidType)
             (function_impl <fun>))))))))) |}]
+
+let%expect_test "TypeOf [magic] type function" =
+  (* TODO: it's not perfect yet as return types don't get casted over terms (looking at Integer vs Int257) *)
+  let source =
+    {|
+      let a = 1;
+      fn t() -> Int257 {
+      1
+      }
+      fn f() -> TypeOf(a) {
+       a
+      } 
+      fn f1() -> TypeOf(t()) {
+       a
+      } 
+      |}
+  in
+  pp_stripped source ;
+  [%expect
+    {|
+    (Ok
+     ((scope
+       ((Bool (Builtin Bool)) (Int257 (Builtin Int257)) (Type (Builtin Type))
+        (TypeOf
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType)))
+            (function_returns (BuiltinType Type)) (function_impl <fun>)))))
+        (Void Void) (a (Integer 1))
+        (f
+         (Function
+          (Fn
+           ((function_params ()) (function_returns IntegerType)
+            (function_impl (((Return (Integer 1)))))))))
+        (f1
+         (Function
+          (Fn
+           ((function_params ()) (function_returns IntegerType)
+            (function_impl (((Return (Integer 1)))))))))
+        (println
+         (Function
+          (BuiltinFn
+           ((function_params ((value HoleType))) (function_returns VoidType)
+            (function_impl <fun>)))))
+        (t
+         (Function
+          (Fn
+           ((function_params ()) (function_returns (BuiltinType Int257))
+            (function_impl (((Return (Integer 1))))))))))))) |}]
