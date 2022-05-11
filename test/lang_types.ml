@@ -32,7 +32,7 @@ let compile s =
 
 let test_alias () =
   let source = {|
-  struct T { a: Int257 }
+  struct T { val a: Int257 }
   let T1 = T; 
   |} in
   Alcotest.(check bool)
@@ -47,10 +47,12 @@ let test_alias () =
      Lang.equal_term t t1 )
 
 let test_carbon_copy () =
-  let source = {|
-  struct T { a: Int257 }
-  struct T1 { a: Int257 }
-  |} in
+  let source =
+    {|
+  struct T { val a: Int257 }
+  struct T1 { val a: Int257 }
+  |}
+  in
   Alcotest.(check bool)
     "carbon copy types are not the same" false
     (let scope = (compile source (make_errors ())).scope in
@@ -65,7 +67,7 @@ let test_carbon_copy () =
 let test_parameterized () =
   let source =
     {|
-  struct T(X: Type) { a: X }
+  struct T(X: Type) { val a: X }
   let T1 = T(Int257);
   let T2 = T(Bool);
   let T3 = T(Int257);

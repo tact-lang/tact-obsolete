@@ -75,10 +75,12 @@ let%expect_test "scope resolution" =
             (function_impl <fun>))))))))) |}]
 
 let%expect_test "deep resolution" =
-  let source = {|
-      let T = struct {a: Int257};
+  let source =
+    {|
+      let T = struct {val a: Int257};
       let T1 = T;
-    |} in
+    |}
+  in
   pp source ;
   [%expect
     {|
@@ -191,8 +193,8 @@ let%expect_test "struct definition" =
   let source =
     {|
   let MyType = struct {
-       a: Int257,
-       b: Bool
+       val a: Int257
+       val b: Bool
   };
   |}
   in
@@ -246,8 +248,8 @@ let%expect_test "duplicate type field" =
   let source =
     {|
   let MyType = struct {
-      a: Int257,
-      a: Bool
+      val a: Int257
+      val a: Bool
   };
   |}
   in
@@ -389,7 +391,7 @@ let%expect_test "compile-time evaluation" =
 let%expect_test "parametric struct instantiation" =
   let source =
     {|
-      struct T(A: Type) { a: A }
+      struct T(A: Type) { val a: A }
       let TA = T(Int257);
    |}
   in
