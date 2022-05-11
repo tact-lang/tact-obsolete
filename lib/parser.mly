@@ -50,7 +50,7 @@ They are equivalent to these:
 
 ```
 let S = struct { ... }
-let S(T: Type) = struct {v: T}
+let S(T: Type) = struct {val v: T}
 ```
 
 Same applies to enums, interfaces, unions and fns
@@ -253,9 +253,7 @@ let params ==
 (* Struct
 
    struct {
-    field_name: <expression>,
-    // or a shorthand version for a type-named field:
-    Type,
+    val field_name: <type expression>
     ...
     
     fn name(...) -> ... { ... }
@@ -269,17 +267,15 @@ let params ==
 let struct_definition(name) ==
   STRUCT;
   n = name;
-  (fields, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, struct_fields, COMMA, list(sugared_function_definition), RBRACE);
+  (fields, bindings) = delimited(LBRACE, pair(list(struct_field), list(sugared_function_definition)), RBRACE);
   { (n, Struct (make_struct_definition ~fields: fields ~struct_bindings: bindings  ())) }
 
 (* Struct field
 
-   field_name: <expression>
-   FieldName
+   val field_name: <type expression>
 *)
-let struct_fields ==
-| located ( name = located(ident); COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
-| located ( name = located(ident); { make_struct_field ~field_name: name ~field_type: (make_located ~loc: (loc name) ~value: (Reference (value name)) ()) () } )
+let struct_field ==
+| located ( VAL ; name = located(ident); COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
 
 (* Struct constructor 
  *
@@ -353,8 +349,8 @@ let enum_member ==
 (* Union
 
   union {
-    member,
-    member,
+    case member_type
+    case member_type
     ...
 
     fn name(...) -> ... { ... }
@@ -363,13 +359,12 @@ let enum_member ==
   }
 
   * Empty unions are allowed
-  * Trailing commas are allowed
 
 *)
 let union_definition(name) ==
   UNION;
   n = name;
-  (members, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, located(union_member), COMMA, list(sugared_function_definition), RBRACE);  
+  (members, bindings) = delimited(LBRACE, pair(list(preceded(CASE, located(union_member))), list(sugared_function_definition)), RBRACE);  
   { (n, Union (make_union_definition ~union_members: members ~union_bindings: bindings ())) }
 
 let union_member :=

@@ -46,6 +46,8 @@ rule token = parse
  | "if" { IF }
  | "else" { ELSE }
  | "return" { RETURN }
+ | "val" { VAL }
+ | "case" { CASE }
  | '-'? integer_with_underscores as i { INT (Z.of_string i) }
  | ident { IDENT (Lexing.lexeme lexbuf) }
  | eof { EOF }
