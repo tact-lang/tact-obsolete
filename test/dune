@@ -1,14 +1,14 @@
 (library
  (preprocess
-  (staged_pps ppx_matches ppx_expect))
+  (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
  (name tact_tests)
  (inline_tests)
- (modules syntax lang)
+ (modules syntax evaluator)
  (libraries tact core sexplib))
 
 (tests
  (preprocess
   (staged_pps ppx_matches))
- (names lang_types)
- (modules lang_types)
+ (names lang_types errors)
+ (modules lang_types errors)
  (libraries tact alcotest ppx_matches core))

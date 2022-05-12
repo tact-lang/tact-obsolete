@@ -1,34 +1,34 @@
 module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
 module Lang = Tact.Lang.Make (Syntax)
-open Lang
+module E = Tact.Evaluator.Make (Syntax)
+module Errors = Tact.Errors
+module Zint = Tact.Zint
 open Core
 
-let make_errors () = make_error_list ~warnings:(ref []) ~errors:(ref []) ()
+let make_errors () = new Errors.errors
 
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
-let build_program stx =
-  let elist = make_errors () in
-  let env = env_from_program stx elist in
-  match (!(elist.errors), !(elist.warnings)) with
-  | [], _ ->
-      Ok env
-  | errors, _ ->
-      Error errors
+let build_program ?(errors = make_errors ()) ?(bindings = E.default_bindings) p
+    =
+  let c = new Lang.of_syntax_converter (bindings, errors) in
+  let p' = c#visit_program () p in
+  let c = new Lang.reference_resolver (p'.bindings, errors) in
+  let p' = c#visit_program () p' in
+  let p' = (new E.evaluator (p', errors))#visit_program () p' in
+  errors#to_result p'
+  |> Result.map_error ~f:(fun errors ->
+         List.map errors ~f:(fun (_, err, _) -> err) )
 
 let pp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
 exception Exn of Lang.error list
 
 let compile s =
-  let env =
-    parse_program s |> build_program
-    |> Result.map_error ~f:(fun err -> Exn err)
-    |> Result.ok_exn
-  in
-  let env = (new Lang.resolved_references_stripper env)#visit_env () env in
-  Lang.eval_env env
+  parse_program s |> build_program
+  |> Result.map_error ~f:(fun err -> Exn err)
+  |> Result.ok_exn
 
 let test_alias () =
   let source = {|
@@ -37,10 +37,10 @@ let test_alias () =
   |} in
   Alcotest.(check bool)
     "aliased types are the same" true
-    (let scope = (compile source (make_errors ())).scope in
-     let t = Lang.in_amap scope (fun m -> Map.find m "T") |> Option.value_exn
+    (let scope = (compile source).bindings in
+     let t = List.Assoc.find scope ~equal:String.equal "T" |> Option.value_exn
      and t1 =
-       Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
+       List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      in
      pp (Lang.sexp_of_term t) ;
      pp (Lang.sexp_of_term t1) ;
@@ -55,10 +55,10 @@ let test_carbon_copy () =
   in
   Alcotest.(check bool)
     "carbon copy types are not the same" false
-    (let scope = (compile source (make_errors ())).scope in
-     let t = Lang.in_amap scope (fun m -> Map.find m "T") |> Option.value_exn
+    (let scope = (compile source).bindings in
+     let t = List.Assoc.find scope ~equal:String.equal "T" |> Option.value_exn
      and t1 =
-       Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
+       List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      in
      pp (Lang.sexp_of_term t) ;
      pp (Lang.sexp_of_term t1) ;
@@ -75,20 +75,20 @@ let test_parameterized () =
   in
   Alcotest.(check bool)
     "differently parameterized types are not the same" false
-    (let scope = (compile source (make_errors ())).scope in
-     let t1 = Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
+    (let scope = (compile source).bindings in
+     let t1 = List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      and t2 =
-       Lang.in_amap scope (fun m -> Map.find m "T2") |> Option.value_exn
+       List.Assoc.find scope ~equal:String.equal "T2" |> Option.value_exn
      in
      pp (Lang.sexp_of_term t1) ;
      pp (Lang.sexp_of_term t2) ;
      Lang.equal_term t1 t2 ) ;
   Alcotest.(check bool)
     "equally parameterized types are the same" true
-    (let scope = (compile source (make_errors ())).scope in
-     let t1 = Lang.in_amap scope (fun m -> Map.find m "T1") |> Option.value_exn
+    (let scope = (compile source).bindings in
+     let t1 = List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      and t3 =
-       Lang.in_amap scope (fun m -> Map.find m "T3") |> Option.value_exn
+       List.Assoc.find scope ~equal:String.equal "T3" |> Option.value_exn
      in
      pp (Lang.sexp_of_term t1) ;
      pp (Lang.sexp_of_term t3) ;

@@ -5,66 +5,54 @@ functor
   (Syntax : Syntax.T)
   ->
   struct
-    (* Error management *)
-    type ('w, 'e) error_list =
-      {mutable warnings : 'w list ref; mutable errors : 'e list ref}
-    [@@deriving make]
-
-    let new_warn warn errors = errors.warnings := !(errors.warnings) @ [warn]
-
-    let new_error error errors = errors.errors := !(errors.errors) @ [error]
-
-    (* *)
+    open Errors
 
     class ['s] base_map =
       object (_ : 's)
-        method visit_z : 'env. 'env -> Z.t -> Z.t = fun _env z -> z
+        inherit ['s] Zint.map
       end
 
-    (* Z wrapper to enable show derivation *)
-    module Z' = struct
-      type t = [%import: Z.t]
+    type 'a named_map = (string * 'a) list
 
-      let pp = Z.pp_print
-    end
-
-    type z = Z'.t [@@deriving show {with_path = false}]
-
-    let sexp_of_z z = Sexplib.Sexp.of_string (Z.to_string z)
-
-    let equal_z = Z.equal
-
-    type 'a named_map = ((string * 'a) list[@sexp.list])
-
-    and function_call = term * term list
+    and program = {stmts : stmt list; [@sexp.list] bindings : term named_map}
 
     and term =
+      | FunctionCall of (function_call * (term option[@sexp.option]) ref)
+        (* term option is cached result *)
+      | Reference of string
       | Void
       | Struct of struct_
       | Function of function_
-      | FunctionCall of function_call
-      | Integer of (z[@visitors.name "z"])
-      | Reference of string
-      | ResolvedReference of string * term
+      | Integer of (Zint.t[@visitors.name "z"])
       | Builtin of builtin
-      | Invalid
       | Hole
-      | Type of type_
+      | InvalidTerm
+
+    and stmt =
+      | Let of term named_map
+      | Return of term
+      | Break of stmt
+      | Term of term
+      | Invalid
 
     and builtin = string
 
     and type_ =
+      | IntegerType
       | VoidType
       | BuiltinType of builtin
       | StructType of struct_
       | FunctionType of function_
-      | ReferenceType of string
-      | ResolvedReferenceType of string * type_
-      | PendingType of function_call
-      | TermType of term
       | HoleType
+      | ReferenceType of string
       | InvalidType
-      | IntegerType
+
+    and struct_ =
+      { struct_fields : struct_field named_map;
+        struct_methods : function_ named_map;
+        struct_id : (int[@sexp.opaque]) }
+
+    and struct_field = {field_type : type_}
 
     and 'a typed_fn =
       { function_params : type_ named_map;
@@ -76,45 +64,20 @@ functor
     and fn = function_body typed_fn
 
     and native_function =
-      (env -> term list -> term[@visitors.opaque] [@equal.ignore])
+      (program -> term list -> term[@visitors.opaque] [@equal.ignore])
 
     and builtin_fn = native_function typed_fn
 
-    and function_ = Fn of fn | BuiltinFn of builtin_fn
+    and function_ = Fn of fn | BuiltinFn of builtin_fn | InvalidFn
 
-    and stmt =
-      | Let of string * term * (stmt list[@sexp.list])
-      | Return of term
-      | Term of term
-
-    and struct_ =
-      { struct_fields : struct_field named_map;
-        struct_methods : function_ named_map;
-        id : (int[@sexp.opaque]) }
-
-    and struct_field = {field_type : type_}
-
-    and env = {scope : scope}
-
-    and scope = term named_map
+    and function_call = term * term list
     [@@deriving
       equal,
         sexp_of,
-        visitors
-          { variety = "map";
-            polymorphic = true;
-            concrete = true;
-            ancestors = ["base_map"] }]
-
-    let as_amap (l : 'a named_map) f =
-      Map.to_alist (f (Map.of_alist_exn (module String) l))
-
-    let in_amap (l : 'a named_map) f = f (Map.of_alist_exn (module String) l)
+        visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]}]
 
     let term_to_type value =
       match value with
-      | Reference value ->
-          ReferenceType value
       | Struct struct_ ->
           StructType struct_
       | Function function_ ->
@@ -125,61 +88,13 @@ functor
           VoidType
       | Hole ->
           HoleType
-      | FunctionCall fc ->
-          PendingType fc
-      | Integer _ ->
-          IntegerType
+      | FunctionCall ((Function (Fn {function_returns; _}), _), _)
+      | FunctionCall ((Function (BuiltinFn {function_returns; _}), _), _) ->
+          function_returns
+      | Reference ref ->
+          ReferenceType ref
       | _ ->
-          TermType value
-      [@@deriving sexp_of]
-
-    type error =
-      | Duplicate_Identifier of string * term
-      | Duplicate_Field of string * struct_
-      | Duplicate_Param of string * function_
-      | Invalid_Param_Type of string * function_
-      | Invalid_Return_Type of function_
-      | Unresolved of string
-      | Recursive_Reference of string
-      | Unsupported
-    [@@deriving sexp_of]
-
-    type elist = (string, error) error_list
-
-    let comptime_println _env = function
-      | arg :: _ ->
-          let f = Caml.Format.std_formatter in
-          Sexplib.Sexp.pp_hum f (sexp_of_term arg) ;
-          Caml.Format.pp_print_newline f () ;
-          Void
-      | _ ->
-          Invalid
-
-    let comptime_typeof _env = function
-      | arg :: _ ->
-          Type (term_to_type arg)
-      | _ ->
-          Invalid
-
-    let default_scope =
-      [ ("Void", Void);
-        ("Type", Builtin "Type");
-        ("Int257", Builtin "Int257");
-        ("Bool", Builtin "Bool");
-        ( "TypeOf",
-          Function
-            (BuiltinFn
-               { function_params = [("value", HoleType)];
-                 function_returns = BuiltinType "Type";
-                 function_impl = comptime_typeof } ) );
-        ( "println",
-          Function
-            (BuiltinFn
-               { function_params = [("value", HoleType)];
-                 function_returns = VoidType;
-                 function_impl = comptime_println } ) ) ]
-
-    let default_env = {scope = default_scope}
+          InvalidType
 
     let rec is_immediate_term = function
       | Void ->
@@ -188,394 +103,191 @@ functor
           true
       | Function _ ->
           true
-      | FunctionCall _ ->
-          false
+      | FunctionCall ((_, args), _) ->
+          are_immediate_arguments args
       | Integer _ ->
           true
-      | Reference _ ->
-          false
-      | ResolvedReference (_, t) ->
-          is_immediate_term t
       | Builtin _ ->
           true
       | Hole ->
           false
-      | Type _ ->
-          true
-      | Invalid ->
+      | Reference _ ->
+          false
+      | InvalidTerm ->
           false
 
-    (* Resolves referenced types *)
-    class ['s] reference_resolver ((env, errors) : env * elist) =
+    and are_immediate_arguments args =
+      Option.is_none (List.find args ~f:(fun a -> not (is_immediate_term a)))
+
+    type error =
+      [ `DuplicateField of string * struct_
+      | `UnresolvedIdentifier of string
+      | `UnexpectedTerm of term
+      | `Unsupported ]
+    [@@deriving equal, sexp_of]
+
+    let default_bindings =
+      [ ("Int257", Builtin "Int257");
+        ("Bool", Builtin "Bool");
+        ("Type", Builtin "Type");
+        ("Void", Void) ]
+
+    class ['s] of_syntax_converter
+      ((bindings, errors) : term named_map * _ errors) =
+      object (s : 's)
+        inherit ['s] Syntax.visitor
+
+        val mutable next_struct_id = 0
+
+        method build_CodeBlock _env _code_block = Invalid
+
+        method build_Enum _env _enum = InvalidTerm
+
+        method build_FieldAccess _env _fieldaccess = InvalidTerm
+
+        method build_Function _env fn = Function (Fn fn)
+
+        method build_FunctionCall _env fc = FunctionCall (fc, ref None)
+
+        method build_Ident _env string_ = string_
+
+        method build_If _env _if = Invalid
+
+        method build_Int _env i = Integer i
+
+        method build_Interface _env _iface = InvalidTerm
+
+        method build_Let _env let_ =
+          let name, expr = Syntax.value let_ in
+          Let [(name, expr)]
+
+        method build_MutRef _env _mutref = InvalidTerm
+
+        method build_Reference _env ref = Reference ref
+
+        method build_Return _env return = Return return
+
+        method build_Break _env stmt = Break stmt
+
+        method build_Struct _env s = Struct s
+
+        method build_StructConstructor _env _sc = InvalidTerm
+
+        method build_Union _env _union = InvalidTerm
+
+        method build_Expr _env expr = Term expr
+
+        method build_binding _env name expr =
+          (Syntax.value name, Syntax.value expr)
+
+        method build_enum_definition _env _members _bindings = ()
+
+        method build_enum_member _env _name _value = ()
+
+        method build_field_access _env _expr _field = ()
+
+        method build_function_call _env fn args =
+          (Syntax.value fn, s#of_located_list args)
+
+        method build_function_definition _env _name params returns body =
+          { function_params =
+              s#of_located_list params
+              |> List.map ~f:(fun (name, type_) ->
+                     (Syntax.value name, Syntax.value type_ |> term_to_type) );
+            function_returns =
+              returns
+              |> Option.map ~f:(fun x -> Syntax.value x |> term_to_type)
+              |> Option.value ~default:HoleType;
+            function_impl = Option.map body ~f:s#of_located_list }
+
+        method build_if_ _env _condition _then _else = ()
+
+        method build_interface_definition _env _members = ()
+
+        method build_program _env stmts =
+          {stmts = s#of_located_list stmts; bindings}
+
+        method build_struct_constructor _env _id _fields = ()
+
+        method build_struct_definition _env struct_fields _bindings =
+          let fields = s#of_located_list struct_fields in
+          let s' =
+            { struct_fields = fields;
+              struct_methods = [];
+              (* TODO: methods *)
+              struct_id = next_struct_id }
+          in
+          (* Check for duplicate fields *)
+          ( match
+              List.find_a_dup fields ~compare:(fun (name1, _) (name2, _) ->
+                  String.compare name1 name2 )
+            with
+          | Some (name, _) ->
+              errors#report `Error (`DuplicateField (name, s')) ()
+          | None ->
+              () ) ;
+          (* Increment next struct's ID *)
+          next_struct_id <- next_struct_id + 1 ;
+          s'
+
+        method build_struct_field _env field_name field_type =
+          ( Syntax.value field_name,
+            {field_type = Syntax.value field_type |> term_to_type} )
+
+        method build_union_definition _env _members _bindings = ()
+
+        method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
+          List.map ~f:Syntax.value
+      end
+
+    class ['s] reference_resolver
+      ((bindings, errors) : term named_map * _ errors) =
       object (s : 's)
         inherit ['s] map as super
 
-        val p_env = env
+        val mutable current_bindings = [bindings]
 
-        val p_errors = errors
-
-        val mutable lookup_path = []
-
-        val mutable scoped_identifiers = []
-
-        method! visit_fn env fn =
-          let scoped_identifiers' = scoped_identifiers in
-          scoped_identifiers <-
-            List.map fn.function_params ~f:(fun (n, _) -> n)
-            :: scoped_identifiers' ;
-          let fn' = super#visit_fn env fn in
-          scoped_identifiers <- scoped_identifiers' ;
-          fn'
-
-        method private scoped_identifier ref =
-          Option.is_some
-            (List.find scoped_identifiers ~f:(fun terms ->
-                 Option.is_some (List.find terms ~f:(String.equal ref)) ) )
-
-        method private find_ref : 'env. 'env -> string -> term option =
-          fun env ref ->
-            match in_amap p_env.scope (fun m -> Map.find m ref) with
-            | Some (Reference ref') ->
-                if List.exists lookup_path ~f:(String.equal ref') then (
-                  new_error (Recursive_Reference ref) p_errors ;
-                  None )
-                else
-                  let path = lookup_path in
-                  lookup_path <- ref :: lookup_path ;
-                  let t = s#find_ref env ref' in
-                  lookup_path <- path ;
-                  t
-            | Some (ResolvedReference (_, t)) | Some t ->
-                Some (s#visit_term env t)
-            | None ->
-                None
-
-        method! visit_Reference env ref =
-          if s#scoped_identifier ref then Reference ref
-          else
-            match s#find_ref env ref with
-            | Some (ResolvedReference (_, t)) | Some t ->
-                ResolvedReference (ref, t)
-            | None ->
-                new_error (Unresolved ref) p_errors ;
-                Reference ref
-
-        method! visit_ReferenceType env ref =
-          if s#scoped_identifier ref then ReferenceType ref
-          else
-            match s#find_ref env ref with
-            | Some (ResolvedReference (_, t)) | Some t ->
-                ResolvedReferenceType (ref, term_to_type t)
-            | None ->
-                new_error (Unresolved ref) p_errors ;
-                ReferenceType ref
-
-        method! visit_Let env name term stmts =
-          let scoped_identifiers' = scoped_identifiers in
-          scoped_identifiers <- [name] :: scoped_identifiers ;
-          let name = s#visit_string env name in
-          let term = s#visit_term env term in
-          let stmts = List.map stmts ~f:(s#visit_stmt env) in
-          let let_ = Let (name, term, stmts) in
-          scoped_identifiers <- scoped_identifiers' ;
-          let_
-      end
-
-    (* Strips resolved references types *)
-    class ['s] resolved_references_stripper (env : env) =
-      object (s : 's)
-        inherit ['s] map
-
-        val p_env = env
-
-        method! visit_ResolvedReference env _ t = s#visit_term env t
-
-        method! visit_ResolvedReferenceType env _ k = s#visit_type_ env k
-      end
-
-    (* Evaluates compile-time function calls *)
-    class ['s] function_call_evaluator ((env, errors) : env * elist) =
-      object (s : 's)
-        inherit ['s] map
-
-        val p_env = env
-
-        method private interpret_function fn args =
-          let env = p_env in
-          let args' =
-            List.map (List.zip_exn fn.function_params args)
-              ~f:(fun ((n, _), a) -> (n, a))
-          in
-          let env' = {scope = args' @ env.scope} in
-          let stripped =
-            equal_env env'
-              ((new resolved_references_stripper env)#visit_env () env')
-          in
-          let statements =
-            List.map (Option.value fn.function_impl ~default:[]) ~f:(fun stmt ->
-                let stmt =
-                  (new reference_resolver
-                     (env', {warnings = ref []; errors = ref []}) )
-                    #visit_stmt () stmt
-                in
-                let stmt =
-                  if stripped then
-                    (new resolved_references_stripper env')#visit_stmt () stmt
-                  else stmt
-                in
-                let fce : 's = new function_call_evaluator (env', errors) in
-                fce#visit_stmt () stmt )
-          in
-          let rec iterate statements env =
-            List.fold_until ~init:Void
-              ~f:
-                (fun _ -> function
-                  | Let (name, term, statements) ->
-                      Continue
-                        (iterate statements
-                           {scope = (name, eval_term env term) :: env.scope} )
-                  | Return term ->
-                      Stop (eval_term env term)
-                  | Term term ->
-                      Continue (eval_term env term) )
-              ~finish:(fun state -> state)
-              statements
-          and resolve_ref env term =
-            let term =
-              (new reference_resolver (env, errors))#visit_term () term
-            in
-            let term =
-              (new resolved_references_stripper env)#visit_term () term
-            in
-            term
-          and eval_term env term =
-            match term with
-            | Reference ref ->
-                resolve_ref env (Reference ref)
-            | term ->
-                term
-          in
-          iterate statements env'
-
-        method! visit_FunctionCall env (f, args) =
-          let f, args = s#visit_function_call env (f, args) in
-          let immediate_arguments =
-            Option.is_none
-              (List.find args ~f:(fun a -> not (is_immediate_term a)))
-          in
-          let rewrite_fn fn =
-            let has_body = Option.is_some fn.function_impl in
-            if immediate_arguments && has_body then s#interpret_function fn args
-            else FunctionCall (Function (Fn fn), args)
-          in
-          match f with
-          | Function (BuiltinFn {function_impl; _})
-          | ResolvedReference (_, Function (BuiltinFn {function_impl; _}))
-            when immediate_arguments ->
-              function_impl p_env args
-          | Function (Fn fn) ->
-              rewrite_fn fn
-          | ResolvedReference (n, Function (Fn fn)) ->
-              ResolvedReference (n, rewrite_fn fn)
-          | _ ->
-              FunctionCall (f, args)
-
-        method! visit_PendingType env fc =
-          match s#visit_FunctionCall env fc with
-          | Type t ->
+        method! visit_Reference _env ref =
+          match s#resolve ref with
+          | Some t ->
               t
-          | _ ->
-              InvalidType
-      end
+          | None ->
+              errors#report `Error (`UnresolvedIdentifier ref) () ;
+              Reference ref
 
-    (* Assigns unique identifiers to types *)
-    class ['s] struct_unique_id_assigner (env : env) =
-      object (_ : 's)
-        inherit ['s] map
+        method! visit_ReferenceType _env ref =
+          match s#resolve ref with
+          | Some t ->
+              term_to_type t
+          | None ->
+              errors#report `Error (`UnresolvedIdentifier ref) () ;
+              ReferenceType ref
 
-        val p_env = env
+        method! visit_Let env bindings =
+          current_bindings <- bindings :: current_bindings ;
+          super#visit_Let env bindings
 
-        val mutable counter = 0
+        (* Do not cross the function boundary *)
+        method! visit_function_body _env b = b
 
-        method! visit_struct_ _env t =
-          let t' = {t with id = counter} in
-          counter <- counter + 1 ;
-          t'
-      end
-
-    let rec env_from_program ?(env = default_env) (stx : Syntax.program)
-        (elist : elist) =
-      let scope = scope_from_bindings stx.bindings elist ~scope:env.scope in
-      let env = {scope} in
-      (* Resolve references inside *)
-      let env = (new struct_unique_id_assigner env)#visit_env () env in
-      let env = (new reference_resolver (env, elist))#visit_env () env in
-      env
-
-    and eval_env env errors =
-      let evaluator = new function_call_evaluator (env, errors) in
-      evaluator#visit_env () env
-
-    and scope_from_bindings ?(scope = default_scope) bindings elist =
-      List.fold ~init:scope
-        ~f:(fun scope binding ->
-          let binding = Syntax.value binding in
-          let ident =
-            Syntax.ident_to_string (Syntax.value binding.binding_name)
+        method! visit_program env program =
+          (* process statements first *)
+          let program = super#visit_program env program in
+          (* process new bindings *)
+          let program' =
+            super#visit_program env
+              {stmts = []; bindings = List.concat current_bindings}
           in
-          match in_amap scope (fun m -> Map.find m ident) with
-          | None -> (
-            match binding_to_term binding elist with
-            | Ok data ->
-                as_amap scope (fun m -> Map.set m ~key:ident ~data)
-            | Error e ->
-                new_error e elist ; scope )
-          | Some existing ->
-              new_error (Duplicate_Identifier (ident, existing)) elist ;
-              scope )
-        bindings
+          {(super#visit_program env program') with stmts = program.stmts}
 
-    and binding_to_term binding elist =
-      expr_to_term (Syntax.value binding.binding_expr) () elist
-
-    and expr_to_term expr loc elist =
-      match expr with
-      | Struct s ->
-          Ok (struct_to_struct s loc elist)
-      | Int i ->
-          Ok (Integer i)
-      | Reference ref ->
-          Ok (Reference (Syntax.ident_to_string ref))
-      | Function f ->
-          Ok (function_to_function f loc elist)
-      | FunctionCall fc ->
-          Ok (function_call_to_function_call fc elist)
-      | _ ->
-          Error Unsupported
-
-    and struct_to_struct s _loc elist =
-      let s' = {struct_fields = []; struct_methods = []; id = 0} in
-      let s =
-        List.fold ~init:s'
-          ~f:(fun s' field ->
-            let ident =
-              Syntax.ident_to_string
-                ((Syntax.value field).field_name |> Syntax.value)
-            in
-            match in_amap s'.struct_fields (fun m -> Map.find m ident) with
-            | Some _ ->
-                new_error (Duplicate_Field (ident, s')) elist ;
-                s'
-            | None -> (
-                let value =
-                  expr_to_term
-                    ((Syntax.value field).field_type |> Syntax.value)
-                    () elist
-                in
-                match Result.map value ~f:term_to_type with
-                | Ok value ->
-                    { s' with
-                      struct_fields =
-                        as_amap s'.struct_fields (fun m ->
-                            Map.set m ~key:ident ~data:{field_type = value} ) }
-                | Error e ->
-                    new_error e elist ; s' ) )
-          s.fields
-      in
-      Struct s
-
-    and block_to_stmts exprs elist =
-      match exprs with
-      | Syntax.Let binding :: rest -> (
-          let binding = Syntax.value binding in
-          match expr_to_term (Syntax.value binding.binding_expr) () elist with
-          | Ok t ->
-              [ Let
-                  ( Syntax.ident_to_string (Syntax.value binding.binding_name),
-                    t,
-                    List.rev (block_to_stmts rest elist) ) ]
-          | Error _ ->
-              [] )
-      | Syntax.Return expr :: rest -> (
-        match expr_to_term expr () elist with
-        | Ok t ->
-            Return t :: block_to_stmts rest elist
-        | Error _ ->
-            block_to_stmts rest elist )
-      | expr :: rest -> (
-        match expr_to_term expr () elist with
-        | Ok t ->
-            Term t :: block_to_stmts rest elist
-        | Error _ ->
-            block_to_stmts rest elist )
-      | [] ->
-          []
-
-    and function_to_function f _loc elist =
-      (* return type *)
-      let return =
-        match
-          Option.map f.returns ~f:(fun e ->
-              expr_to_term (Syntax.value e) () elist )
-          |> Option.value ~default:(Ok Hole)
-        with
-        | Ok v ->
-            v
-        | Error err ->
-            new_error err elist ; Invalid
-      in
-      let f' =
-        { function_params = [];
-          function_returns = TermType return;
-          function_impl =
-            Option.map f.exprs ~f:(fun exprs ->
-                block_to_stmts (List.map exprs ~f:Syntax.value) elist ) }
-      in
-      let f' =
-        { f' with
-          function_returns =
-            ( match term_to_type return with
-            | TermType _value ->
-                new_error (Invalid_Return_Type (Fn f')) elist ;
-                f'.function_returns
-            | type_ ->
-                type_ ) }
-      in
-      (* collect params *)
-      let f =
-        List.fold ~init:f'
-          ~f:(fun f' param ->
-            let name, expr = Syntax.value param in
-            let ident = Syntax.ident_to_string (Syntax.value name) in
-            match in_amap f'.function_params (fun m -> Map.find m ident) with
-            | Some _ ->
-                new_error (Duplicate_Param (ident, Fn f')) elist ;
-                f'
-            | None -> (
-                let value = expr_to_term (Syntax.value expr) () elist in
-                match Result.map value ~f:term_to_type with
-                | Ok (TermType _) ->
-                    new_error (Invalid_Param_Type (ident, Fn f')) elist ;
-                    f'
-                | Ok type_ ->
-                    { f' with
-                      function_params =
-                        as_amap f'.function_params (fun m ->
-                            Map.set m ~key:ident ~data:type_ ) }
-                | Error e ->
-                    new_error e elist ; f' ) )
-          f.params
-      in
-      Function (Fn f)
-
-    and function_call_to_function_call fc elist =
-      let args =
-        List.map fc.arguments ~f:(fun x ->
-            result_to_term (expr_to_term (Syntax.value x) () elist) elist )
-      in
-      FunctionCall
-        (result_to_term (expr_to_term (Syntax.value fc.fn) () elist) elist, args)
-
-    and result_to_term r elist =
-      match r with Ok t -> t | Error e -> new_error e elist ; Invalid
+        method private resolve ref =
+          match
+            List.find_map current_bindings ~f:(fun bindings ->
+                List.Assoc.find bindings ~equal:String.equal ref )
+          with
+          | Some (Reference ref') ->
+              s#resolve ref'
+          | other ->
+              other
+      end
   end
