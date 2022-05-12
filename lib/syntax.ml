@@ -54,7 +54,9 @@ module type T = sig
     { name : ident located option;
       params : function_param located list;
       returns : expr located option;
-      function_stmts : stmt located list option }
+      function_body : function_body option }
+
+  and function_body = {function_stmts : stmt located list}
 
   and binding = {binding_name : ident located; binding_expr : expr located}
 
@@ -71,7 +73,8 @@ module type T = sig
   class virtual ['c] visitor :
     object ('c)
       constraint
-      'c = < build_CodeBlock : 'd -> 'g located list -> 'g
+      'c = < build_Break : 'd -> 'g -> 'g
+           ; build_CodeBlock : 'd -> 'g located list -> 'g
            ; build_Enum : 'd -> 'h -> 'i
            ; build_Expr : 'd -> 'i -> 'g
            ; build_FieldAccess : 'd -> 'j -> 'i
@@ -85,7 +88,6 @@ module type T = sig
            ; build_MutRef : 'd -> 'm located -> 'i
            ; build_Reference : 'd -> 'm -> 'i
            ; build_Return : 'd -> 'i -> 'g
-           ; build_Break : 'd -> 'g -> 'g
            ; build_Struct : 'd -> 'q -> 'i
            ; build_StructConstructor : 'd -> 'r -> 'i
            ; build_Union : 'd -> 's -> 'i
@@ -94,13 +96,14 @@ module type T = sig
                'd -> 't located list -> 'p located list -> 'h
            ; build_enum_member : 'd -> 'm located -> 'i located option -> 't
            ; build_field_access : 'd -> 'i located -> 'm located -> 'j
+           ; build_function_body : 'd -> 'g located list -> 'u
            ; build_function_call : 'd -> 'i located -> 'i located list -> 'l
            ; build_function_definition :
                'd ->
                'm located option ->
                ('m located * 'i located) located list ->
                'i located option ->
-               'g located list option ->
+               'u option ->
                'k
            ; build_if_ :
                'd ->
@@ -109,14 +112,15 @@ module type T = sig
                'g located option ->
                'n
            ; build_interface_definition : 'd -> 'p located list -> 'o
-           ; build_program : 'd -> 'g located list -> 'u
+           ; build_program : 'd -> 'g located list -> 'v
            ; build_struct_constructor :
                'd -> 'i located option -> ('m located * 'i located) list -> 'r
            ; build_struct_definition :
-               'd -> 'v located list -> 'p located list -> 'q
-           ; build_struct_field : 'd -> 'm located -> 'i located -> 'v
+               'd -> 'w located list -> 'p located list -> 'q
+           ; build_struct_field : 'd -> 'm located -> 'i located -> 'w
            ; build_union_definition :
                'd -> 'i located list -> 'p located list -> 's
+           ; visit_Break : 'd -> stmt -> 'g
            ; visit_CodeBlock : 'd -> stmt located list -> 'g
            ; visit_Enum : 'd -> enum_definition -> 'i
            ; visit_Expr : 'd -> expr -> 'g
@@ -131,7 +135,6 @@ module type T = sig
            ; visit_MutRef : 'd -> ident located -> 'i
            ; visit_Reference : 'd -> ident -> 'i
            ; visit_Return : 'd -> expr -> 'g
-           ; visit_Break : 'd -> stmt -> 'g
            ; visit_Struct : 'd -> struct_definition -> 'i
            ; visit_StructConstructor : 'd -> struct_constructor -> 'i
            ; visit_Union : 'd -> union_definition -> 'i
@@ -140,6 +143,7 @@ module type T = sig
            ; visit_enum_member : 'd -> enum_member -> 't
            ; visit_expr : 'd -> expr -> 'i
            ; visit_field_access : 'd -> field_access -> 'j
+           ; visit_function_body : 'd -> function_body -> 'u
            ; visit_function_call : 'd -> function_call -> 'l
            ; visit_function_definition : 'd -> function_definition -> 'k
            ; visit_function_param :
@@ -150,14 +154,16 @@ module type T = sig
            ; visit_located :
                'env 'a 'b.
                ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
-           ; visit_program : 'd -> program -> 'u
+           ; visit_program : 'd -> program -> 'v
            ; visit_stmt : 'd -> stmt -> 'g
            ; visit_struct_constructor : 'd -> struct_constructor -> 'r
            ; visit_struct_definition : 'd -> struct_definition -> 'q
-           ; visit_struct_field : 'd -> struct_field -> 'v
+           ; visit_struct_field : 'd -> struct_field -> 'w
            ; visit_union_definition : 'd -> union_definition -> 's
            ; visit_z : 'env. 'env -> Zint.t -> Zint.t
            ; .. >
+
+      method virtual build_Break : 'd -> 'g -> 'g
 
       method virtual build_CodeBlock : 'd -> 'g located list -> 'g
 
@@ -187,8 +193,6 @@ module type T = sig
 
       method virtual build_Return : 'd -> 'i -> 'g
 
-      method virtual build_Break : 'd -> 'g -> 'g
-
       method virtual build_Struct : 'd -> 'q -> 'i
 
       method virtual build_StructConstructor : 'd -> 'r -> 'i
@@ -205,6 +209,8 @@ module type T = sig
 
       method virtual build_field_access : 'd -> 'i located -> 'm located -> 'j
 
+      method virtual build_function_body : 'd -> 'g located list -> 'u
+
       method virtual build_function_call :
         'd -> 'i located -> 'i located list -> 'l
 
@@ -213,7 +219,7 @@ module type T = sig
         'm located option ->
         ('m located * 'i located) located list ->
         'i located option ->
-        'g located list option ->
+        'u option ->
         'k
 
       method virtual build_if_ :
@@ -221,18 +227,20 @@ module type T = sig
 
       method virtual build_interface_definition : 'd -> 'p located list -> 'o
 
-      method virtual build_program : 'd -> 'g located list -> 'u
+      method virtual build_program : 'd -> 'g located list -> 'v
 
       method virtual build_struct_constructor :
         'd -> 'i located option -> ('m located * 'i located) list -> 'r
 
       method virtual build_struct_definition :
-        'd -> 'v located list -> 'p located list -> 'q
+        'd -> 'w located list -> 'p located list -> 'q
 
-      method virtual build_struct_field : 'd -> 'm located -> 'i located -> 'v
+      method virtual build_struct_field : 'd -> 'm located -> 'i located -> 'w
 
       method virtual build_union_definition :
         'd -> 'i located list -> 'p located list -> 's
+
+      method visit_Break : 'd -> stmt -> 'g
 
       method visit_CodeBlock : 'd -> stmt located list -> 'g
 
@@ -262,8 +270,6 @@ module type T = sig
 
       method visit_Return : 'd -> expr -> 'g
 
-      method visit_Break : 'd -> stmt -> 'g
-
       method visit_Struct : 'd -> struct_definition -> 'i
 
       method visit_StructConstructor : 'd -> struct_constructor -> 'i
@@ -290,6 +296,8 @@ module type T = sig
       method visit_field_access : 'd -> field_access -> 'j
 
       method private visit_float : 'env. 'env -> float -> float
+
+      method visit_function_body : 'd -> function_body -> 'u
 
       method visit_function_call : 'd -> function_call -> 'l
 
@@ -324,7 +332,7 @@ module type T = sig
       method private visit_option :
         'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a option -> 'b option
 
-      method visit_program : 'd -> program -> 'u
+      method visit_program : 'd -> program -> 'v
 
       method private visit_ref :
         'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a ref -> 'b ref
@@ -345,7 +353,7 @@ module type T = sig
 
       method visit_struct_definition : 'd -> struct_definition -> 'q
 
-      method visit_struct_field : 'd -> struct_field -> 'v
+      method visit_struct_field : 'd -> struct_field -> 'w
 
       method visit_union_definition : 'd -> union_definition -> 's
 
@@ -434,7 +442,9 @@ functor
       { name : ident located option; [@sexp.option]
         params : function_param located list; [@sexp.list]
         returns : expr located option; [@sexp.option]
-        function_stmts : stmt located list option [@sexp.option] }
+        function_body : function_body option [@sexp.option] }
+
+    and function_body = {function_stmts : stmt located list [@sexp.list]}
 
     and binding = {binding_name : ident located; binding_expr : expr located}
 
