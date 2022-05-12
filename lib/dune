@@ -23,7 +23,10 @@
   syntax
   unitActionsParser
   parserMessages
-  lang)
+  zint
+  errors
+  lang
+  evaluator)
  (name tact))
 
 (ocamllex lexer)
