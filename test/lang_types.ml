@@ -42,9 +42,9 @@ let test_alias () =
      and t1 =
        List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      in
-     pp (Lang.sexp_of_term t) ;
-     pp (Lang.sexp_of_term t1) ;
-     Lang.equal_term t t1 )
+     pp (Lang.sexp_of_expr t) ;
+     pp (Lang.sexp_of_expr t1) ;
+     Lang.equal_expr t t1 )
 
 let test_carbon_copy () =
   let source =
@@ -60,9 +60,9 @@ let test_carbon_copy () =
      and t1 =
        List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      in
-     pp (Lang.sexp_of_term t) ;
-     pp (Lang.sexp_of_term t1) ;
-     Lang.equal_term t t1 )
+     pp (Lang.sexp_of_expr t) ;
+     pp (Lang.sexp_of_expr t1) ;
+     Lang.equal_expr t t1 )
 
 let test_parameterized () =
   let source =
@@ -80,9 +80,9 @@ let test_parameterized () =
      and t2 =
        List.Assoc.find scope ~equal:String.equal "T2" |> Option.value_exn
      in
-     pp (Lang.sexp_of_term t1) ;
-     pp (Lang.sexp_of_term t2) ;
-     Lang.equal_term t1 t2 ) ;
+     pp (Lang.sexp_of_expr t1) ;
+     pp (Lang.sexp_of_expr t2) ;
+     Lang.equal_expr t1 t2 ) ;
   Alcotest.(check bool)
     "equally parameterized types are the same" true
     (let scope = (compile source).bindings in
@@ -90,9 +90,9 @@ let test_parameterized () =
      and t3 =
        List.Assoc.find scope ~equal:String.equal "T3" |> Option.value_exn
      in
-     pp (Lang.sexp_of_term t1) ;
-     pp (Lang.sexp_of_term t3) ;
-     Lang.equal_term t1 t3 )
+     pp (Lang.sexp_of_expr t1) ;
+     pp (Lang.sexp_of_expr t3) ;
+     Lang.equal_expr t1 t3 )
 
 let () =
   let open Alcotest in

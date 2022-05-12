@@ -23,20 +23,21 @@ functor
           | Some t ->
               t
           | None -> (
-              let args = s#visit_list s#visit_term env args in
+              let args = s#visit_list s#visit_expr env args in
               match fn with
-              | Function (BuiltinFn {function_impl; _})
+              | Value (Function (BuiltinFn {function_impl; _}))
                 when are_immediate_arguments args ->
                   function_impl program args
-              | Function (Fn {function_params; function_impl = Some impl; _})
+              | Value
+                  (Function (Fn {function_params; function_impl = Some impl; _}))
                 when are_immediate_arguments args
                      && equal (List.length function_params) (List.length args)
                 -> (
                   let bindings =
                     List.zip_exn function_params args
-                    |> List.map ~f:(fun ((name, _), term) -> (name, term))
+                    |> List.map ~f:(fun ((name, _), expr) -> (name, expr))
                   in
-                  let rec interpret ?(return = InvalidTerm) bindings stmts =
+                  let rec interpret ?(return = InvalidExpr) bindings stmts =
                     let e : 's =
                       new evaluator
                         ( {program with bindings = bindings @ program.bindings},
@@ -46,30 +47,30 @@ functor
                     | [] ->
                         `Stop return
                     | Invalid :: _ ->
-                        `Stop InvalidTerm
-                    | Term t :: rest ->
-                        let t = eval_term bindings @@ e#visit_term env t in
+                        `Stop InvalidExpr
+                    | Expr t :: rest ->
+                        let t = eval_expr bindings @@ e#visit_expr env t in
                         interpret bindings rest ~return:t
                     | Break t :: _ ->
                         interpret bindings [t]
                     | Return t :: _ ->
-                        `Stop (eval_term bindings t)
+                        `Stop (eval_expr bindings t)
                     | Let let_bindings :: rest ->
                         let let_bindings =
                           List.map let_bindings ~f:(fun (name, binding) ->
-                              (name, eval_term bindings binding) )
+                              (name, eval_expr bindings binding) )
                         in
                         interpret (let_bindings @ bindings) rest
-                  and eval_term bindings term =
-                    (new reference_resolver (bindings, errors))#visit_term ()
-                      term
+                  and eval_expr bindings expr =
+                    (new reference_resolver (bindings, errors))#visit_expr ()
+                      expr
                   in
                   match interpret bindings impl with
-                  | `Stop term ->
-                      result := Some term ;
-                      term
+                  | `Stop expr ->
+                      result := Some expr ;
+                      expr
                   | _ ->
-                      InvalidTerm )
+                      InvalidExpr )
               | _ ->
                   FunctionCall ((fn, args), result) )
       end

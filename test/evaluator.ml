@@ -40,10 +40,11 @@ let%expect_test "scope resolution" =
   [%expect
     {|
     (Ok
-     ((stmts ((Let ((T (Builtin Int257))))))
+     ((stmts ((Let ((T (Value (Builtin Int257)))))))
       (bindings
-       ((T (Builtin Int257)) (Int257 (Builtin Int257)) (Bool (Builtin Bool))
-        (Type (Builtin Type)) (Void Void))))) |}]
+       ((T (Value (Builtin Int257))) (Int257 (Value (Builtin Int257)))
+        (Bool (Value (Builtin Bool))) (Type (Value (Builtin Type)))
+        (Void (Value Void)))))) |}]
 
 let%expect_test "binding resolution" =
   let source =
@@ -59,12 +60,14 @@ let%expect_test "binding resolution" =
     {|
     (Ok
      ((stmts
-       ((Let ((T (Builtin Int257)))) (Let ((T_ (Builtin Int257))))
-        (Let ((a (Integer 1)))) (Let ((a_ (Integer 1))))))
+       ((Let ((T (Value (Builtin Int257)))))
+        (Let ((T_ (Value (Builtin Int257))))) (Let ((a (Value (Integer 1)))))
+        (Let ((a_ (Value (Integer 1)))))))
       (bindings
-       ((a_ (Integer 1)) (a (Integer 1)) (T_ (Builtin Int257))
-        (T (Builtin Int257)) (Int257 (Builtin Int257)) (Bool (Builtin Bool))
-        (Type (Builtin Type)) (Void Void))))) |}]
+       ((a_ (Value (Integer 1))) (a (Value (Integer 1)))
+        (T_ (Value (Builtin Int257))) (T (Value (Builtin Int257)))
+        (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+        (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "failed scope resolution" =
   let source = {|
@@ -86,10 +89,13 @@ let%expect_test "scope resolution after let binding" =
   [%expect
     {|
     (Ok
-     ((stmts ((Let ((A (Builtin Int257)))) (Let ((B (Builtin Int257))))))
+     ((stmts
+       ((Let ((A (Value (Builtin Int257)))))
+        (Let ((B (Value (Builtin Int257)))))))
       (bindings
-       ((B (Builtin Int257)) (A (Builtin Int257)) (Int257 (Builtin Int257))
-        (Bool (Builtin Bool)) (Type (Builtin Type)) (Void Void))))) |}]
+       ((B (Value (Builtin Int257))) (A (Value (Builtin Int257)))
+        (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+        (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "basic struct definition" =
   let source = {|
@@ -102,16 +108,18 @@ let%expect_test "basic struct definition" =
      ((stmts
        ((Let
          ((T
-           (Struct
-            ((struct_fields ((t ((field_type (BuiltinType Int257))))))
-             (struct_methods ()) (struct_id <opaque>))))))))
+           (Value
+            (Struct
+             ((struct_fields ((t ((field_type (BuiltinType Int257))))))
+              (struct_methods ()) (struct_id <opaque>)))))))))
       (bindings
        ((T
-         (Struct
-          ((struct_fields ((t ((field_type (BuiltinType Int257))))))
-           (struct_methods ()) (struct_id <opaque>))))
-        (Int257 (Builtin Int257)) (Bool (Builtin Bool)) (Type (Builtin Type))
-        (Void Void))))) |}]
+         (Value
+          (Struct
+           ((struct_fields ((t ((field_type (BuiltinType Int257))))))
+            (struct_methods ()) (struct_id <opaque>)))))
+        (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+        (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "native function evaluation" =
   let source = {|
@@ -120,29 +128,31 @@ let%expect_test "native function evaluation" =
   pp source
     ~bindings:
       ( ( "incr",
-          Function
-            (BuiltinFn
-               { function_params = [("value", IntegerType)];
-                 function_returns = IntegerType;
-                 function_impl =
-                   (fun _p -> function
-                     | Integer arg :: _ ->
-                         Integer (Zint.succ arg)
-                     | _ ->
-                         Integer Zint.zero ) } ) )
+          Value
+            (Function
+               (BuiltinFn
+                  { function_params = [("value", IntegerType)];
+                    function_returns = IntegerType;
+                    function_impl =
+                      (fun _p -> function
+                        | Value (Integer arg) :: _ ->
+                            Value (Integer (Zint.succ arg))
+                        | _ ->
+                            Value (Integer Zint.zero) ) } ) ) )
       :: E.default_bindings ) ;
   [%expect
     {|
     (Ok
-     ((stmts ((Term (Integer 4))))
+     ((stmts ((Expr (Value (Integer 4)))))
       (bindings
        ((incr
-         (Function
-          (BuiltinFn
-           ((function_params ((value IntegerType)))
-            (function_returns IntegerType) (function_impl <fun>)))))
-        (Int257 (Builtin Int257)) (Bool (Builtin Bool)) (Type (Builtin Type))
-        (Void Void))))) |}]
+         (Value
+          (Function
+           (BuiltinFn
+            ((function_params ((value IntegerType)))
+             (function_returns IntegerType) (function_impl <fun>))))))
+        (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+        (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "Tact function evaluation" =
   let source =
@@ -160,22 +170,24 @@ let%expect_test "Tact function evaluation" =
      ((stmts
        ((Let
          ((test
-           (Function
-            (Fn
-             ((function_params ((i (BuiltinType Int257))))
-              (function_returns (BuiltinType Int257))
-              (function_impl (((Break (Term (Reference i))))))))))))
-        (Let ((a (Integer 1))))))
+           (Value
+            (Function
+             (Fn
+              ((function_params ((i (BuiltinType Int257))))
+               (function_returns (BuiltinType Int257))
+               (function_impl (((Break (Expr (Reference i)))))))))))))
+        (Let ((a (Value (Integer 1)))))))
       (bindings
-       ((a (Integer 1))
+       ((a (Value (Integer 1)))
         (test
-         (Function
-          (Fn
-           ((function_params ((i (BuiltinType Int257))))
-            (function_returns (BuiltinType Int257))
-            (function_impl (((Break (Term (Reference i))))))))))
-        (Int257 (Builtin Int257)) (Bool (Builtin Bool)) (Type (Builtin Type))
-        (Void Void))))) |}]
+         (Value
+          (Function
+           (Fn
+            ((function_params ((i (BuiltinType Int257))))
+             (function_returns (BuiltinType Int257))
+             (function_impl (((Break (Expr (Reference i)))))))))))
+        (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+        (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "struct definition" =
   let source =
@@ -193,20 +205,22 @@ let%expect_test "struct definition" =
        ((stmts
          ((Let
            ((MyType
-             (Struct
-              ((struct_fields
-                ((a ((field_type (BuiltinType Int257))))
-                 (b ((field_type (BuiltinType Bool))))))
-               (struct_methods ()) (struct_id <opaque>))))))))
+             (Value
+              (Struct
+               ((struct_fields
+                 ((a ((field_type (BuiltinType Int257))))
+                  (b ((field_type (BuiltinType Bool))))))
+                (struct_methods ()) (struct_id <opaque>)))))))))
         (bindings
          ((MyType
-           (Struct
-            ((struct_fields
-              ((a ((field_type (BuiltinType Int257))))
-               (b ((field_type (BuiltinType Bool))))))
-             (struct_methods ()) (struct_id <opaque>))))
-          (Int257 (Builtin Int257)) (Bool (Builtin Bool)) (Type (Builtin Type))
-          (Void Void))))) |}]
+           (Value
+            (Struct
+             ((struct_fields
+               ((a ((field_type (BuiltinType Int257))))
+                (b ((field_type (BuiltinType Bool))))))
+              (struct_methods ()) (struct_id <opaque>)))))
+          (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+          (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "duplicate type field" =
   let source =
@@ -242,37 +256,43 @@ let%expect_test "parametric struct instantiation" =
      ((stmts
        ((Let
          ((T
-           (Function
-            (Fn
-             ((function_params ((A (BuiltinType Type))))
-              (function_returns (BuiltinType Type))
-              (function_impl
-               (((Term
+           (Value
+            (Function
+             (Fn
+              ((function_params ((A (BuiltinType Type))))
+               (function_returns (BuiltinType Type))
+               (function_impl
+                (((Expr
+                   (Value
+                    (Struct
+                     ((struct_fields ((a ((field_type (ReferenceType A))))))
+                      (struct_methods ()) (struct_id <opaque>)))))))))))))))
+        (Let
+         ((TA
+           (Value
+            (Struct
+             ((struct_fields ((a ((field_type (BuiltinType Int257))))))
+              (struct_methods ()) (struct_id <opaque>)))))))))
+      (bindings
+       ((TA
+         (Value
+          (Struct
+           ((struct_fields ((a ((field_type (BuiltinType Int257))))))
+            (struct_methods ()) (struct_id <opaque>)))))
+        (T
+         (Value
+          (Function
+           (Fn
+            ((function_params ((A (BuiltinType Type))))
+             (function_returns (BuiltinType Type))
+             (function_impl
+              (((Expr
+                 (Value
                   (Struct
                    ((struct_fields ((a ((field_type (ReferenceType A))))))
                     (struct_methods ()) (struct_id <opaque>)))))))))))))
-        (Let
-         ((TA
-           (Struct
-            ((struct_fields ((a ((field_type (BuiltinType Int257))))))
-             (struct_methods ()) (struct_id <opaque>))))))))
-      (bindings
-       ((TA
-         (Struct
-          ((struct_fields ((a ((field_type (BuiltinType Int257))))))
-           (struct_methods ()) (struct_id <opaque>))))
-        (T
-         (Function
-          (Fn
-           ((function_params ((A (BuiltinType Type))))
-            (function_returns (BuiltinType Type))
-            (function_impl
-             (((Term
-                (Struct
-                 ((struct_fields ((a ((field_type (ReferenceType A))))))
-                  (struct_methods ()) (struct_id <opaque>)))))))))))
-        (Int257 (Builtin Int257)) (Bool (Builtin Bool)) (Type (Builtin Type))
-        (Void Void))))) |}]
+        (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+        (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "function without a return type" =
   let source = {|
@@ -286,20 +306,22 @@ let%expect_test "function without a return type" =
        ((stmts
          ((Let
            ((f
-             (Function
-              (Fn
-               ((function_params ()) (function_returns HoleType)
-                (function_impl (((Break (Term (Integer 1))))))))))))
-          (Let ((a (Integer 1))))))
+             (Value
+              (Function
+               (Fn
+                ((function_params ()) (function_returns HoleType)
+                 (function_impl (((Break (Expr (Value (Integer 1))))))))))))))
+          (Let ((a (Value (Integer 1)))))))
         (bindings
-         ((a (Integer 1))
+         ((a (Value (Integer 1)))
           (f
-           (Function
-            (Fn
-             ((function_params ()) (function_returns HoleType)
-              (function_impl (((Break (Term (Integer 1))))))))))
-          (Int257 (Builtin Int257)) (Bool (Builtin Bool)) (Type (Builtin Type))
-          (Void Void))))) |}]
+           (Value
+            (Function
+             (Fn
+              ((function_params ()) (function_returns HoleType)
+               (function_impl (((Break (Expr (Value (Integer 1))))))))))))
+          (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+          (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
 let%expect_test "scoping that `let` introduces in code" =
   let source =
@@ -318,22 +340,24 @@ let%expect_test "scoping that `let` introduces in code" =
      ((stmts
        ((Let
          ((f
-           (Function
-            (Fn
-             ((function_params ((i (BuiltinType Int257))))
-              (function_returns HoleType)
-              (function_impl
-               (((Let ((a (Reference i)))) (Break (Term (Reference a))))))))))))
-        (Let ((b (Integer 1))))))
+           (Value
+            (Function
+             (Fn
+              ((function_params ((i (BuiltinType Int257))))
+               (function_returns HoleType)
+               (function_impl
+                (((Let ((a (Reference i)))) (Break (Expr (Reference a)))))))))))))
+        (Let ((b (Value (Integer 1)))))))
       (bindings
-       ((b (Integer 1))
+       ((b (Value (Integer 1)))
         (f
-         (Function
-          (Fn
-           ((function_params ((i (BuiltinType Int257))))
-            (function_returns HoleType)
-            (function_impl
-             (((Let ((a (Reference i)))) (Break (Term (Reference a))))))))))
-        (Int257 (Builtin Int257)) (Bool (Builtin Bool)) (Type (Builtin Type))
-        (Void Void)))))
+         (Value
+          (Function
+           (Fn
+            ((function_params ((i (BuiltinType Int257))))
+             (function_returns HoleType)
+             (function_impl
+              (((Let ((a (Reference i)))) (Break (Expr (Reference a)))))))))))
+        (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
+        (Type (Value (Builtin Type))) (Void (Value Void))))))
      |}]

@@ -14,25 +14,28 @@ functor
 
     type 'a named_map = (string * 'a) list
 
-    and program = {stmts : stmt list; [@sexp.list] bindings : term named_map}
+    and program = {stmts : stmt list; [@sexp.list] bindings : expr named_map}
 
-    and term =
-      | FunctionCall of (function_call * (term option[@sexp.option]) ref)
-        (* term option is cached result *)
+    and expr =
+      | FunctionCall of (function_call * (expr option[@sexp.option]) ref)
+        (* expr option is cached result *)
       | Reference of string
+      | Value of value
+      | Hole
+      | InvalidExpr
+
+    and value =
       | Void
       | Struct of struct_
       | Function of function_
       | Integer of (Zint.t[@visitors.name "z"])
       | Builtin of builtin
-      | Hole
-      | InvalidTerm
 
     and stmt =
-      | Let of term named_map
-      | Return of term
+      | Let of expr named_map
+      | Return of expr
       | Break of stmt
-      | Term of term
+      | Expr of expr
       | Invalid
 
     and builtin = string
@@ -64,76 +67,69 @@ functor
     and fn = function_body typed_fn
 
     and native_function =
-      (program -> term list -> term[@visitors.opaque] [@equal.ignore])
+      (program -> expr list -> expr[@visitors.opaque] [@equal.ignore])
 
     and builtin_fn = native_function typed_fn
 
     and function_ = Fn of fn | BuiltinFn of builtin_fn | InvalidFn
 
-    and function_call = term * term list
+    and function_call = expr * expr list
     [@@deriving
       equal,
         sexp_of,
         visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]}]
 
-    let term_to_type value =
+    let expr_to_type value =
       match value with
-      | Struct struct_ ->
+      | Value (Struct struct_) ->
           StructType struct_
-      | Function function_ ->
+      | Value (Function function_) ->
           FunctionType function_
-      | Builtin builtin ->
+      | Value (Builtin builtin) ->
           BuiltinType builtin
-      | Void ->
+      | Value Void ->
           VoidType
       | Hole ->
           HoleType
-      | FunctionCall ((Function (Fn {function_returns; _}), _), _)
-      | FunctionCall ((Function (BuiltinFn {function_returns; _}), _), _) ->
+      | FunctionCall ((Value (Function (Fn {function_returns; _})), _), _)
+      | FunctionCall ((Value (Function (BuiltinFn {function_returns; _})), _), _)
+        ->
           function_returns
       | Reference ref ->
           ReferenceType ref
       | _ ->
           InvalidType
 
-    let rec is_immediate_term = function
-      | Void ->
-          true
-      | Struct _ ->
-          true
-      | Function _ ->
+    let rec is_immediate_expr = function
+      | Value _ ->
           true
       | FunctionCall ((_, args), _) ->
           are_immediate_arguments args
-      | Integer _ ->
-          true
-      | Builtin _ ->
-          true
       | Hole ->
           false
       | Reference _ ->
           false
-      | InvalidTerm ->
+      | InvalidExpr ->
           false
 
     and are_immediate_arguments args =
-      Option.is_none (List.find args ~f:(fun a -> not (is_immediate_term a)))
+      Option.is_none (List.find args ~f:(fun a -> not (is_immediate_expr a)))
 
     type error =
       [ `DuplicateField of string * struct_
       | `UnresolvedIdentifier of string
-      | `UnexpectedTerm of term
+      | `UnexpectedExpr of expr
       | `Unsupported ]
     [@@deriving equal, sexp_of]
 
     let default_bindings =
-      [ ("Int257", Builtin "Int257");
-        ("Bool", Builtin "Bool");
-        ("Type", Builtin "Type");
-        ("Void", Void) ]
+      [ ("Int257", Value (Builtin "Int257"));
+        ("Bool", Value (Builtin "Bool"));
+        ("Type", Value (Builtin "Type"));
+        ("Void", Value Void) ]
 
     class ['s] of_syntax_converter
-      ((bindings, errors) : term named_map * _ errors) =
+      ((bindings, errors) : expr named_map * _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor
 
@@ -141,11 +137,11 @@ functor
 
         method build_CodeBlock _env _code_block = Invalid
 
-        method build_Enum _env _enum = InvalidTerm
+        method build_Enum _env _enum = InvalidExpr
 
-        method build_FieldAccess _env _fieldaccess = InvalidTerm
+        method build_FieldAccess _env _fieldaccess = InvalidExpr
 
-        method build_Function _env fn = Function (Fn fn)
+        method build_Function _env fn = Value (Function (Fn fn))
 
         method build_FunctionCall _env fc = FunctionCall (fc, ref None)
 
@@ -153,15 +149,15 @@ functor
 
         method build_If _env _if = Invalid
 
-        method build_Int _env i = Integer i
+        method build_Int _env i = Value (Integer i)
 
-        method build_Interface _env _iface = InvalidTerm
+        method build_Interface _env _iface = InvalidExpr
 
         method build_Let _env let_ =
           let name, expr = Syntax.value let_ in
           Let [(name, expr)]
 
-        method build_MutRef _env _mutref = InvalidTerm
+        method build_MutRef _env _mutref = InvalidExpr
 
         method build_Reference _env ref = Reference ref
 
@@ -169,13 +165,13 @@ functor
 
         method build_Break _env stmt = Break stmt
 
-        method build_Struct _env s = Struct s
+        method build_Struct _env s = Value (Struct s)
 
-        method build_StructConstructor _env _sc = InvalidTerm
+        method build_StructConstructor _env _sc = InvalidExpr
 
-        method build_Union _env _union = InvalidTerm
+        method build_Union _env _union = InvalidExpr
 
-        method build_Expr _env expr = Term expr
+        method build_Expr _env expr = Expr expr
 
         method build_binding _env name expr =
           (Syntax.value name, Syntax.value expr)
@@ -193,10 +189,10 @@ functor
           { function_params =
               s#of_located_list params
               |> List.map ~f:(fun (name, type_) ->
-                     (Syntax.value name, Syntax.value type_ |> term_to_type) );
+                     (Syntax.value name, Syntax.value type_ |> expr_to_type) );
             function_returns =
               returns
-              |> Option.map ~f:(fun x -> Syntax.value x |> term_to_type)
+              |> Option.map ~f:(fun x -> Syntax.value x |> expr_to_type)
               |> Option.value ~default:HoleType;
             function_impl = Option.map body ~f:s#of_located_list }
 
@@ -232,7 +228,7 @@ functor
 
         method build_struct_field _env field_name field_type =
           ( Syntax.value field_name,
-            {field_type = Syntax.value field_type |> term_to_type} )
+            {field_type = Syntax.value field_type |> expr_to_type} )
 
         method build_union_definition _env _members _bindings = ()
 
@@ -241,7 +237,7 @@ functor
       end
 
     class ['s] reference_resolver
-      ((bindings, errors) : term named_map * _ errors) =
+      ((bindings, errors) : expr named_map * _ errors) =
       object (s : 's)
         inherit ['s] map as super
 
@@ -258,7 +254,7 @@ functor
         method! visit_ReferenceType _env ref =
           match s#resolve ref with
           | Some t ->
-              term_to_type t
+              expr_to_type t
           | None ->
               errors#report `Error (`UnresolvedIdentifier ref) () ;
               ReferenceType ref
