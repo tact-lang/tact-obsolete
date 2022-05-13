@@ -25,6 +25,8 @@
   parserMessages
   zint
   errors
+  lang_types
+  interpreter
   lang)
  (name tact))
 
