@@ -17,9 +17,9 @@ functor
     and program = {stmts : stmt list; [@sexp.list] bindings : expr named_map}
 
     and expr =
-      | FunctionCall of (function_call * (expr option[@sexp.option]) ref)
+      | FunctionCall of (function_call * (value option[@sexp.option]) ref)
         (* expr option is cached result *)
-      | Reference of string
+      | Reference of (string * type_)
       | Value of value
       | Hole
       | InvalidExpr
@@ -30,6 +30,7 @@ functor
       | Function of function_
       | Integer of (Zint.t[@visitors.name "z"])
       | Builtin of builtin
+      | Type of type_
 
     and stmt =
       | Let of expr named_map
@@ -41,13 +42,13 @@ functor
     and builtin = string
 
     and type_ =
+      | TypeType
       | IntegerType
       | VoidType
       | BuiltinType of builtin
       | StructType of struct_
       | FunctionType of function_
       | HoleType
-      | ReferenceType of string
       | InvalidType
 
     and struct_ =
@@ -55,11 +56,11 @@ functor
         struct_methods : function_ named_map;
         struct_id : (int[@sexp.opaque]) }
 
-    and struct_field = {field_type : type_}
+    and struct_field = {field_type : expr}
 
     and 'a typed_fn =
-      { function_params : type_ named_map;
-        function_returns : type_;
+      { function_params : expr named_map;
+        function_returns : expr;
         function_impl : 'a }
 
     and function_body = (stmt list option[@sexp.option])
@@ -67,7 +68,7 @@ functor
     and fn = function_body typed_fn
 
     and native_function =
-      (program -> expr list -> expr[@visitors.opaque] [@equal.ignore])
+      (program -> value list -> value[@visitors.opaque] [@equal.ignore])
 
     and builtin_fn = native_function typed_fn
 
@@ -79,24 +80,27 @@ functor
         sexp_of,
         visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]}]
 
-    let expr_to_type value =
-      match value with
+    let rec expr_to_type = function
       | Value (Struct struct_) ->
           StructType struct_
       | Value (Function function_) ->
           FunctionType function_
       | Value (Builtin builtin) ->
           BuiltinType builtin
+      | Value (Integer _) ->
+          IntegerType
       | Value Void ->
           VoidType
+      | Value (Type type_) ->
+          type_
       | Hole ->
           HoleType
       | FunctionCall ((Value (Function (Fn {function_returns; _})), _), _)
       | FunctionCall ((Value (Function (BuiltinFn {function_returns; _})), _), _)
         ->
-          function_returns
-      | Reference ref ->
-          ReferenceType ref
+          expr_to_type function_returns
+      | Reference (_, t) ->
+          t
       | _ ->
           InvalidType
 
@@ -119,7 +123,9 @@ functor
       [ `DuplicateField of string * struct_
       | `UnresolvedIdentifier of string
       | `UnexpectedExpr of expr
-      | `Unsupported ]
+      | `Unsupported
+      | `CannotInterpret of stmt
+      | `NotEnoughArgument ]
     [@@deriving equal, sexp_of]
 
     let default_bindings =
@@ -128,12 +134,179 @@ functor
         ("Type", Value (Builtin "Type"));
         ("Void", Value Void) ]
 
+    let find_in_scope : 'a. string -> 'a named_map list -> 'a option =
+     fun ref scope ->
+      List.find_map scope ~f:(fun bindings ->
+          Option.map
+            (List.find bindings ~f:(fun (s, _) -> String.equal ref s))
+            ~f:(fun (_name, a) -> a) )
+
+    (*TODO: type checks for arguments*)
+    class interpreter ((bindings, errors) : expr named_map list * _ errors) =
+      object (self)
+        val global_bindings = bindings
+
+        val mutable vars_scope : value named_map list = []
+
+        val mutable return = Void
+
+        method interpret_stmt_list : stmt list -> value =
+          fun stmts ->
+            match stmts with
+            | [] ->
+                return
+            | stmt :: rest ->
+                self#interpret_stmt stmt rest
+
+        method interpret_stmt stmt rest =
+          match stmt with
+          | Let binds -> (
+              let values =
+                List.map binds ~f:(fun (_, arg) -> self#interpret_expr arg)
+              in
+              match
+                List.zip (List.map binds ~f:(fun (name, _) -> name)) values
+              with
+              | Ok args_scope ->
+                  let prev_scope = vars_scope in
+                  vars_scope <- args_scope :: vars_scope ;
+                  let output = self#interpret_stmt_list rest in
+                  vars_scope <- prev_scope ;
+                  output
+              | _ ->
+                  errors#report `Error `NotEnoughArgument () ;
+                  Void )
+          | Break stmt ->
+              self#interpret_stmt stmt []
+          | Return expr ->
+              self#interpret_expr expr
+          | Expr expr ->
+              let expr' = self#interpret_expr expr in
+              return <- expr' ;
+              self#interpret_stmt_list rest
+          | Invalid ->
+              Void
+
+        method interpret_expr : expr -> value =
+          fun expr ->
+            match expr with
+            | FunctionCall (fc, result) -> (
+              match !result with
+              | Some t ->
+                  t
+              | _ ->
+                  let value = self#interpret_fc fc in
+                  result := Some value ;
+                  value )
+            | Reference (name, _) -> (
+              match self#find_ref name with
+              | Some expr' ->
+                  self#interpret_expr expr'
+              | None ->
+                  errors#report `Error (`UnresolvedIdentifier name) () ;
+                  Void )
+            | Value value ->
+                self#interpret_value value
+            | InvalidExpr | Hole ->
+                errors#report `Error (`CannotInterpret (Expr expr)) () ;
+                Void
+
+        method interpret_value : value -> value =
+          fun value ->
+            match value with
+            | Struct {struct_fields; struct_methods; struct_id} ->
+                let struct_fields =
+                  List.map struct_fields ~f:(fun (name, {field_type}) ->
+                      ( name,
+                        {field_type = Value (self#interpret_expr field_type)} ) )
+                in
+                Struct {struct_fields; struct_methods; struct_id}
+            | value ->
+                value
+
+        method interpret_function : function_ -> function_ = fun f -> f
+
+        method interpret_fc : function_call -> value =
+          fun (func, args) ->
+            let mk_err = Expr (FunctionCall ((func, args), ref None)) in
+            let args' = List.map args ~f:(fun arg -> self#interpret_expr arg) in
+            let args_to_list params values =
+              match
+                List.zip (List.map params ~f:(fun (name, _) -> name)) values
+              with
+              | Ok scope ->
+                  Ok scope
+              | _ ->
+                  Error mk_err
+            in
+            match self#interpret_expr func with
+            | Function f -> (
+              match f with
+              | Fn {function_params; function_impl; _} -> (
+                  let args_scope = args_to_list function_params args' in
+                  match args_scope with
+                  | Ok args_scope -> (
+                    match function_impl with
+                    | Some body ->
+                        let prev_scope = vars_scope in
+                        vars_scope <- args_scope :: vars_scope ;
+                        let output = self#interpret_stmt_list body in
+                        vars_scope <- prev_scope ;
+                        output
+                    | None ->
+                        Void )
+                  | Error _ ->
+                      Void )
+              | BuiltinFn {function_impl; _} ->
+                  let output =
+                    function_impl
+                      { stmts = [];
+                        bindings =
+                          Option.value (List.hd global_bindings) ~default:[] }
+                      args'
+                  in
+                  output
+              | _ ->
+                  Void )
+            | _ ->
+                Void
+
+        method private find_ref : string -> expr option =
+          fun ref ->
+            match find_in_scope ref vars_scope with
+            | Some e ->
+                Some (Value e)
+            | None ->
+                self#find_in_global_scope ref
+
+        method private find_in_global_scope : string -> expr option =
+          fun ref ->
+            match find_in_scope ref global_bindings with
+            | Some (Reference (ref', _)) ->
+                self#find_in_global_scope ref'
+            | not_ref ->
+                not_ref
+      end
+
     class ['s] of_syntax_converter
       ((bindings, errors) : expr named_map * _ errors) =
       object (s : 's)
-        inherit ['s] Syntax.visitor
+        inherit ['s] Syntax.visitor as super
 
+        (* Bindings in scope *)
+        val mutable current_bindings = [bindings]
+
+        (* Bindings that will available only in runtime *)
+        val mutable runtime_bindings : type_ named_map list = []
+
+        (* Next structure definition will get this ID *)
         val mutable next_struct_id = 0
+
+        (* Are we inside of a function body? How deep? *)
+        val mutable functions = 0
+
+        (* Program handle we pass to builtin functions *)
+        val program = {bindings; stmts = []}
 
         method build_CodeBlock _env _code_block = Invalid
 
@@ -155,11 +328,32 @@ functor
 
         method build_Let _env let_ =
           let name, expr = Syntax.value let_ in
-          Let [(name, expr)]
+          match is_immediate_expr expr with
+          | true ->
+              current_bindings <- [(name, expr)] :: current_bindings ;
+              Let [(name, expr)]
+          | false ->
+              let ty = expr_to_type expr in
+              runtime_bindings <- [(name, ty)] :: runtime_bindings ;
+              Let [(name, expr)]
 
         method build_MutRef _env _mutref = InvalidExpr
 
-        method build_Reference _env ref = Reference ref
+        method build_Reference env ref =
+          match find_in_scope ref current_bindings with
+          | Some (Reference (ref', _)) ->
+              s#build_Reference env ref'
+          | Some (Value value) ->
+              Value value
+          | Some _ ->
+              (* TODO: type_of *) Reference (ref, HoleType)
+          | None -> (
+            match find_in_scope ref runtime_bindings with
+            | Some ty ->
+                Reference (ref, ty)
+            | None ->
+                errors#report `Error (`UnresolvedIdentifier ref) () ;
+                Reference (ref, HoleType) )
 
         method build_Return _env return = Return return
 
@@ -173,6 +367,16 @@ functor
 
         method build_Expr _env expr = Expr expr
 
+        method! visit_expr env syntax_expr =
+          let expr' = super#visit_expr env syntax_expr in
+          match is_immediate_expr expr' && equal functions 0 with
+          | true ->
+              let inter = new interpreter (current_bindings, errors) in
+              let value' = inter#interpret_expr expr' in
+              Value value'
+          | false ->
+              expr'
+
         method build_binding _env name expr =
           (Syntax.value name, Syntax.value expr)
 
@@ -185,23 +389,56 @@ functor
         method build_function_call _env fn args =
           (Syntax.value fn, s#of_located_list args)
 
+        method! visit_function_definition env f =
+          (* prepare parameter bindings *)
+          let param_bindings =
+            s#of_located_list f.params
+            |> List.map ~f:(fun (ident, expr) ->
+                   ( s#visit_ident env @@ Syntax.value ident,
+                     s#visit_expr env @@ Syntax.value expr ) )
+            |> List.map ~f:(fun (id, expr) -> (id, expr_to_type expr))
+          in
+          let bindings' = runtime_bindings in
+          (* inject them into current bindings *)
+          runtime_bindings <- param_bindings :: runtime_bindings ;
+          (* process the function definition *)
+          let result = super#visit_function_definition env f in
+          (* restore bindings as before entering the function *)
+          runtime_bindings <- bindings' ;
+          result
+
+        method! visit_function_body env body =
+          (* save the function enclosure count *)
+          let functions' = functions in
+          (* increment function counter *)
+          functions <- functions + 1 ;
+          (* process the body *)
+          let result = super#visit_function_body env body in
+          (* restore function enclosure count *)
+          functions <- functions' ;
+          result
+
+        method build_function_body _env stmts = s#of_located_list stmts
+
         method build_function_definition _env _name params returns body =
-          { function_params =
-              s#of_located_list params
-              |> List.map ~f:(fun (name, type_) ->
-                     (Syntax.value name, Syntax.value type_ |> expr_to_type) );
-            function_returns =
-              returns
-              |> Option.map ~f:(fun x -> Syntax.value x |> expr_to_type)
-              |> Option.value ~default:HoleType;
-            function_impl = Option.map body ~f:s#of_located_list }
+          let function_params =
+            s#of_located_list params
+            |> List.map ~f:(fun (name, type_) ->
+                   (Syntax.value name, Syntax.value type_) )
+          and function_returns =
+            returns
+            |> Option.map ~f:(fun x -> Syntax.value x)
+            |> Option.value ~default:Hole
+          and function_impl = body in
+          {function_params; function_returns; function_impl}
 
         method build_if_ _env _condition _then _else = ()
 
         method build_interface_definition _env _members = ()
 
         method build_program _env stmts =
-          {stmts = s#of_located_list stmts; bindings}
+          { stmts = s#of_located_list stmts;
+            bindings = List.concat current_bindings }
 
         method build_struct_constructor _env _id _fields = ()
 
@@ -227,63 +464,15 @@ functor
           s'
 
         method build_struct_field _env field_name field_type =
-          ( Syntax.value field_name,
-            {field_type = Syntax.value field_type |> expr_to_type} )
+          (Syntax.value field_name, {field_type = Syntax.value field_type})
 
         method build_union_definition _env _members _bindings = ()
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
-      end
-
-    class ['s] reference_resolver
-      ((bindings, errors) : expr named_map * _ errors) =
-      object (s : 's)
-        inherit ['s] map as super
-
-        val mutable current_bindings = [bindings]
-
-        method! visit_Reference _env ref =
-          match s#resolve ref with
-          | Some t ->
-              t
-          | None ->
-              errors#report `Error (`UnresolvedIdentifier ref) () ;
-              Reference ref
-
-        method! visit_ReferenceType _env ref =
-          match s#resolve ref with
-          | Some t ->
-              expr_to_type t
-          | None ->
-              errors#report `Error (`UnresolvedIdentifier ref) () ;
-              ReferenceType ref
-
-        method! visit_Let env bindings =
-          current_bindings <- bindings :: current_bindings ;
-          super#visit_Let env bindings
-
-        (* Do not cross the function boundary *)
-        method! visit_function_body _env b = b
-
-        method! visit_program env program =
-          (* process statements first *)
-          let program = super#visit_program env program in
-          (* process new bindings *)
-          let program' =
-            super#visit_program env
-              {stmts = []; bindings = List.concat current_bindings}
-          in
-          {(super#visit_program env program') with stmts = program.stmts}
 
         method private resolve ref =
-          match
-            List.find_map current_bindings ~f:(fun bindings ->
-                List.Assoc.find bindings ~equal:String.equal ref )
-          with
-          | Some (Reference ref') ->
-              s#resolve ref'
-          | other ->
-              other
+          List.find_map current_bindings ~f:(fun bindings ->
+              List.Assoc.find bindings ~equal:String.equal ref )
       end
   end

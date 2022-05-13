@@ -1,7 +1,6 @@
 module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
 module Lang = Tact.Lang.Make (Syntax)
-module E = Tact.Evaluator.Make (Syntax)
 module Errors = Tact.Errors
 module Zint = Tact.Zint
 open Core
@@ -10,13 +9,10 @@ let make_errors () = new Errors.errors
 
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
-let build_program ?(errors = make_errors ()) ?(bindings = E.default_bindings) p
-    =
+let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
+    p =
   let c = new Lang.of_syntax_converter (bindings, errors) in
   let p' = c#visit_program () p in
-  let c = new Lang.reference_resolver (p'.bindings, errors) in
-  let p' = c#visit_program () p' in
-  let p' = (new E.evaluator (p', errors))#visit_program () p' in
   errors#to_result p'
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> err) )

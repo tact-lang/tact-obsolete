@@ -10,7 +10,7 @@
   let expand_fn_sugar params loc typ expr =
     Function (make_function_definition ~params: params
                                            ~returns: (make_located ~loc ~value: typ ())
-                                           ~function_stmts:[make_located ~loc ~value: (Expr (value expr)) ()]
+                                           ~function_body:(make_function_body ~function_stmts: [make_located ~loc ~value: (Expr (value expr)) ()] ())
                                            ())
 
   let remove_trailing_break stmts = 
@@ -125,7 +125,9 @@ let function_definition(name, funbody) :=
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   returns = option(preceded(RARROW, located(fexpr)));
   body = funbody;
-  { (n, Function (make_function_definition ~params:params ?returns:returns ?function_stmts:body ())) } 
+  { (n, Function (make_function_definition ~params:params ?returns:returns 
+                    ?function_body:(Option.map (fun x -> make_function_body ~function_stmts: x ()) body)
+                    ())) } 
 
 let function_signature_binding ==
     (n, f) = function_definition(located(ident), nothing); {
