@@ -140,8 +140,8 @@ let%expect_test "native function evaluation" =
          (Value
           (Function
            (BuiltinFn
-            ((function_params ((value (Type IntegerType))))
-             (function_returns (Type IntegerType)) (function_impl <fun>))))))
+            ((function_params ((value (Value (Type IntegerType)))))
+             (function_returns (Value (Type IntegerType))) (function_impl <fun>))))))
         (Int257 (Value (Builtin Int257))) (Bool (Value (Builtin Bool)))
         (Type (Value (Builtin Type))) (Void (Value Void)))))) |}]
 
@@ -497,7 +497,7 @@ let%expect_test "resolving a reference from inside a function" =
             (Function
              (Fn
               ((function_params ()) (function_returns Hole)
-               (function_impl (((Break (Expr (Reference (i IntegerType))))))))))))))
+               (function_impl (((Break (Expr (Value (Integer 1))))))))))))))
         (Let ((x (Value (Integer 1)))))))
       (bindings
        ((x (Value (Integer 1)))
@@ -506,7 +506,7 @@ let%expect_test "resolving a reference from inside a function" =
           (Function
            (Fn
             ((function_params ()) (function_returns Hole)
-             (function_impl (((Break (Expr (Reference (i IntegerType))))))))))))
+             (function_impl (((Break (Expr (Value (Integer 1))))))))))))
         (i (Value (Integer 1))) (Int257 (Value (Builtin Int257)))
         (Bool (Value (Builtin Bool))) (Type (Value (Builtin Type)))
         (Void (Value Void)))))) |}]
