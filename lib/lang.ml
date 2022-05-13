@@ -13,11 +13,7 @@ functor
       [`DuplicateField of string * struct_ | `UnresolvedIdentifier of string]
     [@@deriving equal, sexp_of]
 
-    let default_bindings =
-      [ ("Int257", Value (Builtin "Int257"));
-        ("Bool", Value (Builtin "Bool"));
-        ("Type", Value (Builtin "Type"));
-        ("Void", Value Void) ]
+    include Stdlib
 
     class ['s] constructor ((bindings, errors) : expr named_map * _ errors) =
       object (s : 's)
@@ -28,9 +24,6 @@ functor
 
         (* Bindings that will available only in runtime *)
         val mutable runtime_bindings : type_ named_map list = []
-
-        (* Next structure definition will get this ID *)
-        val mutable next_struct_id = 0
 
         (* Are we inside of a function body? How deep? *)
         val mutable functions = 0
@@ -178,7 +171,7 @@ functor
             { struct_fields = fields;
               struct_methods = [];
               (* TODO: methods *)
-              struct_id = next_struct_id }
+              struct_id = !struct_counter }
           in
           (* Check for duplicate fields *)
           ( match
@@ -190,7 +183,7 @@ functor
           | None ->
               () ) ;
           (* Increment next struct's ID *)
-          next_struct_id <- next_struct_id + 1 ;
+          struct_counter := !struct_counter + 1 ;
           s'
 
         method build_struct_field _env field_name field_type =

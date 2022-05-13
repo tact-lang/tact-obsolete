@@ -26,6 +26,7 @@
   zint
   errors
   lang_types
+  stdlib
   interpreter
   lang)
  (name tact))
