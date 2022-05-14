@@ -1,7 +1,7 @@
 open Shared
 open Tact.Lang_types
 
-let test_alias_struct () =
+let%test "aliased structures equality" =
   let source = {|
   struct T { val a: Int(257) }
   let T1 = T; 
@@ -17,7 +17,7 @@ let test_alias_struct () =
      pp_sexp (Lang.sexp_of_expr t1) ;
      Lang.equal_expr t t1 )
 
-let test_carbon_copy_struct () =
+let%test "carbon copy structure equality" =
   let source =
     {|
   struct T { val a: Int(257) }
@@ -35,7 +35,7 @@ let test_carbon_copy_struct () =
      pp_sexp (Lang.sexp_of_expr t1) ;
      Lang.equal_expr t t1 )
 
-let test_parameterized_struct () =
+let%test "parameterized structure equality" =
   let source =
     {|
   struct T(X: Type) { val a: X }
@@ -65,7 +65,7 @@ let test_parameterized_struct () =
      pp_sexp (Lang.sexp_of_expr t3) ;
      Lang.equal_expr t1 t3 )
 
-let test_builtin_fn_equality () =
+let%test "builtin function equality" =
   let f1 =
     BuiltinFn
       { function_params = [];
@@ -83,16 +83,3 @@ let test_builtin_fn_equality () =
   Alcotest.(check bool)
     "same instances of the same builtin function are equal" true
     (equal_function_ f1 f1)
-
-let () =
-  let open Alcotest in
-  run "Lang Types"
-    [ ( "struct",
-        [ test_case "aliased struct equality" `Quick test_alias_struct;
-          test_case "carbon copy of the struct equality (same definition)"
-            `Quick test_carbon_copy_struct;
-          test_case "parameterized structs equality" `Quick
-            test_parameterized_struct ] );
-      ( "builtin fn",
-        [test_case "builtin funciton equality" `Quick test_builtin_fn_equality]
-      ) ]

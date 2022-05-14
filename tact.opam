@@ -23,6 +23,7 @@ depends: [
   "ppx_expect" {with-test & >= "0.15.0"}
   "ppx_matches" {with-test & >= "0.1"}
   "alcotest" {with-test & >= "1.5.0"}
+  "ppx_inline_alcotest" {with-test & >= "1.0.0"}
   "utop" {build & >= "2.9.1"}
   "ocamlformat" {build & >= "0.21.0"}
   "odoc" {with-doc}

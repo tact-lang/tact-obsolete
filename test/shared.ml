@@ -23,7 +23,8 @@ let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
            { program with
              bindings =
                List.filter program.bindings ~f:(fun binding ->
-                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) ) }
+                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) )
+           }
          else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> err) )

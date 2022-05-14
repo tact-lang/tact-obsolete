@@ -28,6 +28,7 @@
    (ppx_expect (and :with-test (>= 0.15.0)))
    (ppx_matches (and :with-test (>= 0.1)))
    (alcotest (and :with-test (>= 1.5.0)))
+   (ppx_inline_alcotest (and :with-test (>= 1.0.0)))
    (utop (and :build (>= 2.9.1)))
    (ocamlformat (and :build (>= 0.21.0))))
 )

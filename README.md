@@ -17,7 +17,7 @@ You can now use `tact /path/to/file.tact`
 
 ### Updating dependencies
 
-Run `opam install tact --working-dir --deps-only`
+Run `opam install tact --working-dir --deps-only --with-test`
 
 ### Running REPL
 

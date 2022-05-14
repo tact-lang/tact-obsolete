@@ -14,9 +14,10 @@
  (modules syntax lang)
  (libraries tact core sexplib shared))
 
-(tests
+(library
  (preprocess
-  (staged_pps ppx_matches))
- (names lang_types builtin errors)
- (modules lang_types builtin errors)
- (libraries tact alcotest ppx_matches core shared))
+  (staged_pps ppx_matches ppx_sexp_conv ppx_inline_alcotest))
+ (name tact_tests_)
+ (inline_tests)
+ (modules errors builtin lang_types)
+ (libraries tact core sexplib shared alcotest))

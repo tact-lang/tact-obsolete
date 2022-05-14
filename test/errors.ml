@@ -2,7 +2,7 @@ open Tact.Errors
 
 type severity = [`Warning | `Error]
 
-let test_report_poly () =
+let%test "error reporting" =
   let e = new errors in
   Alcotest.(check bool)
     "reports gets recorded" true
@@ -10,8 +10,3 @@ let test_report_poly () =
       e#report `Error (`VeryBroken 1) () ;
       [%matches? [(`Warning, `Broken, ()); (`Error, `VeryBroken 1, ())]]
         e#errors )
-
-let () =
-  let open Alcotest in
-  run "Errors"
-    [("reporting", [test_case "polymorphic types" `Quick test_report_poly])]
