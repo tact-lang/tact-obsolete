@@ -13,10 +13,18 @@ let make_errors () = new Errors.errors
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
-    p =
+    ?(strip_default_bindings = true) p =
   let c = new Lang.constructor (bindings, errors) in
   let p' = c#visit_program () p in
   errors#to_result p'
+  (* remove default bindings *)
+  |> Result.map ~f:(fun (program : Lang.program) ->
+         if strip_default_bindings then
+           { program with
+             bindings =
+               List.filter program.bindings ~f:(fun binding ->
+                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) ) }
+         else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> err) )
 

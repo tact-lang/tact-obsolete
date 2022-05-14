@@ -9,6 +9,8 @@ type 'a named_map = (string * 'a) list
 
 and comptime_counter = (int[@sexp.opaque])
 
+and binding = string * expr
+
 and program = {stmts : stmt list; [@sexp.list] bindings : expr named_map}
 
 and expr =
