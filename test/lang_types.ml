@@ -1,6 +1,7 @@
 open Shared
+open Tact.Lang_types
 
-let test_alias () =
+let test_alias_struct () =
   let source = {|
   struct T { val a: Int(257) }
   let T1 = T; 
@@ -16,7 +17,7 @@ let test_alias () =
      pp_sexp (Lang.sexp_of_expr t1) ;
      Lang.equal_expr t t1 )
 
-let test_carbon_copy () =
+let test_carbon_copy_struct () =
   let source =
     {|
   struct T { val a: Int(257) }
@@ -34,7 +35,7 @@ let test_carbon_copy () =
      pp_sexp (Lang.sexp_of_expr t1) ;
      Lang.equal_expr t t1 )
 
-let test_parameterized () =
+let test_parameterized_struct () =
   let source =
     {|
   struct T(X: Type) { val a: X }
@@ -64,10 +65,34 @@ let test_parameterized () =
      pp_sexp (Lang.sexp_of_expr t3) ;
      Lang.equal_expr t1 t3 )
 
+let test_builtin_fn_equality () =
+  let f1 =
+    BuiltinFn
+      { function_params = [];
+        function_returns = Value (Type VoidType);
+        function_impl = builtin_fun (fun _ _ -> Void) }
+  and f2 =
+    BuiltinFn
+      { function_params = [];
+        function_returns = Value (Type VoidType);
+        function_impl = builtin_fun (fun _ _ -> Void) }
+  in
+  Alcotest.(check bool)
+    "different instances of the same builtin function are not equal" false
+    (equal_function_ f1 f2) ;
+  Alcotest.(check bool)
+    "same instances of the same builtin function are equal" true
+    (equal_function_ f1 f1)
+
 let () =
   let open Alcotest in
   run "Lang Types"
-    [ ( "equality",
-        [ test_case "aliased type" `Quick test_alias;
-          test_case "carbon copy (same definition)" `Quick test_carbon_copy;
-          test_case "parameterized types" `Quick test_parameterized ] ) ]
+    [ ( "struct",
+        [ test_case "aliased struct equality" `Quick test_alias_struct;
+          test_case "carbon copy of the struct equality (same definition)"
+            `Quick test_carbon_copy_struct;
+          test_case "parameterized structs equality" `Quick
+            test_parameterized_struct ] );
+      ( "builtin fn",
+        [test_case "builtin funciton equality" `Quick test_builtin_fn_equality]
+      ) ]

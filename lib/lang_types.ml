@@ -7,6 +7,8 @@ class ['s] base_map =
 
 type 'a named_map = (string * 'a) list
 
+and comptime_counter = (int[@sexp.opaque])
+
 and program = {stmts : stmt list; [@sexp.list] bindings : expr named_map}
 
 and expr =
@@ -63,7 +65,7 @@ and fn = function_body typed_fn
 and native_function =
   (program -> value list -> value[@visitors.opaque] [@equal.ignore])
 
-and builtin_fn = native_function typed_fn
+and builtin_fn = (native_function * comptime_counter) typed_fn
 
 and function_ = Fn of fn | BuiltinFn of builtin_fn | InvalidFn
 
@@ -112,6 +114,13 @@ let rec is_immediate_expr = function
 
 and are_immediate_arguments args =
   Option.is_none (List.find args ~f:(fun a -> not (is_immediate_expr a)))
+
+let rec builtin_fun_counter = ref 0
+
+and builtin_fun f =
+  let res = (f, !builtin_fun_counter) in
+  builtin_fun_counter := !builtin_fun_counter + 1 ;
+  res
 
 let find_in_scope : 'a. string -> 'a named_map list -> 'a option =
  fun ref scope ->

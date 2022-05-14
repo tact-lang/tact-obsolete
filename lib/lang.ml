@@ -126,7 +126,7 @@ functor
                    (BuiltinFn
                       { function_params = [];
                         function_returns = Value (Type VoidType);
-                        function_impl = (fun _ _ -> Void) } ) ),
+                        function_impl = builtin_fun (fun _ _ -> Void) } ) ),
               [] )
           in
           (* TODO: check method signatures *)

@@ -121,7 +121,7 @@ class interpreter ((bindings, errors) : expr named_map list * _ errors) =
                     Void )
               | Error _ ->
                   Void )
-          | BuiltinFn {function_impl; _} ->
+          | BuiltinFn {function_impl = function_impl, _; _} ->
               let output =
                 function_impl
                   { stmts = [];
