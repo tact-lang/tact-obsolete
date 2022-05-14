@@ -20,6 +20,8 @@ and expr =
 and value =
   | Void
   | Struct of struct_
+  (* Instance of a Struct *)
+  | StructInstance of (struct_ * value named_map)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
   | Builtin of builtin
@@ -47,7 +49,7 @@ and type_ =
 and struct_ =
   { struct_fields : struct_field named_map;
     struct_methods : function_ named_map;
-    struct_id : (int[@sexp.opaque]) }
+    struct_id : (int * int[@sexp.opaque]) }
 
 and struct_field = {field_type : expr}
 
@@ -72,7 +74,9 @@ and function_call = expr * expr list
     visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]}]
 
 let rec expr_to_type = function
-  | Value (Struct struct_) ->
+  | Value (Struct _) ->
+      TypeType
+  | Value (StructInstance (struct_, _)) ->
       StructType struct_
   | Value (Function function_) ->
       FunctionType function_
@@ -115,3 +119,6 @@ let find_in_scope : 'a. string -> 'a named_map list -> 'a option =
       Option.map
         (List.find bindings ~f:(fun (s, _) -> String.equal ref s))
         ~f:(fun (_name, a) -> a) )
+
+(* We declare the struct counter here to count all structs *)
+let struct_counter = ref 0

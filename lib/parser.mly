@@ -215,6 +215,10 @@ let stmt_expr :=
  (* can be access to the field via dot *)
  | from_expr = located(expr); DOT; to_field = located(ident); 
     {FieldAccess (make_field_access ~from_expr ~to_field ())}
+| receiver = located(expr); DOT; 
+  receiver_fn = located(ident);
+  receiver_arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
+    {MethodCall (make_method_call ~receiver ~receiver_fn ~receiver_arguments ())}
  (* can be a type constructor *)
  | struct_constructor
  (* can be a function definition *)
@@ -227,6 +231,10 @@ let expr :=
  (* can be access to the field via dot *)
  | from_expr = located(expr); DOT; to_field = located(ident); 
     {FieldAccess (make_field_access ~from_expr ~to_field ())}
+| receiver = located(expr); DOT; 
+  receiver_fn = located(ident);
+  receiver_arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
+    {MethodCall (make_method_call ~receiver ~receiver_fn ~receiver_arguments ())}
  (* can be a type constructor *)
  | struct_constructor
  (* can be a function definition *)

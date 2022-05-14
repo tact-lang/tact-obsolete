@@ -10,14 +10,13 @@ functor
     open Interpreter
 
     type error =
-      [`DuplicateField of string * struct_ | `UnresolvedIdentifier of string]
+      [ `DuplicateField of string * struct_
+      | `UnresolvedIdentifier of string
+      | `MethodNotFound of expr * string
+      | `UnexpectedType of expr ]
     [@@deriving equal, sexp_of]
 
-    let default_bindings =
-      [ ("Int257", Value (Builtin "Int257"));
-        ("Bool", Value (Builtin "Bool"));
-        ("Type", Value (Builtin "Type"));
-        ("Void", Value Void) ]
+    include Builtin
 
     class ['s] constructor ((bindings, errors) : expr named_map * _ errors) =
       object (s : 's)
@@ -28,9 +27,6 @@ functor
 
         (* Bindings that will available only in runtime *)
         val mutable runtime_bindings : type_ named_map list = []
-
-        (* Next structure definition will get this ID *)
-        val mutable next_struct_id = 0
 
         (* Are we inside of a function body? How deep? *)
         val mutable functions = 0
@@ -47,6 +43,8 @@ functor
         method build_Function _env fn = Value (Function (Fn fn))
 
         method build_FunctionCall _env fc = FunctionCall (fc, ref None)
+
+        method build_MethodCall _env mc = FunctionCall (mc, ref None)
 
         method build_Ident _env string_ = string_
 
@@ -91,7 +89,7 @@ functor
 
         method build_Struct _env s = Value (Struct s)
 
-        method build_StructConstructor _env _sc = InvalidExpr
+        method build_StructConstructor _env sc = Value (StructInstance sc)
 
         method build_Union _env _union = InvalidExpr
 
@@ -118,6 +116,42 @@ functor
 
         method build_function_call _env fn args =
           (Syntax.value fn, s#of_located_list args)
+
+        method build_method_call _env receiver fn args =
+          let receiver = Syntax.value receiver in
+          let fn = Syntax.value fn
+          and dummy : expr * expr list =
+            ( Value
+                (Function
+                   (BuiltinFn
+                      { function_params = [];
+                        function_returns = Value (Type VoidType);
+                        function_impl = (fun _ _ -> Void) } ) ),
+              [] )
+          in
+          (* TODO: check method signatures *)
+          match receiver with
+          | Value (Struct struct') -> (
+            match
+              List.Assoc.find struct'.struct_methods ~equal:String.equal fn
+            with
+            | Some fn' ->
+                (Value (Function fn'), s#of_located_list args)
+            | None ->
+                errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                dummy )
+          | Value (StructInstance (struct', _)) -> (
+            match
+              List.Assoc.find struct'.struct_methods ~equal:String.equal fn
+            with
+            | Some fn' ->
+                (Value (Function fn'), receiver :: s#of_located_list args)
+            | None ->
+                errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                dummy )
+          | receiver ->
+              errors#report `Error (`UnexpectedType receiver) () ;
+              dummy
 
         method! visit_function_definition env f =
           (* prepare parameter bindings *)
@@ -170,19 +204,32 @@ functor
           { stmts = s#of_located_list stmts;
             bindings = List.concat current_bindings }
 
-        method build_struct_constructor _env _id _fields = ()
+        method build_struct_constructor _env id _fields =
+          match Syntax.value id with
+          | Value (Struct struct') ->
+              (struct', []) (* TODO: handle fields *)
+          | e ->
+              errors#report `Error (`UnexpectedType e) () ;
+              ({struct_fields = []; struct_methods = []; struct_id = (0, 0)}, [])
 
-        method build_struct_definition _env struct_fields _bindings =
-          let fields = s#of_located_list struct_fields in
+        method build_struct_definition _env struct_fields bindings =
+          let struct_fields = s#of_located_list struct_fields
+          and struct_methods =
+            List.filter_map bindings ~f:(fun binding ->
+                let name, expr = Syntax.value binding in
+                match expr with
+                | Value (Function f) ->
+                    Some (name, f)
+                | _ ->
+                    None )
+          in
           let s' =
-            { struct_fields = fields;
-              struct_methods = [];
-              (* TODO: methods *)
-              struct_id = next_struct_id }
+            {struct_fields; struct_methods; struct_id = (0, !struct_counter)}
           in
           (* Check for duplicate fields *)
           ( match
-              List.find_a_dup fields ~compare:(fun (name1, _) (name2, _) ->
+              List.find_a_dup struct_fields
+                ~compare:(fun (name1, _) (name2, _) ->
                   String.compare name1 name2 )
             with
           | Some (name, _) ->
@@ -190,7 +237,7 @@ functor
           | None ->
               () ) ;
           (* Increment next struct's ID *)
-          next_struct_id <- next_struct_id + 1 ;
+          struct_counter := !struct_counter + 1 ;
           s'
 
         method build_struct_field _env field_name field_type =

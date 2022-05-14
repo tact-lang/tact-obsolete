@@ -26,6 +26,7 @@
   zint
   errors
   lang_types
+  builtin
   interpreter
   lang)
  (name tact))

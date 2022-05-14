@@ -50,8 +50,8 @@ let%expect_test "struct construction" =
   let source =
     {|
     struct MyType { 
-     val a: Int257
-     val b: Int257
+     val a: Int(257)
+     val b: Int(257)
   }
   let my = MyType {
     a: 0,
@@ -68,8 +68,14 @@ let%expect_test "struct construction" =
            (binding_expr
             (Struct
              ((fields
-               (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
-                ((field_name (Ident b)) (field_type (Reference (Ident Int257)))))))))))
+               (((field_name (Ident a))
+                 (field_type
+                  (FunctionCall
+                   ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
+                ((field_name (Ident b))
+                 (field_type
+                  (FunctionCall
+                   ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))))))))
          (Let
           ((binding_name (Ident my))
            (binding_expr
@@ -97,7 +103,7 @@ let%expect_test "struct fields" =
   let source =
     {|
   struct MyType {
-    val a: Int257
+    val a: Int(257)
     val f: get_type()
   }
   |}
@@ -111,7 +117,10 @@ let%expect_test "struct fields" =
          (binding_expr
           (Struct
            ((fields
-             (((field_name (Ident a)) (field_type (Reference (Ident Int257))))
+             (((field_name (Ident a))
+               (field_type
+                (FunctionCall
+                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
               ((field_name (Ident f))
                (field_type (FunctionCall ((fn (Reference (Ident get_type))))))))))))))))) |}]
 
@@ -120,7 +129,7 @@ let%expect_test "struct methods" =
     {|
     struct MyType {
       fn test() -> Bool {}
-      fn todo() -> Int257
+      fn todo() -> Int(257)
     }
   |}
   in
@@ -138,13 +147,17 @@ let%expect_test "struct methods" =
                 (Function
                  ((returns (Reference (Ident Bool))) (function_body ())))))
               ((binding_name (Ident todo))
-               (binding_expr (Function ((returns (Reference (Ident Int257))))))))))))))))) |}]
+               (binding_expr
+                (Function
+                 ((returns
+                   (FunctionCall
+                    ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))))))))))))) |}]
 
 let%expect_test "struct with fields and methods" =
   let source =
     {|
     struct MyType {
-      val a: Int257
+      val a: Int(257)
       fn test() -> Bool {}
     }
   |}
@@ -158,7 +171,10 @@ let%expect_test "struct with fields and methods" =
          (binding_expr
           (Struct
            ((fields
-             (((field_name (Ident a)) (field_type (Reference (Ident Int257))))))
+             (((field_name (Ident a))
+               (field_type
+                (FunctionCall
+                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))
             (struct_bindings
              (((binding_name (Ident test))
                (binding_expr
@@ -202,9 +218,9 @@ let%expect_test "function definition shorthand" =
 let%expect_test "function without a return type" =
   let source =
     {|
-    let f1 = fn(t: Int257);
-    let f2 = fn(t: Int257) {};
-    fn f4(t: Int257) {}
+    let f1 = fn(t: Int(257));
+    let f2 = fn(t: Int(257)) {};
+    fn f4(t: Int(257)) {}
     |}
   in
   pp source ;
@@ -214,17 +230,29 @@ let%expect_test "function without a return type" =
       ((Let
         ((binding_name (Ident f1))
          (binding_expr
-          (Function ((params (((Ident t) (Reference (Ident Int257))))))))))
+          (Function
+           ((params
+             (((Ident t)
+               (FunctionCall
+                ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))))))
        (Let
         ((binding_name (Ident f2))
          (binding_expr
           (Function
-           ((params (((Ident t) (Reference (Ident Int257))))) (function_body ()))))))
+           ((params
+             (((Ident t)
+               (FunctionCall
+                ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
+            (function_body ()))))))
        (Let
         ((binding_name (Ident f4))
          (binding_expr
           (Function
-           ((params (((Ident t) (Reference (Ident Int257))))) (function_body ()))))))))) |}]
+           ((params
+             (((Ident t)
+               (FunctionCall
+                ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
+            (function_body ()))))))))) |}]
 
 let%expect_test "parse parameterized return type as part of function \
                  signature, not a function call" =
@@ -313,7 +341,7 @@ let%expect_test "function call in a list of statements" =
 let%expect_test "let in function body" =
   let source =
     {|
-  let f = fn() -> Int257 { 
+  let f = fn() -> Int(257) { 
        let a = 1;
        return a;
   };
@@ -327,7 +355,9 @@ let%expect_test "let in function body" =
         ((binding_name (Ident f))
          (binding_expr
           (Function
-           ((returns (Reference (Ident Int257)))
+           ((returns
+             (FunctionCall
+              ((fn (Reference (Ident Int))) (arguments ((Int 257))))))
             (function_body
              ((function_stmts
                ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
@@ -336,7 +366,7 @@ let%expect_test "let in function body" =
 let%expect_test "code block without trailing semicolon" =
   let source =
     {|
-    let f = fn() -> Int257 { 
+    let f = fn() -> Int(257) { 
       let a = 1;
       a
     };
@@ -350,7 +380,9 @@ let%expect_test "code block without trailing semicolon" =
         ((binding_name (Ident f))
          (binding_expr
           (Function
-           ((returns (Reference (Ident Int257)))
+           ((returns
+             (FunctionCall
+              ((fn (Reference (Ident Int))) (arguments ((Int 257))))))
             (function_body
              ((function_stmts
                ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
@@ -446,7 +478,7 @@ let%expect_test "struct construction over a parameterized type" =
 let%expect_test "struct construction over an anonymous type" =
   let source =
     {|
-  let a = (struct { val field: Int257 }) { field: value };
+  let a = (struct { val field: Int(257) }) { field: value };
   |}
   in
   pp source ;
@@ -461,7 +493,9 @@ let%expect_test "struct construction over an anonymous type" =
              (Struct
               ((fields
                 (((field_name (Ident field))
-                  (field_type (Reference (Ident Int257)))))))))
+                  (field_type
+                   (FunctionCall
+                    ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))))))
             (fields_construction (((Ident field) (Reference (Ident value))))))))))))) |}]
 
 let%expect_test "struct construction over an anonymous type's function call" =
@@ -567,11 +601,24 @@ let%expect_test "field access over other expressions" =
                       (to_field (Ident field)))))
                    (to_field (Ident other_field))))))))))))))))) |}]
 
+let%expect_test "method access" =
+  let source = {|
+      foo.bar(1);
+    |} in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Expr
+        (MethodCall
+         ((receiver (Reference (Ident foo))) (receiver_fn (Ident bar))
+          (receiver_arguments ((Int 1))))))))) |}]
+
 let%expect_test "union definition" =
   let source =
     {|
     union U {
-       case Int257
+       case Int(257)
        case Bool
     }  
     |}
@@ -584,13 +631,16 @@ let%expect_test "union definition" =
         ((binding_name (Ident U))
          (binding_expr
           (Union
-           ((union_members ((Reference (Ident Int257)) (Reference (Ident Bool)))))))))))) |}]
+           ((union_members
+             ((FunctionCall
+               ((fn (Reference (Ident Int))) (arguments ((Int 257)))))
+              (Reference (Ident Bool)))))))))))) |}]
 
 let%expect_test "union definition using let binding" =
   let source =
     {|
     let U = union {
-       case Int257
+       case Int(257)
        case Bool
     };
     |}
@@ -603,7 +653,10 @@ let%expect_test "union definition using let binding" =
         ((binding_name (Ident U))
          (binding_expr
           (Union
-           ((union_members ((Reference (Ident Int257)) (Reference (Ident Bool)))))))))))) |}]
+           ((union_members
+             ((FunctionCall
+               ((fn (Reference (Ident Int))) (arguments ((Int 257)))))
+              (Reference (Ident Bool)))))))))))) |}]
 
 let%expect_test "parameterized union definition" =
   let source =

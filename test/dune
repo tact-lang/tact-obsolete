@@ -9,6 +9,6 @@
 (tests
  (preprocess
   (staged_pps ppx_matches))
- (names lang_types errors)
- (modules lang_types errors)
+ (names lang_types builtin errors)
+ (modules lang_types builtin errors)
  (libraries tact alcotest ppx_matches core))
