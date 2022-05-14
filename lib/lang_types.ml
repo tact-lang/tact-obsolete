@@ -49,7 +49,7 @@ and type_ =
 and struct_ =
   { struct_fields : struct_field named_map;
     struct_methods : function_ named_map;
-    struct_id : (int[@sexp.opaque]) }
+    struct_id : (int * int[@sexp.opaque]) }
 
 and struct_field = {field_type : expr}
 

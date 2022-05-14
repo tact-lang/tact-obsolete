@@ -601,6 +601,19 @@ let%expect_test "field access over other expressions" =
                       (to_field (Ident field)))))
                    (to_field (Ident other_field))))))))))))))))) |}]
 
+let%expect_test "method access" =
+  let source = {|
+      foo.bar(1);
+    |} in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Expr
+        (MethodCall
+         ((receiver (Reference (Ident foo))) (receiver_fn (Ident bar))
+          (receiver_arguments ((Int 1))))))))) |}]
+
 let%expect_test "union definition" =
   let source =
     {|

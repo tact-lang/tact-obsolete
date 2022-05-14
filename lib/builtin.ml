@@ -4,12 +4,17 @@ let int_type =
   let struct_counter' = !struct_counter in
   struct_counter := struct_counter' + 1 ;
   (* int's newtype *)
-  let int_type_s =
+  let rec int_type_s bits =
     { struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
-      struct_methods = [];
-      struct_id = struct_counter' }
-  in
-  let rec constructor_impl bits p = function
+      struct_methods = [("new", int_type_s_new bits)];
+      struct_id = (bits, struct_counter') }
+  and int_type_s_new bits =
+    BuiltinFn
+      { function_params = [("integer", Value (Type IntegerType))];
+        (* TODO: figure out how to represent Self *)
+        function_returns = Hole;
+        function_impl = constructor_impl bits }
+  and constructor_impl bits p = function
     | [Integer i] ->
         let numbits = Zint.numbits i in
         let i =
@@ -22,21 +27,13 @@ let int_type =
             extract i 0 (numbits - bits)
           else i
         in
-        StructInstance (int_type_s, [("integer", Integer i)])
+        StructInstance (int_type_s bits, [("integer", Integer i)])
     | _ ->
         (* TODO: raise an error instead *)
         constructor_impl bits p [Integer (Zint.of_int 0)]
-  in
-  let constructor bits =
-    Function
-      (BuiltinFn
-         { function_params = [("integer", Value (Type IntegerType))];
-           function_returns = Value (Struct int_type_s);
-           function_impl = constructor_impl bits } )
-  in
-  let function_impl _p = function
+  and function_impl _p = function
     | [Integer bits] ->
-        constructor @@ Zint.to_int bits
+        Struct (int_type_s @@ Z.to_int bits)
     | _ ->
         (* TODO: raise an error instead *)
         Void
@@ -45,7 +42,7 @@ let int_type =
     (Function
        (BuiltinFn
           { function_params = [("bits", Value (Type IntegerType))];
-            function_returns = Value (constructor 257);
+            function_returns = Value (Struct (int_type_s 257));
             function_impl } ) )
 
 let default_bindings =
