@@ -1,33 +1,4 @@
-module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
-module Parser = Tact.Parser.Make (Syntax)
-module Lang = Tact.Lang.Make (Syntax)
-module Interpreter = Tact.Interpreter
-module Errors = Tact.Errors
-module Zint = Tact.Zint
-open Core
-
-type error = [Lang.error | Interpreter.error] [@@deriving sexp_of]
-
-let make_errors () = new Errors.errors
-
-let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
-
-let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
-    p =
-  let c = new Lang.constructor (bindings, errors) in
-  let p' = c#visit_program () p in
-  errors#to_result p'
-  |> Result.map_error ~f:(fun errors ->
-         List.map errors ~f:(fun (_, err, _) -> err) )
-
-let pp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
-
-exception Exn of error list
-
-let compile s =
-  parse_program s |> build_program
-  |> Result.map_error ~f:(fun err -> Exn err)
-  |> Result.ok_exn
+open Shared
 
 let test_alias () =
   let source = {|
@@ -41,8 +12,8 @@ let test_alias () =
      and t1 =
        List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      in
-     pp (Lang.sexp_of_expr t) ;
-     pp (Lang.sexp_of_expr t1) ;
+     pp_sexp (Lang.sexp_of_expr t) ;
+     pp_sexp (Lang.sexp_of_expr t1) ;
      Lang.equal_expr t t1 )
 
 let test_carbon_copy () =
@@ -59,8 +30,8 @@ let test_carbon_copy () =
      and t1 =
        List.Assoc.find scope ~equal:String.equal "T1" |> Option.value_exn
      in
-     pp (Lang.sexp_of_expr t) ;
-     pp (Lang.sexp_of_expr t1) ;
+     pp_sexp (Lang.sexp_of_expr t) ;
+     pp_sexp (Lang.sexp_of_expr t1) ;
      Lang.equal_expr t t1 )
 
 let test_parameterized () =
@@ -79,8 +50,8 @@ let test_parameterized () =
      and t2 =
        List.Assoc.find scope ~equal:String.equal "T2" |> Option.value_exn
      in
-     pp (Lang.sexp_of_expr t1) ;
-     pp (Lang.sexp_of_expr t2) ;
+     pp_sexp (Lang.sexp_of_expr t1) ;
+     pp_sexp (Lang.sexp_of_expr t2) ;
      Lang.equal_expr t1 t2 ) ;
   Alcotest.(check bool)
     "equally parameterized types are the same" true
@@ -89,8 +60,8 @@ let test_parameterized () =
      and t3 =
        List.Assoc.find scope ~equal:String.equal "T3" |> Option.value_exn
      in
-     pp (Lang.sexp_of_expr t1) ;
-     pp (Lang.sexp_of_expr t3) ;
+     pp_sexp (Lang.sexp_of_expr t1) ;
+     pp_sexp (Lang.sexp_of_expr t3) ;
      Lang.equal_expr t1 t3 )
 
 let () =

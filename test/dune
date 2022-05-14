@@ -1,14 +1,22 @@
 (library
  (preprocess
   (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
+ (name shared)
+ (inline_tests)
+ (modules shared)
+ (libraries tact core sexplib))
+
+(library
+ (preprocess
+  (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
  (name tact_tests)
  (inline_tests)
  (modules syntax lang)
- (libraries tact core sexplib))
+ (libraries tact core sexplib shared))
 
 (tests
  (preprocess
   (staged_pps ppx_matches))
  (names lang_types builtin errors)
  (modules lang_types builtin errors)
- (libraries tact alcotest ppx_matches core))
+ (libraries tact alcotest ppx_matches core shared))

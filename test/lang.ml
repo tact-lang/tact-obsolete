@@ -1,31 +1,4 @@
-module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
-module Parser = Tact.Parser.Make (Syntax)
-module Lang = Tact.Lang.Make (Syntax)
-module Interpreter = Tact.Interpreter
-module Errors = Tact.Errors
-module Zint = Tact.Zint
-open Core
-
-type error = [Lang.error | Interpreter.error] [@@deriving sexp_of]
-
-let make_errors () = new Errors.errors
-
-let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
-
-let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
-    p =
-  let c = new Lang.constructor (bindings, errors) in
-  let p' = c#visit_program () p in
-  errors#to_result p'
-  |> Result.map_error ~f:(fun errors ->
-         List.map errors ~f:(fun (_, err, _) -> err) )
-
-let print_sexp e =
-  Sexplib.Sexp.pp_hum Format.std_formatter
-    (Result.sexp_of_t Lang.sexp_of_program (List.sexp_of_t sexp_of_error) e)
-
-let pp ?(bindings = Lang.default_bindings) s =
-  parse_program s |> build_program ~bindings |> print_sexp
+open Shared
 
 let%expect_test "scope resolution" =
   let source = {|
