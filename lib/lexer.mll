@@ -10,6 +10,21 @@
                  pos_lnum = pos.pos_lnum + 1;
       }
 
+(* Lexing string literals, approach lifted from OCaml's lexer *)
+
+let empty_str_buffer () = Buffer.create 256
+let str_buffer = ref (empty_str_buffer ())
+
+let rec reset_str_buffer () =
+  str_buffer := empty_str_buffer () ;
+and get_str_buffer () =
+  let s = Buffer.contents !str_buffer in
+    reset_str_buffer () ;
+    s
+
+let store_str_char c =
+  Buffer.add_char !str_buffer c
+
 }
 
 (* Define helper regexes *)
@@ -37,6 +52,11 @@ rule token = parse
  | '=' { EQUALS }
  | '~' { TILDE }
  | '.' { DOT }
+ | '"' { 
+     reset_str_buffer ();
+     string lexbuf ;
+     STRING (get_str_buffer ())
+   }
  | "let" { LET }
  | "struct" { STRUCT }
  | "enum" { ENUM }
@@ -53,4 +73,11 @@ rule token = parse
  | eof { EOF }
  | _
     { raise (Error (Printf.sprintf "At offset %d: unexpected character.\n" (Lexing.lexeme_start lexbuf))) }
- 
+
+and string = parse
+ | '"' { () }
+(* string lexer does not currently support any escaping for simplicity's sake,
+ * but is expected to have it *)
+ | eof { raise (Error "Unterminated string literal") }
+ | _ { store_str_char @@ Lexing.lexeme_char lexbuf 0 ;
+       string lexbuf }

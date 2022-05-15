@@ -13,6 +13,14 @@ let%expect_test "empty" =
   let source = {||} in
   pp source ; [%expect {| () |}]
 
+let%expect_test "integer" =
+  let source = {|100;-100|} in
+  pp source ; [%expect {| ((stmts ((Expr (Int 100)) (Expr (Int -100))))) |}]
+
+let%expect_test "string" =
+  let source = {|"hello world"|} in
+  pp source ; [%expect {| ((stmts ((Expr (String "hello world"))))) |}]
+
 let%expect_test "let struct" =
   let source = {|
     let MyType = struct {};

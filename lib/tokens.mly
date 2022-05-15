@@ -1,6 +1,7 @@
 %token LET INTERFACE STRUCT ENUM UNION FN IF ELSE RETURN VAL CASE
 %token EQUALS
 %token <string> IDENT
+%token <string> STRING
 %token EOF
 %token LBRACE LPAREN
 %token RBRACE RPAREN

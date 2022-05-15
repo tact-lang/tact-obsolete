@@ -45,9 +45,8 @@ functor
         method build_FunctionCall _env (f, args) =
           let fc = (f, args) in
           if are_immediate_arguments args then
-            let inter = new interpreter (current_bindings, errors) in
-            let value' = inter#interpret_fc fc in
-            Value value'
+            let inter = new interpreter (current_bindings, errors, functions) in
+            inter#interpret_fc fc
           else FunctionCall fc
 
         method build_MethodCall env mc = s#build_FunctionCall env mc
@@ -57,6 +56,8 @@ functor
         method build_If _env _if = Invalid
 
         method build_Int _env i = Value (Integer i)
+
+        method build_String _env s = Value (String s)
 
         method build_Interface _env _iface = InvalidExpr
 
@@ -111,7 +112,9 @@ functor
           let expr' = super#visit_expr env syntax_expr in
           match is_immediate_expr expr' && equal functions 0 with
           | true ->
-              let inter = new interpreter (current_bindings, errors) in
+              let inter =
+                new interpreter (current_bindings, errors, functions)
+              in
               let value' = inter#interpret_expr expr' in
               Value value'
           | false ->
@@ -138,7 +141,8 @@ functor
                    (BuiltinFn
                       { function_params = [];
                         function_returns = Value (Type VoidType);
-                        function_impl = builtin_fun (fun _ _ -> Void) } ) ),
+                        function_impl = builtin_fun (fun _ _ -> Value Void) } )
+                ),
               [] )
           in
           (* TODO: check method signatures *)
