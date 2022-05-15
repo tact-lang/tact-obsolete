@@ -310,6 +310,53 @@ let%expect_test "Tact function evaluation" =
                  (struct_id <opaque>)))))
              (function_impl (((Break (Expr (Reference (i TypeType)))))))))))))))) |}]
 
+let%expect_test "compile-time function evaluation within a function" =
+  let source =
+    {|
+    fn test() {
+      let v = incr(incr(incr(1)));
+      v
+    }
+  |}
+  in
+  pp source
+    ~bindings:
+      ( ( "incr",
+          Value
+            (Function
+               (BuiltinFn
+                  { function_params = [("value", Value (Type IntegerType))];
+                    function_returns = Value (Type IntegerType);
+                    function_impl =
+                      builtin_fun (fun _p -> function
+                        | Integer arg :: _ ->
+                            Integer (Zint.succ arg)
+                        | _ ->
+                            Integer Zint.zero ) } ) ) )
+      :: Lang.default_bindings ) ;
+  [%expect
+    {|
+    (Ok
+     ((stmts
+       ((Let
+         ((test
+           (Value
+            (Function
+             (Fn
+              ((function_params ()) (function_returns Hole)
+               (function_impl
+                (((Let ((v (Value (Integer 4)))))
+                  (Break (Expr (Value (Integer 4))))))))))))))))
+      (bindings
+       ((test
+         (Value
+          (Function
+           (Fn
+            ((function_params ()) (function_returns Hole)
+             (function_impl
+              (((Let ((v (Value (Integer 4)))))
+                (Break (Expr (Value (Integer 4)))))))))))))))) |}]
+
 let%expect_test "struct definition" =
   let source =
     {|
@@ -642,83 +689,81 @@ let%expect_test "reference in function bodies" =
                 (((Let
                    ((a
                      (FunctionCall
-                      (((Value
-                         (Function
-                          (Fn
-                           ((function_params
-                             ((i
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_methods
-                                   ((new
-                                     (BuiltinFn
-                                      ((function_params
-                                        ((integer (Value (Type IntegerType)))))
-                                       (function_returns Hole)
-                                       (function_impl (<fun> <opaque>)))))))
-                                  (struct_id <opaque>)))))
-                              (i_
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_methods
-                                   ((new
-                                     (BuiltinFn
-                                      ((function_params
-                                        ((integer (Value (Type IntegerType)))))
-                                       (function_returns Hole)
-                                       (function_impl (<fun> <opaque>)))))))
-                                  (struct_id <opaque>)))))))
-                            (function_returns Hole)
-                            (function_impl
-                             (((Break (Expr (Reference (i TypeType)))))))))))
-                        ((Reference (x TypeType)) (Reference (x TypeType))))
-                       ())))))
+                      ((Value
+                        (Function
+                         (Fn
+                          ((function_params
+                            ((i
+                              (Value
+                               (Struct
+                                ((struct_fields
+                                  ((integer
+                                    ((field_type (Value (Type IntegerType)))))))
+                                 (struct_methods
+                                  ((new
+                                    (BuiltinFn
+                                     ((function_params
+                                       ((integer (Value (Type IntegerType)))))
+                                      (function_returns Hole)
+                                      (function_impl (<fun> <opaque>)))))))
+                                 (struct_id <opaque>)))))
+                             (i_
+                              (Value
+                               (Struct
+                                ((struct_fields
+                                  ((integer
+                                    ((field_type (Value (Type IntegerType)))))))
+                                 (struct_methods
+                                  ((new
+                                    (BuiltinFn
+                                     ((function_params
+                                       ((integer (Value (Type IntegerType)))))
+                                      (function_returns Hole)
+                                      (function_impl (<fun> <opaque>)))))))
+                                 (struct_id <opaque>)))))))
+                           (function_returns Hole)
+                           (function_impl
+                            (((Break (Expr (Reference (i TypeType)))))))))))
+                       ((Reference (x TypeType)) (Reference (x TypeType))))))))
                   (Let
                    ((b
                      (FunctionCall
-                      (((Value
-                         (Function
-                          (Fn
-                           ((function_params
-                             ((i
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_methods
-                                   ((new
-                                     (BuiltinFn
-                                      ((function_params
-                                        ((integer (Value (Type IntegerType)))))
-                                       (function_returns Hole)
-                                       (function_impl (<fun> <opaque>)))))))
-                                  (struct_id <opaque>)))))
-                              (i_
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_methods
-                                   ((new
-                                     (BuiltinFn
-                                      ((function_params
-                                        ((integer (Value (Type IntegerType)))))
-                                       (function_returns Hole)
-                                       (function_impl (<fun> <opaque>)))))))
-                                  (struct_id <opaque>)))))))
-                            (function_returns Hole)
-                            (function_impl
-                             (((Break (Expr (Reference (i TypeType)))))))))))
-                        ((Reference (a HoleType)) (Reference (a HoleType))))
-                       ())))))))))))))))))
+                      ((Value
+                        (Function
+                         (Fn
+                          ((function_params
+                            ((i
+                              (Value
+                               (Struct
+                                ((struct_fields
+                                  ((integer
+                                    ((field_type (Value (Type IntegerType)))))))
+                                 (struct_methods
+                                  ((new
+                                    (BuiltinFn
+                                     ((function_params
+                                       ((integer (Value (Type IntegerType)))))
+                                      (function_returns Hole)
+                                      (function_impl (<fun> <opaque>)))))))
+                                 (struct_id <opaque>)))))
+                             (i_
+                              (Value
+                               (Struct
+                                ((struct_fields
+                                  ((integer
+                                    ((field_type (Value (Type IntegerType)))))))
+                                 (struct_methods
+                                  ((new
+                                    (BuiltinFn
+                                     ((function_params
+                                       ((integer (Value (Type IntegerType)))))
+                                      (function_returns Hole)
+                                      (function_impl (<fun> <opaque>)))))))
+                                 (struct_id <opaque>)))))))
+                           (function_returns Hole)
+                           (function_impl
+                            (((Break (Expr (Reference (i TypeType)))))))))))
+                       ((Reference (a HoleType)) (Reference (a HoleType))))))))))))))))))))
       (bindings
        ((f
          (Value
@@ -741,83 +786,81 @@ let%expect_test "reference in function bodies" =
               (((Let
                  ((a
                    (FunctionCall
-                    (((Value
-                       (Function
-                        (Fn
-                         ((function_params
-                           ((i
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_methods
-                                 ((new
-                                   (BuiltinFn
-                                    ((function_params
-                                      ((integer (Value (Type IntegerType)))))
-                                     (function_returns Hole)
-                                     (function_impl (<fun> <opaque>)))))))
-                                (struct_id <opaque>)))))
-                            (i_
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_methods
-                                 ((new
-                                   (BuiltinFn
-                                    ((function_params
-                                      ((integer (Value (Type IntegerType)))))
-                                     (function_returns Hole)
-                                     (function_impl (<fun> <opaque>)))))))
-                                (struct_id <opaque>)))))))
-                          (function_returns Hole)
-                          (function_impl
-                           (((Break (Expr (Reference (i TypeType)))))))))))
-                      ((Reference (x TypeType)) (Reference (x TypeType))))
-                     ())))))
+                    ((Value
+                      (Function
+                       (Fn
+                        ((function_params
+                          ((i
+                            (Value
+                             (Struct
+                              ((struct_fields
+                                ((integer
+                                  ((field_type (Value (Type IntegerType)))))))
+                               (struct_methods
+                                ((new
+                                  (BuiltinFn
+                                   ((function_params
+                                     ((integer (Value (Type IntegerType)))))
+                                    (function_returns Hole)
+                                    (function_impl (<fun> <opaque>)))))))
+                               (struct_id <opaque>)))))
+                           (i_
+                            (Value
+                             (Struct
+                              ((struct_fields
+                                ((integer
+                                  ((field_type (Value (Type IntegerType)))))))
+                               (struct_methods
+                                ((new
+                                  (BuiltinFn
+                                   ((function_params
+                                     ((integer (Value (Type IntegerType)))))
+                                    (function_returns Hole)
+                                    (function_impl (<fun> <opaque>)))))))
+                               (struct_id <opaque>)))))))
+                         (function_returns Hole)
+                         (function_impl
+                          (((Break (Expr (Reference (i TypeType)))))))))))
+                     ((Reference (x TypeType)) (Reference (x TypeType))))))))
                 (Let
                  ((b
                    (FunctionCall
-                    (((Value
-                       (Function
-                        (Fn
-                         ((function_params
-                           ((i
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_methods
-                                 ((new
-                                   (BuiltinFn
-                                    ((function_params
-                                      ((integer (Value (Type IntegerType)))))
-                                     (function_returns Hole)
-                                     (function_impl (<fun> <opaque>)))))))
-                                (struct_id <opaque>)))))
-                            (i_
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_methods
-                                 ((new
-                                   (BuiltinFn
-                                    ((function_params
-                                      ((integer (Value (Type IntegerType)))))
-                                     (function_returns Hole)
-                                     (function_impl (<fun> <opaque>)))))))
-                                (struct_id <opaque>)))))))
-                          (function_returns Hole)
-                          (function_impl
-                           (((Break (Expr (Reference (i TypeType)))))))))))
-                      ((Reference (a HoleType)) (Reference (a HoleType))))
-                     ())))))))))))))
+                    ((Value
+                      (Function
+                       (Fn
+                        ((function_params
+                          ((i
+                            (Value
+                             (Struct
+                              ((struct_fields
+                                ((integer
+                                  ((field_type (Value (Type IntegerType)))))))
+                               (struct_methods
+                                ((new
+                                  (BuiltinFn
+                                   ((function_params
+                                     ((integer (Value (Type IntegerType)))))
+                                    (function_returns Hole)
+                                    (function_impl (<fun> <opaque>)))))))
+                               (struct_id <opaque>)))))
+                           (i_
+                            (Value
+                             (Struct
+                              ((struct_fields
+                                ((integer
+                                  ((field_type (Value (Type IntegerType)))))))
+                               (struct_methods
+                                ((new
+                                  (BuiltinFn
+                                   ((function_params
+                                     ((integer (Value (Type IntegerType)))))
+                                    (function_returns Hole)
+                                    (function_impl (<fun> <opaque>)))))))
+                               (struct_id <opaque>)))))))
+                         (function_returns Hole)
+                         (function_impl
+                          (((Break (Expr (Reference (i TypeType)))))))))))
+                     ((Reference (a HoleType)) (Reference (a HoleType))))))))))))))))
         (op
          (Value
           (Function

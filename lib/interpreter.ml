@@ -55,14 +55,8 @@ class interpreter ((bindings, errors) : expr named_map list * _ errors) =
     method interpret_expr : expr -> value =
       fun expr ->
         match expr with
-        | FunctionCall (fc, result) -> (
-          match !result with
-          | Some t ->
-              t
-          | _ ->
-              let value = self#interpret_fc fc in
-              result := Some value ;
-              value )
+        | FunctionCall fc ->
+            self#interpret_fc fc
         | Reference (name, _) -> (
           match self#find_ref name with
           | Some expr' ->
@@ -92,7 +86,7 @@ class interpreter ((bindings, errors) : expr named_map list * _ errors) =
 
     method interpret_fc : function_call -> value =
       fun (func, args) ->
-        let mk_err = Expr (FunctionCall ((func, args), ref None)) in
+        let mk_err = Expr (FunctionCall (func, args)) in
         let args' = List.map args ~f:(fun arg -> self#interpret_expr arg) in
         let args_to_list params values =
           match
