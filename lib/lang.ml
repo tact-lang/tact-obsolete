@@ -42,9 +42,15 @@ functor
 
         method build_Function _env fn = Value (Function (Fn fn))
 
-        method build_FunctionCall _env fc = FunctionCall (fc, ref None)
+        method build_FunctionCall _env (f, args) =
+          let fc = (f, args) in
+          if are_immediate_arguments args then
+            let inter = new interpreter (current_bindings, errors) in
+            let value' = inter#interpret_fc fc in
+            Value value'
+          else FunctionCall fc
 
-        method build_MethodCall _env mc = FunctionCall (mc, ref None)
+        method build_MethodCall env mc = s#build_FunctionCall env mc
 
         method build_Ident _env string_ = string_
 
@@ -55,14 +61,20 @@ functor
         method build_Interface _env _iface = InvalidExpr
 
         method build_Let _env let_ =
+          let amend_bindings binding = function
+            | [] ->
+                [[binding]]
+            | bindings :: rest ->
+                (binding :: bindings) :: rest
+          in
           let name, expr = Syntax.value let_ in
           match is_immediate_expr expr with
           | true ->
-              current_bindings <- [(name, expr)] :: current_bindings ;
+              current_bindings <- amend_bindings (name, expr) current_bindings ;
               Let [(name, expr)]
           | false ->
               let ty = expr_to_type expr in
-              runtime_bindings <- [(name, ty)] :: runtime_bindings ;
+              runtime_bindings <- amend_bindings (name, ty) runtime_bindings ;
               Let [(name, expr)]
 
         method build_MutRef _env _mutref = InvalidExpr
@@ -176,8 +188,16 @@ functor
           let functions' = functions in
           (* increment function counter *)
           functions <- functions + 1 ;
+          (* new binding scope *)
+          let current_bindings' = current_bindings
+          and runtime_bindings' = runtime_bindings in
+          current_bindings <- [] :: current_bindings ;
+          runtime_bindings <- [] :: runtime_bindings ;
           (* process the body *)
           let result = super#visit_function_body env body in
+          (* drop binding scope *)
+          current_bindings <- current_bindings' ;
+          runtime_bindings <- runtime_bindings' ;
           (* restore function enclosure count *)
           functions <- functions' ;
           result

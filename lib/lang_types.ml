@@ -14,8 +14,7 @@ and binding = string * expr
 and program = {stmts : stmt list; [@sexp.list] bindings : expr named_map}
 
 and expr =
-  | FunctionCall of (function_call * (value option[@sexp.option]) ref)
-    (* expr option is cached result *)
+  | FunctionCall of function_call
   | Reference of (string * type_)
   | Value of value
   | Hole
@@ -94,8 +93,8 @@ let rec expr_to_type = function
       type_
   | Hole ->
       HoleType
-  | FunctionCall ((Value (Function (Fn {function_returns; _})), _), _)
-  | FunctionCall ((Value (Function (BuiltinFn {function_returns; _})), _), _) ->
+  | FunctionCall (Value (Function (Fn {function_returns; _})), _)
+  | FunctionCall (Value (Function (BuiltinFn {function_returns; _})), _) ->
       expr_to_type function_returns
   | Reference (_, t) ->
       t
@@ -105,7 +104,7 @@ let rec expr_to_type = function
 let rec is_immediate_expr = function
   | Value _ ->
       true
-  | FunctionCall ((_, args), _) ->
+  | FunctionCall (_, args) ->
       are_immediate_arguments args
   | Hole ->
       false
