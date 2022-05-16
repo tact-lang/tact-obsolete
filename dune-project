@@ -15,7 +15,6 @@
    (ocaml (>= 4.14.0))
    (ppx_show (>= 0.2.1))
    (ppx_make (>= 0.3.0))
-   (ppx_import (>= 1.9.1))
    (js_of_ocaml-ppx (>= 4.0.0))
    (zarith_stubs_js (>= 0.15.0))
    (yojson (>= 1.7.0))
