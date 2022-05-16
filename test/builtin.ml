@@ -33,7 +33,7 @@ let%expect_test "Int(bits) constructor" =
                (struct_methods
                 ((new
                   ((function_params ((integer (Value (Type IntegerType)))))
-                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 6)))))))
+                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 8)))))))
                (struct_id <opaque>))
               ((integer (Integer 1)))))))))))
       (bindings
@@ -45,7 +45,7 @@ let%expect_test "Int(bits) constructor" =
              (struct_methods
               ((new
                 ((function_params ((integer (Value (Type IntegerType)))))
-                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 6)))))))
+                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 8)))))))
              (struct_id <opaque>))
             ((integer (Integer 1)))))))
         (i

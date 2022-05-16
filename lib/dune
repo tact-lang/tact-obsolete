@@ -31,7 +31,11 @@
   lang_types
   builtin
   interpreter
-  lang)
+  lang
+  lang_ir
+  ;codegen_func
+  ;codegen
+  )
  (name tact))
 
 (ocamllex asm_lexer)

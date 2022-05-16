@@ -42,11 +42,13 @@ and value =
   | Type of type_
 
 and stmt =
-  | Let of (string * expr) list
+  | Let of let_bindings
   | Return of expr
   | Break of stmt
   | Expr of expr
   | Invalid
+
+and let_bindings = (string * expr) list
 
 and builtin = string
 
@@ -76,9 +78,11 @@ and native_function =
 and builtin_fn = native_function * int
 
 and function_ =
-  { function_params : (string * expr) list;
+  { function_params : function_params;
     function_returns : expr;
     function_impl : function_impl }
+
+and function_params = (string * expr) list
 
 and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 

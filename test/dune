@@ -11,7 +11,7 @@
   (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
  (name tact_tests)
  (inline_tests)
- (modules syntax lang builtin)
+ (modules syntax lang lang_ir builtin)
  (libraries tact core sexplib shared))
 
 (library
