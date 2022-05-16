@@ -1,6 +1,7 @@
 open Base
 
-type instr = ADD | NOP | SWAP | XCHG0 of int [@@deriving equal, sexp_of]
+type instr = ADD | NOP | SWAP | XCHG0 of int
+[@@deriving equal, sexp_of, yojson_of]
 
 class ['s] map =
   object (_ : 's)
