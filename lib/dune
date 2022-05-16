@@ -8,8 +8,7 @@
   ppx_sexp_conv
   sexplib)
  (preprocess
-  (staged_pps
-   ppx_import
+  (pps
    ppx_show
    ppx_make
    ppx_compare

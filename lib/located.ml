@@ -1,13 +1,22 @@
-open Sexplib.Std
-
 module Lexing' = struct
+  open Base
+  open Caml.Format
+
   let equal_string = String.equal
 
   let equal_int = Int.equal
 
-  type pos = [%import: Lexing.position] [@@deriving equal, sexp_of]
+  include Lexing
 
-  open Format
+  let equal_position p1 p2 =
+    String.equal p1.pos_fname p2.pos_fname
+    && equal p1.pos_lnum p2.pos_lnum
+    && equal p1.pos_bol p2.pos_bol
+    && equal p1.pos_cnum p2.pos_cnum
+
+  let sexp_of_position _pos = Sexplib.Sexp.(Atom "pos")
+
+  type pos = position [@@deriving equal, sexp_of]
 
   let pp_pos f p =
     pp_print_string f p.pos_fname ;
