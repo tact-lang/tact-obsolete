@@ -21,7 +21,7 @@ Run `opam install tact --working-dir --deps-only --with-test`
 
 ### Running REPL
 
-Run `dune utop`
+Run `dune utop lib`
 
 ### Running tests
 
@@ -45,10 +45,7 @@ pp source ; [%expect {||}]
 
 to fill in the blanks. In this particular case, it's useful to run `dune test --auto-promote`
 
-### Building JavaScript bindings
+### JavaScript bindings
 
-In order to build JavaScript bindings, one needs to edit `dune` file in the
-project root and add `js` to the list of `dirs`. This is not ideal but this
-avoid the problem of attempting to load JavaScript primitives into OCaml
-top-level (when `dune top`/`dune utop` are used). We're looking for a nicer
-solution. 
+Can be built during `dune build` or `dune build js` and will be available in
+` _build/default/js/tact_js.bc.js`
