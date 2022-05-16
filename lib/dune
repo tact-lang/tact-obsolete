@@ -14,7 +14,8 @@
    ppx_make
    ppx_compare
    visitors.ppx
-   ppx_sexp_conv))
+   ppx_sexp_conv
+   ppx_yojson_conv))
  (modules
   tokens
   parser

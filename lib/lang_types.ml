@@ -7,6 +7,8 @@ class ['s] base_map =
     inherit ['s] Asm.map
   end
 
+type 'a unserializable = 'a
+
 type 'a named_map = (string * 'a) list
 
 and comptime_counter = (int[@sexp.opaque])
@@ -79,6 +81,7 @@ and function_call = expr * expr list
 [@@deriving
   equal,
     sexp_of,
+    yojson_of,
     visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]}]
 
 let rec expr_to_type = function

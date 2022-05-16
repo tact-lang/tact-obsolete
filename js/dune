@@ -1,0 +1,7 @@
+(executable
+ (name tact_js)
+ (preprocess
+  (pps js_of_ocaml-ppx))
+ (libraries tact menhirLib sexplib js_of_ocaml zarith_stubs_js)
+ (modules tact_js)
+ (modes js))
