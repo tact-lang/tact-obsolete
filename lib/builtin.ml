@@ -34,16 +34,16 @@ let int_type =
             extract i 0 (numbits - bits)
           else i
         in
-        StructInstance (int_type_s bits, [("integer", Integer i)])
+        Value (StructInstance (int_type_s bits, [("integer", Integer i)]))
     | _ ->
         (* TODO: raise an error instead *)
         constructor_impl bits p [Integer (Zint.of_int 0)]
   and function_impl _p = function
     | [Integer bits] ->
-        Struct (int_type_s @@ Z.to_int bits)
+        Value (Struct (int_type_s @@ Z.to_int bits))
     | _ ->
         (* TODO: raise an error instead *)
-        Void
+        Value Void
   in
   Value
     (Function
@@ -52,8 +52,25 @@ let int_type =
             function_returns = Value (Struct (int_type_s 257));
             function_impl = builtin_fun function_impl } ) )
 
+let asm =
+  let function_impl _p = function
+    | [String code] ->
+        let lexbuf = Lexing.from_string code in
+        let code = Asm_parser.code Asm_lexer.token lexbuf in
+        Asm code
+    | _ ->
+        Value Void
+  in
+  Value
+    (Function
+       (BuiltinFn
+          { function_params = [("instructions", Value (Type StringType))];
+            function_returns = Value (Type VoidType);
+            function_impl = builtin_fun function_impl } ) )
+
 let default_bindings =
-  [ ("Integer", Value (Type IntegerType));
+  [ ("asm", asm);
+    ("Integer", Value (Type IntegerType));
     ("Int", int_type);
     ("Bool", Value (Builtin "Bool"));
     ("Type", Value (Builtin "Type"));

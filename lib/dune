@@ -23,6 +23,9 @@
   syntax
   unitActionsParser
   parserMessages
+  asm
+  asm_lexer
+  asm_parser
   zint
   errors
   lang_types
@@ -30,6 +33,12 @@
   interpreter
   lang)
  (name tact))
+
+(ocamllex asm_lexer)
+
+(menhir
+ (modules asm_parser)
+ (flags -v))
 
 (ocamllex lexer)
 

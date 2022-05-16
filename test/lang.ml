@@ -223,9 +223,9 @@ let%expect_test "native function evaluation" =
                     function_impl =
                       builtin_fun (fun _p -> function
                         | Integer arg :: _ ->
-                            Integer (Zint.succ arg)
+                            Value (Integer (Zint.succ arg))
                         | _ ->
-                            Integer Zint.zero ) } ) ) )
+                            Value (Integer Zint.zero) ) } ) ) )
       :: Lang.default_bindings ) ;
   [%expect
     {|
@@ -330,9 +330,9 @@ let%expect_test "compile-time function evaluation within a function" =
                     function_impl =
                       builtin_fun (fun _p -> function
                         | Integer arg :: _ ->
-                            Integer (Zint.succ arg)
+                            Value (Integer (Zint.succ arg))
                         | _ ->
-                            Integer Zint.zero ) } ) ) )
+                            Value (Integer Zint.zero) ) } ) ) )
       :: Lang.default_bindings ) ;
   [%expect
     {|
@@ -1000,3 +1000,45 @@ let%expect_test "method access" =
                  (function_returns Hole)
                  (function_impl (((Break (Expr (Reference (i IntegerType))))))))))))
             (struct_id <opaque>))))))))) |}]
+
+let%expect_test "can't use asm in compile-time" =
+  let source = {|
+    asm("SWAP 2 XCHG0");
+    asm("ADD");
+  |} in
+  pp source ;
+  [%expect
+    {|
+    (Error
+     ((UninterpretableStatement (Expr (Asm (SWAP (XCHG0 2)))))
+      (UninterpretableStatement (Expr (Asm (ADD)))))) |}]
+
+let%expect_test "use of asm in a function" =
+  let source =
+    {|
+    fn f() {
+      asm("SWAP 2 XCHG0");
+      asm("ADD");
+    }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((stmts
+       ((Let
+         ((f
+           (Value
+            (Function
+             (Fn
+              ((function_params ()) (function_returns Hole)
+               (function_impl
+                (((Expr (Asm (SWAP (XCHG0 2)))) (Expr (Asm (ADD)))))))))))))))
+      (bindings
+       ((f
+         (Value
+          (Function
+           (Fn
+            ((function_params ()) (function_returns Hole)
+             (function_impl (((Expr (Asm (SWAP (XCHG0 2)))) (Expr (Asm (ADD))))))))))))))) |}]

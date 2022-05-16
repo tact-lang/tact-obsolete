@@ -262,6 +262,8 @@ let fexpr :=
  | function_call
  (* can be an integer *)
  | ~= INT; <Int>
+ (* can be a string *)
+ | ~= STRING; <String>
  (* can be mutation ref *)
  | TILDE; ~= located(ident); <MutRef>
 

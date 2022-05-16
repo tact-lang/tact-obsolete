@@ -3,6 +3,8 @@ open Base
 class ['s] base_map =
   object (_ : 's)
     inherit ['s] Zint.map
+
+    inherit ['s] Asm.map
   end
 
 type 'a named_map = (string * 'a) list
@@ -17,6 +19,7 @@ and expr =
   | FunctionCall of function_call
   | Reference of (string * type_)
   | Value of value
+  | Asm of Asm.instr list
   | Hole
   | InvalidExpr
 
@@ -27,6 +30,7 @@ and value =
   | StructInstance of (struct_ * value named_map)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
+  | String of string
   | Builtin of builtin
   | Type of type_
 
@@ -42,6 +46,7 @@ and builtin = string
 and type_ =
   | TypeType
   | IntegerType
+  | StringType
   | VoidType
   | BuiltinType of builtin
   | StructType of struct_
@@ -64,7 +69,7 @@ and function_body = (stmt list option[@sexp.option])
 and fn = function_body typed_fn
 
 and native_function =
-  (program -> value list -> value[@visitors.opaque] [@equal.ignore])
+  (program -> value list -> expr[@visitors.opaque] [@equal.ignore])
 
 and builtin_fn = (native_function * comptime_counter) typed_fn
 
@@ -109,6 +114,8 @@ let rec is_immediate_expr = function
   | Hole ->
       false
   | Reference _ ->
+      false
+  | Asm _ ->
       false
   | InvalidExpr ->
       false

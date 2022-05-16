@@ -9,7 +9,8 @@ type error =
 [@@deriving equal, sexp_of]
 
 (*TODO: type checks for arguments*)
-class interpreter ((bindings, errors) : expr named_map list * _ errors) =
+class interpreter
+  ((bindings, errors, functions) : expr named_map list * _ errors * int) =
   object (self)
     val global_bindings = bindings
 
@@ -55,8 +56,12 @@ class interpreter ((bindings, errors) : expr named_map list * _ errors) =
     method interpret_expr : expr -> value =
       fun expr ->
         match expr with
-        | FunctionCall fc ->
-            self#interpret_fc fc
+        | FunctionCall fc -> (
+          match self#interpret_fc fc with
+          | Value v ->
+              v
+          | e ->
+              self#interpret_expr e )
         | Reference (name, _) -> (
           match self#find_ref name with
           | Some expr' ->
@@ -66,7 +71,7 @@ class interpreter ((bindings, errors) : expr named_map list * _ errors) =
               Void )
         | Value value ->
             self#interpret_value value
-        | InvalidExpr | Hole ->
+        | Asm _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
@@ -84,7 +89,7 @@ class interpreter ((bindings, errors) : expr named_map list * _ errors) =
 
     method interpret_function : function_ -> function_ = fun f -> f
 
-    method interpret_fc : function_call -> value =
+    method interpret_fc : function_call -> expr =
       fun (func, args) ->
         let mk_err = Expr (FunctionCall (func, args)) in
         let args' = List.map args ~f:(fun arg -> self#interpret_expr arg) in
@@ -110,24 +115,24 @@ class interpreter ((bindings, errors) : expr named_map list * _ errors) =
                     vars_scope <- args_scope :: vars_scope ;
                     let output = self#interpret_stmt_list body in
                     vars_scope <- prev_scope ;
-                    output
+                    Value output
                 | None ->
-                    Void )
+                    Value Void )
               | Error _ ->
-                  Void )
+                  Value Void )
           | BuiltinFn {function_impl = function_impl, _; _} ->
-              let output =
+              let expr =
                 function_impl
                   { stmts = [];
                     bindings =
                       Option.value (List.hd global_bindings) ~default:[] }
                   args'
               in
-              output
+              if functions > 0 then expr else Value (self#interpret_expr expr)
           | _ ->
-              Void )
+              Value Void )
         | _ ->
-            Void
+            Value Void
 
     method private find_ref : string -> expr option =
       fun ref ->

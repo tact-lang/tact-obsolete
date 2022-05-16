@@ -38,6 +38,7 @@ module type T = sig
     | MethodCall of method_call
     | Function of function_definition
     | Int of Zint.t
+    | String of string
     | MutRef of ident located
 
   and stmt =
@@ -95,6 +96,7 @@ module type T = sig
            ; build_MutRef : 'd -> 'm located -> 'i
            ; build_Reference : 'd -> 'm -> 'i
            ; build_Return : 'd -> 'i -> 'g
+           ; build_String : 'd -> string -> 'i
            ; build_Struct : 'd -> 'r -> 'i
            ; build_StructConstructor : 'd -> 's -> 'i
            ; build_Union : 'd -> 't -> 'i
@@ -145,6 +147,7 @@ module type T = sig
            ; visit_MutRef : 'd -> ident located -> 'i
            ; visit_Reference : 'd -> ident -> 'i
            ; visit_Return : 'd -> expr -> 'g
+           ; visit_String : 'd -> string -> 'i
            ; visit_Struct : 'd -> struct_definition -> 'i
            ; visit_StructConstructor : 'd -> struct_constructor -> 'i
            ; visit_Union : 'd -> union_definition -> 'i
@@ -205,6 +208,8 @@ module type T = sig
       method virtual build_Reference : 'd -> 'm -> 'i
 
       method virtual build_Return : 'd -> 'i -> 'g
+
+      method virtual build_String : 'd -> string -> 'i
 
       method virtual build_Struct : 'd -> 'r -> 'i
 
@@ -288,6 +293,8 @@ module type T = sig
 
       method visit_Return : 'd -> expr -> 'g
 
+      method visit_String : 'd -> string -> 'i
+
       method visit_Struct : 'd -> struct_definition -> 'i
 
       method visit_StructConstructor : 'd -> struct_constructor -> 'i
@@ -337,11 +344,7 @@ module type T = sig
       method visit_interface_definition : 'd -> interface_definition -> 'o
 
       method private visit_lazy_t :
-        'env 'a 'b.
-        ('env -> 'a -> 'b) ->
-        'env ->
-        'a Sexplib.Std.Lazy.t ->
-        'b Sexplib.Std.Lazy.t
+        'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a Lazy.t -> 'b Lazy.t
 
       method private visit_list :
         'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a list -> 'b list
@@ -449,6 +452,7 @@ functor
       | MethodCall of method_call
       | Function of function_definition
       | Int of (Zint.t[@visitors.name "z"])
+      | String of string
       | MutRef of ident located
 
     and stmt =
