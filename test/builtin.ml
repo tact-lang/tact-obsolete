@@ -20,9 +20,8 @@ let%expect_test "Int(bits) constructor" =
                 ((integer ((field_type (Value (Type IntegerType)))))))
                (struct_methods
                 ((new
-                  (BuiltinFn
-                   ((function_params ((integer (Value (Type IntegerType)))))
-                    (function_returns Hole) (function_impl (<fun> <opaque>)))))))
+                  ((function_params ((integer (Value (Type IntegerType)))))
+                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 1)))))))
                (struct_id <opaque>))
               ((integer (Integer 100)))))))))
         (Let
@@ -33,9 +32,8 @@ let%expect_test "Int(bits) constructor" =
                 ((integer ((field_type (Value (Type IntegerType)))))))
                (struct_methods
                 ((new
-                  (BuiltinFn
-                   ((function_params ((integer (Value (Type IntegerType)))))
-                    (function_returns Hole) (function_impl (<fun> <opaque>)))))))
+                  ((function_params ((integer (Value (Type IntegerType)))))
+                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 6)))))))
                (struct_id <opaque>))
               ((integer (Integer 1)))))))))))
       (bindings
@@ -46,9 +44,8 @@ let%expect_test "Int(bits) constructor" =
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_methods
               ((new
-                (BuiltinFn
-                 ((function_params ((integer (Value (Type IntegerType)))))
-                  (function_returns Hole) (function_impl (<fun> <opaque>)))))))
+                ((function_params ((integer (Value (Type IntegerType)))))
+                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 6)))))))
              (struct_id <opaque>))
             ((integer (Integer 1)))))))
         (i
@@ -58,8 +55,7 @@ let%expect_test "Int(bits) constructor" =
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_methods
               ((new
-                (BuiltinFn
-                 ((function_params ((integer (Value (Type IntegerType)))))
-                  (function_returns Hole) (function_impl (<fun> <opaque>)))))))
+                ((function_params ((integer (Value (Type IntegerType)))))
+                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 1)))))))
              (struct_id <opaque>))
             ((integer (Integer 100))))))))))) |}]

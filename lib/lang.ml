@@ -18,7 +18,8 @@ functor
 
     include Builtin
 
-    class ['s] constructor ((bindings, errors) : expr named_map * _ errors) =
+    class ['s] constructor ((bindings, errors) : (string * expr) list * _ errors)
+      =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
@@ -26,7 +27,7 @@ functor
         val mutable current_bindings = [bindings]
 
         (* Bindings that will available only in runtime *)
-        val mutable runtime_bindings : type_ named_map list = []
+        val mutable runtime_bindings = []
 
         (* Are we inside of a function body? How deep? *)
         val mutable functions = 0
@@ -40,7 +41,7 @@ functor
 
         method build_FieldAccess _env _fieldaccess = InvalidExpr
 
-        method build_Function _env fn = Value (Function (Fn fn))
+        method build_Function _env fn = Value (Function fn)
 
         method build_FunctionCall _env (f, args) =
           let fc = (f, args) in
@@ -138,11 +139,10 @@ functor
           and dummy : expr * expr list =
             ( Value
                 (Function
-                   (BuiltinFn
-                      { function_params = [];
-                        function_returns = Value (Type VoidType);
-                        function_impl = builtin_fun (fun _ _ -> Value Void) } )
-                ),
+                   { function_params = [];
+                     function_returns = Value (Type VoidType);
+                     function_impl =
+                       BuiltinFn (builtin_fun (fun _ _ -> Value Void)) } ),
               [] )
           in
           (* TODO: check method signatures *)
@@ -218,7 +218,7 @@ functor
             |> Option.map ~f:(fun x -> Syntax.value x)
             |> Option.value ~default:Hole
           and function_impl = body in
-          {function_params; function_returns; function_impl}
+          {function_params; function_returns; function_impl = Fn function_impl}
 
         method build_if_ _env _condition _then _else = ()
 

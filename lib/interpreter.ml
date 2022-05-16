@@ -10,11 +10,11 @@ type error =
 
 (*TODO: type checks for arguments*)
 class interpreter
-  ((bindings, errors, functions) : expr named_map list * _ errors * int) =
+  ((bindings, errors, functions) : (string * expr) list list * _ errors * int) =
   object (self)
     val global_bindings = bindings
 
-    val mutable vars_scope : value named_map list = []
+    val mutable vars_scope = []
 
     val mutable return = Void
 
@@ -105,7 +105,7 @@ class interpreter
         match self#interpret_expr func with
         | Function f -> (
           match f with
-          | Fn {function_params; function_impl; _} -> (
+          | {function_params; function_impl = Fn function_impl; _} -> (
               let args_scope = args_to_list function_params args' in
               match args_scope with
               | Ok args_scope -> (
@@ -120,7 +120,7 @@ class interpreter
                     Value Void )
               | Error _ ->
                   Value Void )
-          | BuiltinFn {function_impl = function_impl, _; _} ->
+          | {function_impl = BuiltinFn (function_impl, _); _} ->
               let expr =
                 function_impl
                   { stmts = [];

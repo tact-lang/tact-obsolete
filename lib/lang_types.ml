@@ -7,15 +7,20 @@ class ['s] base_map =
     inherit ['s] Asm.map
   end
 
-type 'a unserializable = 'a
+class virtual ['s] base_visitor =
+  object (_ : 's)
+    inherit ['s] VisitorsRuntime.map
 
-type 'a named_map = (string * 'a) list
+    inherit ['s] Zint.map
 
-and comptime_counter = (int[@sexp.opaque])
+    inherit ['s] Asm.map
+  end
+
+type comptime_counter = (int[@sexp.opaque])
 
 and binding = string * expr
 
-and program = {stmts : stmt list; [@sexp.list] bindings : expr named_map}
+and program = {stmts : stmt list; [@sexp.list] bindings : (string * expr) list}
 
 and expr =
   | FunctionCall of function_call
@@ -29,7 +34,7 @@ and value =
   | Void
   | Struct of struct_
   (* Instance of a Struct *)
-  | StructInstance of (struct_ * value named_map)
+  | StructInstance of (struct_ * (string * value) list)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
   | String of string
@@ -37,7 +42,7 @@ and value =
   | Type of type_
 
 and stmt =
-  | Let of expr named_map
+  | Let of (string * expr) list
   | Return of expr
   | Break of stmt
   | Expr of expr
@@ -57,32 +62,33 @@ and type_ =
   | InvalidType
 
 and struct_ =
-  { struct_fields : struct_field named_map;
-    struct_methods : function_ named_map;
+  { struct_fields : (string * struct_field) list;
+    struct_methods : (string * function_) list;
     struct_id : (int * int[@sexp.opaque]) }
 
 and struct_field = {field_type : expr}
 
-and 'a typed_fn =
-  {function_params : expr named_map; function_returns : expr; function_impl : 'a}
-
 and function_body = (stmt list option[@sexp.option])
-
-and fn = function_body typed_fn
 
 and native_function =
   (program -> value list -> expr[@visitors.opaque] [@equal.ignore])
 
-and builtin_fn = (native_function * comptime_counter) typed_fn
+and builtin_fn = native_function * int
 
-and function_ = Fn of fn | BuiltinFn of builtin_fn | InvalidFn
+and function_ =
+  { function_params : (string * expr) list;
+    function_returns : expr;
+    function_impl : function_impl }
+
+and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
 and function_call = expr * expr list
 [@@deriving
   equal,
     sexp_of,
     yojson_of,
-    visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]}]
+    visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
+    visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
 let rec expr_to_type = function
   | Value (Struct _) ->
@@ -101,8 +107,7 @@ let rec expr_to_type = function
       type_
   | Hole ->
       HoleType
-  | FunctionCall (Value (Function (Fn {function_returns; _})), _)
-  | FunctionCall (Value (Function (BuiltinFn {function_returns; _})), _) ->
+  | FunctionCall (Value (Function {function_returns; _}), _) ->
       expr_to_type function_returns
   | Reference (_, t) ->
       t
@@ -133,7 +138,7 @@ and builtin_fun f =
   builtin_fun_counter := !builtin_fun_counter + 1 ;
   res
 
-let find_in_scope : 'a. string -> 'a named_map list -> 'a option =
+let find_in_scope : 'a. string -> (string * 'a) list list -> 'a option =
  fun ref scope ->
   List.find_map scope ~f:(fun bindings ->
       Option.map
