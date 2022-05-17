@@ -32,7 +32,6 @@
   builtin
   interpreter
   lang
-  lang_ir
   ;codegen_func
   ;codegen
   )

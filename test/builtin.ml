@@ -11,32 +11,7 @@ let%expect_test "Int(bits) constructor" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((i
-           (Value
-            (StructInstance
-             (((struct_fields
-                ((integer ((field_type (Value (Type IntegerType)))))))
-               (struct_methods
-                ((new
-                  ((function_params ((integer (Value (Type IntegerType)))))
-                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 1)))))))
-               (struct_id <opaque>))
-              ((integer (Integer 100)))))))))
-        (Let
-         ((overflow
-           (Value
-            (StructInstance
-             (((struct_fields
-                ((integer ((field_type (Value (Type IntegerType)))))))
-               (struct_methods
-                ((new
-                  ((function_params ((integer (Value (Type IntegerType)))))
-                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 8)))))))
-               (struct_id <opaque>))
-              ((integer (Integer 1)))))))))))
-      (bindings
+     ((bindings
        ((overflow
          (Value
           (StructInstance
@@ -45,7 +20,7 @@ let%expect_test "Int(bits) constructor" =
              (struct_methods
               ((new
                 ((function_params ((integer (Value (Type IntegerType)))))
-                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 8)))))))
+                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 6)))))))
              (struct_id <opaque>))
             ((integer (Integer 1)))))))
         (i

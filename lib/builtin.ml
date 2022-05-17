@@ -20,7 +20,7 @@ let int_type =
       (* TODO: figure out how to represent Self *)
       function_returns = Hole;
       function_impl = BuiltinFn function_impl }
-  and constructor_impl bits p = function
+  and constructor_impl bits = function
     | [Integer i] ->
         let numbits = Zint.numbits i in
         let i =
@@ -36,8 +36,8 @@ let int_type =
         Value (StructInstance (int_type_s bits, [("integer", Integer i)]))
     | _ ->
         (* TODO: raise an error instead *)
-        constructor_impl bits p [Integer (Zint.of_int 0)]
-  and function_impl _p = function
+        constructor_impl bits [Integer (Zint.of_int 0)]
+  and function_impl = function
     | [Integer bits] ->
         Value (Struct (int_type_s @@ Z.to_int bits))
     | _ ->
@@ -51,7 +51,7 @@ let int_type =
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let asm =
-  let function_impl _p = function
+  let function_impl = function
     | [String code] ->
         let lexbuf = Lexing.from_string code in
         let code = Asm_parser.code Asm_lexer.token lexbuf in

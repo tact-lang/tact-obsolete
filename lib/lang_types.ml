@@ -20,7 +20,7 @@ type comptime_counter = (int[@sexp.opaque])
 
 and binding = string * expr
 
-and program = {stmts : stmt list; [@sexp.list] bindings : (string * expr) list}
+and program = {bindings : (string * expr) list}
 
 and expr =
   | FunctionCall of function_call
@@ -72,8 +72,7 @@ and struct_field = {field_type : expr}
 
 and function_body = (stmt list option[@sexp.option])
 
-and native_function =
-  (program -> value list -> expr[@visitors.opaque] [@equal.ignore])
+and native_function = (value list -> expr[@visitors.opaque] [@equal.ignore])
 
 and builtin_fn = native_function * int
 

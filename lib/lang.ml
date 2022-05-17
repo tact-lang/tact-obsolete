@@ -32,9 +32,6 @@ functor
         (* Are we inside of a function body? How deep? *)
         val mutable functions = 0
 
-        (* Program handle we pass to builtin functions *)
-        val program = {bindings; stmts = []}
-
         method build_CodeBlock _env _code_block = Invalid
 
         method build_Enum _env _enum = InvalidExpr
@@ -142,7 +139,7 @@ functor
                    { function_params = [];
                      function_returns = Value (Type VoidType);
                      function_impl =
-                       BuiltinFn (builtin_fun (fun _ _ -> Value Void)) } ),
+                       BuiltinFn (builtin_fun (fun _ -> Value Void)) } ),
               [] )
           in
           (* TODO: check method signatures *)
@@ -224,9 +221,8 @@ functor
 
         method build_interface_definition _env _members = ()
 
-        method build_program _env stmts =
-          { stmts = s#of_located_list stmts;
-            bindings = List.concat current_bindings }
+        method build_program _env _stmts =
+          {bindings = List.concat current_bindings}
 
         method build_struct_constructor _env id _fields =
           match Syntax.value id with
