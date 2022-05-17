@@ -2,15 +2,21 @@ open Base
 open Lang_types
 
 let int_type =
+  (* memoize struct ids for equality *)
+  let struct_ids = Hashtbl.create (module Int)
   (* memoize constructor funs for equality *)
-  let int_constructor_funs = Hashtbl.create (module Int)
-  and struct_counter' = !struct_counter in
-  struct_counter := struct_counter' + 1 ;
+  and int_constructor_funs = Hashtbl.create (module Int) in
   (* int's newtype *)
   let rec int_type_s bits =
+    let struct_id =
+      Hashtbl.find_or_add struct_ids bits ~default:(fun () ->
+          let c = !struct_counter in
+          struct_counter := c + 1 ;
+          c )
+    in
     { struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
       struct_methods = [("new", int_type_s_new bits)];
-      struct_id = (bits, struct_counter') }
+      struct_id }
   and int_type_s_new bits =
     let function_impl =
       Hashtbl.find_or_add int_constructor_funs bits ~default:(fun () ->

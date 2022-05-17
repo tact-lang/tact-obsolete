@@ -64,7 +64,7 @@ and type_ =
 and struct_ =
   { struct_fields : (string * struct_field) list;
     struct_methods : (string * function_) list;
-    struct_id : (int * int[@sexp.opaque]) }
+    struct_id : (int[@sexp.opaque]) }
 
 and struct_field = {field_type : expr}
 

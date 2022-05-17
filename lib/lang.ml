@@ -234,7 +234,7 @@ functor
               (struct', []) (* TODO: handle fields *)
           | e ->
               errors#report `Error (`UnexpectedType e) () ;
-              ({struct_fields = []; struct_methods = []; struct_id = (0, 0)}, [])
+              ({struct_fields = []; struct_methods = []; struct_id = 0}, [])
 
         method build_struct_definition _env struct_fields bindings =
           let struct_fields = s#of_located_list struct_fields
@@ -248,7 +248,7 @@ functor
                     None )
           in
           let s' =
-            {struct_fields; struct_methods; struct_id = (0, !struct_counter)}
+            {struct_fields; struct_methods; struct_id = !struct_counter}
           in
           (* Check for duplicate fields *)
           ( match
