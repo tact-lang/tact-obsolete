@@ -32,7 +32,7 @@
   builtin
   interpreter
   lang
-  ;codegen_func
+  codegen_func
   ;codegen
   )
  (name tact))

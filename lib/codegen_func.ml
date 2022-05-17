@@ -1,5 +1,4 @@
 open Base
-open Errors
 
 exception Unsupported
 
@@ -142,3 +141,113 @@ and typeof_expr = function
       type_
   | AnExpr ->
       raise Invalid
+
+class ['s] collector =
+  object (_s : 's)
+    inherit ['s] Lang_types.map as super
+
+    val mutable struct_instances = []
+
+    method! visit_struct_ env s = super#visit_struct_ env s
+  end
+
+(*
+class codegen_ir =
+  object (self)
+    val program = []
+
+    method codegen_ir : Lang.program -> program =
+      function
+      | {bindings = (name, expr) :: xs} ->
+          self#codegen_top_level_expr name expr ;
+          self#codegen_ir xs
+      | {bindings = []} ->
+          program
+
+    method codegen
+  end
+
+class ['s] constructor ((program, errors) : Lang_types.program * _ errors) =
+  object (s : 's)
+    inherit ['s] Lang_types.visitor as super
+
+    method build_Asm _env asm = raise Unsupported
+
+    method build_Break _env e = raise Unsupported
+
+    method build_Builtin _env b = raise Invalid
+
+    method build_BuiltinFn _env b = raise Invalid
+
+    method build_BuiltinType _env = raise Invalid
+
+    method build_Expr _env expr = raise Invalid
+
+    method build_Fn _env _ = raise Invalid
+
+    method build_Function _env _f = raise Unsupported
+
+    method build_FunctionCall _env _fc = AnExpr
+
+    method build_FunctionType _env _ft = raise Invalid
+
+    method build_Hole _env = raise Invalid
+
+    method build_HoleType _env = raise Invalid
+
+    method build_Integer _env i = Integer i
+
+    method build_IntegerType _env = raise Invalid
+
+    method build_Invalid _env = raise Invalid
+
+    method build_InvalidExpr _env = raise Invalid
+
+    method build_InvalidFn _env = raise Invalid
+
+    method build_InvalidType _env = raise Invalid
+
+    method build_Let _env bindings =
+      Vars
+        (List.map bindings ~f:(fun (name, expr) ->
+             (typeof_expr expr, name, expr) ) )
+
+    method build_Reference _env (name, t) = Reference (name, typeof_type t)
+
+    method build_Return _env expr = Return expr
+
+    method build_String : 's -> ident -> expr = fun _env -> raise Invalid
+
+    method build_StringType _env = raise Invalid
+
+    method build_Struct _env _s = raise Invalid
+
+    method build_StructInstance _env _si = raise Unsupported
+
+    method build_StructType _env _t = raise Invalid
+
+    method build_Type _env _t = raise Invalid (* typeof_type t *)
+
+    method build_TypeType _env = raise Invalid
+
+    method build_Value _env v = v
+
+    method build_Void _env = raise Invalid
+
+    method build_VoidType _env = raise Invalid
+
+    method build_function_ _env _params returns impl =
+      Function
+        { function_name = "dummy";
+          function_args = [];
+          function_returns = returns;
+          function_body = impl }
+
+    method build_program _env _p = raise Invalid
+
+    method build_struct_ _env s = raise Invalid
+
+    method build_struct_field _env _sf = raise Invalid
+
+    method! visit_program env p = s#visit_list s#visit_binding env p.bindings
+  end*)

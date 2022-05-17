@@ -117,19 +117,38 @@ let rec expr_to_type = function
   | _ ->
       InvalidType
 
-let rec is_immediate_expr = function
-  | Value _ ->
-      true
-  | FunctionCall (_, args) ->
-      are_immediate_arguments args
-  | Hole ->
-      false
-  | Reference _ ->
-      false
-  | Asm _ ->
-      false
-  | InvalidExpr ->
-      false
+(*FIXME: iter or reduce visitor*)
+class ['s] immediate_check =
+  object (_s : 's)
+    inherit ['s] map as super
+
+    val mutable is_immediate = true
+
+    method! visit_Reference env ref =
+      is_immediate <- false ;
+      super#visit_Reference env ref
+
+    method! visit_Asm env asm =
+      is_immediate <- false ;
+      super#visit_Asm env asm
+
+    method! visit_Hole env =
+      is_immediate <- false ;
+      super#visit_Hole env
+
+    method! visit_InvalidExpr env =
+      is_immediate <- false ;
+      super#visit_InvalidExpr env
+
+    method! visit_function_ _env f = f
+
+    method get_is_immediate = is_immediate
+  end
+
+let rec is_immediate_expr expr =
+  let checker = new immediate_check in
+  let _expr = checker#visit_expr () expr in
+  checker#get_is_immediate
 
 and are_immediate_arguments args =
   Option.is_none (List.find args ~f:(fun a -> not (is_immediate_expr a)))
