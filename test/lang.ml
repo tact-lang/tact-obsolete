@@ -134,8 +134,7 @@ let%expect_test "native function evaluation" =
     let v = incr(incr(incr(1)));
   |} in
   pp source ~bindings:(("incr", Value incr_f) :: Lang.default_bindings) ;
-  [%expect
-    {|
+  [%expect {|
     (Ok ((bindings ((v (Value (Integer 4))))))) |}]
 
 let%expect_test "Tact function evaluation" =
@@ -602,3 +601,31 @@ let%expect_test "use of asm in a function" =
            ((function_params ()) (function_returns Hole)
             (function_impl
              (Fn (((Expr (Asm (SWAP (XCHG0 2)))) (Expr (Asm (ADD))))))))))))))) |}]
+
+let%expect_test "constant definitions inside of functions" =
+  let source =
+    {|
+      fn const() { return incr(10); }
+      fn f() {
+        let a = incr(incr(incr(1)));
+        let b = const();
+      }
+    |}
+  in
+  pp source ~bindings:(("incr", Value incr_f) :: Lang.default_bindings) ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((f
+         (Value
+          (Function
+           ((function_params ()) (function_returns Hole)
+            (function_impl
+             (Fn
+              (((Let ((a (Value (Integer 4))))) (Let ((b (Value (Integer 11)))))))))))))
+        (const
+         (Value
+          (Function
+           ((function_params ()) (function_returns Hole)
+            (function_impl (Fn (((Return (Value (Integer 11))))))))))))))) |}]

@@ -108,7 +108,7 @@ functor
 
         method! visit_expr env syntax_expr =
           let expr' = super#visit_expr env syntax_expr in
-          match is_immediate_expr expr' && equal functions 0 with
+          match is_immediate_expr expr' with
           | true ->
               let inter =
                 new interpreter (current_bindings, errors, functions)
