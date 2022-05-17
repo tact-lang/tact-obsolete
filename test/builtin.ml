@@ -18,10 +18,6 @@ let%expect_test "Int(bits) constructor" =
             (StructInstance
              (((struct_fields
                 ((integer ((field_type (Value (Type IntegerType)))))))
-               (struct_methods
-                ((new
-                  ((function_params ((integer (Value (Type IntegerType)))))
-                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 1)))))))
                (struct_id <opaque>))
               ((integer (Integer 100)))))))))
         (Let
@@ -30,10 +26,6 @@ let%expect_test "Int(bits) constructor" =
             (StructInstance
              (((struct_fields
                 ((integer ((field_type (Value (Type IntegerType)))))))
-               (struct_methods
-                ((new
-                  ((function_params ((integer (Value (Type IntegerType)))))
-                   (function_returns Hole) (function_impl (BuiltinFn (<fun> 6)))))))
                (struct_id <opaque>))
               ((integer (Integer 1)))))))))))
       (bindings
@@ -42,10 +34,6 @@ let%expect_test "Int(bits) constructor" =
           (StructInstance
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
-             (struct_methods
-              ((new
-                ((function_params ((integer (Value (Type IntegerType)))))
-                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 6)))))))
              (struct_id <opaque>))
             ((integer (Integer 1)))))))
         (i
@@ -53,9 +41,20 @@ let%expect_test "Int(bits) constructor" =
           (StructInstance
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
-             (struct_methods
-              ((new
-                ((function_params ((integer (Value (Type IntegerType)))))
-                 (function_returns Hole) (function_impl (BuiltinFn (<fun> 1)))))))
              (struct_id <opaque>))
-            ((integer (Integer 100))))))))))) |}]
+            ((integer (Integer 100)))))))))
+      (methods
+       (((Struct
+          ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
+           (struct_id <opaque>)))
+         ((new
+           ((function_params ((integer (Value (Type IntegerType)))))
+            (function_returns Hole)
+            (function_impl (BuiltinFn (<fun> () <opaque>)))))))
+        ((Struct
+          ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
+           (struct_id <opaque>)))
+         ((new
+           ((function_params ((integer (Value (Type IntegerType)))))
+            (function_returns Hole)
+            (function_impl (BuiltinFn (<fun> () <opaque>))))))))))) |}]

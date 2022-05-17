@@ -33,7 +33,7 @@ functor
         val mutable functions = 0
 
         (* Program handle we pass to builtin functions *)
-        val program = {bindings; stmts = []}
+        val program = {bindings; stmts = []; methods = []}
 
         method build_CodeBlock _env _code_block = Invalid
 
@@ -46,7 +46,9 @@ functor
         method build_FunctionCall _env (f, args) =
           let fc = (f, args) in
           if are_immediate_arguments args then
-            let inter = new interpreter (current_bindings, errors, functions) in
+            let inter =
+              new interpreter (program, current_bindings, errors, functions)
+            in
             inter#interpret_fc fc
           else FunctionCall fc
 
@@ -114,7 +116,7 @@ functor
           match is_immediate_expr expr' && equal functions 0 with
           | true ->
               let inter =
-                new interpreter (current_bindings, errors, functions)
+                new interpreter (program, current_bindings, errors, functions)
               in
               let value' = inter#interpret_expr expr' in
               Value value'
@@ -148,23 +150,33 @@ functor
           (* TODO: check method signatures *)
           match receiver with
           | Value (Struct struct') -> (
-            match
-              List.Assoc.find struct'.struct_methods ~equal:String.equal fn
-            with
-            | Some fn' ->
-                (Value (Function fn'), s#of_located_list args)
-            | None ->
-                errors#report `Error (`MethodNotFound (receiver, fn)) () ;
-                dummy )
+              let methods =
+                List.Assoc.find program.methods ~equal:equal_value
+                  (Struct struct')
+              in
+              match
+                Option.bind methods ~f:(fun methods ->
+                    List.Assoc.find methods ~equal:String.equal fn )
+              with
+              | Some fn' ->
+                  (Value (Function fn'), s#of_located_list args)
+              | None ->
+                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  dummy )
           | Value (StructInstance (struct', _)) -> (
-            match
-              List.Assoc.find struct'.struct_methods ~equal:String.equal fn
-            with
-            | Some fn' ->
-                (Value (Function fn'), receiver :: s#of_located_list args)
-            | None ->
-                errors#report `Error (`MethodNotFound (receiver, fn)) () ;
-                dummy )
+              let methods =
+                List.Assoc.find program.methods ~equal:equal_value
+                  (Struct struct')
+              in
+              match
+                Option.bind methods ~f:(fun methods ->
+                    List.Assoc.find methods ~equal:String.equal fn )
+              with
+              | Some fn' ->
+                  (Value (Function fn'), receiver :: s#of_located_list args)
+              | None ->
+                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  dummy )
           | receiver ->
               errors#report `Error (`UnexpectedType receiver) () ;
               dummy
@@ -225,7 +237,8 @@ functor
         method build_interface_definition _env _members = ()
 
         method build_program _env stmts =
-          { stmts = s#of_located_list stmts;
+          { program with
+            stmts = s#of_located_list stmts;
             bindings = List.concat current_bindings }
 
         method build_struct_constructor _env id _fields =
@@ -234,22 +247,11 @@ functor
               (struct', []) (* TODO: handle fields *)
           | e ->
               errors#report `Error (`UnexpectedType e) () ;
-              ({struct_fields = []; struct_methods = []; struct_id = 0}, [])
+              ({struct_fields = []; struct_id = 0}, [])
 
-        method build_struct_definition _env struct_fields bindings =
-          let struct_fields = s#of_located_list struct_fields
-          and struct_methods =
-            List.filter_map bindings ~f:(fun binding ->
-                let name, expr = Syntax.value binding in
-                match expr with
-                | Value (Function f) ->
-                    Some (name, f)
-                | _ ->
-                    None )
-          in
-          let s' =
-            {struct_fields; struct_methods; struct_id = !struct_counter}
-          in
+        method build_struct_definition _env struct_fields _bindings =
+          let struct_fields = s#of_located_list struct_fields in
+          let s' = {struct_fields; struct_id = !struct_counter} in
           (* Check for duplicate fields *)
           ( match
               List.find_a_dup struct_fields
@@ -263,6 +265,34 @@ functor
           (* Increment next struct's ID *)
           struct_counter := !struct_counter + 1 ;
           s'
+
+        method! visit_struct_definition env _visitors_this =
+          let _visitors_r0 =
+            s#visit_list
+              (s#visit_located s#visit_struct_field)
+              env _visitors_this.fields
+          in
+          let struct_ = s#build_struct_definition env _visitors_r0 []
+          and current_bindings' = current_bindings in
+          current_bindings <-
+            [("Self", Value (Struct struct_))] :: current_bindings' ;
+          let bindings =
+            s#visit_list
+              (s#visit_located s#visit_binding)
+              env _visitors_this.struct_bindings
+          in
+          current_bindings <- current_bindings' ;
+          let struct_methods =
+            List.filter_map bindings ~f:(fun binding ->
+                let name, expr = Syntax.value binding in
+                match expr with
+                | Value (Function f) ->
+                    Some (name, f)
+                | _ ->
+                    None )
+          in
+          program.methods <- (Struct struct_, struct_methods) :: program.methods ;
+          struct_
 
         method build_struct_field _env field_name field_type =
           (Syntax.value field_name, {field_type = Syntax.value field_type})
