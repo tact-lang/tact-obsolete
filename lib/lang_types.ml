@@ -7,6 +7,13 @@ class ['s] base_map =
     inherit ['s] Asm.map
   end
 
+class virtual ['s] base_reduce =
+  object (_ : 's)
+    method virtual visit_instr : _
+
+    method virtual visit_z : _
+  end
+
 class virtual ['s] base_visitor =
   object (_ : 's)
     inherit ['s] VisitorsRuntime.map
@@ -89,6 +96,7 @@ and function_call = expr * expr list
     sexp_of,
     yojson_of,
     visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
+    visitors {variety = "reduce"; ancestors = ["base_reduce"]},
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
 let rec expr_to_type = function
@@ -115,19 +123,31 @@ let rec expr_to_type = function
   | _ ->
       InvalidType
 
-let rec is_immediate_expr = function
-  | Value _ ->
-      true
-  | FunctionCall (_, args) ->
-      are_immediate_arguments args
-  | Hole ->
-      false
-  | Reference _ ->
-      false
-  | Asm _ ->
-      false
-  | InvalidExpr ->
-      false
+class ['s] expr_immediacy_check =
+  object (_self : 's)
+    inherit [_] reduce
+
+    method private zero = true
+
+    method private plus = ( && )
+
+    method! visit_Reference _env _ref = false
+
+    method! visit_Hole _env = false
+
+    method! visit_InvalidExpr _env = false
+
+    (* Any function is assumed to be immediate as it can be evaluated *)
+    method! visit_function_ _env _f = true
+
+    method visit_instr _env _instr = false
+
+    method visit_z _env _z = true
+  end
+
+let rec is_immediate_expr expr =
+  let checker = new expr_immediacy_check in
+  checker#visit_expr () expr
 
 and are_immediate_arguments args =
   Option.is_none (List.find args ~f:(fun a -> not (is_immediate_expr a)))
