@@ -121,20 +121,14 @@ class interpreter
                     Value Void )
               | Error _ ->
                   Value Void )
-          | {function_impl = BuiltinFn (function_impl, typing, _); _} ->
-              (* Perform typing to register methods *)
-              let _ =
-                Option.iter typing ~f:(fun f ->
-                    let _ = f program args' in
-                    () )
+          | {function_impl = BuiltinFn (function_impl, _); _} ->
+              let program' =
+                { program with
+                  bindings = Option.value (List.hd global_bindings) ~default:[]
+                }
               in
-              let expr =
-                function_impl
-                  { program with
-                    bindings =
-                      Option.value (List.hd global_bindings) ~default:[] }
-                  args'
-              in
+              let expr = function_impl program' args' in
+              program.methods <- program'.methods ;
               if functions > 0 then expr else Value (self#interpret_expr expr)
           | _ ->
               Value Void )

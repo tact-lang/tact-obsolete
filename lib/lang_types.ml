@@ -74,11 +74,7 @@ and function_body = (stmt list option[@sexp.option])
 and native_function =
   (program -> value list -> expr[@visitors.opaque] [@equal.ignore])
 
-and native_function_typing =
-  (((program -> value list -> expr)[@equal.ignore] [@visitors.opaque]) option
-  [@sexp.option] )
-
-and builtin_fn = native_function * native_function_typing * (int[@sexp.opaque])
+and builtin_fn = native_function * (int[@sexp.opaque])
 
 and function_ =
   { function_params : (string * expr) list;
@@ -138,8 +134,8 @@ and are_immediate_arguments args =
 
 let rec builtin_fun_counter = ref 0
 
-and builtin_fun ?(typing = None) f =
-  let res = (f, typing, !builtin_fun_counter) in
+and builtin_fun f =
+  let res = (f, !builtin_fun_counter) in
   builtin_fun_counter := !builtin_fun_counter + 1 ;
   res
 
