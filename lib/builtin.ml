@@ -14,23 +14,23 @@ let int_type =
           struct_counter := c + 1 ;
           c )
     in
-    let methods = [("new", int_type_s_new bits)]
-    and s =
+    let s =
       { struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
         struct_id }
     in
+    let methods = [("new", int_type_s_new s bits)] in
     if Option.is_none @@ List.Assoc.find p.methods ~equal:equal_value (Struct s)
     then p.methods <- (Struct s, methods) :: p.methods
     else () ;
     s
-  and int_type_s_new bits =
+  and int_type_s_new self bits =
     let function_impl =
       Hashtbl.find_or_add int_constructor_funs bits ~default:(fun () ->
           builtin_fun @@ constructor_impl bits )
     in
     { function_params = [("integer", Value (Type IntegerType))];
       (* TODO: figure out how to represent Self *)
-      function_returns = Hole;
+      function_returns = Value (Struct self);
       function_impl = BuiltinFn function_impl }
   and constructor_impl bits p = function
     | [Integer i] ->
