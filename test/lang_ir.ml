@@ -33,9 +33,9 @@ let%expect_test "scope resolution" =
   let source = {|
     let T = Int(257);
   |} in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -91,9 +91,9 @@ let%expect_test "binding resolution" =
     let a_ = a;
   |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -168,7 +168,9 @@ let%expect_test "failed scope resolution" =
   let source = {|
     let T = Int256;
   |} in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Error ((UnresolvedIdentifier Int256)))(Error
                                             ((UnresolvedIdentifier Int256))) |}]
 
@@ -177,9 +179,9 @@ let%expect_test "scope resolution after let binding" =
     let A = Int(257);
     let B = A;
   |} in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -250,9 +252,9 @@ let%expect_test "basic struct definition" =
   let source = {|
     struct T { val t: Int(257) }
   |} in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -337,9 +339,9 @@ let%expect_test "Tact function evaluation" =
     let a = test(test(1));
   |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -434,7 +436,8 @@ let%expect_test "compile-time function evaluation within a function" =
   in
   pp source ~bindings:(("incr", Value incr_f) :: Lang.default_bindings) ;
   [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -484,9 +487,9 @@ let%expect_test "struct definition" =
   };
   |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -622,9 +625,9 @@ let%expect_test "parametric struct instantiation" =
       let TA = T(Int(257));
    |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -719,9 +722,9 @@ let%expect_test "function without a return type" =
     fn f() { 1 }
     let a = f();
     |} in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -769,9 +772,9 @@ let%expect_test "scoping that `let` introduces in code" =
     let b = f(1);
     |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -854,9 +857,9 @@ let%expect_test "reference in function bodies" =
       }
     |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -1130,9 +1133,9 @@ let%expect_test "resolving a reference from inside a function" =
       let x = f();
     |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -1184,9 +1187,9 @@ let%expect_test "method access" =
       let res = foo.bar(1);
     |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -1298,9 +1301,9 @@ let%expect_test "use of asm in a function" =
     }
   |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
