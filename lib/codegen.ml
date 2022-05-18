@@ -1,1 +1,1 @@
-module FunC = Codegen_func
+module Demo_FunC = Codegen_demo_func

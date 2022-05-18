@@ -4,7 +4,7 @@ module Lang = Tact.Lang.Make (Syntax)
 module Interpreter = Tact.Interpreter
 module Errors = Tact.Errors
 module Zint = Tact.Zint
-module Codegen = Tact.Codegen.FunC
+module Codegen = Tact.Codegen.Demo_FunC
 include Core
 
 type error = [Lang.error | Interpreter.error] [@@deriving sexp_of]
