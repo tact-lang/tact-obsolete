@@ -56,14 +56,11 @@ let int_type =
         (* TODO: raise an error instead *)
         Value Void
   in
-  let p = {stmts = []; bindings = []; methods = []} in
   Value
     (Function
        { function_params = [("bits", Value (Type IntegerType))];
-         function_returns = Value (Struct (int_type_s p 257));
-         function_impl =
-           BuiltinFn (builtin_fun ~typing:(Some function_impl) function_impl) }
-    )
+         function_returns = Value (Type TypeType);
+         function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let asm =
   let function_impl _p = function
@@ -85,5 +82,5 @@ let default_bindings =
     ("Integer", Value (Type IntegerType));
     ("Int", int_type);
     ("Bool", Value (Builtin "Bool"));
-    ("Type", Value (Builtin "Type"));
+    ("Type", Value (Type TypeType));
     ("Void", Value Void) ]
