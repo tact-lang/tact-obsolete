@@ -33,8 +33,7 @@
   interpreter
   lang
   codegen_func
-  ;codegen
-  )
+  codegen)
  (name tact))
 
 (ocamllex asm_lexer)

@@ -18,7 +18,10 @@ and function_body =
 
 and stmt = Vars of (type_ * ident * expr) list | Return of expr
 
-and expr = Integer of Zint.t | Reference of (ident * type_) | AnExpr
+and expr =
+  | Integer of Zint.t
+  | Reference of (ident * type_)
+  | FunctionCall of (ident * expr list)
 
 and ident = string
 
@@ -37,15 +40,22 @@ and program = top_level_expr list [@@deriving sexp_of]
 
 open Caml.Format
 
+let list_iter ~f ~flast l =
+  match (List.drop_last l, List.last l) with
+  | Some rest, Some last ->
+      List.iter rest ~f ; flast last
+  | _ ->
+      ()
+
 let rec pp_program f program =
   List.iter program ~f:(function
     | Function fn ->
-        pp_function f fn
+        pp_function f fn ; pp_print_newline f ()
     | Global _ ->
         () )
 
 and pp_function f fn =
-  pp_open_box f 80 ;
+  pp_open_hvbox f 2 ;
   pp_type f fn.function_returns ;
   pp_print_space f () ;
   pp_ident f fn.function_name ;
@@ -53,7 +63,11 @@ and pp_function f fn =
   List.iter fn.function_args ~f:(fun (name, t) ->
       pp_type f t ; pp_print_space f () ; pp_ident f name ) ;
   pp_print_string f ")" ;
+  pp_print_space f () ;
+  pp_print_string f "{" ;
+  pp_print_newline f () ;
   pp_function_body f fn.function_body ;
+  pp_print_string f "}" ;
   pp_close_box f ()
 
 and pp_function_body f = function
@@ -86,8 +100,13 @@ and pp_expr f = function
       pp_print_string f (Zint.to_string i)
   | Reference (ref, _) ->
       pp_print_string f ref
-  | AnExpr ->
-      raise Invalid (* this is temporary for figuring out typing [FIXME] *)
+  | FunctionCall (name, args) ->
+      pp_print_string f name ;
+      pp_print_string f "(" ;
+      list_iter args
+        ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
+        ~flast:(pp_expr f) ;
+      pp_print_string f ")"
 
 and pp_type f = function
   | Int ->
@@ -103,7 +122,7 @@ and pp_type f = function
   | Tuple tuple ->
       pp_print_string f "[" ;
       list_iter tuple
-        ~f:(fun t -> pp_type f t ; pp_print_string f ", ")
+        ~f:(fun (t : type_) -> pp_type f t ; pp_print_string f ", ")
         ~flast:(pp_type f) ;
       pp_print_string f "]"
   | Tensor tuple ->
@@ -114,13 +133,6 @@ and pp_type f = function
       pp_print_string f ")"
 
 and pp_ident f i = pp_print_string f i
-
-and list_iter ~f ~flast l =
-  match (List.drop_last l, List.last l) with
-  | Some rest, Some last ->
-      List.iter rest ~f ; flast last
-  | _ ->
-      ()
 
 (* FunC code constructor *)
 
@@ -139,17 +151,118 @@ and typeof_expr = function
       Int
   | Reference (_, type_) ->
       type_
-  | AnExpr ->
+  | FunctionCall _ ->
       raise Invalid
 
 class ['s] collector =
-  object (_s : 's)
+  object (self : 's)
     inherit ['s] Lang_types.map as super
 
     val mutable struct_instances = []
 
-    method! visit_struct_ env s = super#visit_struct_ env s
+    method! visit_struct_ env s =
+      let is_immediate =
+        let checker = new Lang_types.immediate_check in
+        let _ = checker#visit_struct_ () s in
+        checker#get_is_immediate
+      in
+      match is_immediate with
+      | true ->
+          self#add_struct_ s ; super#visit_struct_ env s
+      (* If struct does not flow into runtime so it fields too. *)
+      | false ->
+          s
+
+    method private add_struct_ struct_ =
+      match
+        List.find struct_instances ~f:(Lang_types.equal_struct_ struct_)
+      with
+      | Some _ ->
+          ()
+      | None ->
+          struct_instances <- struct_ :: struct_instances
+
+    method get_structs = struct_instances
   end
+
+exception DoesNotWantToWriteItsOk
+
+(* TODO: struct name? field types? *)
+let generate_struct_name : Lang_types.struct_ -> string =
+ fun {struct_id = x, _; _} -> "struct" ^ Printf.sprintf "%d" x
+
+let lang_type_to_type =
+  let open Lang_types in
+  function IntegerType -> Int | _ -> raise DoesNotWantToWriteItsOk
+
+let rec lang_expr_to_type =
+  let open Lang_types in
+  function
+  | Value value -> (
+    match value with
+    | Type type_ ->
+        lang_type_to_type type_
+    | Struct s -> (
+      match s.struct_fields with
+      | [(_, {field_type})] ->
+          lang_expr_to_type field_type
+      | _ ->
+          raise DoesNotWantToWriteItsOk )
+    | value ->
+        Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+          (Lang_types.sexp_of_value value) ;
+        raise DoesNotWantToWriteItsOk )
+  | _ ->
+      raise DoesNotWantToWriteItsOk
+
+let rec codegen_serialize_function_body_struct_ = function
+  | (name, field_type) :: xs ->
+      let serialize_this =
+        Vars
+          [ ( Builder,
+              "b",
+              FunctionCall
+                ( "store_uint",
+                  [Reference ("b", Builder); Reference (name, field_type)] ) )
+          ]
+      in
+      serialize_this :: codegen_serialize_function_body_struct_ xs
+  | [] ->
+      []
+
+let codegen_serialize_function_struct_ struct_ =
+  let function_name = generate_struct_name struct_ in
+  let struct_fields =
+    List.map struct_.struct_fields ~f:(fun (name, {field_type}) ->
+        (name, lang_expr_to_type field_type) )
+  in
+  let function_args = struct_fields in
+  let function_returns = Cell in
+  let function_body =
+    let builder_stmt =
+      Vars [(Builder, "b", FunctionCall ("new_builder", []))]
+    in
+    let serialize = codegen_serialize_function_body_struct_ struct_fields in
+    let ret = Return (FunctionCall ("build", [Reference ("b", Builder)])) in
+    Fn ((builder_stmt :: serialize) @ [ret])
+  in
+  {function_name; function_args; function_returns; function_body}
+
+let codegen_struct_ : Lang_types.struct_ -> top_level_expr list =
+ fun s ->
+  let serialize_fn = codegen_serialize_function_struct_ s in
+  [Function serialize_fn]
+
+let rec flatten = function [] -> [] | l :: r -> l @ flatten r
+
+let codegen_prog : Lang_types.program -> program =
+ fun program ->
+  let structs =
+    let collector = new collector in
+    let _ = collector#visit_program () program in
+    collector#get_structs
+  in
+  flatten (List.map structs ~f:codegen_struct_)
 
 (*
 class codegen_ir =
