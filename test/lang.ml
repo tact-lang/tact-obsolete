@@ -25,7 +25,8 @@ let%expect_test "scope resolution" =
        ((T
          (Value
           (Struct
-           ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
+           ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+            (struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
             (struct_methods
              ((new
                ((function_params ((integer (Value (Type IntegerType)))))
@@ -50,7 +51,8 @@ let%expect_test "binding resolution" =
         (T_
          (Value
           (Struct
-           ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
+           ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+            (struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
             (struct_methods
              ((new
                ((function_params ((integer (Value (Type IntegerType)))))
@@ -59,7 +61,8 @@ let%expect_test "binding resolution" =
         (T
          (Value
           (Struct
-           ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
+           ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+            (struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
             (struct_methods
              ((new
                ((function_params ((integer (Value (Type IntegerType)))))
@@ -86,7 +89,8 @@ let%expect_test "scope resolution after let binding" =
        ((B
          (Value
           (Struct
-           ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
+           ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+            (struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
             (struct_methods
              ((new
                ((function_params ((integer (Value (Type IntegerType)))))
@@ -95,7 +99,8 @@ let%expect_test "scope resolution after let binding" =
         (A
          (Value
           (Struct
-           ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
+           ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+            (struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
             (struct_methods
              ((new
                ((function_params ((integer (Value (Type IntegerType)))))
@@ -114,12 +119,14 @@ let%expect_test "basic struct definition" =
        ((T
          (Value
           (Struct
-           ((struct_fields
+           ((struct_modifiers ((is_builtin_int false) (int_bits 0)))
+            (struct_fields
              ((t
                ((field_type
                  (Value
                   (Struct
-                   ((struct_fields
+                   ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                    (struct_fields
                      ((integer ((field_type (Value (Type IntegerType)))))))
                     (struct_methods
                      ((new
@@ -159,7 +166,8 @@ let%expect_test "Tact function evaluation" =
              ((i
                (Value
                 (Struct
-                 ((struct_fields
+                 ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                  (struct_fields
                    ((integer ((field_type (Value (Type IntegerType)))))))
                   (struct_methods
                    ((new
@@ -170,7 +178,8 @@ let%expect_test "Tact function evaluation" =
             (function_returns
              (Value
               (Struct
-               ((struct_fields
+               ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                (struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_methods
                  ((new
@@ -220,12 +229,14 @@ let%expect_test "struct definition" =
          ((MyType
            (Value
             (Struct
-             ((struct_fields
+             ((struct_modifiers ((is_builtin_int false) (int_bits 0)))
+              (struct_fields
                ((a
                  ((field_type
                    (Value
                     (Struct
-                     ((struct_fields
+                     ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                      (struct_fields
                        ((integer ((field_type (Value (Type IntegerType)))))))
                       (struct_methods
                        ((new
@@ -251,12 +262,14 @@ let%expect_test "duplicate type field" =
     (Error
      ((DuplicateField
        (a
-        ((struct_fields
+        ((struct_modifiers ((is_builtin_int false) (int_bits 0)))
+         (struct_fields
           ((a
             ((field_type
               (Value
                (Struct
-                ((struct_fields
+                ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                 (struct_fields
                   ((integer ((field_type (Value (Type IntegerType)))))))
                  (struct_methods
                   ((new
@@ -282,12 +295,14 @@ let%expect_test "parametric struct instantiation" =
        ((TA
          (Value
           (Struct
-           ((struct_fields
+           ((struct_modifiers ((is_builtin_int false) (int_bits 0)))
+            (struct_fields
              ((a
                ((field_type
                  (Value
                   (Struct
-                   ((struct_fields
+                   ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                    (struct_fields
                      ((integer ((field_type (Value (Type IntegerType)))))))
                     (struct_methods
                      ((new
@@ -306,7 +321,8 @@ let%expect_test "parametric struct instantiation" =
               (((Expr
                  (Value
                   (Struct
-                   ((struct_fields
+                   ((struct_modifiers ((is_builtin_int false) (int_bits 0)))
+                    (struct_fields
                      ((a ((field_type (Reference (A (BuiltinType Type))))))))
                     (struct_methods ()) (struct_id <opaque>))))))))))))))))) |}]
 
@@ -350,7 +366,8 @@ let%expect_test "scoping that `let` introduces in code" =
              ((i
                (Value
                 (Struct
-                 ((struct_fields
+                 ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                  (struct_fields
                    ((integer ((field_type (Value (Type IntegerType)))))))
                   (struct_methods
                    ((new
@@ -390,7 +407,8 @@ let%expect_test "reference in function bodies" =
              ((x
                (Value
                 (Struct
-                 ((struct_fields
+                 ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                  (struct_fields
                    ((integer ((field_type (Value (Type IntegerType)))))))
                   (struct_methods
                    ((new
@@ -410,7 +428,9 @@ let%expect_test "reference in function bodies" =
                          ((i
                            (Value
                             (Struct
-                             ((struct_fields
+                             ((struct_modifiers
+                               ((is_builtin_int true) (int_bits 257)))
+                              (struct_fields
                                ((integer
                                  ((field_type (Value (Type IntegerType)))))))
                               (struct_methods
@@ -423,7 +443,9 @@ let%expect_test "reference in function bodies" =
                           (i_
                            (Value
                             (Struct
-                             ((struct_fields
+                             ((struct_modifiers
+                               ((is_builtin_int true) (int_bits 257)))
+                              (struct_fields
                                ((integer
                                  ((field_type (Value (Type IntegerType)))))))
                               (struct_methods
@@ -446,7 +468,9 @@ let%expect_test "reference in function bodies" =
                          ((i
                            (Value
                             (Struct
-                             ((struct_fields
+                             ((struct_modifiers
+                               ((is_builtin_int true) (int_bits 257)))
+                              (struct_fields
                                ((integer
                                  ((field_type (Value (Type IntegerType)))))))
                               (struct_methods
@@ -459,7 +483,9 @@ let%expect_test "reference in function bodies" =
                           (i_
                            (Value
                             (Struct
-                             ((struct_fields
+                             ((struct_modifiers
+                               ((is_builtin_int true) (int_bits 257)))
+                              (struct_fields
                                ((integer
                                  ((field_type (Value (Type IntegerType)))))))
                               (struct_methods
@@ -480,7 +506,8 @@ let%expect_test "reference in function bodies" =
              ((i
                (Value
                 (Struct
-                 ((struct_fields
+                 ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                  (struct_fields
                    ((integer ((field_type (Value (Type IntegerType)))))))
                   (struct_methods
                    ((new
@@ -491,7 +518,8 @@ let%expect_test "reference in function bodies" =
               (i_
                (Value
                 (Struct
-                 ((struct_fields
+                 ((struct_modifiers ((is_builtin_int true) (int_bits 257)))
+                  (struct_fields
                    ((integer ((field_type (Value (Type IntegerType)))))))
                   (struct_methods
                    ((new
@@ -546,7 +574,8 @@ let%expect_test "method access" =
         (foo
          (Value
           (StructInstance
-           (((struct_fields ())
+           (((struct_modifiers ((is_builtin_int false) (int_bits 0)))
+             (struct_fields ())
              (struct_methods
               ((bar
                 ((function_params
@@ -559,7 +588,8 @@ let%expect_test "method access" =
         (Foo
          (Value
           (Struct
-           ((struct_fields ())
+           ((struct_modifiers ((is_builtin_int false) (int_bits 0)))
+            (struct_fields ())
             (struct_methods
              ((bar
                ((function_params

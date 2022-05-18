@@ -8,7 +8,8 @@ let int_type =
   struct_counter := struct_counter' + 1 ;
   (* int's newtype *)
   let rec int_type_s bits =
-    { struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
+    { struct_modifiers = {is_builtin_int = true; int_bits = bits};
+      struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
       struct_methods = [("new", int_type_s_new bits)];
       struct_id = (bits, struct_counter') }
   and int_type_s_new bits =

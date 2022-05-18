@@ -48,20 +48,31 @@ let list_iter ~f ~flast l =
       ()
 
 let rec pp_program f program =
+  let prev_margin = pp_get_margin f () in
+  let prev_indent = pp_get_max_indent f () in
+  pp_set_margin f 80 ;
+  pp_set_max_indent f 40 ;
   List.iter program ~f:(function
     | Function fn ->
         pp_function f fn ; pp_print_newline f ()
     | Global _ ->
-        () )
+        () ) ;
+  pp_set_margin f prev_margin ;
+  pp_set_max_indent f prev_indent
 
 and pp_function f fn =
-  pp_open_hvbox f 2 ;
+  pp_open_box f 4 ;
   pp_type f fn.function_returns ;
   pp_print_space f () ;
   pp_ident f fn.function_name ;
   pp_print_string f "(" ;
-  List.iter fn.function_args ~f:(fun (name, t) ->
-      pp_type f t ; pp_print_space f () ; pp_ident f name ) ;
+  list_iter fn.function_args
+    ~f:(fun (name, t) ->
+      pp_type f t ;
+      pp_print_space f () ;
+      pp_ident f name ;
+      pp_print_string f ", " )
+    ~flast:(fun (name, t) -> pp_type f t ; pp_print_space f () ; pp_ident f name) ;
   pp_print_string f ")" ;
   pp_print_space f () ;
   pp_print_string f "{" ;
@@ -187,6 +198,17 @@ class ['s] collector =
 
 exception DoesNotWantToWriteItsOk
 
+type codegen_ctx =
+  {serialize_builder_functions : (Lang_types.type_ * string) list}
+
+let get_serialize_method type_ ctx =
+  List.find_map ctx.serialize_builder_functions ~f:(fun (ty, fc) ->
+      match Lang_types.equal_type_ ty type_ with
+      | true ->
+          Some fc
+      | false ->
+          None )
+
 (* TODO: struct name? field types? *)
 let generate_struct_name : Lang_types.struct_ -> string =
  fun {struct_id = x, _; _} -> "struct" ^ Printf.sprintf "%d" x
@@ -215,152 +237,116 @@ let rec lang_expr_to_type =
   | _ ->
       raise DoesNotWantToWriteItsOk
 
-let rec codegen_serialize_function_body_struct_ = function
-  | (name, field_type) :: xs ->
+let rec codegen_serialize_function_body_struct_ :
+    codegen_ctx ref -> (string * Lang_types.struct_field) list -> _ =
+ fun ctx -> function
+  | (name, {field_type}) :: xs ->
+      let func_name =
+        Option.value
+          (get_serialize_method (Lang_types.real_expr_to_type field_type) !ctx)
+          ~default:"unknown"
+      in
       let serialize_this =
         Vars
           [ ( Builder,
               "b",
               FunctionCall
-                ( "store_uint",
-                  [Reference ("b", Builder); Reference (name, field_type)] ) )
-          ]
+                ( func_name,
+                  [ Reference ("b", Builder);
+                    Reference (name, lang_expr_to_type field_type) ] ) ) ]
       in
-      serialize_this :: codegen_serialize_function_body_struct_ xs
+      serialize_this :: codegen_serialize_function_body_struct_ ctx xs
   | [] ->
       []
 
-let codegen_serialize_function_struct_ struct_ =
-  let function_name = generate_struct_name struct_ in
+let codegen_serialize_function_struct_ ctx struct_ =
+  let function_name = "serialize_" ^ generate_struct_name struct_ in
   let struct_fields =
     List.map struct_.struct_fields ~f:(fun (name, {field_type}) ->
         (name, lang_expr_to_type field_type) )
   in
-  let function_args = struct_fields in
+  let function_args = ("b", Builder) :: struct_fields in
+  let function_returns = Builder in
+  let function_body =
+    let serialize =
+      codegen_serialize_function_body_struct_ ctx struct_.struct_fields
+    in
+    let ret = Return (Reference ("b", Builder)) in
+    Fn (serialize @ [ret])
+  in
+  {function_name; function_args; function_returns; function_body}
+
+let codegen_serialize_cell_function_struct_ builder_fun_name args =
+  let function_name = builder_fun_name ^ "_cell" in
+  let function_args = args in
   let function_returns = Cell in
   let function_body =
     let builder_stmt =
       Vars [(Builder, "b", FunctionCall ("new_builder", []))]
     in
-    let serialize = codegen_serialize_function_body_struct_ struct_fields in
+    let serialize =
+      Vars
+        [ ( Builder,
+            "b",
+            FunctionCall
+              ( builder_fun_name,
+                Reference ("b", Builder)
+                :: List.map args ~f:(fun (name, ty) -> Reference (name, ty)) )
+          ) ]
+    in
     let ret = Return (FunctionCall ("build", [Reference ("b", Builder)])) in
-    Fn ((builder_stmt :: serialize) @ [ret])
+    Fn (builder_stmt :: serialize :: [ret])
   in
   {function_name; function_args; function_returns; function_body}
 
-let codegen_struct_ : Lang_types.struct_ -> top_level_expr list =
- fun s ->
-  let serialize_fn = codegen_serialize_function_struct_ s in
-  [Function serialize_fn]
+let codegen_integer bits =
+  let function_name = "serialize_int" ^ Printf.sprintf "%d" bits in
+  let function_args = [("b", Builder); ("value", Int)] in
+  let function_returns = Cell in
+  let function_body =
+    let serialize =
+      Vars
+        [ ( Builder,
+            "b",
+            FunctionCall
+              ( "store_int",
+                [ Reference ("b", Builder);
+                  Reference ("value", Int);
+                  Integer (Z.of_int bits) ] ) ) ]
+    in
+    let ret = Return (Reference ("b", Builder)) in
+    Fn (serialize :: [ret])
+  in
+  {function_name; function_args; function_returns; function_body}
+
+let codegen_struct_ :
+    codegen_ctx ref -> Lang_types.struct_ -> top_level_expr list =
+ fun ctx s ->
+  let serialize_builder_fn =
+    match s.struct_modifiers.is_builtin_int with
+    | true ->
+        codegen_integer s.struct_modifiers.int_bits
+    | false ->
+        codegen_serialize_function_struct_ ctx s
+  in
+  ctx :=
+    { serialize_builder_functions =
+        (Lang_types.StructType s, serialize_builder_fn.function_name)
+        :: !ctx.serialize_builder_functions } ;
+  let serialize_cell_fn =
+    codegen_serialize_cell_function_struct_ serialize_builder_fn.function_name
+      (Option.value (List.tl serialize_builder_fn.function_args) ~default:[])
+  in
+  [Function serialize_builder_fn; Function serialize_cell_fn]
 
 let rec flatten = function [] -> [] | l :: r -> l @ flatten r
 
 let codegen_prog : Lang_types.program -> program =
  fun program ->
+  let codegen_ctx = ref {serialize_builder_functions = []} in
   let structs =
     let collector = new collector in
     let _ = collector#visit_program () program in
     collector#get_structs
   in
-  flatten (List.map structs ~f:codegen_struct_)
-
-(*
-class codegen_ir =
-  object (self)
-    val program = []
-
-    method codegen_ir : Lang.program -> program =
-      function
-      | {bindings = (name, expr) :: xs} ->
-          self#codegen_top_level_expr name expr ;
-          self#codegen_ir xs
-      | {bindings = []} ->
-          program
-
-    method codegen
-  end
-
-class ['s] constructor ((program, errors) : Lang_types.program * _ errors) =
-  object (s : 's)
-    inherit ['s] Lang_types.visitor as super
-
-    method build_Asm _env asm = raise Unsupported
-
-    method build_Break _env e = raise Unsupported
-
-    method build_Builtin _env b = raise Invalid
-
-    method build_BuiltinFn _env b = raise Invalid
-
-    method build_BuiltinType _env = raise Invalid
-
-    method build_Expr _env expr = raise Invalid
-
-    method build_Fn _env _ = raise Invalid
-
-    method build_Function _env _f = raise Unsupported
-
-    method build_FunctionCall _env _fc = AnExpr
-
-    method build_FunctionType _env _ft = raise Invalid
-
-    method build_Hole _env = raise Invalid
-
-    method build_HoleType _env = raise Invalid
-
-    method build_Integer _env i = Integer i
-
-    method build_IntegerType _env = raise Invalid
-
-    method build_Invalid _env = raise Invalid
-
-    method build_InvalidExpr _env = raise Invalid
-
-    method build_InvalidFn _env = raise Invalid
-
-    method build_InvalidType _env = raise Invalid
-
-    method build_Let _env bindings =
-      Vars
-        (List.map bindings ~f:(fun (name, expr) ->
-             (typeof_expr expr, name, expr) ) )
-
-    method build_Reference _env (name, t) = Reference (name, typeof_type t)
-
-    method build_Return _env expr = Return expr
-
-    method build_String : 's -> ident -> expr = fun _env -> raise Invalid
-
-    method build_StringType _env = raise Invalid
-
-    method build_Struct _env _s = raise Invalid
-
-    method build_StructInstance _env _si = raise Unsupported
-
-    method build_StructType _env _t = raise Invalid
-
-    method build_Type _env _t = raise Invalid (* typeof_type t *)
-
-    method build_TypeType _env = raise Invalid
-
-    method build_Value _env v = v
-
-    method build_Void _env = raise Invalid
-
-    method build_VoidType _env = raise Invalid
-
-    method build_function_ _env _params returns impl =
-      Function
-        { function_name = "dummy";
-          function_args = [];
-          function_returns = returns;
-          function_body = impl }
-
-    method build_program _env _p = raise Invalid
-
-    method build_struct_ _env s = raise Invalid
-
-    method build_struct_field _env _sf = raise Invalid
-
-    method! visit_program env p = s#visit_list s#visit_binding env p.bindings
-  end*)
+  flatten (List.map structs ~f:(codegen_struct_ codegen_ctx))

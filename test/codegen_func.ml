@@ -48,23 +48,55 @@ let pp ?(bindings = Lang.default_bindings) s =
   |> Codegen.pp_program Format.std_formatter
 
 let%expect_test "Simple struct" =
-  let source = {|
-    struct Foo { val field: Int(257) }
-  |} in
-  pp source ; [%expect {|
-    cell struct257(int integer) {
+  let source =
+    {|
+    struct Foo { val field1: Int(257) val field2: Int(256) }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    cell serialize_int256(builder b, int value) {
+    builder b =
+    store_int(b, value, 256);
+    return
+    b;
+    }
+    cell serialize_int256_cell(int value) {
     builder b =
     new_builder();
     builder b =
-    store_uint(b, integer);
+    serialize_int256(b, value);
     return
     build(b);
     }
-    cell struct0(int field) {
+    cell serialize_int257(builder b, int value) {
+    builder b =
+    store_int(b, value, 257);
+    return
+    b;
+    }
+    cell serialize_int257_cell(int value) {
     builder b =
     new_builder();
     builder b =
-    store_uint(b, field);
+    serialize_int257(b, value);
+    return
+    build(b);
+    }
+    builder serialize_struct0(builder b, int field1, int field2) {
+    builder b =
+    serialize_int257(b, field1);
+    builder b =
+    serialize_int256(b, field2);
+    return
+    b;
+    }
+    cell serialize_struct0_cell(int field1, int field2) {
+    builder b =
+    new_builder();
+    builder b =
+    serialize_struct0(b, field1, field2);
     return
     build(b);
     } |}]

@@ -16,6 +16,11 @@ class virtual ['s] base_visitor =
     inherit ['s] Asm.map
   end
 
+type struct_modifiers = {is_builtin_int : bool; int_bits : int}
+[@@deriving equal, sexp_of, yojson_of]
+
+let default_modifiers = {is_builtin_int = false; int_bits = 0}
+
 type comptime_counter = (int[@sexp.opaque])
 
 and binding = string * expr
@@ -64,7 +69,8 @@ and type_ =
   | InvalidType
 
 and struct_ =
-  { struct_fields : (string * struct_field) list;
+  { struct_modifiers : struct_modifiers; [@visitors.opaque]
+    struct_fields : (string * struct_field) list;
     struct_methods : (string * function_) list;
     struct_id : (int * int[@sexp.opaque]) }
 
@@ -114,6 +120,12 @@ let rec expr_to_type = function
       expr_to_type function_returns
   | Reference (_, t) ->
       t
+  | _ ->
+      InvalidType
+
+let real_expr_to_type = function
+  | Value (Struct s) ->
+      StructType s
   | _ ->
       InvalidType
 
