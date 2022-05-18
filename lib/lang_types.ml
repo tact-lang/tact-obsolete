@@ -20,7 +20,10 @@ type comptime_counter = (int[@sexp.opaque])
 
 and binding = string * expr
 
-and program = {stmts : stmt list; [@sexp.list] bindings : (string * expr) list}
+and program =
+  { stmts : stmt list; [@sexp.list]
+    bindings : (string * expr) list;
+    mutable methods : (value * (string * function_) list) list [@sexp.list] }
 
 and expr =
   | FunctionCall of function_call
@@ -62,9 +65,7 @@ and type_ =
   | InvalidType
 
 and struct_ =
-  { struct_fields : (string * struct_field) list;
-    struct_methods : (string * function_) list;
-    struct_id : (int[@sexp.opaque]) }
+  {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
 
 and struct_field = {field_type : expr}
 
@@ -73,7 +74,11 @@ and function_body = (stmt list option[@sexp.option])
 and native_function =
   (program -> value list -> expr[@visitors.opaque] [@equal.ignore])
 
-and builtin_fn = native_function * int
+and native_function_typing =
+  (((program -> value list -> expr)[@equal.ignore] [@visitors.opaque]) option
+  [@sexp.option] )
+
+and builtin_fn = native_function * native_function_typing * (int[@sexp.opaque])
 
 and function_ =
   { function_params : (string * expr) list;
@@ -133,8 +138,8 @@ and are_immediate_arguments args =
 
 let rec builtin_fun_counter = ref 0
 
-and builtin_fun f =
-  let res = (f, !builtin_fun_counter) in
+and builtin_fun ?(typing = None) f =
+  let res = (f, typing, !builtin_fun_counter) in
   builtin_fun_counter := !builtin_fun_counter + 1 ;
   res
 

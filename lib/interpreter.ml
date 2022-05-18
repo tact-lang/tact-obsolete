@@ -10,7 +10,8 @@ type error =
 
 (*TODO: type checks for arguments*)
 class interpreter
-  ((bindings, errors, functions) : (string * expr) list list * _ errors * int) =
+  ((program, bindings, errors, functions) :
+    program * (string * expr) list list * _ errors * int ) =
   object (self)
     val global_bindings = bindings
 
@@ -78,12 +79,12 @@ class interpreter
     method interpret_value : value -> value =
       fun value ->
         match value with
-        | Struct {struct_fields; struct_methods; struct_id} ->
+        | Struct {struct_fields; struct_id} ->
             let struct_fields =
               List.map struct_fields ~f:(fun (name, {field_type}) ->
                   (name, {field_type = Value (self#interpret_expr field_type)}) )
             in
-            Struct {struct_fields; struct_methods; struct_id}
+            Struct {struct_fields; struct_id}
         | value ->
             value
 
@@ -120,10 +121,16 @@ class interpreter
                     Value Void )
               | Error _ ->
                   Value Void )
-          | {function_impl = BuiltinFn (function_impl, _); _} ->
+          | {function_impl = BuiltinFn (function_impl, typing, _); _} ->
+              (* Perform typing to register methods *)
+              let _ =
+                Option.iter typing ~f:(fun f ->
+                    let _ = f program args' in
+                    () )
+              in
               let expr =
                 function_impl
-                  { stmts = [];
+                  { program with
                     bindings =
                       Option.value (List.hd global_bindings) ~default:[] }
                   args'

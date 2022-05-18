@@ -7,16 +7,22 @@ let int_type =
   (* memoize constructor funs for equality *)
   and int_constructor_funs = Hashtbl.create (module Int) in
   (* int's newtype *)
-  let rec int_type_s bits =
+  let rec int_type_s p bits =
     let struct_id =
       Hashtbl.find_or_add struct_ids bits ~default:(fun () ->
           let c = !struct_counter in
           struct_counter := c + 1 ;
           c )
     in
-    { struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
-      struct_methods = [("new", int_type_s_new bits)];
-      struct_id }
+    let methods = [("new", int_type_s_new bits)]
+    and s =
+      { struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
+        struct_id }
+    in
+    if Option.is_none @@ List.Assoc.find p.methods ~equal:equal_value (Struct s)
+    then p.methods <- (Struct s, methods) :: p.methods
+    else () ;
+    s
   and int_type_s_new bits =
     let function_impl =
       Hashtbl.find_or_add int_constructor_funs bits ~default:(fun () ->
@@ -39,22 +45,25 @@ let int_type =
             extract i 0 (numbits - bits)
           else i
         in
-        Value (StructInstance (int_type_s bits, [("integer", Integer i)]))
+        Value (StructInstance (int_type_s p bits, [("integer", Integer i)]))
     | _ ->
         (* TODO: raise an error instead *)
         constructor_impl bits p [Integer (Zint.of_int 0)]
-  and function_impl _p = function
+  and function_impl p = function
     | [Integer bits] ->
-        Value (Struct (int_type_s @@ Z.to_int bits))
+        Value (Struct (int_type_s p @@ Z.to_int bits))
     | _ ->
         (* TODO: raise an error instead *)
         Value Void
   in
+  let p = {stmts = []; bindings = []; methods = []} in
   Value
     (Function
        { function_params = [("bits", Value (Type IntegerType))];
-         function_returns = Value (Struct (int_type_s 257));
-         function_impl = BuiltinFn (builtin_fun function_impl) } )
+         function_returns = Value (Struct (int_type_s p 257));
+         function_impl =
+           BuiltinFn (builtin_fun ~typing:(Some function_impl) function_impl) }
+    )
 
 let asm =
   let function_impl _p = function

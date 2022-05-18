@@ -6,7 +6,8 @@ module Errors = Tact.Errors
 module Zint = Tact.Zint
 include Core
 
-type error = [Lang.error | Interpreter.error] [@@deriving sexp_of]
+type error = [Lang.error | Interpreter.error] * Lang.program
+[@@deriving sexp_of]
 
 let make_errors () = new Errors.errors
 
@@ -27,7 +28,7 @@ let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
            }
          else program )
   |> Result.map_error ~f:(fun errors ->
-         List.map errors ~f:(fun (_, err, _) -> err) )
+         List.map errors ~f:(fun (_, err, _) -> (err, p')) )
 
 let rec pp_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
