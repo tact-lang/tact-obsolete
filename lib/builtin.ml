@@ -29,7 +29,6 @@ let int_type =
           builtin_fun @@ constructor_impl bits )
     in
     { function_params = [("integer", Value (Type IntegerType))];
-      (* TODO: figure out how to represent Self *)
       function_returns = Value (Struct self);
       function_impl = BuiltinFn function_impl }
   and constructor_impl bits p = function
