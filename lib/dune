@@ -31,7 +31,8 @@
   lang_types
   builtin
   interpreter
-  lang)
+  lang
+  func)
  (name tact))
 
 (ocamllex asm_lexer)
