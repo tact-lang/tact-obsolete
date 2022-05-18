@@ -8,7 +8,7 @@ let incr_f =
       function_impl =
         BuiltinFn
           (builtin_fun (fun _p -> function
-             | Integer arg :: _ ->
+             | Value (Integer arg) :: _ ->
                  Value (Integer (Zint.succ arg))
              | _ ->
                  Value (Integer Zint.zero) ) ) }
@@ -47,6 +47,17 @@ let%expect_test "scope resolution" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
 
 let%expect_test "binding resolution" =
@@ -102,6 +113,17 @@ let%expect_test "binding resolution" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
 
 let%expect_test "failed scope resolution" =
@@ -121,6 +143,7 @@ let%expect_test "failed scope resolution" =
              ((function_params ((instructions (Value (Type StringType)))))
               (function_returns (Value (Type VoidType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
            (Value
@@ -178,6 +201,17 @@ let%expect_test "scope resolution after let binding" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
 
 let%expect_test "basic struct definition" =
@@ -238,6 +272,17 @@ let%expect_test "basic struct definition" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
 
 let%expect_test "native function evaluation" =
@@ -315,6 +360,17 @@ let%expect_test "Tact function evaluation" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
 
 let%expect_test "compile-time function evaluation within a function" =
@@ -416,6 +472,17 @@ let%expect_test "struct definition" =
                  ((struct_fields
                    ((integer ((field_type (Value (Type IntegerType)))))))
                   (struct_id <opaque>)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_params
+               ((self
+                 (Value
+                  (Struct
+                   ((struct_fields
+                     ((integer ((field_type (Value (Type IntegerType)))))))
+                    (struct_id <opaque>)))))
+                (builder (Value (Type (BuiltinType Builder))))))
+              (function_returns (Value (Type VoidType)))
               (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
 
 let%expect_test "duplicate type field" =
@@ -478,6 +545,7 @@ let%expect_test "duplicate type field" =
              ((function_params ((instructions (Value (Type StringType)))))
               (function_returns (Value (Type VoidType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
            (Value
@@ -512,6 +580,17 @@ let%expect_test "duplicate type field" =
                  ((struct_fields
                    ((integer ((field_type (Value (Type IntegerType)))))))
                   (struct_id <opaque>)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_params
+               ((self
+                 (Value
+                  (Struct
+                   ((struct_fields
+                     ((integer ((field_type (Value (Type IntegerType)))))))
+                    (struct_id <opaque>)))))
+                (builder (Value (Type (BuiltinType Builder))))))
+              (function_returns (Value (Type VoidType)))
               (function_impl (BuiltinFn (<fun> <opaque>))))))))))))) |}]
 
 let%expect_test "parametric struct instantiation" =
@@ -590,6 +669,17 @@ let%expect_test "parametric struct instantiation" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>)))))))
         ((Struct
           ((struct_fields ((a ((field_type (Reference (A TypeType)))))))
@@ -682,6 +772,17 @@ let%expect_test "scoping that `let` introduces in code" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>)))))))))))
      |}]
 
@@ -876,6 +977,17 @@ let%expect_test "reference in function bodies" =
                ((struct_fields
                  ((integer ((field_type (Value (Type IntegerType)))))))
                 (struct_id <opaque>)))))
+            (function_impl (BuiltinFn (<fun> <opaque>)))))
+          (serialize
+           ((function_params
+             ((self
+               (Value
+                (Struct
+                 ((struct_fields
+                   ((integer ((field_type (Value (Type IntegerType)))))))
+                  (struct_id <opaque>)))))
+              (builder (Value (Type (BuiltinType Builder))))))
+            (function_returns (Value (Type VoidType)))
             (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
 
 let%expect_test "resolving a reference from inside a function" =
@@ -982,7 +1094,7 @@ let%expect_test "can't use asm in compile-time" =
   [%expect
     {|
     (Error
-     (((UninterpretableStatement (Expr (Asm (SWAP (XCHG0 2)))))
+     (((UninterpretableStatement (Expr (Asm (() (SWAP (XCHG0 2))))))
        ((stmts ((Expr (Value Void)) (Expr (Value Void))))
         (bindings
          ((asm
@@ -991,6 +1103,7 @@ let%expect_test "can't use asm in compile-time" =
              ((function_params ((instructions (Value (Type StringType)))))
               (function_returns (Value (Type VoidType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
            (Value
@@ -1000,7 +1113,7 @@ let%expect_test "can't use asm in compile-time" =
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (Bool (Value (Builtin Bool))) (Type (Value (Type TypeType)))
           (Void (Value Void))))))
-      ((UninterpretableStatement (Expr (Asm (ADD))))
+      ((UninterpretableStatement (Expr (Asm (() (ADD)))))
        ((stmts ((Expr (Value Void)) (Expr (Value Void))))
         (bindings
          ((asm
@@ -1009,6 +1122,7 @@ let%expect_test "can't use asm in compile-time" =
              ((function_params ((instructions (Value (Type StringType)))))
               (function_returns (Value (Type VoidType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
            (Value
@@ -1039,11 +1153,12 @@ let%expect_test "use of asm in a function" =
             (Function
              ((function_params ()) (function_returns Hole)
               (function_impl
-               (Fn (((Expr (Asm (SWAP (XCHG0 2)))) (Expr (Asm (ADD)))))))))))))))
+               (Fn
+                (((Expr (Asm (() (SWAP (XCHG0 2))))) (Expr (Asm (() (ADD))))))))))))))))
       (bindings
        ((f
          (Value
           (Function
            ((function_params ()) (function_returns Hole)
             (function_impl
-             (Fn (((Expr (Asm (SWAP (XCHG0 2)))) (Expr (Asm (ADD))))))))))))))) |}]
+             (Fn (((Expr (Asm (() (SWAP (XCHG0 2))))) (Expr (Asm (() (ADD)))))))))))))))) |}]

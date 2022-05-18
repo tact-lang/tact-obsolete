@@ -45,7 +45,7 @@ functor
 
         method build_FunctionCall _env (f, args) =
           let fc = (f, args) in
-          if are_immediate_arguments args then
+          if is_immediate_expr (FunctionCall (f, args)) then
             let inter =
               new interpreter (program, current_bindings, errors, functions)
             in

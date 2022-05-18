@@ -18,7 +18,12 @@ rule token = parse
  | "NOP" { NOP }
  | "SWAP" { SWAP }
  | "XCHG0" { XCHG0 }
+ | "PUSHINT" { PUSHINT }
+ | "INT" { PUSHINT }
  | "ADD" { ADD }
+ | "NEWC" { NEWC }
+ | "STIX" { STIX }
+ | "ENDC" { ENDC }
  | integer as i { INT (int_of_string i) }
  | eof { EOF }
  | _

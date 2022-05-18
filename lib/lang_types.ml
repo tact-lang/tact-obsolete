@@ -36,7 +36,8 @@ and expr =
   | FunctionCall of function_call
   | Reference of (string * type_)
   | Value of value
-  | Asm of Asm.instr list
+  | Asm of (expr list * Asm.instr list) (* push list * instruction list *)
+  | StructField of (expr * string)
   | Hole
   | InvalidExpr
 
@@ -79,7 +80,7 @@ and struct_field = {field_type : expr}
 and function_body = (stmt list option[@sexp.option])
 
 and native_function =
-  (program -> value list -> expr[@visitors.opaque] [@equal.ignore])
+  (program -> expr list -> expr[@visitors.opaque] [@equal.ignore])
 
 and builtin_fn = native_function * (int[@sexp.opaque])
 
@@ -125,7 +126,7 @@ let rec expr_to_type = function
 
 class ['s] expr_immediacy_check =
   object (_self : 's)
-    inherit [_] reduce
+    inherit [_] reduce as super
 
     method private zero = true
 
@@ -136,6 +137,13 @@ class ['s] expr_immediacy_check =
     method! visit_Hole _env = false
 
     method! visit_InvalidExpr _env = false
+
+    method! visit_function_call env (f, args) =
+      match f with
+      | Value (Function {function_impl = BuiltinFn _; _}) ->
+          true
+      | _ ->
+          super#visit_function_call env (f, args)
 
     (* Any function is assumed to be immediate as it can be evaluated *)
     method! visit_function_ _env _f = true

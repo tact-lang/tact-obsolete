@@ -5,6 +5,8 @@ open Errors
 type error =
   [ `UnresolvedIdentifier of string
   | `UninterpretableStatement of stmt
+  | `UnexpectedType of expr
+  | `FieldNotFound of struct_ * string
   | `ArgumentNumberMismatch ]
 [@@deriving equal, sexp_of]
 
@@ -54,6 +56,35 @@ class interpreter
       | Invalid ->
           Void
 
+    method private interpret_expr' =
+      function
+      | FunctionCall fc -> (
+        match self#interpret_fc fc with
+        | Value v ->
+            Value v
+        | e ->
+            self#interpret_expr' e )
+      | Reference (name, _) as ref -> (
+        match self#find_ref name with
+        | Some expr' ->
+            self#interpret_expr' expr'
+        | None ->
+            ref )
+      | StructField (struct_, field) as sf -> (
+        match self#interpret_expr' struct_ with
+        | Value (StructInstance (_, struct')) -> (
+          match List.Assoc.find struct' ~equal:String.equal field with
+          | Some field ->
+              Value field
+          | None ->
+              sf )
+        | other ->
+            other )
+      | Value value ->
+          Value (self#interpret_value value)
+      | sf ->
+          sf
+
     method interpret_expr : expr -> value =
       fun expr ->
         match expr with
@@ -69,6 +100,18 @@ class interpreter
               self#interpret_expr expr'
           | None ->
               errors#report `Error (`UnresolvedIdentifier name) () ;
+              Void )
+        | StructField (struct_, field) -> (
+          match self#interpret_expr struct_ with
+          | StructInstance (struct_, struct') -> (
+            match List.Assoc.find struct' ~equal:String.equal field with
+            | Some field ->
+                field
+            | None ->
+                errors#report `Error (`FieldNotFound (struct_, field)) () ;
+                Void )
+          | other ->
+              errors#report `Error (`UnexpectedType (Value other)) () ;
               Void )
         | Value value ->
             self#interpret_value value
@@ -93,7 +136,6 @@ class interpreter
     method interpret_fc : function_call -> expr =
       fun (func, args) ->
         let mk_err = Expr (FunctionCall (func, args)) in
-        let args' = List.map args ~f:(fun arg -> self#interpret_expr arg) in
         let args_to_list params values =
           match
             List.zip (List.map params ~f:(fun (name, _) -> name)) values
@@ -107,6 +149,9 @@ class interpreter
         | Function f -> (
           match f with
           | {function_params; function_impl = Fn function_impl; _} -> (
+              let args' =
+                List.map args ~f:(fun arg -> self#interpret_expr arg)
+              in
               let args_scope = args_to_list function_params args' in
               match args_scope with
               | Ok args_scope -> (
@@ -122,6 +167,9 @@ class interpreter
               | Error _ ->
                   Value Void )
           | {function_impl = BuiltinFn (function_impl, _); _} ->
+              let args' =
+                List.map args ~f:(fun arg -> self#interpret_expr' arg)
+              in
               let program' =
                 { program with
                   bindings = Option.value (List.hd global_bindings) ~default:[]
