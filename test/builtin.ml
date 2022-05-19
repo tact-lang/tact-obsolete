@@ -60,15 +60,16 @@ let%expect_test "Int(bits) constructor" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))))
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 8))))))))))))))
         ((Struct
           ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
            (struct_id <opaque>)))
@@ -85,15 +86,16 @@ let%expect_test "Int(bits) constructor" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "Int(bits) serializer" =
   let source =
@@ -127,17 +129,30 @@ let%expect_test "Int(bits) serializer" =
                            (struct_id <opaque>))
                           ((integer (Integer 100)))))))))
                     (Expr
-                     (Asm
-                      (((StructField
-                         ((Value
-                           (StructInstance
-                            (((struct_fields
-                               ((integer ((field_type (Value (Type IntegerType)))))))
-                              (struct_id <opaque>))
-                             ((integer (Integer 100))))))
-                          integer))
-                        (Reference (b (BuiltinType Builder))))
-                       ((PUSHINT 32) STIX))))))))))))))))
+                     (FunctionCall
+                      ((Value
+                        (Function
+                         ((function_signature
+                           ((function_params
+                             ((builder (Value (Type (BuiltinType Builder))))
+                              (value (Value (Type HoleType)))))
+                            (function_returns (Value (Type (BuiltinType Builder))))))
+                          (function_impl
+                           (Fn
+                            (((Return
+                               (FunctionCall
+                                ((Reference (UNKNOWN HoleType))
+                                 ((StructField
+                                   ((Reference (value HoleType)) integer))
+                                  (Reference (builder HoleType))
+                                  (Value (Integer 32)))))))))))))
+                       ((Value
+                         (StructInstance
+                          (((struct_fields
+                             ((integer ((field_type (Value (Type IntegerType)))))))
+                            (struct_id <opaque>))
+                           ((integer (Integer 100))))))
+                        (Reference (b (BuiltinType Builder)))))))))))))))))))
         (bindings
          ((test
            (Value
@@ -156,17 +171,30 @@ let%expect_test "Int(bits) serializer" =
                          (struct_id <opaque>))
                         ((integer (Integer 100)))))))))
                   (Expr
-                   (Asm
-                    (((StructField
-                       ((Value
-                         (StructInstance
-                          (((struct_fields
-                             ((integer ((field_type (Value (Type IntegerType)))))))
-                            (struct_id <opaque>))
-                           ((integer (Integer 100))))))
-                        integer))
-                      (Reference (b (BuiltinType Builder))))
-                     ((PUSHINT 32) STIX))))))))))))))
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params
+                           ((builder (Value (Type (BuiltinType Builder))))
+                            (value (Value (Type HoleType)))))
+                          (function_returns (Value (Type (BuiltinType Builder))))))
+                        (function_impl
+                         (Fn
+                          (((Return
+                             (FunctionCall
+                              ((Reference (UNKNOWN HoleType))
+                               ((StructField
+                                 ((Reference (value HoleType)) integer))
+                                (Reference (builder HoleType))
+                                (Value (Integer 32)))))))))))))
+                     ((Value
+                       (StructInstance
+                        (((struct_fields
+                           ((integer ((field_type (Value (Type IntegerType)))))))
+                          (struct_id <opaque>))
+                         ((integer (Integer 100))))))
+                      (Reference (b (BuiltinType Builder)))))))))))))))))
         (methods
          (((Struct
             ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
@@ -184,15 +212,16 @@ let%expect_test "Int(bits) serializer" =
             (serialize
              ((function_signature
                ((function_params
-                 ((self
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))
-                  (builder (Value (Type (BuiltinType Builder))))))
-                (function_returns (Value (Type VoidType)))))
-              (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+                 ((builder (Value (Type (BuiltinType Builder))))
+                  (value (Value (Type HoleType)))))
+                (function_returns (Value (Type (BuiltinType Builder))))))
+              (function_impl
+               (Fn
+                (((Return
+                   (FunctionCall
+                    ((Reference (UNKNOWN HoleType))
+                     ((StructField ((Reference (value HoleType)) integer))
+                      (Reference (builder HoleType)) (Value (Integer 32)))))))))))))))))) |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -238,16 +267,57 @@ let%expect_test "demo struct serializer" =
            (Value
             (Function
              ((function_signature
-               ((function_params ((t (Value (Type TypeType)))))
-                (function_returns
-                 (Value
-                  (Type
-                   (FunctionType
-                    ((function_params
-                      ((t (Value (Type HoleType)))
-                       (builder (Value (Type (BuiltinType Builder))))))
-                     (function_returns (Value (Type VoidType))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+               ((function_params
+                 ((self (Value (Type HoleType)))
+                  (builder (Value (Type (BuiltinType Builder))))))
+                (function_returns (Value (Type VoidType)))))
+              (function_impl
+               (Fn
+                (((Let
+                   ((builder
+                     (FunctionCall
+                      ((Value
+                        (Function
+                         ((function_signature
+                           ((function_params
+                             ((builder (Value (Type (BuiltinType Builder))))
+                              (value (Value (Type HoleType)))))
+                            (function_returns
+                             (Value (Type (BuiltinType Builder))))))
+                          (function_impl
+                           (Fn
+                            (((Return
+                               (FunctionCall
+                                ((Reference (store_uint HoleType))
+                                 ((StructField
+                                   ((Reference (value HoleType)) integer))
+                                  (Reference (builder HoleType))
+                                  (Value (Integer 32)))))))))))))
+                       ((StructField ((Reference (self HoleType)) a))
+                        (Value (Type (BuiltinType Builder)))))))))
+                  (Let
+                   ((builder
+                     (FunctionCall
+                      ((Value
+                        (Function
+                         ((function_signature
+                           ((function_params
+                             ((builder (Value (Type (BuiltinType Builder))))
+                              (value (Value (Type HoleType)))))
+                            (function_returns
+                             (Value (Type (BuiltinType Builder))))))
+                          (function_impl
+                           (Fn
+                            (((Return
+                               (FunctionCall
+                                ((Reference (store_uint HoleType))
+                                 ((StructField
+                                   ((Reference (value HoleType)) integer))
+                                  (Reference (builder HoleType))
+                                  (Value (Integer 16)))))))))))))
+                       ((StructField ((Reference (self HoleType)) b))
+                        (Value (Type (BuiltinType Builder)))))))))
+                  (Return (Reference (builder (BuiltinType Builder))))))))))))))
         (Let
          ((test
            (Value
@@ -258,69 +328,87 @@ let%expect_test "demo struct serializer" =
               (function_impl
                (Fn
                 (((Expr
-                   (Block
-                    (Expr
-                     (Asm
-                      (((StructField
-                         ((StructField
-                           ((Value
-                             (StructInstance
-                              (((struct_fields
-                                 ((a
-                                   ((field_type
-                                     (Value
-                                      (Struct
-                                       ((struct_fields
-                                         ((integer
-                                           ((field_type
-                                             (Value (Type IntegerType)))))))
-                                        (struct_id <opaque>)))))))
-                                  (b
-                                   ((field_type
-                                     (Value
-                                      (Struct
-                                       ((struct_fields
-                                         ((integer
-                                           ((field_type
-                                             (Value (Type IntegerType)))))))
-                                        (struct_id <opaque>)))))))))
-                                (struct_id <opaque>))
-                               ())))
-                            a))
-                          integer))
-                        (Reference (b (BuiltinType Builder))))
-                       ((PUSHINT 32) STIX))))
-                    (Expr
-                     (Asm
-                      (((StructField
-                         ((StructField
-                           ((Value
-                             (StructInstance
-                              (((struct_fields
-                                 ((a
-                                   ((field_type
-                                     (Value
-                                      (Struct
-                                       ((struct_fields
-                                         ((integer
-                                           ((field_type
-                                             (Value (Type IntegerType)))))))
-                                        (struct_id <opaque>)))))))
-                                  (b
-                                   ((field_type
-                                     (Value
-                                      (Struct
-                                       ((struct_fields
-                                         ((integer
-                                           ((field_type
-                                             (Value (Type IntegerType)))))))
-                                        (struct_id <opaque>)))))))))
-                                (struct_id <opaque>))
-                               ())))
-                            b))
-                          integer))
-                        (Reference (b (BuiltinType Builder))))
-                       ((PUSHINT 16) STIX))))))))))))))))))
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params
+                           ((self (Value (Type HoleType)))
+                            (builder (Value (Type (BuiltinType Builder))))))
+                          (function_returns (Value (Type VoidType)))))
+                        (function_impl
+                         (Fn
+                          (((Let
+                             ((builder
+                               (FunctionCall
+                                ((Value
+                                  (Function
+                                   ((function_signature
+                                     ((function_params
+                                       ((builder
+                                         (Value (Type (BuiltinType Builder))))
+                                        (value (Value (Type HoleType)))))
+                                      (function_returns
+                                       (Value (Type (BuiltinType Builder))))))
+                                    (function_impl
+                                     (Fn
+                                      (((Return
+                                         (FunctionCall
+                                          ((Reference (store_uint HoleType))
+                                           ((StructField
+                                             ((Reference (value HoleType))
+                                              integer))
+                                            (Reference (builder HoleType))
+                                            (Value (Integer 32)))))))))))))
+                                 ((StructField ((Reference (self HoleType)) a))
+                                  (Value (Type (BuiltinType Builder)))))))))
+                            (Let
+                             ((builder
+                               (FunctionCall
+                                ((Value
+                                  (Function
+                                   ((function_signature
+                                     ((function_params
+                                       ((builder
+                                         (Value (Type (BuiltinType Builder))))
+                                        (value (Value (Type HoleType)))))
+                                      (function_returns
+                                       (Value (Type (BuiltinType Builder))))))
+                                    (function_impl
+                                     (Fn
+                                      (((Return
+                                         (FunctionCall
+                                          ((Reference (store_uint HoleType))
+                                           ((StructField
+                                             ((Reference (value HoleType))
+                                              integer))
+                                            (Reference (builder HoleType))
+                                            (Value (Integer 16)))))))))))))
+                                 ((StructField ((Reference (self HoleType)) b))
+                                  (Value (Type (BuiltinType Builder)))))))))
+                            (Return (Reference (builder (BuiltinType Builder)))))))))))
+                     ((Value
+                       (StructInstance
+                        (((struct_fields
+                           ((a
+                             ((field_type
+                               (Value
+                                (Struct
+                                 ((struct_fields
+                                   ((integer
+                                     ((field_type (Value (Type IntegerType)))))))
+                                  (struct_id <opaque>)))))))
+                            (b
+                             ((field_type
+                               (Value
+                                (Struct
+                                 ((struct_fields
+                                   ((integer
+                                     ((field_type (Value (Type IntegerType)))))))
+                                  (struct_id <opaque>)))))))))
+                          (struct_id <opaque>))
+                         ())))
+                      (Reference (b (BuiltinType Builder)))))))))))))))))))
       (bindings
        ((test
          (Value
@@ -331,79 +419,138 @@ let%expect_test "demo struct serializer" =
             (function_impl
              (Fn
               (((Expr
-                 (Block
-                  (Expr
-                   (Asm
-                    (((StructField
-                       ((StructField
-                         ((Value
-                           (StructInstance
-                            (((struct_fields
-                               ((a
-                                 ((field_type
-                                   (Value
-                                    (Struct
-                                     ((struct_fields
-                                       ((integer
-                                         ((field_type (Value (Type IntegerType)))))))
-                                      (struct_id <opaque>)))))))
-                                (b
-                                 ((field_type
-                                   (Value
-                                    (Struct
-                                     ((struct_fields
-                                       ((integer
-                                         ((field_type (Value (Type IntegerType)))))))
-                                      (struct_id <opaque>)))))))))
-                              (struct_id <opaque>))
-                             ())))
-                          a))
-                        integer))
-                      (Reference (b (BuiltinType Builder))))
-                     ((PUSHINT 32) STIX))))
-                  (Expr
-                   (Asm
-                    (((StructField
-                       ((StructField
-                         ((Value
-                           (StructInstance
-                            (((struct_fields
-                               ((a
-                                 ((field_type
-                                   (Value
-                                    (Struct
-                                     ((struct_fields
-                                       ((integer
-                                         ((field_type (Value (Type IntegerType)))))))
-                                      (struct_id <opaque>)))))))
-                                (b
-                                 ((field_type
-                                   (Value
-                                    (Struct
-                                     ((struct_fields
-                                       ((integer
-                                         ((field_type (Value (Type IntegerType)))))))
-                                      (struct_id <opaque>)))))))))
-                              (struct_id <opaque>))
-                             ())))
-                          b))
-                        integer))
-                      (Reference (b (BuiltinType Builder))))
-                     ((PUSHINT 16) STIX))))))))))))))
+                 (FunctionCall
+                  ((Value
+                    (Function
+                     ((function_signature
+                       ((function_params
+                         ((self (Value (Type HoleType)))
+                          (builder (Value (Type (BuiltinType Builder))))))
+                        (function_returns (Value (Type VoidType)))))
+                      (function_impl
+                       (Fn
+                        (((Let
+                           ((builder
+                             (FunctionCall
+                              ((Value
+                                (Function
+                                 ((function_signature
+                                   ((function_params
+                                     ((builder
+                                       (Value (Type (BuiltinType Builder))))
+                                      (value (Value (Type HoleType)))))
+                                    (function_returns
+                                     (Value (Type (BuiltinType Builder))))))
+                                  (function_impl
+                                   (Fn
+                                    (((Return
+                                       (FunctionCall
+                                        ((Reference (store_uint HoleType))
+                                         ((StructField
+                                           ((Reference (value HoleType)) integer))
+                                          (Reference (builder HoleType))
+                                          (Value (Integer 32)))))))))))))
+                               ((StructField ((Reference (self HoleType)) a))
+                                (Value (Type (BuiltinType Builder)))))))))
+                          (Let
+                           ((builder
+                             (FunctionCall
+                              ((Value
+                                (Function
+                                 ((function_signature
+                                   ((function_params
+                                     ((builder
+                                       (Value (Type (BuiltinType Builder))))
+                                      (value (Value (Type HoleType)))))
+                                    (function_returns
+                                     (Value (Type (BuiltinType Builder))))))
+                                  (function_impl
+                                   (Fn
+                                    (((Return
+                                       (FunctionCall
+                                        ((Reference (store_uint HoleType))
+                                         ((StructField
+                                           ((Reference (value HoleType)) integer))
+                                          (Reference (builder HoleType))
+                                          (Value (Integer 16)))))))))))))
+                               ((StructField ((Reference (self HoleType)) b))
+                                (Value (Type (BuiltinType Builder)))))))))
+                          (Return (Reference (builder (BuiltinType Builder)))))))))))
+                   ((Value
+                     (StructInstance
+                      (((struct_fields
+                         ((a
+                           ((field_type
+                             (Value
+                              (Struct
+                               ((struct_fields
+                                 ((integer
+                                   ((field_type (Value (Type IntegerType)))))))
+                                (struct_id <opaque>)))))))
+                          (b
+                           ((field_type
+                             (Value
+                              (Struct
+                               ((struct_fields
+                                 ((integer
+                                   ((field_type (Value (Type IntegerType)))))))
+                                (struct_id <opaque>)))))))))
+                        (struct_id <opaque>))
+                       ())))
+                    (Reference (b (BuiltinType Builder)))))))))))))))
         (T_serializer
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (Value (Type TypeType)))))
-              (function_returns
-               (Value
-                (Type
-                 (FunctionType
-                  ((function_params
-                    ((t (Value (Type HoleType)))
-                     (builder (Value (Type (BuiltinType Builder))))))
-                   (function_returns (Value (Type VoidType))))))))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))))
+             ((function_params
+               ((self (Value (Type HoleType)))
+                (builder (Value (Type (BuiltinType Builder))))))
+              (function_returns (Value (Type VoidType)))))
+            (function_impl
+             (Fn
+              (((Let
+                 ((builder
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params
+                           ((builder (Value (Type (BuiltinType Builder))))
+                            (value (Value (Type HoleType)))))
+                          (function_returns (Value (Type (BuiltinType Builder))))))
+                        (function_impl
+                         (Fn
+                          (((Return
+                             (FunctionCall
+                              ((Reference (store_uint HoleType))
+                               ((StructField
+                                 ((Reference (value HoleType)) integer))
+                                (Reference (builder HoleType))
+                                (Value (Integer 32)))))))))))))
+                     ((StructField ((Reference (self HoleType)) a))
+                      (Value (Type (BuiltinType Builder)))))))))
+                (Let
+                 ((builder
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params
+                           ((builder (Value (Type (BuiltinType Builder))))
+                            (value (Value (Type HoleType)))))
+                          (function_returns (Value (Type (BuiltinType Builder))))))
+                        (function_impl
+                         (Fn
+                          (((Return
+                             (FunctionCall
+                              ((Reference (store_uint HoleType))
+                               ((StructField
+                                 ((Reference (value HoleType)) integer))
+                                (Reference (builder HoleType))
+                                (Value (Integer 16)))))))))))))
+                     ((StructField ((Reference (self HoleType)) b))
+                      (Value (Type (BuiltinType Builder)))))))))
+                (Return (Reference (builder (BuiltinType Builder))))))))))))
         (T
          (Value
           (Struct
@@ -458,15 +605,16 @@ let%expect_test "demo struct serializer" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))))
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 16))))))))))))))
         ((Struct
           ((struct_fields ((integer ((field_type (Value (Type IntegerType)))))))
            (struct_id <opaque>)))
@@ -483,12 +631,13 @@ let%expect_test "demo struct serializer" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 32)))))))))))))))))) |}]

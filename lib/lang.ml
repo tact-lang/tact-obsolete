@@ -49,7 +49,7 @@ functor
             let inter =
               new interpreter (program, current_bindings, errors, functions)
             in
-            inter#interpret_fc fc
+            Value (inter#interpret_fc fc)
           else FunctionCall fc
 
         method build_MethodCall env mc = s#build_FunctionCall env mc
@@ -144,8 +144,8 @@ functor
                    { function_signature =
                        { function_params = [];
                          function_returns = Value (Type VoidType) };
-                     function_impl =
-                       BuiltinFn (builtin_fun (fun _ _ -> Value Void)) } ),
+                     function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void))
+                   } ),
               [] )
           in
           (* TODO: check method signatures *)

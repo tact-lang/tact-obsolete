@@ -25,6 +25,8 @@ class virtual ['s] base_visitor =
 
 type comptime_counter = (int[@sexp.opaque])
 
+and metadata = (string * string) list
+
 and binding = string * expr
 
 and program =
@@ -81,7 +83,7 @@ and struct_field = {field_type : expr}
 and function_body = (stmt list option[@sexp.option])
 
 and native_function =
-  (program -> expr list -> expr[@visitors.opaque] [@equal.ignore])
+  (program -> value list -> value[@visitors.opaque] [@equal.ignore])
 
 and builtin_fn = native_function * (int[@sexp.opaque])
 
@@ -91,7 +93,11 @@ and function_ =
 and function_signature =
   {function_params : (string * expr) list; function_returns : expr}
 
-and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
+and function_impl =
+  | Fn of function_body
+  | BuiltinFn of builtin_fn
+  | AsmFn of Asm.instr
+  | InvalidFn
 
 and function_call = expr * expr list
 [@@deriving
@@ -149,7 +155,8 @@ class ['s] expr_immediacy_check =
           super#visit_function_call env (f, args)
 
     (* Any function is assumed to be immediate as it can be evaluated *)
-    method! visit_function_ _env _f = true
+    method! visit_function_ _env f =
+      match f.function_impl with AsmFn _ -> false | _ -> true
 
     method visit_instr _env _instr = false
 
