@@ -38,7 +38,6 @@ and expr =
   | FunctionCall of function_call
   | Reference of (string * type_)
   | Value of value
-  | Asm of (expr list * Asm.instr list) (* push list * instruction list *)
   | StructField of (expr * string)
   | Hole
   | Primitive of primitive

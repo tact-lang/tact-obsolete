@@ -82,7 +82,7 @@ class interpreter
               Void )
         | Value value ->
             self#interpret_value value
-        | Primitive _ | Asm _ | InvalidExpr | Hole ->
+        | Primitive _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
