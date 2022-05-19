@@ -16,7 +16,9 @@ let _ =
          let result =
            let e = new errors in
            let p = Parser.program Tact.Lexer.token lexbuf in
-           let c = new Lang.constructor (Lang.default_bindings, e) in
+           let c =
+             new Lang.constructor Lang.default_bindings Lang.default_methods e
+           in
            let p' = c#visit_program () p in
            e#to_result p'
          in

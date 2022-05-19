@@ -14,8 +14,8 @@ let make_errors () = new Errors.errors
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
-    ?(strip_default_bindings = true) p =
-  let c = new Lang.constructor (bindings, errors) in
+    ?(methods = Lang.default_methods) ?(strip_default_bindings = true) p =
+  let c = new Lang.constructor bindings methods errors in
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings *)

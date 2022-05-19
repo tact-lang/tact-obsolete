@@ -18,8 +18,8 @@ functor
 
     include Builtin
 
-    class ['s] constructor ((bindings, errors) : (string * expr) list * _ errors)
-      =
+    class ['s] constructor (bindings : (string * expr) list)
+      (methods : (value * (string * function_) list) list) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
@@ -33,7 +33,7 @@ functor
         val mutable functions = 0
 
         (* Program handle we pass to builtin functions *)
-        val program = {bindings; stmts = []; methods = []}
+        val program = {bindings; stmts = []; methods}
 
         method build_CodeBlock _env _code_block = Invalid
 
@@ -168,6 +168,19 @@ functor
               let methods =
                 List.Assoc.find program.methods ~equal:equal_value
                   (Struct struct')
+              in
+              match
+                Option.bind methods ~f:(fun methods ->
+                    List.Assoc.find methods ~equal:String.equal fn )
+              with
+              | Some fn' ->
+                  (Value (Function fn'), receiver :: s#of_located_list args)
+              | None ->
+                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  dummy )
+          | Value v -> (
+              let methods =
+                List.Assoc.find program.methods ~equal:equal_value v
               in
               match
                 Option.bind methods ~f:(fun methods ->

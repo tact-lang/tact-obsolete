@@ -56,33 +56,6 @@ class interpreter
       | Invalid ->
           Void
 
-    method private interpret_expr' =
-      function
-      | FunctionCall fc ->
-          self#interpret_fc fc
-      | Reference (name, _) -> (
-        match self#find_ref name with
-        | Some expr' ->
-            self#interpret_expr' expr'
-        | None ->
-            Void )
-      | StructField (struct_, field) -> (
-        match self#interpret_expr' struct_ with
-        | StructInstance (_, struct') -> (
-          match List.Assoc.find struct' ~equal:String.equal field with
-          | Some field ->
-              field
-          | None ->
-              Void )
-        | other ->
-            other )
-      | Value value ->
-          self#interpret_value value
-      | Block stmts ->
-          self#interpret_stmt_list stmts
-      | _ ->
-          Void
-
     method interpret_expr : expr -> value =
       fun expr ->
         match expr with
@@ -109,9 +82,7 @@ class interpreter
               Void )
         | Value value ->
             self#interpret_value value
-        | Block stmts ->
-            self#interpret_stmt_list stmts
-        | Asm _ | InvalidExpr | Hole ->
+        | Primitive _ | Asm _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
@@ -131,6 +102,7 @@ class interpreter
 
     method interpret_fc : function_call -> value =
       fun (func, args) ->
+        let args' = List.map args ~f:(fun arg -> self#interpret_expr arg) in
         let mk_err = Expr (FunctionCall (func, args)) in
         let args_to_list params values =
           match
@@ -147,9 +119,6 @@ class interpreter
           | { function_signature = {function_params; _};
               function_impl = Fn function_impl;
               _ } -> (
-              let args' =
-                List.map args ~f:(fun arg -> self#interpret_expr arg)
-              in
               let args_scope = args_to_list function_params args' in
               match args_scope with
               | Ok args_scope -> (
@@ -165,9 +134,6 @@ class interpreter
               | Error _ ->
                   Void )
           | {function_impl = BuiltinFn (function_impl, _); _} ->
-              let args' =
-                List.map args ~f:(fun arg -> self#interpret_expr' arg)
-              in
               let program' =
                 { program with
                   bindings = Option.value (List.hd global_bindings) ~default:[]
