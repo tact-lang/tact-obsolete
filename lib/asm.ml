@@ -1,6 +1,14 @@
 open Base
 
-type instr = ADD | NOP | SWAP | XCHG0 of int
+type instr =
+  | ADD
+  | NOP
+  | SWAP
+  | XCHG0 of int
+  | PUSHINT of int
+  | NEWC
+  | STIX
+  | ENDC
 [@@deriving equal, sexp_of, yojson_of]
 
 class ['s] map =

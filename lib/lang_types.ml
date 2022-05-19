@@ -36,8 +36,10 @@ and expr =
   | FunctionCall of function_call
   | Reference of (string * type_)
   | Value of value
-  | Asm of Asm.instr list
+  | Asm of (expr list * Asm.instr list) (* push list * instruction list *)
+  | StructField of (expr * string)
   | Hole
+  | Block of stmt list [@sexp.list]
   | InvalidExpr
 
 and value =
@@ -67,7 +69,7 @@ and type_ =
   | VoidType
   | BuiltinType of builtin
   | StructType of struct_
-  | FunctionType of function_
+  | FunctionType of function_signature
   | HoleType
   | InvalidType
 
@@ -79,14 +81,15 @@ and struct_field = {field_type : expr}
 and function_body = (stmt list option[@sexp.option])
 
 and native_function =
-  (program -> value list -> expr[@visitors.opaque] [@equal.ignore])
+  (program -> expr list -> expr[@visitors.opaque] [@equal.ignore])
 
 and builtin_fn = native_function * (int[@sexp.opaque])
 
 and function_ =
-  { function_params : (string * expr) list;
-    function_returns : expr;
-    function_impl : function_impl }
+  {function_signature : function_signature; function_impl : function_impl}
+
+and function_signature =
+  {function_params : (string * expr) list; function_returns : expr}
 
 and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
@@ -104,8 +107,8 @@ let rec expr_to_type = function
       TypeType
   | Value (StructInstance (struct_, _)) ->
       StructType struct_
-  | Value (Function function_) ->
-      FunctionType function_
+  | Value (Function {function_signature; _}) ->
+      FunctionType function_signature
   | Value (Builtin builtin) ->
       BuiltinType builtin
   | Value (Integer _) ->
@@ -116,7 +119,8 @@ let rec expr_to_type = function
       type_
   | Hole ->
       HoleType
-  | FunctionCall (Value (Function {function_returns; _}), _) ->
+  | FunctionCall
+      (Value (Function {function_signature = {function_returns; _}; _}), _) ->
       expr_to_type function_returns
   | Reference (_, t) ->
       t
@@ -125,7 +129,7 @@ let rec expr_to_type = function
 
 class ['s] expr_immediacy_check =
   object (_self : 's)
-    inherit [_] reduce
+    inherit [_] reduce as super
 
     method private zero = true
 
@@ -136,6 +140,13 @@ class ['s] expr_immediacy_check =
     method! visit_Hole _env = false
 
     method! visit_InvalidExpr _env = false
+
+    method! visit_function_call env (f, args) =
+      match f with
+      | Value (Function {function_impl = BuiltinFn _; _}) ->
+          true
+      | _ ->
+          super#visit_function_call env (f, args)
 
     (* Any function is assumed to be immediate as it can be evaluated *)
     method! visit_function_ _env _f = true

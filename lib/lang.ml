@@ -45,7 +45,7 @@ functor
 
         method build_FunctionCall _env (f, args) =
           let fc = (f, args) in
-          if are_immediate_arguments args then
+          if is_immediate_expr (FunctionCall (f, args)) then
             let inter =
               new interpreter (program, current_bindings, errors, functions)
             in
@@ -141,8 +141,9 @@ functor
           and dummy : expr * expr list =
             ( Value
                 (Function
-                   { function_params = [];
-                     function_returns = Value (Type VoidType);
+                   { function_signature =
+                       { function_params = [];
+                         function_returns = Value (Type VoidType) };
                      function_impl =
                        BuiltinFn (builtin_fun (fun _ _ -> Value Void)) } ),
               [] )
@@ -230,7 +231,8 @@ functor
             |> Option.map ~f:(fun x -> Syntax.value x)
             |> Option.value ~default:Hole
           and function_impl = body in
-          {function_params; function_returns; function_impl = Fn function_impl}
+          { function_signature = {function_params; function_returns};
+            function_impl = Fn function_impl }
 
         method build_if_ _env _condition _then _else = ()
 
