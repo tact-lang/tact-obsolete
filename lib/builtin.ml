@@ -35,16 +35,18 @@ let int_type =
       Hashtbl.find_or_add int_constructor_funs bits ~default:(fun () ->
           builtin_fun @@ constructor_impl bits )
     in
-    { function_params = [("integer", Value (Type IntegerType))];
-      function_returns = Value (Struct self);
+    { function_signature =
+        { function_params = [("integer", Value (Type IntegerType))];
+          function_returns = Value (Struct self) };
       function_impl = BuiltinFn function_impl }
   and int_type_s_serialize self bits =
     let function_impl =
       Hashtbl.find_or_add int_serializator_funs bits ~default:(fun () ->
           builtin_fun @@ serialize_impl bits )
     in
-    { function_params = [("self", Value (Struct self)); ("builder", builder)];
-      function_returns = Value (Type VoidType);
+    { function_signature =
+        { function_params = [("self", Value (Struct self)); ("builder", builder)];
+          function_returns = Value (Type VoidType) };
       function_impl = BuiltinFn function_impl }
   and constructor_impl bits p = function
     | [Value (Integer i)] ->
@@ -81,8 +83,9 @@ let int_type =
   in
   Value
     (Function
-       { function_params = [("bits", Value (Type IntegerType))];
-         function_returns = Value (Type TypeType);
+       { function_signature =
+           { function_params = [("bits", Value (Type IntegerType))];
+             function_returns = Value (Type TypeType) };
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let asm =
@@ -96,8 +99,60 @@ let asm =
   in
   Value
     (Function
-       { function_params = [("instructions", Value (Type StringType))];
-         function_returns = Value (Type VoidType);
+       { function_signature =
+           { function_params = [("instructions", Value (Type StringType))];
+             function_returns = Value (Type VoidType) };
+         function_impl = BuiltinFn (builtin_fun function_impl) } )
+
+let serializer =
+  let function_signature =
+    { function_params = [("t", Value (Type TypeType))];
+      function_returns =
+        Value
+          (Type
+             (FunctionType
+                { function_params =
+                    [("t", Value (Type HoleType)); ("builder", builder)];
+                  function_returns = Value (Type VoidType) } ) ) }
+  in
+  let serializer_f s p = function
+    | [struct'; builder] ->
+        let calls =
+          List.filter_map s.struct_fields ~f:(function
+            | name, {field_type = Value f} ->
+                let methods =
+                  List.Assoc.find_exn p.methods ~equal:equal_value f
+                in
+                List.Assoc.find methods ~equal:String.equal "serialize"
+                |> Option.map ~f:(fun method_ ->
+                       Expr
+                         (FunctionCall
+                            ( Value (Function method_),
+                              StructField (struct', name) :: [builder] ) ) )
+            | _ ->
+                None )
+        in
+        Block calls
+    | _ ->
+        (* TODO: error *)
+        Value Void
+  in
+  let function_impl _p = function
+    | [Value (Struct s)] ->
+        Value
+          (Function
+             { function_signature;
+               function_impl = BuiltinFn (builtin_fun @@ serializer_f s) } )
+    | _ ->
+        Value
+          (Function
+             { function_signature;
+               function_impl =
+                 BuiltinFn (builtin_fun @@ fun _p _args -> Value Void) } )
+  in
+  Value
+    (Function
+       { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let default_bindings =
@@ -107,4 +162,8 @@ let default_bindings =
     ("Int", int_type);
     ("Bool", Value (Builtin "Bool"));
     ("Type", Value (Type TypeType));
-    ("Void", Value Void) ]
+    ("Void", Value Void);
+    (* TODO: re-design the serialization API surface; this is more for demonstration
+     * purposes
+     *)
+    ("serializer", serializer) ]
