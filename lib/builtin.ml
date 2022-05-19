@@ -3,6 +3,13 @@ open Lang_types
 
 let builder = Value (Type (BuiltinType "Builder"))
 
+let builder_methods =
+  let new_ =
+    { function_signature = {function_params = []; function_returns = builder};
+      function_impl = Fn (Some [Return (Primitive EmptyBuilder)]) }
+  in
+  [("new", new_)]
+
 let cell = Value (Type (BuiltinType "Cell"))
 
 let int_type =
@@ -24,7 +31,7 @@ let int_type =
     in
     let methods =
       [ ("new", int_type_s_new s bits);
-        ("serialize", int_type_s_serialize bits p) ]
+        ("serialize", int_type_s_serialize bits s) ]
     in
     if Option.is_none @@ List.Assoc.find p.methods ~equal:equal_value (Struct s)
     then p.methods <- (Struct s, methods) :: p.methods
@@ -39,7 +46,6 @@ let int_type =
         { function_params = [("integer", Value (Type IntegerType))];
           function_returns = Value (Struct self) };
       function_impl = BuiltinFn function_impl }
-  and int_type_s_serialize bits p = serialize_impl bits p
   and constructor_impl bits p = function
     | [Integer i] ->
         let numbits = Zint.numbits i in
@@ -57,33 +63,23 @@ let int_type =
     | _ ->
         (* TODO: raise an error instead *)
         constructor_impl bits p [Integer (Zint.of_int 0)]
-  and serialize_impl bits p =
-    let store_int_method, _ =
-      Option.value
-        (List.find p.bindings ~f:(fun (_, binding) ->
-             match binding with
-             | Value (Function {function_impl = AsmFn Asm.STIX; _}) ->
-                 true
-             | _ ->
-                 false ) )
-        ~default:("UNKNOWN", Value Void)
-    in
-    let func =
-      { function_signature =
-          { function_params =
-              [("builder", builder); ("value", Value (Type HoleType))];
-            function_returns = builder };
-        function_impl =
-          Fn
-            (Some
-               [ Return
-                   (FunctionCall
-                      ( Reference (store_int_method, HoleType),
-                        [ StructField (Reference ("value", HoleType), "integer");
-                          Reference ("builder", HoleType);
-                          Value (Integer (Z.of_int bits)) ] ) ) ] ) }
-    in
-    func
+  and int_type_s_serialize bits s =
+    let self = Value (Type (StructType s)) in
+    { function_signature =
+        { function_params = [("self", self); ("builder", builder)];
+          function_returns = builder };
+      function_impl =
+        Fn
+          (Some
+             [ Return
+                 (Primitive
+                    (StoreInt
+                       { builder = Reference ("builder", BuiltinType "Builder");
+                         length = Value (Integer (Z.of_int bits));
+                         integer =
+                           StructField
+                             (Reference ("self", StructType s), "integer");
+                         signed = true } ) ) ] ) }
   and function_impl p = function
     | [Integer bits] ->
         Struct (int_type_s p @@ Z.to_int bits)
@@ -96,22 +92,6 @@ let int_type =
        { function_signature =
            { function_params = [("bits", Value (Type IntegerType))];
              function_returns = Value (Type TypeType) };
-         function_impl = BuiltinFn (builtin_fun function_impl) } )
-
-let asm =
-  let function_impl _p = function
-    | [String code] ->
-        let _lexbuf = Lexing.from_string code in
-        let _code = Asm_parser.code Asm_lexer.token _lexbuf in
-        Void
-    | _ ->
-        Void
-  in
-  Value
-    (Function
-       { function_signature =
-           { function_params = [("instructions", Value (Type StringType))];
-             function_returns = Value (Type VoidType) };
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let serializer =
@@ -157,25 +137,8 @@ let serializer =
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
-let asm_function args ret instr =
-  Value
-    (Function
-       { function_signature = {function_params = args; function_returns = ret};
-         function_impl = AsmFn instr } )
-
-let asm_functions =
-  [ ("new_builder", asm_function [] builder Asm.NEWC);
-    ( "store_uint",
-      asm_function
-        [ ("value", Value (Type IntegerType));
-          ("builder", builder);
-          ("bits", Value (Type IntegerType)) ]
-        builder Asm.STIX );
-    ("end_builder", asm_function [("builder", builder)] cell Asm.ENDC) ]
-
 let default_bindings =
-  [ ("asm", asm);
-    ("Builder", builder);
+  [ ("Builder", builder);
     ("Integer", Value (Type IntegerType));
     ("Int", int_type);
     ("Bool", Value (Builtin "Bool"));
@@ -185,4 +148,5 @@ let default_bindings =
      * purposes
      *)
     ("serializer", serializer) ]
-  @ asm_functions
+
+let default_methods = [(Type (BuiltinType "Builder"), builder_methods)]

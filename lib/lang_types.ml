@@ -41,7 +41,7 @@ and expr =
   | Asm of (expr list * Asm.instr list) (* push list * instruction list *)
   | StructField of (expr * string)
   | Hole
-  | Block of stmt list [@sexp.list]
+  | Primitive of primitive
   | InvalidExpr
 
 and value =
@@ -93,13 +93,14 @@ and function_ =
 and function_signature =
   {function_params : (string * expr) list; function_returns : expr}
 
-and function_impl =
-  | Fn of function_body
-  | BuiltinFn of builtin_fn
-  | AsmFn of Asm.instr
-  | InvalidFn
+and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
 and function_call = expr * expr list
+
+and primitive =
+  | EmptyBuilder
+  | StoreInt of {builder : expr; length : expr; integer : expr; signed : bool}
+  | BuildCell of {builder : expr}
 [@@deriving
   equal,
     sexp_of,
@@ -133,9 +134,26 @@ let rec expr_to_type = function
   | _ ->
       InvalidType
 
+class ['s] primitive_presence =
+  object (_self : 's)
+    inherit [_] reduce
+
+    method private zero = false
+
+    method private plus = ( || )
+
+    method! visit_Primitive _env _primitive = true
+
+    method visit_instr _env _instr = false
+
+    method visit_z _env _z = false
+  end
+
 class ['s] expr_immediacy_check =
   object (_self : 's)
     inherit [_] reduce as super
+
+    val mutable in_function_call = 0
 
     method private zero = true
 
@@ -147,16 +165,25 @@ class ['s] expr_immediacy_check =
 
     method! visit_InvalidExpr _env = false
 
+    method! visit_Primitive _env _primitive = false
+
     method! visit_function_call env (f, args) =
       match f with
       | Value (Function {function_impl = BuiltinFn _; _}) ->
           true
       | _ ->
-          super#visit_function_call env (f, args)
+          in_function_call <- in_function_call + 1 ;
+          let result = super#visit_function_call env (f, args) in
+          in_function_call <- in_function_call - 1 ;
+          result
 
-    (* Any function is assumed to be immediate as it can be evaluated *)
     method! visit_function_ _env f =
-      match f.function_impl with AsmFn _ -> false | _ -> true
+      if in_function_call > 0 then
+        (* If we're calling this function, check if there are no primitives *)
+        not @@ (new primitive_presence)#visit_function_ () f
+      else
+        (* Any function is assumed to be immediate as it can be evaluated otherwise *)
+        true
 
     method visit_instr _env _instr = false
 
