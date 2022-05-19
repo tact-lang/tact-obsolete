@@ -45,8 +45,15 @@ and print_sexp e =
   pp_sexp
     (Result.sexp_of_t Lang.sexp_of_program (List.sexp_of_t sexp_of_error) e)
 
+let print_pp e =
+  match e with
+  | Ok e ->
+      Tact.Pp.pp_program Caml.Format.std_formatter e
+  | Error e ->
+      print_sexp (Error e)
+
 let pp ?(bindings = Lang.default_bindings) s =
-  parse_program s |> build_program ~bindings |> print_sexp
+  parse_program s |> build_program ~bindings |> print_pp
 
 exception Exn of error list
 

@@ -31,7 +31,7 @@ and binding = string * expr
 
 and program =
   { stmts : stmt list; [@sexp.list]
-    bindings : (string * expr) list;
+    bindings : binding list;
     mutable methods : (value * (string * function_) list) list [@sexp.list] }
 
 and expr =

@@ -6,7 +6,9 @@
   zarith
   visitors.runtime
   ppx_sexp_conv
-  sexplib)
+  sexplib
+  printbox
+  printbox-text)
  (preprocess
   (pps
    ppx_show
@@ -31,7 +33,8 @@
   lang_types
   builtin
   interpreter
-  lang)
+  lang
+  pp)
  (name tact))
 
 (ocamllex asm_lexer)

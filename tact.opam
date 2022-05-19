@@ -23,6 +23,8 @@ depends: [
   "base" {>= "0.15.0"}
   "ppx_jane" {>= "0.15.0"}
   "visitors" {= "20210608"}
+  "printbox" {>= "0.6.1"}
+  "printbox-text" {>= "0.6.1"}
   "core" {with-test & >= "0.15.0"}
   "ppx_expect" {with-test & >= "0.15.0"}
   "ppx_matches" {with-test & >= "0.1"}
