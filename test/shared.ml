@@ -17,7 +17,7 @@ let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
     ?(methods = Lang.default_methods) ?(strip_default_bindings = true) p =
   let c = new Lang.constructor bindings methods errors in
   let p' = c#visit_program () p in
-  errors#to_result p'
+  errors#to_result {p' with stmts = []}
   (* remove default bindings *)
   |> Result.map ~f:(fun (program : Lang.program) ->
          if strip_default_bindings then

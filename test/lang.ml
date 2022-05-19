@@ -22,15 +22,7 @@ let%expect_test "scope resolution" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((T
-           (Value
-            (Struct
-             ((struct_fields
-               ((integer ((field_type (Value (Type IntegerType)))))))
-              (struct_id <opaque>)))))))))
-      (bindings
+     ((bindings
        ((T
          (Value
           (Struct
@@ -98,23 +90,7 @@ let%expect_test "binding resolution" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((T
-           (Value
-            (Struct
-             ((struct_fields
-               ((integer ((field_type (Value (Type IntegerType)))))))
-              (struct_id <opaque>)))))))
-        (Let
-         ((T_
-           (Value
-            (Struct
-             ((struct_fields
-               ((integer ((field_type (Value (Type IntegerType)))))))
-              (struct_id <opaque>)))))))
-        (Let ((a (Value (Integer 1))))) (Let ((a_ (Value (Integer 1)))))))
-      (bindings
+     ((bindings
        ((a_ (Value (Integer 1))) (a (Value (Integer 1)))
         (T_
          (Value
@@ -228,22 +204,7 @@ let%expect_test "scope resolution after let binding" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((A
-           (Value
-            (Struct
-             ((struct_fields
-               ((integer ((field_type (Value (Type IntegerType)))))))
-              (struct_id <opaque>)))))))
-        (Let
-         ((B
-           (Value
-            (Struct
-             ((struct_fields
-               ((integer ((field_type (Value (Type IntegerType)))))))
-              (struct_id <opaque>)))))))))
-      (bindings
+     ((bindings
        ((B
          (Value
           (Struct
@@ -311,21 +272,7 @@ let%expect_test "basic struct definition" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((T
-           (Value
-            (Struct
-             ((struct_fields
-               ((t
-                 ((field_type
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))))))
-              (struct_id <opaque>)))))))))
-      (bindings
+     ((bindings
        ((T
          (Value
           (Struct
@@ -406,8 +353,7 @@ let%expect_test "native function evaluation" =
   [%expect
     {|
     (Ok
-     ((stmts ((Let ((v (Value (Integer 4)))))))
-      (bindings ((v (Value (Integer 4)))))
+     ((bindings ((v (Value (Integer 4)))))
       (methods
        (((Type (BuiltinType Builder))
          ((new
@@ -429,28 +375,7 @@ let%expect_test "Tact function evaluation" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((test
-           (Value
-            (Function
-             ((function_signature
-               ((function_params
-                 ((i
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))))
-                (function_returns
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))))
-              (function_impl (Fn (((Break (Expr (Reference (i TypeType))))))))))))))
-        (Let ((a (Value (Integer 1)))))))
-      (bindings
+     ((bindings
        ((a (Value (Integer 1)))
         (test
          (Value
@@ -532,17 +457,7 @@ let%expect_test "compile-time function evaluation within a function" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((test
-           (Value
-            (Function
-             ((function_signature ((function_params ()) (function_returns Hole)))
-              (function_impl
-               (Fn
-                (((Let ((v (Value (Integer 4)))))
-                  (Break (Expr (Value (Integer 4))))))))))))))))
-      (bindings
+     ((bindings
        ((test
          (Value
           (Function
@@ -572,22 +487,7 @@ let%expect_test "struct definition" =
   [%expect
     {|
       (Ok
-       ((stmts
-         ((Let
-           ((MyType
-             (Value
-              (Struct
-               ((struct_fields
-                 ((a
-                   ((field_type
-                     (Value
-                      (Struct
-                       ((struct_fields
-                         ((integer ((field_type (Value (Type IntegerType)))))))
-                        (struct_id <opaque>)))))))
-                  (b ((field_type (Value (Builtin Bool)))))))
-                (struct_id <opaque>)))))))))
-        (bindings
+       ((bindings
          ((MyType
            (Value
             (Struct
@@ -815,36 +715,7 @@ let%expect_test "parametric struct instantiation" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((T
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((A (Value (Type TypeType)))))
-                (function_returns (Value (Type TypeType)))))
-              (function_impl
-               (Fn
-                (((Expr
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((a ((field_type (Reference (A TypeType)))))))
-                      (struct_id <opaque>)))))))))))))))
-        (Let
-         ((TA
-           (Value
-            (Struct
-             ((struct_fields
-               ((a
-                 ((field_type
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))))))
-              (struct_id <opaque>)))))))))
-      (bindings
+     ((bindings
        ((TA
          (Value
           (Struct
@@ -932,15 +803,7 @@ let%expect_test "function without a return type" =
   [%expect
     {|
       (Ok
-       ((stmts
-         ((Let
-           ((f
-             (Value
-              (Function
-               ((function_signature ((function_params ()) (function_returns Hole)))
-                (function_impl (Fn (((Break (Expr (Value (Integer 1))))))))))))))
-          (Let ((a (Value (Integer 1)))))))
-        (bindings
+       ((bindings
          ((a (Value (Integer 1)))
           (f
            (Value
@@ -969,26 +832,7 @@ let%expect_test "scoping that `let` introduces in code" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((f
-           (Value
-            (Function
-             ((function_signature
-               ((function_params
-                 ((i
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))))
-                (function_returns Hole)))
-              (function_impl
-               (Fn
-                (((Let ((a (Reference (i TypeType)))))
-                  (Break (Expr (Reference (a TypeType))))))))))))))
-        (Let ((b (Value (Integer 1)))))))
-      (bindings
+     ((bindings
        ((b (Value (Integer 1)))
         (f
          (Value
@@ -1073,93 +917,7 @@ let%expect_test "reference in function bodies" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let
-         ((op
-           (Value
-            (Function
-             ((function_signature
-               ((function_params
-                 ((i
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))
-                  (i_
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))))
-                (function_returns Hole)))
-              (function_impl (Fn (((Break (Expr (Reference (i TypeType))))))))))))))
-        (Let
-         ((f
-           (Value
-            (Function
-             ((function_signature
-               ((function_params
-                 ((x
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))))
-                (function_returns Hole)))
-              (function_impl
-               (Fn
-                (((Let
-                   ((a
-                     (FunctionCall
-                      ((Value
-                        (Function
-                         ((function_signature
-                           ((function_params
-                             ((i
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_id <opaque>)))))
-                              (i_
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_id <opaque>)))))))
-                            (function_returns Hole)))
-                          (function_impl
-                           (Fn (((Break (Expr (Reference (i TypeType)))))))))))
-                       ((Reference (x TypeType)) (Reference (x TypeType))))))))
-                  (Let
-                   ((b
-                     (FunctionCall
-                      ((Value
-                        (Function
-                         ((function_signature
-                           ((function_params
-                             ((i
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_id <opaque>)))))
-                              (i_
-                               (Value
-                                (Struct
-                                 ((struct_fields
-                                   ((integer
-                                     ((field_type (Value (Type IntegerType)))))))
-                                  (struct_id <opaque>)))))))
-                            (function_returns Hole)))
-                          (function_impl
-                           (Fn (((Break (Expr (Reference (i TypeType)))))))))))
-                       ((Reference (a HoleType)) (Reference (a HoleType))))))))))))))))))))
-      (bindings
+     ((bindings
        ((f
          (Value
           (Function
@@ -1306,16 +1064,7 @@ let%expect_test "resolving a reference from inside a function" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let ((i (Value (Integer 1)))))
-        (Let
-         ((f
-           (Value
-            (Function
-             ((function_signature ((function_params ()) (function_returns Hole)))
-              (function_impl (Fn (((Break (Expr (Value (Integer 1))))))))))))))
-        (Let ((x (Value (Integer 1)))))))
-      (bindings
+     ((bindings
        ((x (Value (Integer 1)))
         (f
          (Value
@@ -1347,14 +1096,7 @@ let%expect_test "method access" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let ((Foo (Value (Struct ((struct_fields ()) (struct_id <opaque>)))))))
-        (Let
-         ((foo
-           (Value
-            (StructInstance (((struct_fields ()) (struct_id <opaque>)) ()))))))
-        (Let ((res (Value (Integer 1)))))))
-      (bindings
+     ((bindings
        ((res (Value (Integer 1)))
         (foo
          (Value (StructInstance (((struct_fields ()) (struct_id <opaque>)) ()))))
@@ -1388,9 +1130,7 @@ let%expect_test "Self type resolution in methods" =
   [%expect
     {|
     (Ok
-     ((stmts
-       ((Let ((Foo (Value (Struct ((struct_fields ()) (struct_id <opaque>)))))))))
-      (bindings
+     ((bindings
        ((Foo (Value (Struct ((struct_fields ()) (struct_id <opaque>)))))))
       (methods
        (((Struct ((struct_fields ()) (struct_id <opaque>)))
