@@ -3,6 +3,8 @@ open Lang_types
 
 let builder = Value (Type (BuiltinType "Builder"))
 
+let cell = Value (Type (BuiltinType "Cell"))
+
 let int_type =
   (* memoize struct ids for equality *)
   let struct_ids = Hashtbl.create (module Int)
@@ -155,6 +157,22 @@ let serializer =
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
+let asm_function args ret instr =
+  Value
+    (Function
+       { function_signature = {function_params = args; function_returns = ret};
+         function_impl = AsmFn instr } )
+
+let asm_functions =
+  [ ("new_builder", asm_function [] builder Asm.NEWC);
+    ( "store_uint",
+      asm_function
+        [ ("builder", builder);
+          ("value", Value (Type IntegerType));
+          ("bits", Value (Type IntegerType)) ]
+        builder Asm.NEWC );
+    ("end_builder", asm_function [("builder", builder)] cell Asm.ENDC) ]
+
 let default_bindings =
   [ ("asm", asm);
     ("Builder", builder);
@@ -167,3 +185,4 @@ let default_bindings =
      * purposes
      *)
     ("serializer", serializer) ]
+  @ asm_functions
