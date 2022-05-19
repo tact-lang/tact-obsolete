@@ -9,10 +9,10 @@ let incr_f =
       function_impl =
         BuiltinFn
           (builtin_fun (fun _p -> function
-             | Value (Integer arg) :: _ ->
-                 Value (Integer (Zint.succ arg))
+             | Integer arg :: _ ->
+                 Integer (Zint.succ arg)
              | _ ->
-                 Value (Integer Zint.zero) ) ) }
+                 Integer Zint.zero ) ) }
 
 let%expect_test "scope resolution" =
   let source = {|
@@ -53,15 +53,16 @@ let%expect_test "scope resolution" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "binding resolution" =
   let source =
@@ -121,15 +122,16 @@ let%expect_test "binding resolution" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "failed scope resolution" =
   let source = {|
@@ -173,7 +175,32 @@ let%expect_test "failed scope resolution" =
                       ((t (Value (Type HoleType)))
                        (builder (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type VoidType))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>))))))))))))) |}]
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (new_builder
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ())
+                (function_returns (Value (Type (BuiltinType Builder))))))
+              (function_impl (AsmFn NEWC))))))
+          (store_uint
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((value (Value (Type IntegerType)))
+                  (builder (Value (Type (BuiltinType Builder))))
+                  (bits (Value (Type IntegerType)))))
+                (function_returns (Value (Type (BuiltinType Builder))))))
+              (function_impl (AsmFn STIX))))))
+          (end_builder
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((builder (Value (Type (BuiltinType Builder))))))
+                (function_returns (Value (Type (BuiltinType Cell))))))
+              (function_impl (AsmFn ENDC)))))))))))) |}]
 
 let%expect_test "scope resolution after let binding" =
   let source = {|
@@ -227,15 +254,16 @@ let%expect_test "scope resolution after let binding" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "basic struct definition" =
   let source = {|
@@ -300,15 +328,16 @@ let%expect_test "basic struct definition" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "native function evaluation" =
   let source = {|
@@ -392,15 +421,16 @@ let%expect_test "Tact function evaluation" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "compile-time function evaluation within a function" =
   let source =
@@ -506,15 +536,16 @@ let%expect_test "struct definition" =
             (serialize
              ((function_signature
                ((function_params
-                 ((self
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))
-                  (builder (Value (Type (BuiltinType Builder))))))
-                (function_returns (Value (Type VoidType)))))
-              (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+                 ((builder (Value (Type (BuiltinType Builder))))
+                  (value (Value (Type HoleType)))))
+                (function_returns (Value (Type (BuiltinType Builder))))))
+              (function_impl
+               (Fn
+                (((Return
+                   (FunctionCall
+                    ((Reference (store_uint HoleType))
+                     ((StructField ((Reference (value HoleType)) integer))
+                      (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "duplicate type field" =
   let source =
@@ -601,7 +632,32 @@ let%expect_test "duplicate type field" =
                       ((t (Value (Type HoleType)))
                        (builder (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type VoidType))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (new_builder
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ())
+                (function_returns (Value (Type (BuiltinType Builder))))))
+              (function_impl (AsmFn NEWC))))))
+          (store_uint
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((value (Value (Type IntegerType)))
+                  (builder (Value (Type (BuiltinType Builder))))
+                  (bits (Value (Type IntegerType)))))
+                (function_returns (Value (Type (BuiltinType Builder))))))
+              (function_impl (AsmFn STIX))))))
+          (end_builder
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((builder (Value (Type (BuiltinType Builder))))))
+                (function_returns (Value (Type (BuiltinType Cell))))))
+              (function_impl (AsmFn ENDC))))))))
         (methods
          (((Struct
             ((struct_fields
@@ -632,15 +688,16 @@ let%expect_test "duplicate type field" =
             (serialize
              ((function_signature
                ((function_params
-                 ((self
-                   (Value
-                    (Struct
-                     ((struct_fields
-                       ((integer ((field_type (Value (Type IntegerType)))))))
-                      (struct_id <opaque>)))))
-                  (builder (Value (Type (BuiltinType Builder))))))
-                (function_returns (Value (Type VoidType)))))
-              (function_impl (BuiltinFn (<fun> <opaque>))))))))))))) |}]
+                 ((builder (Value (Type (BuiltinType Builder))))
+                  (value (Value (Type HoleType)))))
+                (function_returns (Value (Type (BuiltinType Builder))))))
+              (function_impl
+               (Fn
+                (((Return
+                   (FunctionCall
+                    ((Reference (store_uint HoleType))
+                     ((StructField ((Reference (value HoleType)) integer))
+                      (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))))) |}]
 
 let%expect_test "parametric struct instantiation" =
   let source =
@@ -725,15 +782,16 @@ let%expect_test "parametric struct instantiation" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))))
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257))))))))))))))
         ((Struct
           ((struct_fields ((a ((field_type (Reference (A TypeType)))))))
            (struct_id <opaque>)))
@@ -832,15 +890,16 @@ let%expect_test "scoping that `let` introduces in code" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))))))))
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257))))))))))))))))))
      |}]
 
 let%expect_test "reference in function bodies" =
@@ -1047,15 +1106,16 @@ let%expect_test "reference in function bodies" =
           (serialize
            ((function_signature
              ((function_params
-               ((self
-                 (Value
-                  (Struct
-                   ((struct_fields
-                     ((integer ((field_type (Value (Type IntegerType)))))))
-                    (struct_id <opaque>)))))
-                (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
-            (function_impl (BuiltinFn (<fun> <opaque>))))))))))) |}]
+               ((builder (Value (Type (BuiltinType Builder))))
+                (value (Value (Type HoleType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
+            (function_impl
+             (Fn
+              (((Return
+                 (FunctionCall
+                  ((Reference (store_uint HoleType))
+                   ((StructField ((Reference (value HoleType)) integer))
+                    (Reference (builder HoleType)) (Value (Integer 257)))))))))))))))))) |}]
 
 let%expect_test "resolving a reference from inside a function" =
   let source =
@@ -1162,77 +1222,7 @@ let%expect_test "can't use asm in compile-time" =
   pp source ;
   [%expect
     {|
-    (Error
-     (((UninterpretableStatement (Expr (Asm (() (SWAP (XCHG0 2))))))
-       ((stmts ((Expr (Value Void)) (Expr (Value Void))))
-        (bindings
-         ((asm
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((instructions (Value (Type StringType)))))
-                (function_returns (Value (Type VoidType)))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Builder (Value (Type (BuiltinType Builder))))
-          (Integer (Value (Type IntegerType)))
-          (Int
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((bits (Value (Type IntegerType)))))
-                (function_returns (Value (Type TypeType)))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Bool (Value (Builtin Bool))) (Type (Value (Type TypeType)))
-          (Void (Value Void))
-          (serializer
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((t (Value (Type TypeType)))))
-                (function_returns
-                 (Value
-                  (Type
-                   (FunctionType
-                    ((function_params
-                      ((t (Value (Type HoleType)))
-                       (builder (Value (Type (BuiltinType Builder))))))
-                     (function_returns (Value (Type VoidType))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))))))
-      ((UninterpretableStatement (Expr (Asm (() (ADD)))))
-       ((stmts ((Expr (Value Void)) (Expr (Value Void))))
-        (bindings
-         ((asm
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((instructions (Value (Type StringType)))))
-                (function_returns (Value (Type VoidType)))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Builder (Value (Type (BuiltinType Builder))))
-          (Integer (Value (Type IntegerType)))
-          (Int
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((bits (Value (Type IntegerType)))))
-                (function_returns (Value (Type TypeType)))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Bool (Value (Builtin Bool))) (Type (Value (Type TypeType)))
-          (Void (Value Void))
-          (serializer
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((t (Value (Type TypeType)))))
-                (function_returns
-                 (Value
-                  (Type
-                   (FunctionType
-                    ((function_params
-                      ((t (Value (Type HoleType)))
-                       (builder (Value (Type (BuiltinType Builder))))))
-                     (function_returns (Value (Type VoidType))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>))))))))))))) |}]
+    (Ok ((stmts ((Expr (Value Void)) (Expr (Value Void)))) (bindings ()))) |}]
 
 let%expect_test "use of asm in a function" =
   let source =
@@ -1253,13 +1243,10 @@ let%expect_test "use of asm in a function" =
            (Value
             (Function
              ((function_signature ((function_params ()) (function_returns Hole)))
-              (function_impl
-               (Fn
-                (((Expr (Asm (() (SWAP (XCHG0 2))))) (Expr (Asm (() (ADD))))))))))))))))
+              (function_impl (Fn (((Expr (Value Void)) (Expr (Value Void))))))))))))))
       (bindings
        ((f
          (Value
           (Function
            ((function_signature ((function_params ()) (function_returns Hole)))
-            (function_impl
-             (Fn (((Expr (Asm (() (SWAP (XCHG0 2))))) (Expr (Asm (() (ADD)))))))))))))))) |}]
+            (function_impl (Fn (((Expr (Value Void)) (Expr (Value Void)))))))))))))) |}]

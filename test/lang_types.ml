@@ -69,11 +69,11 @@ let%test "builtin function equality" =
   let f1 =
     { function_signature =
         {function_params = []; function_returns = Value (Type VoidType)};
-      function_impl = BuiltinFn (builtin_fun (fun _ _ -> Value Void)) }
+      function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }
   and f2 =
     { function_signature =
         {function_params = []; function_returns = Value (Type VoidType)};
-      function_impl = BuiltinFn (builtin_fun (fun _ _ -> Value Void)) }
+      function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }
   in
   Alcotest.(check bool)
     "different instances of the same builtin function are not equal" false

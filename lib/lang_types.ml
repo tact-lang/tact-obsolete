@@ -83,7 +83,7 @@ and struct_field = {field_type : expr}
 and function_body = (stmt list option[@sexp.option])
 
 and native_function =
-  (program -> expr list -> expr[@visitors.opaque] [@equal.ignore])
+  (program -> value list -> value[@visitors.opaque] [@equal.ignore])
 
 and builtin_fn = native_function * (int[@sexp.opaque])
 

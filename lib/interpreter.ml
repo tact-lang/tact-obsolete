@@ -12,7 +12,7 @@ type error =
 
 (*TODO: type checks for arguments*)
 class interpreter
-  ((program, bindings, errors, functions) :
+  ((program, bindings, errors, _functions) :
     program * (string * expr) list list * _ errors * int ) =
   object (self)
     val global_bindings = bindings
@@ -58,44 +58,36 @@ class interpreter
 
     method private interpret_expr' =
       function
-      | FunctionCall fc -> (
-        match self#interpret_fc fc with
-        | Value v ->
-            Value v
-        | e ->
-            self#interpret_expr' e )
-      | Reference (name, _) as ref -> (
+      | FunctionCall fc ->
+          self#interpret_fc fc
+      | Reference (name, _) -> (
         match self#find_ref name with
         | Some expr' ->
             self#interpret_expr' expr'
         | None ->
-            ref )
-      | StructField (struct_, field) as sf -> (
+            Void )
+      | StructField (struct_, field) -> (
         match self#interpret_expr' struct_ with
-        | Value (StructInstance (_, struct')) -> (
+        | StructInstance (_, struct') -> (
           match List.Assoc.find struct' ~equal:String.equal field with
           | Some field ->
-              Value field
+              field
           | None ->
-              sf )
+              Void )
         | other ->
             other )
       | Value value ->
-          Value (self#interpret_value value)
+          self#interpret_value value
       | Block stmts ->
-          Value (self#interpret_stmt_list stmts)
-      | sf ->
-          sf
+          self#interpret_stmt_list stmts
+      | _ ->
+          Void
 
     method interpret_expr : expr -> value =
       fun expr ->
         match expr with
-        | FunctionCall fc -> (
-          match self#interpret_fc fc with
-          | Value v ->
-              v
-          | e ->
-              self#interpret_expr e )
+        | FunctionCall fc ->
+            self#interpret_fc fc
         | Reference (name, _) -> (
           match self#find_ref name with
           | Some expr' ->
@@ -137,78 +129,57 @@ class interpreter
 
     method interpret_function : function_ -> function_ = fun f -> f
 
-    method interpret_fc : function_call -> expr =
+    method interpret_fc : function_call -> value =
       fun (func, args) ->
-        if not @@ is_immediate_expr (FunctionCall (func, args)) then
-          FunctionCall (func, args)
-        else
-          let mk_err = Expr (FunctionCall (func, args)) in
-          let args_to_list params values =
-            match
-              List.zip (List.map params ~f:(fun (name, _) -> name)) values
-            with
-            | Ok scope ->
-                Ok scope
-            | _ ->
-                Error mk_err
-          in
-          match self#interpret_expr func with
-          | Function f -> (
-            match f with
-            | { function_signature = {function_params; _};
-                function_impl = Fn function_impl;
-                _ } -> (
-                let args' =
-                  List.map args ~f:(fun arg -> self#interpret_expr arg)
-                in
-                let args_scope = args_to_list function_params args' in
-                match args_scope with
-                | Ok args_scope -> (
-                  match function_impl with
-                  | Some body ->
-                      let prev_scope = vars_scope in
-                      vars_scope <- args_scope :: vars_scope ;
-                      let output = self#interpret_stmt_list body in
-                      vars_scope <- prev_scope ;
-                      Value output
-                  | None ->
-                      Value Void )
-                | Error _ ->
-                    Value Void )
-            | {function_impl = BuiltinFn (function_impl, _); _} ->
-                let args' =
-                  List.map args ~f:(fun arg -> self#interpret_expr' arg)
-                in
-                let program' =
-                  { program with
-                    bindings =
-                      Option.value (List.hd global_bindings) ~default:[] }
-                in
-                let expr =
-                  (* FIXME: temporary hack to expand returned exprs *)
-                  match function_impl program' args' with
-                  | Block stmts
-                    when not
-                           (List.exists stmts ~f:(function
-                             | Expr _ ->
-                                 false
-                             | _ ->
-                                 true ) ) ->
-                      Block
-                        (List.map stmts ~f:(function
-                          | Expr e ->
-                              Expr (self#interpret_expr' e)
-                          | _ ->
-                              Expr (Value Void) ) )
-                  | expr ->
-                      self#interpret_expr' expr
-                in
-                program.methods <- program'.methods ;
-                if functions > 0 then expr else Value (self#interpret_expr expr)
-            | _ ->
-                Value Void )
+        let mk_err = Expr (FunctionCall (func, args)) in
+        let args_to_list params values =
+          match
+            List.zip (List.map params ~f:(fun (name, _) -> name)) values
+          with
+          | Ok scope ->
+              Ok scope
           | _ ->
-              Value Void
+              Error mk_err
+        in
+        match self#interpret_expr func with
+        | Function f -> (
+          match f with
+          | { function_signature = {function_params; _};
+              function_impl = Fn function_impl;
+              _ } -> (
+              let args' =
+                List.map args ~f:(fun arg -> self#interpret_expr arg)
+              in
+              let args_scope = args_to_list function_params args' in
+              match args_scope with
+              | Ok args_scope -> (
+                match function_impl with
+                | Some body ->
+                    let prev_scope = vars_scope in
+                    vars_scope <- args_scope :: vars_scope ;
+                    let output = self#interpret_stmt_list body in
+                    vars_scope <- prev_scope ;
+                    output
+                | None ->
+                    Void )
+              | Error _ ->
+                  Void )
+          | {function_impl = BuiltinFn (function_impl, _); _} ->
+              let args' =
+                List.map args ~f:(fun arg -> self#interpret_expr' arg)
+              in
+              let program' =
+                { program with
+                  bindings = Option.value (List.hd global_bindings) ~default:[]
+                }
+              in
+              let value = function_impl program' args' in
+              program.methods <- program'.methods ;
+              value
+          | _ ->
+              Void )
+        | _ ->
+            Void
 
     method private find_ref : string -> expr option =
       fun ref ->
