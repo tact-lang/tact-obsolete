@@ -26,6 +26,7 @@
    (menhirSdk (= 20220210))
    (zarith (>= 1.12))
    (base (>= 0.15.0))
+   (checkseum (>= 0.3.3))
    (ppx_jane (>= 0.15.0))
    (visitors (= 20210608))
    (core (and :with-test (>= 0.15.0)))

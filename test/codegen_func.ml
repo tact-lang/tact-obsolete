@@ -59,15 +59,18 @@ let%expect_test "simple function generation" =
     } |}]
 
 let%expect_test "passing struct to function" =
-  let source = {|
+  let source =
+    {|
       struct T { 
        val a: Int(32)
        val b: Integer
        val c: struct { val d : Integer }
       }
       fn test(t: T) -> Integer { return 1; }
-    |} in
-  pp source ; [%expect {|
+    |}
+  in
+  pp source ;
+  [%expect {|
     int test([[int], int, [int]] t) {
       return 1;
     } |}]

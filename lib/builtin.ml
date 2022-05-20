@@ -144,6 +144,26 @@ let serializer =
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
+let crc32 =
+  let function_signature =
+    { function_params = [("string", Value (Type StringType))];
+      function_returns = Value (Type IntegerType) }
+  and function_impl _p = function
+    | [String s] ->
+        Integer
+          Checkseum.Crc32.(
+            digest_string s 0 (String.length s) default
+            |> Optint.to_int |> Zint.of_int)
+    | other :: _ ->
+        other
+    | [] ->
+        Void
+  in
+  Value
+    (Function
+       { function_signature;
+         function_impl = BuiltinFn (builtin_fun function_impl) } )
+
 let default_bindings =
   [ ("Builder", builder);
     ("Integer", Value (Type IntegerType));
@@ -151,6 +171,7 @@ let default_bindings =
     ("Bool", Value (Builtin "Bool"));
     ("Type", Value (Type TypeType));
     ("Void", Value Void);
+    ("crc32", crc32);
     (* TODO: re-design the serialization API surface; this is more for demonstration
      * purposes
      *)
