@@ -24,13 +24,13 @@ and expr =
 and ident = string
 
 and type_ =
-  | Int
-  | Cell
-  | Slice
-  | Builder
-  | Tuple of type_ list
-  | Tensor of type_ list
-  | Cont
+  | IntType
+  | CellType
+  | SliceType
+  | BuilderType
+  | TupleType of type_ list
+  | TensorType of type_ list
+  | ContType
 
 and top_level_expr = Function of function_ | Global of type_ * ident
 
@@ -118,23 +118,23 @@ and pp_expr f = function
       pp_print_string f ")"
 
 and pp_type f = function
-  | Int ->
+  | IntType ->
       pp_print_string f "int"
-  | Cell ->
+  | CellType ->
       pp_print_string f "cell"
-  | Slice ->
+  | SliceType ->
       pp_print_string f "slice"
-  | Builder ->
+  | BuilderType ->
       pp_print_string f "builder"
-  | Cont ->
+  | ContType ->
       pp_print_string f "cont"
-  | Tuple tuple ->
+  | TupleType tuple ->
       pp_print_string f "[" ;
       list_iter tuple
         ~f:(fun (t : type_) -> pp_type f t ; pp_print_string f ", ")
         ~flast:(pp_type f) ;
       pp_print_string f "]"
-  | Tensor tuple ->
+  | TensorType tuple ->
       pp_print_string f "(" ;
       list_iter tuple
         ~f:(fun t -> pp_type f t ; pp_print_string f ", ")

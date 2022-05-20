@@ -39,7 +39,7 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method build_Integer : _ -> Zint.t -> F.expr = fun _env i -> F.Integer i
 
-    method build_IntegerType _env = F.Int
+    method build_IntegerType _env = F.IntType
 
     method build_Invalid _env = raise Invalid
 
@@ -121,7 +121,7 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
     method private lang_type_to_type : T.type_ -> F.type_ =
       function
       | IntegerType ->
-          F.Int
+          F.IntType
       | StructType s ->
           self#struct_to_ty s
       | _ ->
@@ -146,5 +146,5 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
           List.map struct_fields ~f:(fun (_, {field_type}) ->
               self#lang_expr_to_type field_type )
         in
-        Tuple types
+        TupleType types
   end
