@@ -90,15 +90,41 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method build_function_signature _env _sf = raise Invalid
 
-    method build_StructField _env _sf = raise Invalid
+    method build_StructField _env _ = raise Unsupported
+
+    method! visit_StructField env (from_expr, field) =
+      let build_access struct_ty field =
+        let name =
+          match field with
+          | 0 ->
+              "first"
+          | 1 ->
+              "second"
+          | 2 ->
+              "third"
+          | _ ->
+              raise Unsupported
+        in
+        F.FunctionCall (name, [struct_ty])
+      in
+      match T.type_of from_expr with
+      | StructType s ->
+          let field_id, (_, _) =
+            Option.value_exn
+              (List.findi s.struct_fields ~f:(fun _ (name, _) ->
+                   equal_string name field ) )
+          in
+          build_access (self#visit_expr env from_expr) field_id
+      | _ ->
+          raise Invalid
+
+    method build_ResolvedReference _env _sf = raise Invalid
 
     method build_StoreInt _env builder length int_ is_signed =
       let name =
         match is_signed with true -> "store_int" | false -> "store_uint"
       in
       (name, [builder; int_; length])
-
-    method build_ResolvedReference _env _sf = raise Invalid
 
     method build_Primitive _env p = FunctionCall p
 
