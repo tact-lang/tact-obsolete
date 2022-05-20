@@ -109,8 +109,6 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method private lang_expr_to_type : T.expr -> F.type_ =
       function
-      | Value (Struct s) ->
-          self#struct_to_ty s
       | Value (Type t) ->
           self#lang_type_to_type t
       | ResolvedReference (_ref, expr) ->
@@ -119,7 +117,13 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
           raise Invalid
 
     method private lang_type_to_type : T.type_ -> F.type_ =
-      function IntegerType -> F.Int | _ -> raise Invalid
+      function
+      | IntegerType ->
+          F.Int
+      | StructType s ->
+          self#struct_to_ty s
+      | _ ->
+          raise Invalid
 
     method private struct_to_ty : T.struct_ -> F.type_ =
       fun s ->

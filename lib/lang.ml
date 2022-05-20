@@ -103,7 +103,7 @@ functor
 
         method build_Break _env stmt = Break stmt
 
-        method build_Struct _env s = Value (Struct s)
+        method build_Struct _env s = Value (Type (StructType s))
 
         method build_StructConstructor _env sc = Value (StructInstance sc)
 
@@ -150,12 +150,12 @@ functor
           in
           (* TODO: check method signatures *)
           match receiver with
-          | ResolvedReference (_, Value (Struct struct'))
-          | Value (Struct struct') -> (
-              let receiver' = Value (Struct struct') in
+          | ResolvedReference (_, Value (Type (StructType struct')))
+          | Value (Type (StructType struct')) -> (
+              let receiver' = Value (Type (StructType struct')) in
               let methods =
                 List.Assoc.find program.methods ~equal:equal_value
-                  (Struct struct')
+                  (Type (StructType struct'))
               in
               match
                 Option.bind methods ~f:(fun methods ->
@@ -169,10 +169,10 @@ functor
                   dummy )
           | ResolvedReference (_, Value (StructInstance (struct', _)))
           | Value (StructInstance (struct', _)) -> (
-              let receiver' = Value (Struct struct') in
+              let receiver' = Value (Type (StructType struct')) in
               let methods =
                 List.Assoc.find program.methods ~equal:equal_value
-                  (Struct struct')
+                  (Type (StructType struct'))
               in
               match
                 Option.bind methods ~f:(fun methods ->
@@ -266,8 +266,8 @@ functor
 
         method build_struct_constructor _env id _fields =
           match Syntax.value id with
-          | ResolvedReference (_, Value (Struct struct'))
-          | Value (Struct struct') ->
+          | ResolvedReference (_, Value (Type (StructType struct')))
+          | Value (Type (StructType struct')) ->
               (struct', []) (* TODO: handle fields *)
           | e ->
               errors#report `Error (`UnexpectedType e) () ;
@@ -299,7 +299,7 @@ functor
           let struct_ = s#build_struct_definition env _visitors_r0 []
           and current_bindings' = current_bindings in
           current_bindings <-
-            [("Self", Value (Struct struct_))] :: current_bindings' ;
+            [("Self", Value (Type (StructType struct_)))] :: current_bindings' ;
           let bindings =
             s#visit_list
               (s#visit_located s#visit_binding)
@@ -315,7 +315,8 @@ functor
                 | _ ->
                     None )
           in
-          program.methods <- (Struct struct_, struct_methods) :: program.methods ;
+          program.methods <-
+            (Type (StructType struct_), struct_methods) :: program.methods ;
           struct_
 
         method build_struct_field _env field_name field_type =

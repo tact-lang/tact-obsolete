@@ -46,7 +46,6 @@ and expr =
 
 and value =
   | Void
-  | Struct of struct_
   (* Instance of a Struct *)
   | StructInstance of (struct_ * (string * value) list)
   | Function of function_
@@ -110,8 +109,6 @@ and primitive =
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
 let rec expr_to_type = function
-  | Value (Struct _) ->
-      TypeType
   | Value (StructInstance (struct_, _)) ->
       StructType struct_
   | Value (Function {function_signature; _}) ->
