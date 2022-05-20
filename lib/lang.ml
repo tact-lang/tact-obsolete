@@ -88,7 +88,7 @@ functor
           | Some (Reference (ref', _)) ->
               s#build_Reference env ref'
           | Some (Value value) ->
-              Value value
+              ResolvedReference (ref, Value value)
           | Some _ ->
               (* TODO: type_of *) Reference (ref, HoleType)
           | None -> (
@@ -150,7 +150,9 @@ functor
           in
           (* TODO: check method signatures *)
           match receiver with
+          | ResolvedReference (_, Value (Struct struct'))
           | Value (Struct struct') -> (
+              let receiver' = Value (Struct struct') in
               let methods =
                 List.Assoc.find program.methods ~equal:equal_value
                   (Struct struct')
@@ -160,11 +162,14 @@ functor
                     List.Assoc.find methods ~equal:String.equal fn )
               with
               | Some fn' ->
-                  (Value (Function fn'), s#of_located_list args)
+                  ( ResolvedReference (fn, Value (Function fn')),
+                    s#of_located_list args )
               | None ->
-                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  errors#report `Error (`MethodNotFound (receiver', fn)) () ;
                   dummy )
+          | ResolvedReference (_, Value (StructInstance (struct', _)))
           | Value (StructInstance (struct', _)) -> (
+              let receiver' = Value (Struct struct') in
               let methods =
                 List.Assoc.find program.methods ~equal:equal_value
                   (Struct struct')
@@ -174,11 +179,13 @@ functor
                     List.Assoc.find methods ~equal:String.equal fn )
               with
               | Some fn' ->
-                  (Value (Function fn'), receiver :: s#of_located_list args)
+                  ( ResolvedReference (fn, Value (Function fn')),
+                    receiver :: s#of_located_list args )
               | None ->
-                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  errors#report `Error (`MethodNotFound (receiver', fn)) () ;
                   dummy )
-          | Value v -> (
+          | ResolvedReference (_, Value v) | Value v -> (
+              let receiver' = Value v in
               let methods =
                 List.Assoc.find program.methods ~equal:equal_value v
               in
@@ -187,12 +194,13 @@ functor
                     List.Assoc.find methods ~equal:String.equal fn )
               with
               | Some fn' ->
-                  (Value (Function fn'), receiver :: s#of_located_list args)
+                  ( ResolvedReference (fn, Value (Function fn')),
+                    receiver :: s#of_located_list args )
               | None ->
-                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  errors#report `Error (`MethodNotFound (receiver', fn)) () ;
                   dummy )
-          | receiver ->
-              errors#report `Error (`UnexpectedType receiver) () ;
+          | receiver' ->
+              errors#report `Error (`UnexpectedType receiver') () ;
               dummy
 
         method! visit_function_definition env f =
@@ -258,6 +266,7 @@ functor
 
         method build_struct_constructor _env id _fields =
           match Syntax.value id with
+          | ResolvedReference (_, Value (Struct struct'))
           | Value (Struct struct') ->
               (struct', []) (* TODO: handle fields *)
           | e ->
@@ -316,9 +325,5 @@ functor
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
-
-        method private resolve ref =
-          List.find_map current_bindings ~f:(fun bindings ->
-              List.Assoc.find bindings ~equal:String.equal ref )
       end
   end

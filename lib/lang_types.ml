@@ -37,6 +37,7 @@ and program =
 and expr =
   | FunctionCall of function_call
   | Reference of (string * type_)
+  | ResolvedReference of (string * (expr[@sexp.opaque]))
   | Value of value
   | StructField of (expr * string)
   | Hole
@@ -126,11 +127,17 @@ let rec expr_to_type = function
   | Hole ->
       HoleType
   | FunctionCall
+      ( ResolvedReference
+          (_, Value (Function {function_signature = {function_returns; _}; _})),
+        _ )
+  | FunctionCall
       (Value (Function {function_signature = {function_returns; _}; _}), _) ->
       expr_to_type function_returns
   | Reference (_, t) ->
       t
-  | _ ->
+  | ResolvedReference (_, e) ->
+      expr_to_type e
+  | _other ->
       InvalidType
 
 class ['s] primitive_presence =

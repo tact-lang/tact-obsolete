@@ -61,6 +61,8 @@ class interpreter
         match expr with
         | FunctionCall fc ->
             self#interpret_fc fc
+        | ResolvedReference (_, expr') ->
+            self#interpret_expr expr'
         | Reference (name, _) -> (
           match self#find_ref name with
           | Some expr' ->
@@ -160,6 +162,8 @@ class interpreter
         match find_in_scope ref global_bindings with
         | Some (Reference (ref', _)) ->
             self#find_in_global_scope ref'
+        | Some (ResolvedReference (_, e)) ->
+            Some e
         | not_ref ->
             not_ref
   end

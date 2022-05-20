@@ -465,7 +465,7 @@ let%expect_test "compile-time function evaluation within a function" =
             (function_impl
              (Fn
               (((Let ((v (Value (Integer 4)))))
-                (Break (Expr (Value (Integer 4))))))))))))))
+                (Break (Expr (ResolvedReference (v <opaque>))))))))))))))
       (methods
        (((Type (BuiltinType Builder))
          ((new
@@ -935,52 +935,12 @@ let%expect_test "reference in function bodies" =
               (((Let
                  ((a
                    (FunctionCall
-                    ((Value
-                      (Function
-                       ((function_signature
-                         ((function_params
-                           ((i
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_id <opaque>)))))
-                            (i_
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_id <opaque>)))))))
-                          (function_returns Hole)))
-                        (function_impl
-                         (Fn (((Break (Expr (Reference (i TypeType)))))))))))
+                    ((ResolvedReference (op <opaque>))
                      ((Reference (x TypeType)) (Reference (x TypeType))))))))
                 (Let
                  ((b
                    (FunctionCall
-                    ((Value
-                      (Function
-                       ((function_signature
-                         ((function_params
-                           ((i
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_id <opaque>)))))
-                            (i_
-                             (Value
-                              (Struct
-                               ((struct_fields
-                                 ((integer
-                                   ((field_type (Value (Type IntegerType)))))))
-                                (struct_id <opaque>)))))))
-                          (function_returns Hole)))
-                        (function_impl
-                         (Fn (((Break (Expr (Reference (i TypeType)))))))))))
+                    ((ResolvedReference (op <opaque>))
                      ((Reference (a HoleType)) (Reference (a HoleType))))))))))))))))
         (op
          (Value
@@ -1070,7 +1030,8 @@ let%expect_test "resolving a reference from inside a function" =
          (Value
           (Function
            ((function_signature ((function_params ()) (function_returns Hole)))
-            (function_impl (Fn (((Break (Expr (Value (Integer 1))))))))))))
+            (function_impl
+             (Fn (((Break (Expr (ResolvedReference (i <opaque>))))))))))))
         (i (Value (Integer 1)))))
       (methods
        (((Type (BuiltinType Builder))
