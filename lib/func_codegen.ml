@@ -39,7 +39,7 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method build_Integer : _ -> Zint.t -> F.expr = fun _env i -> F.Integer i
 
-    method build_IntegerType _env = raise Invalid
+    method build_IntegerType _env = F.Int
 
     method build_Invalid _env = raise Invalid
 
@@ -59,11 +59,9 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method build_StringType _env = raise Invalid
 
-    method build_Struct _env _s = raise Invalid
-
     method build_StructInstance _env _si = raise Unsupported
 
-    method build_StructType _env _t = raise Invalid
+    method build_StructType _env ty = ty
 
     method build_Type _env _t = raise Invalid (* typeof_type t *)
 
@@ -86,7 +84,7 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method build_struct_ _env _field _id = raise Invalid
 
-    method! visit_struct_ _env _s = ()
+    method! visit_struct_ _env s = self#struct_to_ty s
 
     method build_struct_field _env _sf = raise Invalid
 
@@ -94,15 +92,19 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method build_StructField _env _sf = raise Invalid
 
-    method build_StoreInt _env _sf = raise Invalid
+    method build_StoreInt _env builder length int_ is_signed =
+      let name =
+        match is_signed with true -> "store_int" | false -> "store_uint"
+      in
+      (name, [builder; int_; length])
 
     method build_ResolvedReference _env _sf = raise Invalid
 
-    method build_Primitive _env _sf = raise Invalid
+    method build_Primitive _env p = FunctionCall p
 
-    method build_EmptyBuilder _env _sf = raise Invalid
+    method build_EmptyBuilder _env = ("new_builder", [])
 
-    method build_BuildCell _env _sf = raise Invalid
+    method build_BuildCell _env builder_arg = ("build", [builder_arg])
 
     method! visit_program env p =
       self#visit_list self#visit_binding env p.bindings
