@@ -168,7 +168,12 @@ class constructor =
           List.map struct_fields ~f:(fun (_, {field_type}) ->
               self#lang_expr_to_type field_type )
         in
-        TupleType types
+        let linearized =
+          List.fold types ~init:[] ~f:(fun acc -> function
+            | TupleType t -> t @ acc | other -> other :: acc )
+          |> List.rev
+        in
+        TupleType linearized
   end
 
 let codegen program =
