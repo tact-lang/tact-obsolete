@@ -457,7 +457,8 @@ let%expect_test "compile-time function evaluation within a function" =
        ((test
          (Value
           (Function
-           ((function_signature ((function_params ()) (function_returns Hole)))
+           ((function_signature
+             ((function_params ()) (function_returns (Value (Type HoleType)))))
             (function_impl
              (Fn
               (((Let ((v (Value (Integer 4)))))
@@ -807,7 +808,8 @@ let%expect_test "function without a return type" =
           (f
            (Value
             (Function
-             ((function_signature ((function_params ()) (function_returns Hole)))
+             ((function_signature
+               ((function_params ()) (function_returns (Value (Type HoleType)))))
               (function_impl (Fn (((Break (Expr (Value (Integer 1)))))))))))))))) |}]
 
 let%expect_test "scoping that `let` introduces in code" =
@@ -838,7 +840,7 @@ let%expect_test "scoping that `let` introduces in code" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))))
-              (function_returns Hole)))
+              (function_returns (Value (Type HoleType)))))
             (function_impl
              (Fn
               (((Let
@@ -933,7 +935,7 @@ let%expect_test "reference in function bodies" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))))
-              (function_returns Hole)))
+              (function_returns (Value (Type HoleType)))))
             (function_impl
              (Fn
               (((Let
@@ -976,7 +978,7 @@ let%expect_test "reference in function bodies" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))))
-              (function_returns Hole)))
+              (function_returns (Value (Type HoleType)))))
             (function_impl
              (Fn
               (((Break
@@ -1051,7 +1053,8 @@ let%expect_test "resolving a reference from inside a function" =
         (f
          (Value
           (Function
-           ((function_signature ((function_params ()) (function_returns Hole)))
+           ((function_signature
+             ((function_params ()) (function_returns (Value (Type HoleType)))))
             (function_impl
              (Fn (((Break (Expr (ResolvedReference (i <opaque>))))))))))))
         (i (Value (Integer 1))))))) |}]
@@ -1084,7 +1087,7 @@ let%expect_test "method access" =
            ((function_signature
              ((function_params
                ((self (Value (Type TypeType))) (i (Value (Type IntegerType)))))
-              (function_returns Hole)))
+              (function_returns (Value (Type HoleType)))))
             (function_impl (Fn (((Break (Expr (Reference (i IntegerType)))))))))))))))) |}]
 
 let%expect_test "Self type resolution in methods" =

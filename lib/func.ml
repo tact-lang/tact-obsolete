@@ -19,6 +19,7 @@ and stmt = Vars of (type_ * ident * expr) list | Return of expr
 and expr =
   | Integer of Zint.t
   | Reference of (ident * type_)
+  | Tuple of expr list
   | FunctionCall of (ident * expr list)
 
 and ident = string
@@ -35,6 +36,18 @@ and type_ =
 and top_level_expr = Function of function_ | Global of type_ * ident
 
 and program = top_level_expr list [@@deriving sexp_of]
+
+exception UnknownType
+
+let rec type_of = function
+  | Integer _ ->
+      IntType
+  | Reference (_, ty) ->
+      ty
+  | Tuple exprs ->
+      TupleType (List.map exprs ~f:type_of)
+  | FunctionCall _ ->
+      raise UnknownType
 
 open Caml.Format
 
@@ -116,6 +129,8 @@ and pp_expr f = function
         ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
         ~flast:(pp_expr f) ;
       pp_print_string f ")"
+  | Tuple _ ->
+      ()
 
 and pp_type f = function
   | IntType ->

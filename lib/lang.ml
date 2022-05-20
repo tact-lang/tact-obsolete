@@ -77,7 +77,7 @@ functor
               current_bindings <- amend_bindings (name, expr) current_bindings ;
               Let [(name, expr)]
           | false ->
-              let ty = expr_to_type expr in
+              let ty = type_of expr in
               runtime_bindings <- amend_bindings (name, ty) runtime_bindings ;
               Let [(name, expr)]
 
@@ -250,7 +250,7 @@ functor
           and function_returns =
             returns
             |> Option.map ~f:(fun x -> Syntax.value x)
-            |> Option.value ~default:Hole
+            |> Option.value ~default:(Value (Type HoleType))
           and function_impl = body in
           { function_signature = {function_params; function_returns};
             function_impl = Fn function_impl }

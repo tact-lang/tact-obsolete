@@ -133,7 +133,7 @@ let%expect_test "Int(bits) serializer" =
             (Function
              ((function_signature
                ((function_params ((b (Value (Type (BuiltinType Builder))))))
-                (function_returns Hole)))
+                (function_returns (Value (Type HoleType)))))
               (function_impl
                (Fn
                 (((Let
@@ -217,7 +217,8 @@ let%expect_test "demo struct serializer" =
        ((test
          (Value
           (Function
-           ((function_signature ((function_params ()) (function_returns Hole)))
+           ((function_signature
+             ((function_params ()) (function_returns (Value (Type HoleType)))))
             (function_impl
              (Fn
               (((Let
