@@ -7,94 +7,75 @@ exception Invalid
 
 exception Unsupported
 
-class ['s] constructor ((_program, _errors) : T.program * _ errors) =
-  object (self : 's)
-    inherit ['s] Lang_types.visitor as _super
-
+class constructor =
+  object (self)
     val mutable struct_representations : (T.struct_ * F.type_) list = []
 
     val mutable functions : (string * F.function_) list = []
 
-    method build_Asm _env _asm = raise Unsupported
+    method cg_Fn body = F.Fn (List.concat (Option.value_exn body))
 
-    method build_Break _env _e = raise Unsupported
+    method build_Integer : Zint.t -> F.expr = fun i -> F.Integer i
 
-    method build_Builtin _env _b = raise Invalid
+    method cg_Let : _ -> F.stmt =
+      fun bindings ->
+        F.Vars
+          (List.map bindings ~f:(fun (name, expr) ->
+               let expr = self#cg_expr expr in
+               (F.type_of expr, name, expr) ) )
 
-    method build_BuiltinFn _env _b = raise Invalid
+    method cg_expr : T.expr -> F.expr =
+      function
+      | Value (Integer i) ->
+          F.Integer i
+      | StructField x ->
+          self#cg_StructField x
+      | ResolvedReference s ->
+          self#cg_ResolvedReference s
+      | Primitive p ->
+          self#cg_Primitive p
+      | _ ->
+          raise Unsupported
 
-    method build_BuiltinType _env = raise Invalid
+    method cg_stmt : T.stmt -> F.stmt =
+      function
+      | Let bindings ->
+          self#cg_Let bindings
+      | Return expr ->
+          F.Return (self#cg_expr expr)
+      | _ ->
+          raise Unsupported
 
-    method build_Expr _env _expr = raise Invalid
+    method cg_function_ : string -> T.function_ -> F.function_ =
+      fun name fn ->
+        let body =
+          match fn.function_impl with
+          | Fn body ->
+              Option.value_exn body
+          | _ ->
+              []
+        in
+        { function_name = name;
+          function_args =
+            List.map fn.function_signature.function_params ~f:(fun (name, ty) ->
+                (name, self#lang_expr_to_type ty) );
+          function_returns =
+            self#lang_expr_to_type fn.function_signature.function_returns;
+          function_body = F.Fn (List.map body ~f:self#cg_stmt) }
 
-    method build_Fn _env _ = raise Invalid
+    method cg_top_level_stmt : string -> T.expr -> F.top_level_expr =
+      fun name -> function
+        | Value (Function f) ->
+            F.Function (self#cg_function_ name f)
+        | _ ->
+            raise Unsupported
 
-    method build_Function _env _f = raise Unsupported
+    method cg_program : T.program -> F.program =
+      fun program ->
+        List.map program.bindings ~f:(fun (name, top_level_stmt) ->
+            self#cg_top_level_stmt name top_level_stmt )
 
-    method build_FunctionCall _env _fc = raise Invalid
-
-    method build_FunctionType _env _ft = raise Invalid
-
-    method build_Hole _env = raise Invalid
-
-    method build_HoleType _env = raise Invalid
-
-    method build_Integer : _ -> Zint.t -> F.expr = fun _env i -> F.Integer i
-
-    method build_IntegerType _env = F.IntType
-
-    method build_Invalid _env = raise Invalid
-
-    method build_InvalidExpr _env = raise Invalid
-
-    method build_InvalidFn _env = raise Invalid
-
-    method build_InvalidType _env = raise Invalid
-
-    method build_Let _env _bindings = raise Invalid
-
-    method build_Reference _env (name, ty) = F.Reference (name, ty)
-
-    method build_Return _env expr = F.Return expr
-
-    method build_String : 's -> string -> F.expr = fun _env -> raise Invalid
-
-    method build_StringType _env = raise Invalid
-
-    method build_StructInstance _env _si = raise Unsupported
-
-    method build_StructType _env ty = ty
-
-    method build_Type _env _t = raise Invalid (* typeof_type t *)
-
-    method build_TypeType _env = raise Invalid
-
-    method build_Value _env _v = raise Invalid
-
-    method build_Void _env = raise Invalid
-
-    method build_VoidType _env = raise Invalid
-
-    method build_function_ _env _params returns impl =
-      F.Function
-        { function_name = "dummy";
-          function_args = [];
-          function_returns = returns;
-          function_body = impl }
-
-    method build_program _env _p = raise Invalid
-
-    method build_struct_ _env _field _id = raise Invalid
-
-    method! visit_struct_ _env s = self#struct_to_ty s
-
-    method build_struct_field _env _sf = raise Invalid
-
-    method build_function_signature _env _sf = raise Invalid
-
-    method build_StructField _env _ = raise Unsupported
-
-    method! visit_StructField env (from_expr, field) =
+    method cg_StructField (from_expr, field) =
       let build_access struct_ty field =
         let name =
           match field with
@@ -116,11 +97,11 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
               (List.findi s.struct_fields ~f:(fun _ (name, _) ->
                    equal_string name field ) )
           in
-          build_access (self#visit_expr env from_expr) field_id
+          build_access (self#cg_expr from_expr) field_id
       | _ ->
           raise Invalid
 
-    method build_ResolvedReference _env (name, _) =
+    method cg_ResolvedReference (name, _) =
       match
         List.find functions ~f:(fun (fname, _) -> equal_string name fname)
       with
@@ -129,20 +110,26 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
       | None ->
           raise Invalid
 
-    method build_StoreInt _env builder length int_ is_signed =
+    method cg_StoreInt builder length int_ is_signed =
       let name =
         match is_signed with true -> "store_int" | false -> "store_uint"
       in
-      (name, [builder; int_; length])
+      F.FunctionCall (name, [builder; int_; length])
 
-    method build_Primitive _env p = FunctionCall p
+    method cg_Primitive : T.primitive -> F.expr =
+      function
+      | EmptyBuilder ->
+          self#cg_EmptyBuilder
+      | BuildCell {builder} ->
+          self#cg_BuildCell builder
+      | StoreInt {builder; length; integer; signed} ->
+          self#cg_StoreInt (self#cg_expr builder) (self#cg_expr length)
+            (self#cg_expr integer) signed
 
-    method build_EmptyBuilder _env = ("new_builder", [])
+    method cg_EmptyBuilder = F.FunctionCall ("new_builder", [])
 
-    method build_BuildCell _env builder_arg = ("build", [builder_arg])
-
-    method! visit_program env p =
-      self#visit_list self#visit_binding env p.bindings
+    method cg_BuildCell builder_arg =
+      F.FunctionCall ("build", [self#cg_expr builder_arg])
 
     method private lang_expr_to_type : T.expr -> F.type_ =
       function
@@ -183,3 +170,7 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
         in
         TupleType types
   end
+
+let codegen program =
+  let constructor = new constructor in
+  constructor#cg_program program
