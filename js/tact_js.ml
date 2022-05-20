@@ -5,7 +5,7 @@ module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
 module Lang = Tact.Lang.Make (Syntax)
 module Errors = Tact.Errors
-module CG = Tact.Func_codegen
+module CG = Tact.Codegen_func
 module Func = Tact.Func
 open Errors
 

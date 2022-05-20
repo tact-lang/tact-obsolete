@@ -4,7 +4,7 @@ module Lang = Tact.Lang.Make (Syntax)
 module Interpreter = Tact.Interpreter
 module Errors = Tact.Errors
 module Zint = Tact.Zint
-module Codegen = Tact.Func_codegen
+module Codegen = Tact.Codegen_func
 module Func = Tact.Func
 include Core
 
