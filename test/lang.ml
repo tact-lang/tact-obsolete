@@ -326,8 +326,7 @@ let%expect_test "native function evaluation" =
     let v = incr(incr(incr(1)));
   |} in
   pp source ~bindings:(("incr", Value incr_f) :: Lang.default_bindings) ;
-  [%expect
-    {|
+  [%expect {|
     (Ok ((bindings ((v (Value (Integer 4))))))) |}]
 
 let%expect_test "Tact function evaluation" =
