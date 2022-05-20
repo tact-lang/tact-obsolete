@@ -5,6 +5,8 @@ module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
 module Lang = Tact.Lang.Make (Syntax)
 module Errors = Tact.Errors
+module CG = Tact.Func_codegen
+module Func = Tact.Func
 open Errors
 
 let _ =
@@ -13,7 +15,7 @@ let _ =
        method parse (src : Js.js_string Js.t) =
          let src = Js.to_string src in
          let lexbuf = Lexing.from_string src in
-         let result =
+         let program =
            let e = new errors in
            let p = Parser.program Tact.Lexer.token lexbuf in
            let c =
@@ -22,10 +24,13 @@ let _ =
            let p' = c#visit_program () p in
            e#to_result p'
          in
-         match result with
-         | Ok result ->
-             (* FIXME: figure out a better way *)
-             Lang.yojson_of_program result |> Yojson.Safe.to_string |> Js.string
+         match program with
+         | Ok program ->
+             (* Lang.yojson_of_program result |> Yojson.Safe.to_string |> Js.string *)
+             let generated = CG.codegen program in
+             let buffer = Buffer.create 0 in
+             Func.pp_program (Caml.Format.formatter_of_buffer buffer) generated ;
+             Buffer.contents buffer |> Js.string
          | Error _ ->
              Js.string "Error"
     end )

@@ -2,4 +2,6 @@
  (public_name tact)
  (name main)
  (modules main)
- (libraries tact menhirLib sexplib))
+ (libraries tact menhirLib sexplib ppx_sexp_conv)
+ (preprocess
+  (pps ppx_sexp_conv)))

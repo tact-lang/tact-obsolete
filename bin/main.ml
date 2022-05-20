@@ -3,18 +3,39 @@ module E = MenhirLib.ErrorReports
 module L = MenhirLib.LexerUtil
 module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
+module Lang = Tact.Lang.Make (Syntax)
+module CG = Tact.Func_codegen
+module Func = Tact.Func
+module Errors = Tact.Errors
+module Interpreter = Tact.Interpreter
+open Base
+
+type error = [`Error] * [Lang.error | Interpreter.error] * unit
+[@@deriving sexp_of]
 
 let fastpath filename =
   let text, lexbuf = L.read filename in
   match Parser.program Tact.Lexer.token lexbuf with
-  | result ->
-      Sexplib.Sexp.pp_hum Format.std_formatter (Syntax.sexp_of_program result) ;
-      exit 0
-  | exception Tact.Lexer.Error msg ->
-      eprintf "lexing error: %s" msg ;
-      exit 1
-  | exception Parser.Error ->
-      text
+  | stx -> (
+      let errors = new Errors.errors in
+      let constructor =
+        new Lang.constructor Lang.default_bindings Lang.default_methods errors
+      in
+      let program = constructor#visit_program () stx in
+      match errors#to_result program with
+      | Error errors ->
+          Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+          @@ List.sexp_of_t sexp_of_error errors ;
+          Caml.exit 1
+      | Ok program ->
+          let generated_code = CG.codegen program in
+          Func.pp_program Caml.Format.std_formatter generated_code ;
+          Caml.exit 0
+      | exception Tact.Lexer.Error msg ->
+          eprintf "lexing error: %s" msg ;
+          Caml.exit 1
+      | exception Parser.Error ->
+          text )
 
 module I = Tact.UnitActionsParser.MenhirInterpreter
 
@@ -78,7 +99,7 @@ let fail text buffer (checkpoint : _ I.checkpoint) =
   let message = E.expand (get text checkpoint) message in
   (* Show these three components. *)
   eprintf "%s%s%s%!" location indication message ;
-  exit 1
+  Caml.exit 1
 
 let slowpath filename text =
   (* Allocate and initialize a lexing buffer. *)
@@ -100,6 +121,6 @@ let slowpath filename text =
   I.loop_handle succeed (fail text buffer) supplier checkpoint
 
 let () =
-  let filename = Sys.argv.(1) in
+  let filename = Array.get (Sys.get_argv ()) 1 in
   let text = fastpath filename in
   slowpath filename text

@@ -63,16 +63,16 @@ class constructor =
             self#lang_expr_to_type fn.function_signature.function_returns;
           function_body = F.Fn (List.map body ~f:self#cg_stmt) }
 
-    method cg_top_level_stmt : string -> T.expr -> F.top_level_expr =
+    method cg_top_level_stmt : string -> T.expr -> F.top_level_expr option =
       fun name -> function
-        | Value (Function f) ->
-            F.Function (self#cg_function_ name f)
+        | Value (Function f) -> (
+          try Some (F.Function (self#cg_function_ name f)) with _ -> None )
         | _ ->
-            raise Unsupported
+            None
 
     method cg_program : T.program -> F.program =
       fun program ->
-        List.map program.bindings ~f:(fun (name, top_level_stmt) ->
+        List.filter_map program.bindings ~f:(fun (name, top_level_stmt) ->
             self#cg_top_level_stmt name top_level_stmt )
 
     method cg_StructField (from_expr, field) =
