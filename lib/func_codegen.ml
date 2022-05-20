@@ -13,6 +13,8 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     val mutable struct_representations : (T.struct_ * F.type_) list = []
 
+    val mutable functions : (string * F.function_) list = []
+
     method build_Asm _env _asm = raise Unsupported
 
     method build_Break _env _e = raise Unsupported
@@ -51,7 +53,7 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
 
     method build_Let _env _bindings = raise Invalid
 
-    method build_Reference _env (_name, _t) = raise Invalid
+    method build_Reference _env (name, ty) = F.Reference (name, ty)
 
     method build_Return _env expr = F.Return expr
 
@@ -118,7 +120,14 @@ class ['s] constructor ((_program, _errors) : T.program * _ errors) =
       | _ ->
           raise Invalid
 
-    method build_ResolvedReference _env _sf = raise Invalid
+    method build_ResolvedReference _env (name, _) =
+      match
+        List.find functions ~f:(fun (fname, _) -> equal_string name fname)
+      with
+      | Some (_, fn) ->
+          F.Reference (name, fn.function_returns)
+      | None ->
+          raise Invalid
 
     method build_StoreInt _env builder length int_ is_signed =
       let name =
