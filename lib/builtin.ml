@@ -33,8 +33,10 @@ let int_type =
       [ ("new", int_type_s_new s bits);
         ("serialize", int_type_s_serialize bits s) ]
     in
-    if Option.is_none @@ List.Assoc.find p.methods ~equal:equal_value (Struct s)
-    then p.methods <- (Struct s, methods) :: p.methods
+    if
+      Option.is_none
+      @@ List.Assoc.find p.methods ~equal:equal_value (Type (StructType s))
+    then p.methods <- (Type (StructType s), methods) :: p.methods
     else () ;
     s
   and int_type_s_new self bits =
@@ -44,7 +46,7 @@ let int_type =
     in
     { function_signature =
         { function_params = [("integer", Value (Type IntegerType))];
-          function_returns = Value (Struct self) };
+          function_returns = Value (Type (StructType self)) };
       function_impl = BuiltinFn function_impl }
   and constructor_impl bits p = function
     | [Integer i] ->
@@ -82,7 +84,7 @@ let int_type =
                          signed = true } ) ) ] ) }
   and function_impl p = function
     | [Integer bits] ->
-        Struct (int_type_s p @@ Z.to_int bits)
+        Type (StructType (int_type_s p @@ Z.to_int bits))
     | _ ->
         (* TODO: raise an error instead *)
         Void
@@ -131,7 +133,12 @@ let serializer =
             function_returns = Value (Type VoidType) };
         function_impl = Fn (Some body) }
   in
-  let function_impl p = function [Struct s] -> serializer_f s p | _ -> Void in
+  let function_impl p = function
+    | [Type (StructType s)] ->
+        serializer_f s p
+    | _ ->
+        Void
+  in
   Value
     (Function
        { function_signature;

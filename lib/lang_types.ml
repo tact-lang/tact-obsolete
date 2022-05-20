@@ -46,7 +46,6 @@ and expr =
 
 and value =
   | Void
-  | Struct of struct_
   (* Instance of a Struct *)
   | StructInstance of (struct_ * (string * value) list)
   | Function of function_
@@ -110,8 +109,23 @@ and primitive =
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
 let rec expr_to_type = function
-  | Value (Struct _) ->
-      TypeType
+  | Value (Type type_) ->
+      type_
+  | FunctionCall
+      ( ResolvedReference
+          (_, Value (Function {function_signature = {function_returns; _}; _})),
+        _ )
+  | FunctionCall
+      (Value (Function {function_signature = {function_returns; _}; _}), _) ->
+      expr_to_type function_returns
+  | Reference (_, t) ->
+      t
+  | ResolvedReference (_, e) ->
+      expr_to_type e
+  | _other ->
+      InvalidType
+
+let rec type_of = function
   | Value (StructInstance (struct_, _)) ->
       StructType struct_
   | Value (Function {function_signature; _}) ->
@@ -122,8 +136,8 @@ let rec expr_to_type = function
       IntegerType
   | Value Void ->
       VoidType
-  | Value (Type type_) ->
-      type_
+  | Value (Type _) ->
+      TypeType
   | Hole ->
       HoleType
   | FunctionCall
@@ -136,7 +150,7 @@ let rec expr_to_type = function
   | Reference (_, t) ->
       t
   | ResolvedReference (_, e) ->
-      expr_to_type e
+      type_of e
   | _other ->
       InvalidType
 

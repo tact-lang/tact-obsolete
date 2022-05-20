@@ -91,12 +91,12 @@ class interpreter
     method interpret_value : value -> value =
       fun value ->
         match value with
-        | Struct {struct_fields; struct_id} ->
+        | Type (StructType {struct_fields; struct_id}) ->
             let struct_fields =
               List.map struct_fields ~f:(fun (name, {field_type}) ->
                   (name, {field_type = Value (self#interpret_expr field_type)}) )
             in
-            Struct {struct_fields; struct_id}
+            Type (StructType {struct_fields; struct_id})
         | value ->
             value
 

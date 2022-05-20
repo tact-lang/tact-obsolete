@@ -19,22 +19,35 @@ and stmt = Vars of (type_ * ident * expr) list | Return of expr
 and expr =
   | Integer of Zint.t
   | Reference of (ident * type_)
+  | Tuple of expr list
   | FunctionCall of (ident * expr list)
 
 and ident = string
 
 and type_ =
-  | Int
-  | Cell
-  | Slice
-  | Builder
-  | Tuple of type_ list
-  | Tensor of type_ list
-  | Cont
+  | IntType
+  | CellType
+  | SliceType
+  | BuilderType
+  | TupleType of type_ list
+  | TensorType of type_ list
+  | ContType
 
 and top_level_expr = Function of function_ | Global of type_ * ident
 
 and program = top_level_expr list [@@deriving sexp_of]
+
+exception UnknownType
+
+let rec type_of = function
+  | Integer _ ->
+      IntType
+  | Reference (_, ty) ->
+      ty
+  | Tuple exprs ->
+      TupleType (List.map exprs ~f:type_of)
+  | FunctionCall _ ->
+      raise UnknownType
 
 open Caml.Format
 
@@ -116,25 +129,27 @@ and pp_expr f = function
         ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
         ~flast:(pp_expr f) ;
       pp_print_string f ")"
+  | Tuple _ ->
+      ()
 
 and pp_type f = function
-  | Int ->
+  | IntType ->
       pp_print_string f "int"
-  | Cell ->
+  | CellType ->
       pp_print_string f "cell"
-  | Slice ->
+  | SliceType ->
       pp_print_string f "slice"
-  | Builder ->
+  | BuilderType ->
       pp_print_string f "builder"
-  | Cont ->
+  | ContType ->
       pp_print_string f "cont"
-  | Tuple tuple ->
+  | TupleType tuple ->
       pp_print_string f "[" ;
       list_iter tuple
         ~f:(fun (t : type_) -> pp_type f t ; pp_print_string f ", ")
         ~flast:(pp_type f) ;
       pp_print_string f "]"
-  | Tensor tuple ->
+  | TensorType tuple ->
       pp_print_string f "(" ;
       list_iter tuple
         ~f:(fun t -> pp_type f t ; pp_print_string f ", ")

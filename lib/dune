@@ -32,7 +32,8 @@
   builtin
   interpreter
   lang
-  func)
+  func
+  func_codegen)
  (name tact))
 
 (ocamllex asm_lexer)
