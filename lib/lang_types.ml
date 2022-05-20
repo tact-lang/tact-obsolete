@@ -140,30 +140,33 @@ let rec expr_to_type = function
   | _other ->
       InvalidType
 
-class ['s] primitive_presence =
+class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)
     inherit [_] reduce
 
-    method private zero = false
+    method private zero = zero
 
-    method private plus = ( || )
+    method private plus = if zero then ( && ) else ( || )
+
+    method visit_instr _env _instr = zero
+
+    method visit_z _env _z = zero
+  end
+
+class ['s] primitive_presence =
+  object (_self : 's)
+    inherit [_] boolean_reduce false
 
     method! visit_Primitive _env _primitive = true
-
-    method visit_instr _env _instr = false
-
-    method visit_z _env _z = false
   end
+
+let has_primitives = (new primitive_presence)#visit_function_ ()
 
 class ['s] expr_immediacy_check =
   object (_self : 's)
-    inherit [_] reduce as super
+    inherit [_] boolean_reduce true as super
 
     val mutable in_function_call = 0
-
-    method private zero = true
-
-    method private plus = ( && )
 
     method! visit_Reference _env _ref = false
 
@@ -186,14 +189,10 @@ class ['s] expr_immediacy_check =
     method! visit_function_ _env f =
       if in_function_call > 0 then
         (* If we're calling this function, check if there are no primitives *)
-        not @@ (new primitive_presence)#visit_function_ () f
+        not @@ has_primitives f
       else
         (* Any function is assumed to be immediate as it can be evaluated otherwise *)
         true
-
-    method visit_instr _env _instr = false
-
-    method visit_z _env _z = true
   end
 
 let rec is_immediate_expr expr =
