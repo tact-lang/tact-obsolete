@@ -108,13 +108,7 @@ let%expect_test "Int(bits) constructor" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]
 
 let%expect_test "Int(bits) serializer" =
   let source =
@@ -192,13 +186,7 @@ let%expect_test "Int(bits) serializer" =
                              ((integer ((field_type (Value (Type IntegerType)))))))
                             (struct_id <opaque>)))))
                         integer)))
-                     (signed true))))))))))))
-          ((Type (BuiltinType Builder))
-           ((new
-             ((function_signature
-               ((function_params ())
-                (function_returns (Value (Type (BuiltinType Builder))))))
-              (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                     (signed true)))))))))))))))) |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -462,10 +450,4 @@ let%expect_test "demo struct serializer" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]

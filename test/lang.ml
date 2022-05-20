@@ -69,13 +69,7 @@ let%expect_test "scope resolution" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]
 
 let%expect_test "binding resolution" =
   let source =
@@ -143,13 +137,7 @@ let%expect_test "binding resolution" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]
 
 let%expect_test "failed scope resolution" =
   let source = {|
@@ -256,13 +244,7 @@ let%expect_test "scope resolution after let binding" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]
 
 let%expect_test "basic struct definition" =
   let source = {|
@@ -337,13 +319,7 @@ let%expect_test "basic struct definition" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]
 
 let%expect_test "native function evaluation" =
   let source = {|
@@ -352,15 +328,7 @@ let%expect_test "native function evaluation" =
   pp source ~bindings:(("incr", Value incr_f) :: Lang.default_bindings) ;
   [%expect
     {|
-    (Ok
-     ((bindings ((v (Value (Integer 4)))))
-      (methods
-       (((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+    (Ok ((bindings ((v (Value (Integer 4))))))) |}]
 
 let%expect_test "Tact function evaluation" =
   let source =
@@ -436,13 +404,7 @@ let%expect_test "Tact function evaluation" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]
 
 let%expect_test "compile-time function evaluation within a function" =
   let source =
@@ -465,14 +427,7 @@ let%expect_test "compile-time function evaluation within a function" =
             (function_impl
              (Fn
               (((Let ((v (Value (Integer 4)))))
-                (Break (Expr (ResolvedReference (v <opaque>))))))))))))))
-      (methods
-       (((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                (Break (Expr (ResolvedReference (v <opaque>)))))))))))))))) |}]
 
 let%expect_test "struct definition" =
   let source =
@@ -554,13 +509,7 @@ let%expect_test "struct definition" =
                              ((integer ((field_type (Value (Type IntegerType)))))))
                             (struct_id <opaque>)))))
                         integer)))
-                     (signed true))))))))))))
-          ((Type (BuiltinType Builder))
-           ((new
-             ((function_signature
-               ((function_params ())
-                (function_returns (Value (Type (BuiltinType Builder))))))
-              (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                     (signed true)))))))))))))))) |}]
 
 let%expect_test "duplicate type field" =
   let source =
@@ -786,13 +735,7 @@ let%expect_test "parametric struct instantiation" =
         ((Struct
           ((struct_fields ((a ((field_type (Reference (A TypeType)))))))
            (struct_id <opaque>)))
-         ())
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+         ()))))) |}]
 
 let%expect_test "function without a return type" =
   let source = {|
@@ -809,14 +752,7 @@ let%expect_test "function without a return type" =
            (Value
             (Function
              ((function_signature ((function_params ()) (function_returns Hole)))
-              (function_impl (Fn (((Break (Expr (Value (Integer 1))))))))))))))
-        (methods
-         (((Type (BuiltinType Builder))
-           ((new
-             ((function_signature
-               ((function_params ())
-                (function_returns (Value (Type (BuiltinType Builder))))))
-              (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+              (function_impl (Fn (((Break (Expr (Value (Integer 1)))))))))))))))) |}]
 
 let%expect_test "scoping that `let` introduces in code" =
   let source =
@@ -891,13 +827,7 @@ let%expect_test "scoping that `let` introduces in code" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder))))))))))))))
+                   (signed true))))))))))))))))
      |}]
 
 let%expect_test "reference in function bodies" =
@@ -1002,13 +932,7 @@ let%expect_test "reference in function bodies" =
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>)))))
                       integer)))
-                   (signed true))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+                   (signed true)))))))))))))))) |}]
 
 let%expect_test "resolving a reference from inside a function" =
   let source =
@@ -1032,14 +956,7 @@ let%expect_test "resolving a reference from inside a function" =
            ((function_signature ((function_params ()) (function_returns Hole)))
             (function_impl
              (Fn (((Break (Expr (ResolvedReference (i <opaque>))))))))))))
-        (i (Value (Integer 1)))))
-      (methods
-       (((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+        (i (Value (Integer 1))))))) |}]
 
 let%expect_test "method access" =
   let source =
@@ -1069,13 +986,7 @@ let%expect_test "method access" =
              ((function_params
                ((self (Value (Type TypeType))) (i (Value (Type IntegerType)))))
               (function_returns Hole)))
-            (function_impl (Fn (((Break (Expr (Reference (i IntegerType))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+            (function_impl (Fn (((Break (Expr (Reference (i IntegerType)))))))))))))))) |}]
 
 let%expect_test "Self type resolution in methods" =
   let source =
@@ -1101,10 +1012,4 @@ let%expect_test "Self type resolution in methods" =
                ((self (Value (Struct ((struct_fields ()) (struct_id <opaque>)))))))
               (function_returns
                (Value (Struct ((struct_fields ()) (struct_id <opaque>)))))))
-            (function_impl (Fn (((Break (Expr (Reference (self TypeType))))))))))))
-        ((Type (BuiltinType Builder))
-         ((new
-           ((function_signature
-             ((function_params ())
-              (function_returns (Value (Type (BuiltinType Builder))))))
-            (function_impl (Fn (((Return (Primitive EmptyBuilder)))))))))))))) |}]
+            (function_impl (Fn (((Break (Expr (Reference (self TypeType)))))))))))))))) |}]
