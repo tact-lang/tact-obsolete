@@ -55,6 +55,5 @@ let%expect_test "simple function generation" =
     |} in
   pp source ; [%expect {|
     int test() {
-    return
-    0;
+      return 0;
     } |}]

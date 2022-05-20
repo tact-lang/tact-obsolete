@@ -58,6 +58,8 @@ let list_iter ~f ~flast l =
   | _ ->
       ()
 
+let indentation = "  "
+
 let rec pp_program f program =
   let prev_margin = pp_get_margin f () in
   let prev_indent = pp_get_max_indent f () in
@@ -88,7 +90,10 @@ and pp_function f fn =
   pp_print_space f () ;
   pp_print_string f "{" ;
   pp_print_newline f () ;
+  pp_print_string f indentation ;
+  pp_open_box f 4 ;
   pp_function_body f fn.function_body ;
+  pp_close_box f () ;
   pp_print_string f "}" ;
   pp_close_box f ()
 
