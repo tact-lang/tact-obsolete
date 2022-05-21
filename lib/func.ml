@@ -92,16 +92,17 @@ and pp_function f fn =
   pp_print_space f () ;
   pp_print_string f "{" ;
   pp_print_newline f () ;
-  pp_print_string f indentation ;
-  pp_open_box f 4 ;
-  pp_function_body f fn.function_body ;
-  pp_close_box f () ;
+  pp_function_body f indentation fn.function_body ;
   pp_print_string f "}" ;
   pp_close_box f ()
 
-and pp_function_body f = function
+and pp_function_body f indentation = function
   | Fn stmts ->
-      List.iter stmts ~f:(pp_stmt f)
+      List.iter stmts ~f:(fun stmt ->
+          pp_print_string f indentation ;
+          pp_open_hovbox f 2 ;
+          pp_stmt f stmt ;
+          pp_close_box f () )
   | _ ->
       raise Unsupported
 

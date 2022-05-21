@@ -109,7 +109,7 @@ let%expect_test "Int(bits) serializer codegen" =
     }
     _ test(builder b) {
       [int] i = [100];
-    function_0([100], b);
+      function_0([100], b);
     } |}]
 
 let%expect_test "demo struct serializer" =
@@ -136,15 +136,13 @@ let%expect_test "demo struct serializer" =
     }
     builder T_serializer([[int], [int]] self, builder builder) {
       builder builder = function_0(first(self), builder);
-    builder builder =
-    function_1(second(self), builder);
-    return
-    builder;
+      builder builder = function_1(second(self), builder);
+      return builder;
     }
     builder function_2() {
       return new_builder();
     }
     _ test() {
       builder b = function_2();
-    T_serializer([], b);
+      T_serializer([], b);
     } |}]
