@@ -14,7 +14,7 @@ and function_body =
   | AsmFn of Asm.instr list [@sexp.list]
   | Fn of stmt list [@sexp.list]
 
-and stmt = Vars of (type_ * ident * expr) list | Return of expr
+and stmt = Vars of (type_ * ident * expr) list | Return of expr | Expr of expr
 
 and expr =
   | Integer of Zint.t
@@ -33,6 +33,7 @@ and type_ =
   | TensorType of type_ list
   | FunctionType of function_
   | ContType
+  | InferType
 
 and top_level_expr = Function of function_ | Global of type_ * ident
 
@@ -122,6 +123,8 @@ and pp_stmt f = function
       pp_expr f expr ;
       pp_print_string f ";" ;
       pp_print_newline f ()
+  | Expr expr ->
+      pp_expr f expr ; pp_print_string f ";" ; pp_print_newline f ()
 
 and pp_expr f = function
   | Integer i ->
@@ -135,8 +138,12 @@ and pp_expr f = function
         ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
         ~flast:(pp_expr f) ;
       pp_print_string f ")"
-  | Tuple _ ->
-      ()
+  | Tuple tuple ->
+      pp_print_string f "[" ;
+      list_iter tuple
+        ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
+        ~flast:(pp_expr f) ;
+      pp_print_string f "]"
 
 and pp_type f = function
   | IntType ->
@@ -161,6 +168,8 @@ and pp_type f = function
         ~f:(fun t -> pp_type f t ; pp_print_string f ", ")
         ~flast:(pp_type f) ;
       pp_print_string f ")"
+  | InferType ->
+      pp_print_string f "_"
   | FunctionType _ ->
       raise UnknownType
 

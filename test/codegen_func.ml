@@ -91,3 +91,18 @@ let%expect_test "function calls " =
     int test2(int value) {
       return test(value);
     } |}]
+
+let%expect_test "Int(bits) serializer codegen" =
+  let source =
+    {|
+        fn test(b: Builder) {
+          let i = Int(32).new(100);
+          i.serialize(b);
+        }
+      |}
+  in
+  pp source ; [%expect {|
+    _ test(builder b) {
+      [int] i = [100];
+    function_0([100], b);
+    } |}]

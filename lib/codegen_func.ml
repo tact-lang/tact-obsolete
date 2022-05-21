@@ -26,12 +26,18 @@ class constructor =
                let expr = self#cg_expr expr in
                (F.type_of expr, name, expr) ) )
 
+    method cg_StructInstance : T.struct_ * (string * T.value) list -> F.expr =
+      fun (_, args) ->
+        F.Tuple (List.map args ~f:(fun (_, expr) -> self#cg_expr (Value expr)))
+
     method cg_expr : T.expr -> F.expr =
       function
       | Value (Integer i) ->
           F.Integer i
       | StructField x ->
           self#cg_StructField x
+      | Value (StructInstance inst) ->
+          self#cg_StructInstance inst
       | ResolvedReference s ->
           self#cg_ResolvedReference s
       | Reference (name, ty) ->
@@ -48,7 +54,8 @@ class constructor =
               F.FunctionCall (name, args)
           | _ ->
               raise Invalid )
-      | _ ->
+      | e ->
+          Sexplib.Sexp.pp_hum Caml.Format.std_formatter (T.sexp_of_expr e) ;
           raise Unsupported
 
     method cg_stmt : T.stmt -> F.stmt =
@@ -57,7 +64,10 @@ class constructor =
           self#cg_Let bindings
       | Return expr ->
           F.Return (self#cg_expr expr)
-      | _ ->
+      | Expr e ->
+          F.Expr (self#cg_expr e)
+      | e ->
+          Sexplib.Sexp.pp_hum Caml.Format.std_formatter (T.sexp_of_stmt e) ;
           raise Unsupported
 
     method cg_function_ : string -> T.function_ -> F.function_ =
@@ -80,7 +90,8 @@ class constructor =
     method cg_top_level_stmt : string -> T.expr -> F.top_level_expr option =
       fun name -> function
         | Value (Function f) -> (
-          try Some (F.Function (self#add_function f ~name)) with _ -> None )
+          try Some (F.Function (self#add_function f ~name))
+          with ex -> raise ex )
         | _ ->
             None
 
@@ -154,7 +165,14 @@ class constructor =
           F.IntType
       | StructType s ->
           self#struct_to_ty s
-      | _ ->
+      | BuiltinType "Builder" ->
+          F.BuilderType
+      | BuiltinType "Cell" ->
+          F.CellType
+      | HoleType ->
+          F.InferType
+      | e ->
+          Sexplib.Sexp.pp_hum Caml.Format.std_formatter (T.sexp_of_type_ e) ;
           raise Invalid
 
     method private struct_to_ty : T.struct_ -> F.type_ =
