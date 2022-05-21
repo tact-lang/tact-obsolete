@@ -171,6 +171,13 @@ let%expect_test "failed scope resolution" =
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (Bool (Value (Builtin Bool))) (Type (Value (Type TypeType)))
           (Void (Value Void))
+          (crc32
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((string (Value (Type StringType)))))
+                (function_returns (Value (Type IntegerType)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (serializer
            (Value
             (Function
@@ -622,6 +629,13 @@ let%expect_test "duplicate type field" =
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (Bool (Value (Builtin Bool))) (Type (Value (Type TypeType)))
           (Void (Value Void))
+          (crc32
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((string (Value (Type StringType)))))
+                (function_returns (Value (Type IntegerType)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (serializer
            (Value
             (Function

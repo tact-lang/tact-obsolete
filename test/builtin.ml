@@ -470,3 +470,10 @@ let%expect_test "demo struct serializer" =
                           (struct_id <opaque>)))))
                       integer)))
                    (signed true)))))))))))))))) |}]
+
+let%expect_test "compile-time crc32" =
+  let source = {|
+      let i = crc32("transfer(slice, int)"); 
+    |} in
+  pp source ;
+  [%expect {| (Ok ((bindings ((i (Value (Integer 2235694568))))))) |}]

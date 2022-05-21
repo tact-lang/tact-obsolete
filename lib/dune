@@ -6,7 +6,8 @@
   zarith
   visitors.runtime
   ppx_sexp_conv
-  sexplib)
+  sexplib
+  checkseum)
  (preprocess
   (pps
    ppx_show
