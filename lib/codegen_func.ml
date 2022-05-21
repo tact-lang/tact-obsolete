@@ -97,9 +97,12 @@ class constructor =
 
     method cg_program : T.program -> F.program =
       fun program ->
-        List.filter_map (List.rev program.bindings)
-          ~f:(fun (name, top_level_stmt) ->
-            self#cg_top_level_stmt name top_level_stmt )
+        let _ =
+          List.filter_map (List.rev program.bindings)
+            ~f:(fun (name, top_level_stmt) ->
+              self#cg_top_level_stmt name top_level_stmt )
+        in
+        List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
 
     method cg_StructField (from_expr, field) =
       let build_access struct_ty field =

@@ -102,6 +102,9 @@ let%expect_test "Int(bits) serializer codegen" =
       |}
   in
   pp source ; [%expect {|
+    builder function_0([int] self, builder builder) {
+      return store_int(builder, first(self), 32);
+    }
     _ test(builder b) {
       [int] i = [100];
     function_0([100], b);
