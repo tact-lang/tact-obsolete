@@ -150,12 +150,10 @@ functor
           in
           (* TODO: check method signatures *)
           match receiver with
-          | ResolvedReference (_, Value (Type (StructType struct')))
-          | Value (Type (StructType struct')) -> (
-              let receiver' = Value (Type (StructType struct')) in
+          | ResolvedReference (_, Value (Type ty)) | Value (Type ty) -> (
+              let receiver' = Value (Type ty) in
               let methods =
-                List.Assoc.find program.methods ~equal:equal_value
-                  (Type (StructType struct'))
+                List.Assoc.find program.methods ~equal:equal_value (Type ty)
               in
               match
                 Option.bind methods ~f:(fun methods ->

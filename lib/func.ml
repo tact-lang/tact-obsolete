@@ -14,13 +14,13 @@ and function_body =
   | AsmFn of Asm.instr list [@sexp.list]
   | Fn of stmt list [@sexp.list]
 
-and stmt = Vars of (type_ * ident * expr) list | Return of expr
+and stmt = Vars of (type_ * ident * expr) list | Return of expr | Expr of expr
 
 and expr =
   | Integer of Zint.t
   | Reference of (ident * type_)
   | Tuple of expr list
-  | FunctionCall of (ident * expr list)
+  | FunctionCall of (ident * expr list * type_)
 
 and ident = string
 
@@ -31,7 +31,9 @@ and type_ =
   | BuilderType
   | TupleType of type_ list
   | TensorType of type_ list
+  | FunctionType of function_
   | ContType
+  | InferType
 
 and top_level_expr = Function of function_ | Global of type_ * ident
 
@@ -46,8 +48,8 @@ let rec type_of = function
       ty
   | Tuple exprs ->
       TupleType (List.map exprs ~f:type_of)
-  | FunctionCall _ ->
-      raise UnknownType
+  | FunctionCall (_, _, ty) ->
+      ty
 
 open Caml.Format
 
@@ -90,16 +92,17 @@ and pp_function f fn =
   pp_print_space f () ;
   pp_print_string f "{" ;
   pp_print_newline f () ;
-  pp_print_string f indentation ;
-  pp_open_box f 4 ;
-  pp_function_body f fn.function_body ;
-  pp_close_box f () ;
+  pp_function_body f indentation fn.function_body ;
   pp_print_string f "}" ;
   pp_close_box f ()
 
-and pp_function_body f = function
+and pp_function_body f indentation = function
   | Fn stmts ->
-      List.iter stmts ~f:(pp_stmt f)
+      List.iter stmts ~f:(fun stmt ->
+          pp_print_string f indentation ;
+          pp_open_hovbox f 2 ;
+          pp_stmt f stmt ;
+          pp_close_box f () )
   | _ ->
       raise Unsupported
 
@@ -121,21 +124,27 @@ and pp_stmt f = function
       pp_expr f expr ;
       pp_print_string f ";" ;
       pp_print_newline f ()
+  | Expr expr ->
+      pp_expr f expr ; pp_print_string f ";" ; pp_print_newline f ()
 
 and pp_expr f = function
   | Integer i ->
       pp_print_string f (Zint.to_string i)
   | Reference (ref, _) ->
       pp_print_string f ref
-  | FunctionCall (name, args) ->
+  | FunctionCall (name, args, _) ->
       pp_print_string f name ;
       pp_print_string f "(" ;
       list_iter args
         ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
         ~flast:(pp_expr f) ;
       pp_print_string f ")"
-  | Tuple _ ->
-      ()
+  | Tuple tuple ->
+      pp_print_string f "[" ;
+      list_iter tuple
+        ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
+        ~flast:(pp_expr f) ;
+      pp_print_string f "]"
 
 and pp_type f = function
   | IntType ->
@@ -160,5 +169,9 @@ and pp_type f = function
         ~f:(fun t -> pp_type f t ; pp_print_string f ", ")
         ~flast:(pp_type f) ;
       pp_print_string f ")"
+  | InferType ->
+      pp_print_string f "_"
+  | FunctionType _ ->
+      raise UnknownType
 
 and pp_ident f i = pp_print_string f i
