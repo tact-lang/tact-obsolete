@@ -75,7 +75,7 @@ let%expect_test "passing struct to function" =
       return 1;
     } |}]
 
-let%expect_test "function calls" =
+let%expect_test "function calls " =
   let source =
     {|
       fn test(value: Integer) -> Integer { return value; }
@@ -85,9 +85,9 @@ let%expect_test "function calls" =
   pp source ;
   [%expect
     {|
-    int test2(int value) {
-      return function_0(value);
-    }
-    int function_0(int value) {
+    int test(int value) {
       return value;
+    }
+    int test2(int value) {
+      return test(value);
     } |}]

@@ -86,7 +86,8 @@ class constructor =
 
     method cg_program : T.program -> F.program =
       fun program ->
-        List.filter_map program.bindings ~f:(fun (name, top_level_stmt) ->
+        List.filter_map (List.rev program.bindings)
+          ~f:(fun (name, top_level_stmt) ->
             self#cg_top_level_stmt name top_level_stmt )
 
     method cg_StructField (from_expr, field) =
