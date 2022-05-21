@@ -123,7 +123,7 @@ let%expect_test "demo struct serializer" =
   
         fn test() {
           let b = Builder.new();
-          T_serializer(T{}, b);
+          T_serializer(T{a: Int(32).new(0), b: Int(16).new(1)}, b);
         }
       |}
   in
@@ -146,5 +146,5 @@ let%expect_test "demo struct serializer" =
     }
     _ test() {
       builder b = function_2();
-      T_serializer([], b);
+      T_serializer([[0], [1]], b);
     } |}]

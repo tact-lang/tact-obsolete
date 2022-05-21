@@ -1124,3 +1124,44 @@ let%expect_test "Self type resolution in methods" =
                  (Expr
                   (Reference
                    (self (StructType ((struct_fields ()) (struct_id <opaque>))))))))))))))))))) |}]
+
+let%expect_test "struct instantiation" =
+  let source =
+    {|
+    struct T {
+      val a: Integer
+      val b: Integer
+    }
+
+    let t = T{a: 1, b: 2}
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((t
+         (Value
+          (StructInstance
+           (((struct_fields
+              ((a ((field_type (Value (Type IntegerType)))))
+               (b ((field_type (Value (Type IntegerType)))))))
+             (struct_id <opaque>))
+            ((a (Value (Integer 1))) (b (Value (Integer 2))))))))
+        (T
+         (Value
+          (Type
+           (StructType
+            ((struct_fields
+              ((a ((field_type (Value (Type IntegerType)))))
+               (b ((field_type (Value (Type IntegerType)))))))
+             (struct_id <opaque>))))))))
+      (methods
+       (((Type
+          (StructType
+           ((struct_fields
+             ((a ((field_type (Value (Type IntegerType)))))
+              (b ((field_type (Value (Type IntegerType)))))))
+            (struct_id <opaque>))))
+         ()))))) |}]

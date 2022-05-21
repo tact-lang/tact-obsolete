@@ -26,9 +26,9 @@ class constructor =
                let expr = self#cg_expr expr in
                (F.type_of expr, name, expr) ) )
 
-    method cg_StructInstance : T.struct_ * (string * T.value) list -> F.expr =
+    method cg_StructInstance : T.struct_ * (string * T.expr) list -> F.expr =
       fun (_, args) ->
-        F.Tuple (List.map args ~f:(fun (_, expr) -> self#cg_expr (Value expr)))
+        F.Tuple (List.map args ~f:(fun (_, expr) -> self#cg_expr expr))
 
     method cg_expr : T.expr -> F.expr =
       function

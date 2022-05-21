@@ -75,7 +75,7 @@ class interpreter
           | StructInstance (struct_, struct') -> (
             match List.Assoc.find struct' ~equal:String.equal field with
             | Some field ->
-                field
+                self#interpret_expr field
             | None ->
                 errors#report `Error (`FieldNotFound (struct_, field)) () ;
                 Void )

@@ -262,11 +262,13 @@ functor
             stmts = s#of_located_list stmts;
             bindings = List.concat current_bindings }
 
-        method build_struct_constructor _env id _fields =
+        method build_struct_constructor _env id fields =
           match Syntax.value id with
           | ResolvedReference (_, Value (Type (StructType struct')))
           | Value (Type (StructType struct')) ->
-              (struct', []) (* TODO: handle fields *)
+              ( struct',
+                List.map fields ~f:(fun (name, expr) ->
+                    (Syntax.value name, Syntax.value expr) ) )
           | e ->
               errors#report `Error (`UnexpectedType e) () ;
               ({struct_fields = []; struct_id = 0}, [])

@@ -18,14 +18,14 @@ let%expect_test "Int(bits) constructor" =
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>))
-            ((integer (Integer 1)))))))
+            ((integer (Value (Integer 1))))))))
         (i
          (Value
           (StructInstance
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>))
-            ((integer (Integer 100)))))))))
+            ((integer (Value (Integer 100))))))))))
       (methods
        (((Type
           (StructType
@@ -143,7 +143,7 @@ let%expect_test "Int(bits) serializer" =
                        (((struct_fields
                           ((integer ((field_type (Value (Type IntegerType)))))))
                          (struct_id <opaque>))
-                        ((integer (Integer 100)))))))))
+                        ((integer (Value (Integer 100))))))))))
                   (Expr
                    (FunctionCall
                     ((ResolvedReference (serialize <opaque>))
@@ -205,7 +205,7 @@ let%expect_test "demo struct serializer" =
 
       fn test() {
         let b = Builder.new();
-        T_serializer(T{}, b);
+        T_serializer(T{a: Int(32).new(0), b: Int(16).new(1)}, b);
       }
     |}
   in
@@ -248,7 +248,22 @@ let%expect_test "demo struct serializer" =
                                     ((field_type (Value (Type IntegerType)))))))
                                  (struct_id <opaque>))))))))))
                         (struct_id <opaque>))
-                       ())))
+                       ((a
+                         (Value
+                          (StructInstance
+                           (((struct_fields
+                              ((integer
+                                ((field_type (Value (Type IntegerType)))))))
+                             (struct_id <opaque>))
+                            ((integer (Value (Integer 0))))))))
+                        (b
+                         (Value
+                          (StructInstance
+                           (((struct_fields
+                              ((integer
+                                ((field_type (Value (Type IntegerType)))))))
+                             (struct_id <opaque>))
+                            ((integer (Value (Integer 1))))))))))))
                     (Reference (b (BuiltinType Builder)))))))))))))))
         (T_serializer
          (Value

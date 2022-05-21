@@ -61,7 +61,7 @@ let int_type =
             extract i 0 (numbits - bits)
           else i
         in
-        StructInstance (int_type_s p bits, [("integer", Integer i)])
+        StructInstance (int_type_s p bits, [("integer", Value (Integer i))])
     | _ ->
         (* TODO: raise an error instead *)
         constructor_impl bits p [Integer (Zint.of_int 0)]

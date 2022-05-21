@@ -47,7 +47,7 @@ and expr =
 and value =
   | Void
   (* Instance of a Struct *)
-  | StructInstance of (struct_ * (string * value) list)
+  | StructInstance of (struct_ * (string * expr) list)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
   | String of string
