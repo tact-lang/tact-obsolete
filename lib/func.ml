@@ -20,7 +20,7 @@ and expr =
   | Integer of Zint.t
   | Reference of (ident * type_)
   | Tuple of expr list
-  | FunctionCall of (ident * expr list)
+  | FunctionCall of (ident * expr list * type_)
 
 and ident = string
 
@@ -48,8 +48,8 @@ let rec type_of = function
       ty
   | Tuple exprs ->
       TupleType (List.map exprs ~f:type_of)
-  | FunctionCall _ ->
-      raise UnknownType
+  | FunctionCall (_, _, ty) ->
+      ty
 
 open Caml.Format
 
@@ -131,7 +131,7 @@ and pp_expr f = function
       pp_print_string f (Zint.to_string i)
   | Reference (ref, _) ->
       pp_print_string f ref
-  | FunctionCall (name, args) ->
+  | FunctionCall (name, args, _) ->
       pp_print_string f name ;
       pp_print_string f "(" ;
       list_iter args

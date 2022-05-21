@@ -101,11 +101,50 @@ let%expect_test "Int(bits) serializer codegen" =
         }
       |}
   in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     builder function_0([int] self, builder builder) {
       return store_int(builder, first(self), 32);
     }
     _ test(builder b) {
       [int] i = [100];
     function_0([100], b);
+    } |}]
+
+let%expect_test "demo struct serializer" =
+  let source =
+    {|
+        struct T {
+          val a: Int(32)
+          val b: Int(16)
+        }
+        let T_serializer = serializer(T);
+  
+        fn test() {
+          let b = Builder.new();
+          T_serializer(T{}, b);
+        }
+      |}
+  in
+  pp source ; [%expect {|
+    builder function_0([int] self, builder builder) {
+      return store_int(builder, first(self), 32);
+    }
+    builder function_1([int] self, builder builder) {
+      return store_int(builder, first(self), 16);
+    }
+    builder T_serializer([[int], [int]] self, builder builder) {
+      builder builder = function_0(first(self), builder);
+    builder builder =
+    function_1(second(self), builder);
+    return
+    builder;
+    }
+    builder function_2() {
+      return new_builder();
+    }
+    _ test() {
+      builder b = function_2();
+    T_serializer([], b);
     } |}]

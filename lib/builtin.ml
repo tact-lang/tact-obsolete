@@ -118,8 +118,9 @@ let serializer =
                      [ ( "builder",
                          FunctionCall
                            ( Value (Function method_),
-                             StructField (Reference ("self", HoleType), name)
-                             :: [builder] ) ) ] )
+                             StructField (Reference ("self", StructType s), name)
+                             :: [Reference ("builder", BuiltinType "Builder")]
+                           ) ) ] )
         | _ ->
             None )
     in
@@ -129,8 +130,8 @@ let serializer =
     Function
       { function_signature =
           { function_params =
-              [("self", Value (Type HoleType)); ("builder", builder)];
-            function_returns = Value (Type VoidType) };
+              [("self", Value (Type (StructType s))); ("builder", builder)];
+            function_returns = builder };
         function_impl = Fn (Some body) }
   in
   let function_impl p = function

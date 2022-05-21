@@ -50,12 +50,11 @@ class constructor =
       | FunctionCall (func, args) -> (
           let args = List.map args ~f:self#cg_expr in
           match self#cg_expr func with
-          | Reference (name, _) ->
-              F.FunctionCall (name, args)
+          | Reference (name, F.FunctionType f) ->
+              F.FunctionCall (name, args, f.function_returns)
           | _ ->
               raise Invalid )
-      | e ->
-          Sexplib.Sexp.pp_hum Caml.Format.std_formatter (T.sexp_of_expr e) ;
+      | _ ->
           raise Unsupported
 
     method cg_stmt : T.stmt -> F.stmt =
@@ -66,8 +65,7 @@ class constructor =
           F.Return (self#cg_expr expr)
       | Expr e ->
           F.Expr (self#cg_expr e)
-      | e ->
-          Sexplib.Sexp.pp_hum Caml.Format.std_formatter (T.sexp_of_stmt e) ;
+      | _ ->
           raise Unsupported
 
     method cg_function_ : string -> T.function_ -> F.function_ =
@@ -105,7 +103,7 @@ class constructor =
         List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
 
     method cg_StructField (from_expr, field) =
-      let build_access struct_ty field =
+      let build_access struct_ty field field_ty =
         let name =
           match field with
           | 0 ->
@@ -117,16 +115,17 @@ class constructor =
           | _ ->
               raise Unsupported
         in
-        F.FunctionCall (name, [struct_ty])
+        F.FunctionCall (name, [struct_ty], field_ty)
       in
       match T.type_of from_expr with
       | StructType s ->
-          let field_id, (_, _) =
+          let field_id, (_, field) =
             Option.value_exn
               (List.findi s.struct_fields ~f:(fun _ (name, _) ->
                    equal_string name field ) )
           in
           build_access (self#cg_expr from_expr) field_id
+            (self#lang_expr_to_type field.field_type)
       | _ ->
           raise Invalid
 
@@ -136,7 +135,7 @@ class constructor =
       let name =
         match is_signed with true -> "store_int" | false -> "store_uint"
       in
-      F.FunctionCall (name, [builder; int_; length])
+      F.FunctionCall (name, [builder; int_; length], F.IntType)
 
     method cg_Primitive : T.primitive -> F.expr =
       function
@@ -148,10 +147,10 @@ class constructor =
           self#cg_StoreInt (self#cg_expr builder) (self#cg_expr length)
             (self#cg_expr integer) signed
 
-    method cg_EmptyBuilder = F.FunctionCall ("new_builder", [])
+    method cg_EmptyBuilder = F.FunctionCall ("new_builder", [], F.BuilderType)
 
     method cg_BuildCell builder_arg =
-      F.FunctionCall ("build", [self#cg_expr builder_arg])
+      F.FunctionCall ("build", [self#cg_expr builder_arg], F.CellType)
 
     method private lang_expr_to_type : T.expr -> F.type_ =
       function
@@ -174,8 +173,7 @@ class constructor =
           F.CellType
       | HoleType ->
           F.InferType
-      | e ->
-          Sexplib.Sexp.pp_hum Caml.Format.std_formatter (T.sexp_of_type_ e) ;
+      | _ ->
           raise Invalid
 
     method private struct_to_ty : T.struct_ -> F.type_ =

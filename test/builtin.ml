@@ -222,10 +222,7 @@ let%expect_test "demo struct serializer" =
             (function_impl
              (Fn
               (((Let
-                 ((b
-                   (FunctionCall
-                    ((ResolvedReference (new <opaque>))
-                     ((ResolvedReference (Builder <opaque>))))))))
+                 ((b (FunctionCall ((ResolvedReference (new <opaque>)) ())))))
                 (Expr
                  (FunctionCall
                   ((ResolvedReference (T_serializer <opaque>))
@@ -258,9 +255,32 @@ let%expect_test "demo struct serializer" =
           (Function
            ((function_signature
              ((function_params
-               ((self (Value (Type HoleType)))
+               ((self
+                 (Value
+                  (Type
+                   (StructType
+                    ((struct_fields
+                      ((a
+                        ((field_type
+                          (Value
+                           (Type
+                            (StructType
+                             ((struct_fields
+                               ((integer
+                                 ((field_type (Value (Type IntegerType)))))))
+                              (struct_id <opaque>))))))))
+                       (b
+                        ((field_type
+                          (Value
+                           (Type
+                            (StructType
+                             ((struct_fields
+                               ((integer
+                                 ((field_type (Value (Type IntegerType)))))))
+                              (struct_id <opaque>))))))))))
+                     (struct_id <opaque>))))))
                 (builder (Value (Type (BuiltinType Builder))))))
-              (function_returns (Value (Type VoidType)))))
+              (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               (((Let
@@ -299,8 +319,32 @@ let%expect_test "demo struct serializer" =
                                       (struct_id <opaque>)))))
                                   integer)))
                                (signed true)))))))))))
-                     ((StructField ((Reference (self HoleType)) a))
-                      (Value (Type (BuiltinType Builder)))))))))
+                     ((StructField
+                       ((Reference
+                         (self
+                          (StructType
+                           ((struct_fields
+                             ((a
+                               ((field_type
+                                 (Value
+                                  (Type
+                                   (StructType
+                                    ((struct_fields
+                                      ((integer
+                                        ((field_type (Value (Type IntegerType)))))))
+                                     (struct_id <opaque>))))))))
+                              (b
+                               ((field_type
+                                 (Value
+                                  (Type
+                                   (StructType
+                                    ((struct_fields
+                                      ((integer
+                                        ((field_type (Value (Type IntegerType)))))))
+                                     (struct_id <opaque>))))))))))
+                            (struct_id <opaque>)))))
+                        a))
+                      (Reference (builder (BuiltinType Builder)))))))))
                 (Let
                  ((builder
                    (FunctionCall
@@ -337,8 +381,32 @@ let%expect_test "demo struct serializer" =
                                       (struct_id <opaque>)))))
                                   integer)))
                                (signed true)))))))))))
-                     ((StructField ((Reference (self HoleType)) b))
-                      (Value (Type (BuiltinType Builder)))))))))
+                     ((StructField
+                       ((Reference
+                         (self
+                          (StructType
+                           ((struct_fields
+                             ((a
+                               ((field_type
+                                 (Value
+                                  (Type
+                                   (StructType
+                                    ((struct_fields
+                                      ((integer
+                                        ((field_type (Value (Type IntegerType)))))))
+                                     (struct_id <opaque>))))))))
+                              (b
+                               ((field_type
+                                 (Value
+                                  (Type
+                                   (StructType
+                                    ((struct_fields
+                                      ((integer
+                                        ((field_type (Value (Type IntegerType)))))))
+                                     (struct_id <opaque>))))))))))
+                            (struct_id <opaque>)))))
+                        b))
+                      (Reference (builder (BuiltinType Builder)))))))))
                 (Return (Reference (builder (BuiltinType Builder))))))))))))
         (T
          (Value
