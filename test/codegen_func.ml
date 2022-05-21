@@ -127,7 +127,9 @@ let%expect_test "demo struct serializer" =
         }
       |}
   in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     builder function_0([int] self, builder builder) {
       return store_int(builder, first(self), 32);
     }
