@@ -88,7 +88,7 @@ class constructor =
     method cg_top_level_stmt : string -> T.expr -> F.top_level_expr option =
       fun name -> function
         | Value (Function f) -> (
-          try Some (F.Function (self#add_function f ~name))
+          try Some (F.Function (self#add_function f ~name:(Some name)))
           with ex -> raise ex )
         | _ ->
             None
@@ -197,8 +197,9 @@ class constructor =
         in
         TupleType types
 
-    method private add_function : ?name:string -> T.function_ -> F.function_ =
-      fun ?(name = "") fn ->
+    method private add_function
+        : ?name:string option -> T.function_ -> F.function_ =
+      fun ?(name = None) fn ->
         match
           List.find functions ~f:(fun (func, _) -> T.equal_function_ func fn)
         with
@@ -206,7 +207,8 @@ class constructor =
             f
         | None ->
             let name =
-              if equal_string "" name then self#generate_func_name else name
+              Option.value_or_thunk name ~default:(fun () ->
+                  self#generate_func_name )
             in
             let fn' = self#cg_function_ name fn in
             functions <- (fn, fn') :: functions ;
