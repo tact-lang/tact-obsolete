@@ -200,19 +200,17 @@ class constructor =
     method private add_function
         : ?name:string option -> T.function_ -> F.function_ =
       fun ?(name = None) fn ->
-        match
-          List.find functions ~f:(fun (func, _) -> T.equal_function_ func fn)
-        with
-        | Some (_, f) ->
-            f
-        | None ->
-            let name =
-              Option.value_or_thunk name ~default:(fun () ->
-                  self#generate_func_name )
-            in
-            let fn' = self#cg_function_ name fn in
-            functions <- (fn, fn') :: functions ;
-            fn'
+        let default () =
+          let name =
+            Option.value_or_thunk name ~default:(fun () ->
+                self#generate_func_name )
+          in
+          let fn' = self#cg_function_ name fn in
+          functions <- (fn, fn') :: functions ;
+          fn'
+        in
+        List.Assoc.find functions ~equal:T.equal_function_ fn
+        |> Option.value_or_thunk ~default
 
     method private generate_func_name =
       let num = fn_name_counter in
