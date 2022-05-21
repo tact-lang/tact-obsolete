@@ -11,7 +11,9 @@ class constructor =
   object (self)
     val mutable struct_representations : (T.struct_ * F.type_) list = []
 
-    val mutable functions : (string * F.function_) list = []
+    val mutable fn_name_counter = 0
+
+    val mutable functions : (T.function_ * F.function_) list = []
 
     method cg_Fn body = F.Fn (List.concat (Option.value_exn body))
 
@@ -32,8 +34,20 @@ class constructor =
           self#cg_StructField x
       | ResolvedReference s ->
           self#cg_ResolvedReference s
+      | Reference (name, ty) ->
+          F.Reference (name, self#lang_type_to_type ty)
       | Primitive p ->
           self#cg_Primitive p
+      | Value (Function f) ->
+          let f' = self#add_function f in
+          F.Reference (f'.function_name, F.FunctionType f')
+      | FunctionCall (func, args) -> (
+          let args = List.map args ~f:self#cg_expr in
+          match self#cg_expr func with
+          | Reference (name, _) ->
+              F.FunctionCall (name, args)
+          | _ ->
+              raise Invalid )
       | _ ->
           raise Unsupported
 
@@ -66,7 +80,7 @@ class constructor =
     method cg_top_level_stmt : string -> T.expr -> F.top_level_expr option =
       fun name -> function
         | Value (Function f) -> (
-          try Some (F.Function (self#cg_function_ name f)) with _ -> None )
+          try Some (F.Function (self#add_function f ~name)) with _ -> None )
         | _ ->
             None
 
@@ -101,14 +115,7 @@ class constructor =
       | _ ->
           raise Invalid
 
-    method cg_ResolvedReference (name, _) =
-      match
-        List.find functions ~f:(fun (fname, _) -> equal_string name fname)
-      with
-      | Some (_, fn) ->
-          F.Reference (name, fn.function_returns)
-      | None ->
-          raise Invalid
+    method cg_ResolvedReference (_, expr) = self#cg_expr expr
 
     method cg_StoreInt builder length int_ is_signed =
       let name =
@@ -169,6 +176,26 @@ class constructor =
               self#lang_expr_to_type field_type )
         in
         TupleType types
+
+    method private add_function : ?name:string -> T.function_ -> F.function_ =
+      fun ?(name = "") fn ->
+        match
+          List.find functions ~f:(fun (func, _) -> T.equal_function_ func fn)
+        with
+        | Some (_, f) ->
+            f
+        | None ->
+            let name =
+              if equal_string "" name then self#generate_func_name else name
+            in
+            let fn' = self#cg_function_ name fn in
+            functions <- (fn, fn') :: functions ;
+            fn'
+
+    method private generate_func_name =
+      let num = fn_name_counter in
+      fn_name_counter <- fn_name_counter + 1 ;
+      "function_" ^ Printf.sprintf "%d" num
   end
 
 let codegen program =

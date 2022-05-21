@@ -31,6 +31,7 @@ and type_ =
   | BuilderType
   | TupleType of type_ list
   | TensorType of type_ list
+  | FunctionType of function_
   | ContType
 
 and top_level_expr = Function of function_ | Global of type_ * ident
@@ -160,5 +161,7 @@ and pp_type f = function
         ~f:(fun t -> pp_type f t ; pp_print_string f ", ")
         ~flast:(pp_type f) ;
       pp_print_string f ")"
+  | FunctionType _ ->
+      raise UnknownType
 
 and pp_ident f i = pp_print_string f i
