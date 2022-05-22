@@ -27,8 +27,11 @@ class constructor =
                (F.type_of expr, name, expr) ) )
 
     method cg_StructInstance : T.struct_ * (string * T.expr) list -> F.expr =
-      fun (_, args) ->
-        F.Tuple (List.map args ~f:(fun (_, expr) -> self#cg_expr expr))
+      function
+      | _, [(_, expr)] ->
+          self#cg_expr expr
+      | _, args ->
+          F.Tuple (List.map args ~f:(fun (_, expr) -> self#cg_expr expr))
 
     method cg_expr : T.expr -> F.expr =
       function
@@ -118,6 +121,8 @@ class constructor =
         F.FunctionCall (name, [struct_ty], field_ty)
       in
       match T.type_of from_expr with
+      | StructType {struct_fields = [_]; _} ->
+          self#cg_expr from_expr
       | StructType s ->
           let field_id, (_, field) =
             Option.value_exn
@@ -190,12 +195,15 @@ class constructor =
             ty
 
     method private create_ty_from_struct : T.struct_ -> F.type_ =
-      fun {struct_fields; _} ->
-        let types =
-          List.map struct_fields ~f:(fun (_, {field_type}) ->
-              self#lang_expr_to_type field_type )
-        in
-        TupleType types
+      function
+      | {struct_fields = [(_, {field_type})]; _} ->
+          self#lang_expr_to_type field_type
+      | {struct_fields; _} ->
+          let types =
+            List.map struct_fields ~f:(fun (_, {field_type}) ->
+                self#lang_expr_to_type field_type )
+          in
+          TupleType types
 
     method private add_function
         : ?name:string option -> T.function_ -> F.function_ =
