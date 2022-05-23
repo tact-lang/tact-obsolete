@@ -1469,7 +1469,9 @@ let%expect_test "type inference" =
   let source = {|
       fn foo(i: Integer) { return i; }
     |} in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Ok
      ((bindings
        ((foo
