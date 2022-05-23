@@ -36,7 +36,9 @@ and program =
 
 and expr =
   | FunctionCall of function_call
-  | Reference of (string * type_)
+  (* Note that it is TYPE EXPR, means that `string` has `expr` type, not `string` references to `type` *)
+  (* FIXME: make new type *)
+  | Reference of (string * expr)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
   | Value of value
   | StructField of (expr * string)
@@ -118,8 +120,8 @@ let rec expr_to_type = function
   | FunctionCall
       (Value (Function {function_signature = {function_returns; _}; _}), _) ->
       expr_to_type function_returns
-  | Reference (_, t) ->
-      t
+  | Reference _ ->
+      InvalidType
   | ResolvedReference (_, e) ->
       expr_to_type e
   | _other ->
@@ -127,32 +129,32 @@ let rec expr_to_type = function
 
 let rec type_of = function
   | Value (StructInstance (struct_, _)) ->
-      StructType struct_
+      Value (Type (StructType struct_))
   | Value (Function {function_signature; _}) ->
-      FunctionType function_signature
+      Value (Type (FunctionType function_signature))
   | Value (Builtin builtin) ->
-      BuiltinType builtin
+      Value (Type (BuiltinType builtin))
   | Value (Integer _) ->
-      IntegerType
+      Value (Type IntegerType)
   | Value Void ->
-      VoidType
+      Value (Type VoidType)
   | Value (Type _) ->
-      TypeType
+      Value (Type TypeType)
   | Hole ->
-      HoleType
+      Value (Type HoleType)
   | FunctionCall
       ( ResolvedReference
           (_, Value (Function {function_signature = {function_returns; _}; _})),
         _ )
   | FunctionCall
       (Value (Function {function_signature = {function_returns; _}; _}), _) ->
-      expr_to_type function_returns
+      function_returns
   | Reference (_, t) ->
       t
   | ResolvedReference (_, e) ->
       type_of e
   | _other ->
-      InvalidType
+      Value (Type InvalidType)
 
 class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)
