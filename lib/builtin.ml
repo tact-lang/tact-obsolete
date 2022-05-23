@@ -76,11 +76,12 @@ let int_type =
              [ Return
                  (Primitive
                     (StoreInt
-                       { builder = Reference ("builder", BuiltinType "Builder");
+                       { builder = Reference ("builder", builder);
                          length = Value (Integer (Z.of_int bits));
                          integer =
                            StructField
-                             (Reference ("self", StructType s), "integer");
+                             ( Reference ("self", Value (Type (StructType s))),
+                               "integer" );
                          signed = true } ) ) ] ) }
   and function_impl p = function
     | [Integer bits] ->
@@ -118,15 +119,14 @@ let serializer =
                      [ ( "builder",
                          FunctionCall
                            ( Value (Function method_),
-                             StructField (Reference ("self", StructType s), name)
-                             :: [Reference ("builder", BuiltinType "Builder")]
-                           ) ) ] )
+                             StructField
+                               ( Reference ("self", Value (Type (StructType s))),
+                                 name )
+                             :: [Reference ("builder", builder)] ) ) ] )
         | _ ->
             None )
     in
-    let body =
-      calls @ [Return (Reference ("builder", BuiltinType "Builder"))]
-    in
+    let body = calls @ [Return (Reference ("builder", builder))] in
     Function
       { function_signature =
           { function_params =

@@ -13,10 +13,14 @@ functor
       [ `DuplicateField of string * struct_
       | `UnresolvedIdentifier of string
       | `MethodNotFound of expr * string
-      | `UnexpectedType of expr ]
+      | `UnexpectedType of expr
+      | `TypeError of expr * expr
+      | `UnallowedStmt of stmt ]
     [@@deriving equal, sexp_of]
 
     include Builtin
+
+    type infer_ctx = {mutable fn_returns : expr option}
 
     class ['s] constructor (bindings : (string * expr) list)
       (methods : (value * (string * function_) list) list) (errors : _ errors) =
@@ -28,6 +32,8 @@ functor
 
         (* Bindings that will available only in runtime *)
         val mutable runtime_bindings = []
+
+        val infer_ctx = {fn_returns = None}
 
         (* Are we inside of a function body? How deep? *)
         val mutable functions = 0
@@ -89,19 +95,49 @@ functor
               s#build_Reference env ref'
           | Some (Value value) ->
               ResolvedReference (ref, Value value)
-          | Some _ ->
-              (* TODO: type_of *) Reference (ref, HoleType)
+          | Some ex ->
+              Reference (ref, type_of ex)
           | None -> (
             match find_in_scope ref runtime_bindings with
             | Some ty ->
                 Reference (ref, ty)
             | None ->
                 errors#report `Error (`UnresolvedIdentifier ref) () ;
-                Reference (ref, HoleType) )
+                Reference (ref, Value (Type HoleType)) )
 
-        method build_Return _env return = Return return
+        method build_Return _env return =
+          match infer_ctx.fn_returns with
+          | Some fn_returns -> (
+            match s#check_type (type_of return) ~expected:fn_returns with
+            | Ok ty ->
+                infer_ctx.fn_returns <- Some ty ;
+                Return return
+            | Error _ ->
+                errors#report `Error
+                  (`TypeError (fn_returns, type_of return))
+                  () ;
+                Return return )
+          | None ->
+              errors#report `Error (`UnallowedStmt (Return return)) () ;
+              Return return
 
-        method build_Break _env stmt = Break stmt
+        method build_Break _env stmt =
+          match stmt with
+          | Expr ex -> (
+            match infer_ctx.fn_returns with
+            | Some fn_returns -> (
+              match s#check_type (type_of ex) ~expected:fn_returns with
+              | Ok ty ->
+                  infer_ctx.fn_returns <- Some ty ;
+                  Break stmt
+              | Error _ ->
+                  errors#report `Error (`TypeError (fn_returns, type_of ex)) () ;
+                  Break stmt )
+            | None ->
+                errors#report `Error (`UnallowedStmt (Break stmt)) () ;
+                Break stmt )
+          | stmt ->
+              Break stmt
 
         method build_Struct _env s = Value (Type (StructType s))
 
@@ -208,13 +244,21 @@ functor
             |> List.map ~f:(fun (ident, expr) ->
                    ( s#visit_ident env @@ Syntax.value ident,
                      s#visit_expr env @@ Syntax.value expr ) )
-            |> List.map ~f:(fun (id, expr) -> (id, expr_to_type expr))
+            |> List.map ~f:(fun (id, expr) -> (id, expr))
+          in
+          let function_returns =
+            f.returns
+            |> Option.map ~f:(fun x -> s#visit_expr env (Syntax.value x))
+            |> Option.value ~default:(Value (Type HoleType))
           in
           let bindings' = runtime_bindings in
           (* inject them into current bindings *)
           runtime_bindings <- param_bindings :: runtime_bindings ;
           (* process the function definition *)
-          let result = super#visit_function_definition env f in
+          let result =
+            s#with_fn_returns env function_returns (fun env' ->
+                super#visit_function_definition env' f )
+          in
           (* restore bindings as before entering the function *)
           runtime_bindings <- bindings' ;
           result
@@ -240,15 +284,13 @@ functor
 
         method build_function_body _env stmts = s#of_located_list stmts
 
-        method build_function_definition _env _name params returns body =
+        method build_function_definition _env _name params _ body =
           let function_params =
             s#of_located_list params
             |> List.map ~f:(fun (name, type_) ->
                    (Syntax.value name, Syntax.value type_) )
           and function_returns =
-            returns
-            |> Option.map ~f:(fun x -> Syntax.value x)
-            |> Option.value ~default:(Value (Type HoleType))
+            Option.value infer_ctx.fn_returns ~default:(Value (Type HoleType))
           and function_impl = body in
           { function_signature = {function_params; function_returns};
             function_impl = Fn function_impl }
@@ -326,5 +368,23 @@ functor
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
+
+        method private with_fn_returns
+            : 'env 'a. 'env -> expr -> ('env -> 'a) -> 'a =
+          fun env ty f ->
+            let prev = infer_ctx.fn_returns in
+            infer_ctx.fn_returns <- Some ty ;
+            let result = f env in
+            infer_ctx.fn_returns <- prev ;
+            result
+
+        method private check_type ~expected actual =
+          match expected with
+          | Value (Type HoleType) ->
+              Ok actual
+          | _ when equal_expr expected actual ->
+              Ok actual
+          | _ ->
+              Error ()
       end
   end

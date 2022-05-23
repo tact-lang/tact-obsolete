@@ -44,7 +44,7 @@ class constructor =
       | ResolvedReference s ->
           self#cg_ResolvedReference s
       | Reference (name, ty) ->
-          F.Reference (name, self#lang_type_to_type ty)
+          F.Reference (name, self#lang_expr_to_type ty)
       | Primitive p ->
           self#cg_Primitive p
       | Value (Function f) ->
@@ -121,9 +121,9 @@ class constructor =
         F.FunctionCall (name, [struct_ty], field_ty)
       in
       match T.type_of from_expr with
-      | StructType {struct_fields = [_]; _} ->
+      | Value (Type (StructType {struct_fields = [_]; _})) ->
           self#cg_expr from_expr
-      | StructType s ->
+      | Value (Type (StructType s)) ->
           let field_id, (_, field) =
             Option.value_exn
               (List.findi s.struct_fields ~f:(fun _ (name, _) ->
