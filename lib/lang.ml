@@ -121,7 +121,23 @@ functor
               errors#report `Error (`UnallowedStmt (Return return)) () ;
               Return return
 
-        method build_Break _env stmt = Break stmt
+        method build_Break _env stmt =
+          match stmt with
+          | Expr ex -> (
+            match infer_ctx.fn_returns with
+            | Some fn_returns -> (
+              match s#check_type (type_of ex) ~expected:fn_returns with
+              | Ok ty ->
+                  infer_ctx.fn_returns <- Some ty ;
+                  Break stmt
+              | Error _ ->
+                  errors#report `Error (`TypeError (fn_returns, type_of ex)) () ;
+                  Break stmt )
+            | None ->
+                errors#report `Error (`UnallowedStmt (Break stmt)) () ;
+                Break stmt )
+          | stmt ->
+              Break stmt
 
         method build_Struct _env s = Value (Type (StructType s))
 
