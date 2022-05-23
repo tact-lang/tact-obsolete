@@ -57,6 +57,8 @@ rule token = parse
      string lexbuf ;
      STRING (get_str_buffer ())
    }
+ | "true" { BOOL true }
+ | "false" { BOOL false }
  | "let" { LET }
  | "struct" { STRUCT }
  | "enum" { ENUM }

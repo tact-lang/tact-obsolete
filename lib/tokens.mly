@@ -9,5 +9,6 @@
 %token COLON RARROW SEMICOLON
 %token TILDE DOT
 %token <Z.t> INT
+%token <bool> BOOL
 
 %%

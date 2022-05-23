@@ -41,7 +41,21 @@ functor
         (* Program handle we pass to builtin functions *)
         val program = {bindings; stmts = []; methods}
 
-        method build_CodeBlock _env _code_block = Invalid
+        method build_CodeBlock _env code_block =
+          Block (s#of_located_list code_block)
+
+        method! visit_CodeBlock env block =
+          (* new binding scope *)
+          let current_bindings' = current_bindings
+          and runtime_bindings' = runtime_bindings in
+          current_bindings <- [] :: current_bindings ;
+          runtime_bindings <- [] :: runtime_bindings ;
+          (* process the body *)
+          let result = super#visit_CodeBlock env block in
+          (* drop binding scope *)
+          current_bindings <- current_bindings' ;
+          runtime_bindings <- runtime_bindings' ;
+          result
 
         method build_Enum _env _enum = InvalidExpr
 
@@ -62,9 +76,11 @@ functor
 
         method build_Ident _env string_ = string_
 
-        method build_If _env _if = Invalid
+        method build_If _env if_ = If if_
 
         method build_Int _env i = Value (Integer i)
+
+        method build_Bool _env b = Value (Bool b)
 
         method build_String _env s = Value (String s)
 
@@ -268,21 +284,13 @@ functor
           let functions' = functions in
           (* increment function counter *)
           functions <- functions + 1 ;
-          (* new binding scope *)
-          let current_bindings' = current_bindings
-          and runtime_bindings' = runtime_bindings in
-          current_bindings <- [] :: current_bindings ;
-          runtime_bindings <- [] :: runtime_bindings ;
           (* process the body *)
           let result = super#visit_function_body env body in
-          (* drop binding scope *)
-          current_bindings <- current_bindings' ;
-          runtime_bindings <- runtime_bindings' ;
           (* restore function enclosure count *)
           functions <- functions' ;
           result
 
-        method build_function_body _env stmts = s#of_located_list stmts
+        method build_function_body _env stmt = stmt
 
         method build_function_definition _env _name params _ body =
           let function_params =
@@ -295,7 +303,10 @@ functor
           { function_signature = {function_params; function_returns};
             function_impl = Fn function_impl }
 
-        method build_if_ _env _condition _then _else = ()
+        method build_if_ _env if_condition if_then if_else =
+          { if_condition = Syntax.value if_condition;
+            if_then = Syntax.value if_then;
+            if_else = Option.map if_else ~f:Syntax.value }
 
         method build_interface_definition _env _members = ()
 

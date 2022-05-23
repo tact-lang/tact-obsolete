@@ -6,7 +6,7 @@ let builder = Value (Type (BuiltinType "Builder"))
 let builder_methods =
   let new_ =
     { function_signature = {function_params = []; function_returns = builder};
-      function_impl = Fn (Some [Return (Primitive EmptyBuilder)]) }
+      function_impl = Fn (Some (Return (Primitive EmptyBuilder))) }
   in
   [("new", new_)]
 
@@ -73,16 +73,16 @@ let int_type =
       function_impl =
         Fn
           (Some
-             [ Return
-                 (Primitive
-                    (StoreInt
-                       { builder = Reference ("builder", builder);
-                         length = Value (Integer (Z.of_int bits));
-                         integer =
-                           StructField
-                             ( Reference ("self", Value (Type (StructType s))),
-                               "integer" );
-                         signed = true } ) ) ] ) }
+             (Return
+                (Primitive
+                   (StoreInt
+                      { builder = Reference ("builder", builder);
+                        length = Value (Integer (Z.of_int bits));
+                        integer =
+                          StructField
+                            ( Reference ("self", Value (Type (StructType s))),
+                              "integer" );
+                        signed = true } ) ) ) ) }
   and function_impl p = function
     | [Integer bits] ->
         Type (StructType (int_type_s p @@ Z.to_int bits))
@@ -126,7 +126,7 @@ let serializer =
         | _ ->
             None )
     in
-    let body = calls @ [Return (Reference ("builder", builder))] in
+    let body = Block (calls @ [Return (Reference ("builder", builder))]) in
     Function
       { function_signature =
           { function_params =
@@ -149,7 +149,7 @@ let default_bindings =
   [ ("Builder", builder);
     ("Integer", Value (Type IntegerType));
     ("Int", int_type);
-    ("Bool", Value (Builtin "Bool"));
+    ("Bool", Value (Type BoolType));
     ("Type", Value (Type TypeType));
     ("Void", Value Void);
     (* TODO: re-design the serialization API surface; this is more for demonstration

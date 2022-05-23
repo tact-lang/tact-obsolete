@@ -148,3 +148,49 @@ let%expect_test "demo struct serializer" =
       builder b = function_2();
       T_serializer([0, 1], b);
     } |}]
+
+let%expect_test "true and false" =
+  let source =
+    {|
+    fn test(flag: Bool) {
+      if (flag) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+      int test(int flag) {
+        if (flag) {
+        return 0;
+      } else
+      {
+        return -1;
+      }} |}]
+
+let%expect_test "if/then/else" =
+  let source =
+    {|
+    fn test(flag: Bool) {
+      if (flag) {
+        return 1;
+      } else {
+        return 2;
+      }
+    }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+      int test(int flag) {
+        if (flag) {
+        return 1;
+      } else
+      {
+        return 2;
+      }} |}]

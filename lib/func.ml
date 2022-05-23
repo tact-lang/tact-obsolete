@@ -14,7 +14,12 @@ and function_body =
   | AsmFn of Asm.instr list [@sexp.list]
   | Fn of stmt list [@sexp.list]
 
-and stmt = Vars of (type_ * ident * expr) list | Return of expr | Expr of expr
+and stmt =
+  | Vars of (type_ * ident * expr) list
+  | Return of expr
+  | Expr of expr
+  | Block of stmt list
+  | If of (expr * stmt * stmt option)
 
 and expr =
   | Integer of Zint.t
@@ -126,6 +131,35 @@ and pp_stmt f = function
       pp_print_newline f ()
   | Expr expr ->
       pp_expr f expr ; pp_print_string f ";" ; pp_print_newline f ()
+  | Block [stmt] ->
+      pp_print_string f "{" ;
+      pp_print_newline f () ;
+      pp_print_string f indentation ;
+      pp_open_hovbox f 2 ;
+      pp_stmt f stmt ;
+      pp_close_box f () ;
+      pp_print_string f "}"
+  | Block stmts ->
+      pp_print_string f "{" ;
+      pp_print_newline f () ;
+      pp_print_string f indentation ;
+      pp_open_hovbox f 2 ;
+      List.iter stmts ~f:(pp_stmt f) ;
+      pp_close_box f () ;
+      pp_print_string f "}"
+  | If (condition, then_, else_) ->
+      pp_print_string f "if" ;
+      pp_print_space f () ;
+      pp_print_string f "(" ;
+      pp_expr f condition ;
+      pp_print_string f ")" ;
+      pp_print_space f () ;
+      pp_stmt f then_ ;
+      Option.iter else_ ~f:(fun e ->
+          pp_print_space f () ;
+          pp_print_string f "else" ;
+          pp_print_space f () ;
+          pp_stmt f e )
 
 and pp_expr f = function
   | Integer i ->
