@@ -25,6 +25,9 @@ and get_str_buffer () =
 let store_str_char c =
   Buffer.add_char !str_buffer c
 
+let comment_ctr = ref 0
+let single_line_comment_flag = ref false
+
 }
 
 (* Define helper regexes *)
@@ -72,6 +75,8 @@ rule token = parse
  | "case" { CASE }
  | '-'? integer_with_underscores as i { INT (Z.of_string i) }
  | ident { IDENT (Lexing.lexeme lexbuf) }
+ | "/*" { comment_ctr := !comment_ctr + 1 ; comment lexbuf }
+ | "//" { single_line_comment_flag := true ; single_line_comment lexbuf }
  | eof { EOF }
  | _
     { raise (Error (Printf.sprintf "At offset %d: unexpected character.\n" (Lexing.lexeme_start lexbuf))) }
@@ -83,3 +88,19 @@ and string = parse
  | eof { raise (Error "Unterminated string literal") }
  | _ { store_str_char @@ Lexing.lexeme_char lexbuf 0 ;
        string lexbuf }
+
+and comment = parse
+ | "/*" { comment_ctr := !comment_ctr + 1 ; comment lexbuf }
+ | "*/" { 
+     comment_ctr := !comment_ctr - 1 ;
+     if !comment_ctr == 0 then
+      if !single_line_comment_flag then single_line_comment lexbuf
+      else token lexbuf
+     else
+       comment lexbuf
+   }
+ | _ { comment lexbuf }
+
+and single_line_comment = parse
+ | newline { single_line_comment_flag := false; token lexbuf }
+ | _ { single_line_comment lexbuf }

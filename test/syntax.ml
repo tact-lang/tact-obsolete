@@ -730,3 +730,57 @@ let%expect_test "parameterized union definition using let binding" =
                 (Union
                  ((union_members
                    ((Reference (Ident T)) (Reference (Ident Null)))))))))))))))))) |}]
+
+let%expect_test "single-line comments" =
+  let source = {|
+    let a = 1; // Useful binding
+  |} in
+  pp source ;
+  [%expect
+    {| ((stmts ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))))) |}]
+
+let%expect_test "multi-line comment started in a single-line comment is ignored"
+    =
+  let source =
+    {|
+    let a = 1; // Useful binding /* this shouldn't get recognized as a comment
+    let b = 2;
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+       (Let ((binding_name (Ident b)) (binding_expr (Int 2))))))) |}]
+
+let%expect_test "multi-line comment" =
+  let source =
+    {|
+    let a = 1; /* multi-line comment started here
+    and ended here */
+    let b = 2;
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+       (Let ((binding_name (Ident b)) (binding_expr (Int 2))))))) |}]
+
+let%expect_test "nested multi-line comment" =
+  let source =
+    {|
+    let a = 1; /* multi-line comment started here
+      /* I hope you like comments */
+    and ended here */
+    let b = 2;
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+       (Let ((binding_name (Ident b)) (binding_expr (Int 2))))))) |}]
