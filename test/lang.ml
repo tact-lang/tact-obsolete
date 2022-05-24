@@ -373,7 +373,7 @@ let%expect_test "Tact function evaluation" =
     fn test(i: Int(257)) -> Int(257) {
       i
     }
-    let a = test(test(1));
+    let a = test(test(Int(257).new(1)));
   |}
   in
   pp source ;
@@ -381,7 +381,13 @@ let%expect_test "Tact function evaluation" =
     {|
     (Ok
      ((bindings
-       ((a (Value (Integer 1)))
+       ((a
+         (Value
+          (StructInstance
+           (((struct_fields
+              ((integer ((field_type (Value (Type IntegerType)))))))
+             (struct_id <opaque>))
+            ((integer (Value (Integer 1))))))))
         (test
          (Value
           (Function
@@ -856,7 +862,7 @@ let%expect_test "scoping that `let` introduces in code" =
       let a = i;
       a
     }
-    let b = f(1);
+    let b = f(Int(257).new(1));
     |}
   in
   pp source ;
@@ -864,7 +870,13 @@ let%expect_test "scoping that `let` introduces in code" =
     {|
     (Ok
      ((bindings
-       ((b (Value (Integer 1)))
+       ((b
+         (Value
+          (StructInstance
+           (((struct_fields
+              ((integer ((field_type (Value (Type IntegerType)))))))
+             (struct_id <opaque>))
+            ((integer (Value (Integer 1))))))))
         (f
          (Value
           (Function
@@ -1152,7 +1164,7 @@ let%expect_test "method access" =
   let source =
     {|
       struct Foo {
-        fn bar(self: Type, i: Integer) {
+        fn bar(self: Self, i: Integer) {
            i
         }
       }
@@ -1175,7 +1187,10 @@ let%expect_test "method access" =
          ((bar
            ((function_signature
              ((function_params
-               ((self (Value (Type TypeType))) (i (Value (Type IntegerType)))))
+               ((self
+                 (Value
+                  (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))
+                (i (Value (Type IntegerType)))))
               (function_returns (Value (Type IntegerType)))))
             (function_impl
              (Fn
