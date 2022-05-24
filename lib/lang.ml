@@ -15,6 +15,7 @@ functor
       | `MethodNotFound of expr * string
       | `UnexpectedType of expr
       | `TypeError of expr * expr
+      | `ExpectedFunction of expr
       | `UnallowedStmt of stmt ]
     [@@deriving equal, sexp_of]
 
@@ -64,13 +65,33 @@ functor
         method build_Function _env fn = Value (Function fn)
 
         method build_FunctionCall _env (f, args) =
-          let fc = (f, args) in
-          if is_immediate_expr (FunctionCall (f, args)) then
-            let inter =
-              new interpreter (program, current_bindings, errors, functions)
-            in
-            Value (inter#interpret_fc fc)
-          else FunctionCall fc
+          match type_of f with
+          | Value (Type (FunctionType sign)) -> (
+              let types_satisfying =
+                List.for_all2 sign.function_params args
+                  ~f:(fun (_, expected) expr ->
+                    if equal_expr expected (type_of expr) then true
+                    else (
+                      errors#report `Error
+                        (`TypeError (expected, type_of expr))
+                        () ;
+                      false ) )
+              in
+              match types_satisfying with
+              | Ok true ->
+                  let fc = (f, args) in
+                  if is_immediate_expr (FunctionCall (f, args)) then
+                    let inter =
+                      new interpreter
+                        (program, current_bindings, errors, functions)
+                    in
+                    Value (inter#interpret_fc fc)
+                  else FunctionCall fc
+              | _ ->
+                  Value Void )
+          | ty ->
+              errors#report `Error (`ExpectedFunction ty) () ;
+              Value Void
 
         method build_MethodCall env mc = s#build_FunctionCall env mc
 
