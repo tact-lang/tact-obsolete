@@ -72,8 +72,6 @@ functor
                   ~f:(fun (_, expected) expr ->
                     if equal_expr expected (type_of expr) then true
                     else (
-                      Sexplib.Sexp.pp_hum Caml.Format.std_formatter
-                        (sexp_of_expr expr) ;
                       errors#report `Error
                         (`TypeError (expected, type_of expr))
                         () ;

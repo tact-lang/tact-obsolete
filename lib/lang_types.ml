@@ -138,8 +138,6 @@ let rec type_of = function
       Value (Type (StructType struct_))
   | Value (Function {function_signature; _}) ->
       Value (Type (FunctionType function_signature))
-  | Value (Builtin "Bool") ->
-      Value (Type TypeType)
   | Value (Builtin builtin) ->
       Value (Type (BuiltinType builtin))
   | Value (Integer _) ->
