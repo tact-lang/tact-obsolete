@@ -1574,7 +1574,9 @@ let%expect_test "type check error" =
       }
     |}
   in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Error
      (((TypeError
         ((Value
