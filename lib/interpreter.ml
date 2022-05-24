@@ -53,6 +53,19 @@ class interpreter
           let expr' = self#interpret_expr expr in
           return <- expr' ;
           self#interpret_stmt_list rest
+      | Block stmts ->
+          self#interpret_stmt_list stmts
+      | If {if_condition; if_then; if_else} -> (
+          let result = self#interpret_expr if_condition in
+          match result with
+          | Bool true ->
+              self#interpret_stmt if_then []
+          | Bool false ->
+              Option.map if_else ~f:(fun stmt -> self#interpret_stmt stmt [])
+              |> Option.value ~default:Void
+          | value ->
+              errors#report `Error (`UnexpectedType (Value value)) () ;
+              Void )
       | Invalid ->
           Void
 
@@ -128,7 +141,7 @@ class interpreter
                 | Some body ->
                     let prev_scope = vars_scope in
                     vars_scope <- args_scope :: vars_scope ;
-                    let output = self#interpret_stmt_list body in
+                    let output = self#interpret_stmt body [] in
                     vars_scope <- prev_scope ;
                     output
                 | None ->

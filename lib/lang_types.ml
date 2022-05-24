@@ -46,21 +46,26 @@ and expr =
   | Primitive of primitive
   | InvalidExpr
 
+and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
+
 and value =
   | Void
   (* Instance of a Struct *)
   | StructInstance of (struct_ * (string * expr) list)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
+  | Bool of bool
   | String of string
   | Builtin of builtin
   | Type of type_
 
 and stmt =
+  | If of if_
   | Let of (string * expr) list
   | Return of expr
   | Break of stmt
   | Expr of expr
+  | Block of stmt list
   | Invalid
 
 and builtin = string
@@ -68,6 +73,7 @@ and builtin = string
 and type_ =
   | TypeType
   | IntegerType
+  | BoolType
   | StringType
   | VoidType
   | BuiltinType of builtin
@@ -81,7 +87,7 @@ and struct_ =
 
 and struct_field = {field_type : expr}
 
-and function_body = (stmt list option[@sexp.option])
+and function_body = (stmt option[@sexp.option])
 
 and native_function =
   (program -> value list -> value[@visitors.opaque] [@equal.ignore])
@@ -136,6 +142,8 @@ let rec type_of = function
       Value (Type (BuiltinType builtin))
   | Value (Integer _) ->
       Value (Type IntegerType)
+  | Value (Bool _) ->
+      Value (Type BoolType)
   | Value Void ->
       Value (Type VoidType)
   | Value (Type _) ->

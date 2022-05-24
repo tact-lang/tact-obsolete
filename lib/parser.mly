@@ -10,7 +10,7 @@
   let expand_fn_sugar params loc typ expr =
     Function (make_function_definition ~params: params
                                            ~returns: (make_located ~loc ~value: typ ())
-                                           ~function_body:(make_function_body ~function_stmts: [make_located ~loc ~value: (Expr (value expr)) ()] ())
+                                           ~function_body:(make_function_body ~function_stmt:(Expr (value expr))  ())
                                            ())
 
   let remove_trailing_break stmts = 
@@ -126,7 +126,7 @@ let function_definition(name, funbody) :=
   returns = option(preceded(RARROW, located(fexpr)));
   body = funbody;
   { (n, Function (make_function_definition ~params:params ?returns:returns 
-                    ?function_body:(Option.map (fun x -> make_function_body ~function_stmts: x ()) body)
+                    ?function_body:(Option.map (fun x -> make_function_body ~function_stmt: x ()) body)
                     ())) } 
 
 let function_signature_binding ==
@@ -156,7 +156,7 @@ let function_call :=
 
 let else_ :=
   | ELSE; ~= if_; <>
-  | ELSE; ~= code_block; <CodeBlock>
+  | ELSE; c = code_block; { c }
 
 let if_ :=
   IF;
@@ -166,9 +166,8 @@ let if_ :=
   { If (make_if_ ~condition ~body ?else_ ()) }
 
 let code_block :=
-  | code_block = delimited(LBRACE, block_stmt, RBRACE);
-    { code_block }
-  | LBRACE; RBRACE; { [] }
+  | c = delimited(LBRACE, block_stmt, RBRACE); { CodeBlock c }
+  | LBRACE; RBRACE; { CodeBlock [] }
 
 let block_stmt :=
   | left = located(non_semicolon_stmt); right = block_stmt;
@@ -193,7 +192,7 @@ let semicolon_stmt :=
 let non_semicolon_stmt :=
   | ~= shorthand_binding(some(code_block)); <Let>
   | if_
-  | ~= code_block; <CodeBlock>
+  | code_block
 
 (* Type expression
   
@@ -262,6 +261,8 @@ let fexpr :=
  | function_call
  (* can be an integer *)
  | ~= INT; <Int>
+ (* can be a boolean *)
+ | ~= BOOL; <Bool>
  (* can be a string *)
  | ~= STRING; <String>
  (* can be mutation ref *)

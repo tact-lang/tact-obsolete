@@ -38,6 +38,7 @@ module type T = sig
     | MethodCall of method_call
     | Function of function_definition
     | Int of Zint.t
+    | Bool of bool
     | String of string
     | MutRef of ident located
 
@@ -63,13 +64,13 @@ module type T = sig
       returns : expr located option;
       function_body : function_body option }
 
-  and function_body = {function_stmts : stmt located list}
+  and function_body = {function_stmt : stmt}
 
   and binding = {binding_name : ident located; binding_expr : expr located}
 
   and if_ =
     { condition : expr located;
-      body : stmt located list located;
+      body : stmt located;
       else_ : stmt located option [@sexp.option] }
 
   and field_access = {from_expr : expr located; to_field : ident located}
@@ -105,7 +106,7 @@ module type T = sig
                'd -> 'u located list -> 'p located list -> 'h
            ; build_enum_member : 'd -> 'm located -> 'i located option -> 'u
            ; build_field_access : 'd -> 'i located -> 'm located -> 'j
-           ; build_function_body : 'd -> 'g located list -> 'v
+           ; build_function_body : 'd -> 'g -> 'v
            ; build_function_call : 'd -> 'i located -> 'i located list -> 'l
            ; build_function_definition :
                'd ->
@@ -115,11 +116,7 @@ module type T = sig
                'v option ->
                'k
            ; build_if_ :
-               'd ->
-               'i located ->
-               'g located list located ->
-               'g located option ->
-               'n
+               'd -> 'i located -> 'g located -> 'g located option -> 'n
            ; build_interface_definition : 'd -> 'p located list -> 'o
            ; build_method_call :
                'd -> 'i located -> 'm located -> 'i located list -> 'q
@@ -141,6 +138,7 @@ module type T = sig
            ; visit_Ident : 'd -> string -> 'm
            ; visit_If : 'd -> if_ -> 'g
            ; visit_Int : 'd -> Zint.t -> 'i
+           ; visit_Bool : 'd -> bool -> 'i
            ; visit_Interface : 'd -> interface_definition -> 'i
            ; visit_Let : 'd -> binding located -> 'g
            ; visit_MethodCall : 'd -> method_call -> 'i
@@ -197,6 +195,8 @@ module type T = sig
 
       method virtual build_Int : 'd -> Zint.t -> 'i
 
+      method virtual build_Bool : 'd -> bool -> 'i
+
       method virtual build_Interface : 'd -> 'o -> 'i
 
       method virtual build_Let : 'd -> 'p located -> 'g
@@ -227,7 +227,7 @@ module type T = sig
 
       method virtual build_field_access : 'd -> 'i located -> 'm located -> 'j
 
-      method virtual build_function_body : 'd -> 'g located list -> 'v
+      method virtual build_function_body : 'd -> 'g -> 'v
 
       method virtual build_function_call :
         'd -> 'i located -> 'i located list -> 'l
@@ -241,7 +241,7 @@ module type T = sig
         'k
 
       method virtual build_if_ :
-        'd -> 'i located -> 'g located list located -> 'g located option -> 'n
+        'd -> 'i located -> 'g located -> 'g located option -> 'n
 
       method virtual build_interface_definition : 'd -> 'p located list -> 'o
 
@@ -280,6 +280,8 @@ module type T = sig
       method visit_If : 'd -> if_ -> 'g
 
       method visit_Int : 'd -> Zint.t -> 'i
+
+      method visit_Bool : 'd -> bool -> 'i
 
       method visit_Interface : 'd -> interface_definition -> 'i
 
@@ -452,6 +454,7 @@ functor
       | MethodCall of method_call
       | Function of function_definition
       | Int of (Zint.t[@visitors.name "z"])
+      | Bool of bool
       | String of string
       | MutRef of ident located
 
@@ -478,13 +481,13 @@ functor
         returns : expr located option; [@sexp.option]
         function_body : function_body option [@sexp.option] }
 
-    and function_body = {function_stmts : stmt located list [@sexp.list]}
+    and function_body = {function_stmt : stmt}
 
     and binding = {binding_name : ident located; binding_expr : expr located}
 
     and if_ =
       { condition : expr located;
-        body : (stmt located list[@sexp.list]) located;
+        body : stmt located;
         else_ : stmt located option [@sexp.option] }
 
     and field_access = {from_expr : expr located; to_field : ident located}

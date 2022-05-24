@@ -37,6 +37,10 @@ class constructor =
       function
       | Value (Integer i) ->
           F.Integer i
+      | Value (Bool true) ->
+          F.Integer (Zint.of_int (-1))
+      | Value (Bool false) ->
+          F.Integer Zint.zero
       | StructField x ->
           self#cg_StructField x
       | Value (StructInstance inst) ->
@@ -68,6 +72,15 @@ class constructor =
           F.Return (self#cg_expr expr)
       | Expr e ->
           F.Expr (self#cg_expr e)
+      | Block stmts ->
+          F.Block (List.map stmts ~f:self#cg_stmt)
+      | If {if_condition; if_then; if_else} ->
+          F.If
+            ( self#cg_expr if_condition,
+              self#cg_stmt if_then,
+              Option.map if_else ~f:self#cg_stmt )
+      | Break stmt ->
+          self#cg_stmt stmt (* FIXME: this is unlikely to be correct *)
       | _ ->
           raise Unsupported
 
@@ -75,8 +88,10 @@ class constructor =
       fun name fn ->
         let body =
           match fn.function_impl with
-          | Fn body ->
-              Option.value_exn body
+          | Fn (Some (Block stmts)) ->
+              stmts
+          | Fn (Some stmt) ->
+              [stmt]
           | _ ->
               []
         in
@@ -169,6 +184,8 @@ class constructor =
     method private lang_type_to_type : T.type_ -> F.type_ =
       function
       | IntegerType ->
+          F.IntType
+      | BoolType ->
           F.IntType
       | StructType s ->
           self#struct_to_ty s
