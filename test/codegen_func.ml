@@ -104,12 +104,12 @@ let%expect_test "Int(bits) serializer codegen" =
   pp source ;
   [%expect
     {|
-    builder function_0(int self, builder b) {
+    builder f0(int self, builder b) {
       return store_int(b, self, 32);
     }
     _ test(builder b) {
       int i = 100;
-      function_0(100, b);
+      f0(100, b);
     } |}]
 
 let%expect_test "demo struct serializer" =
@@ -130,22 +130,22 @@ let%expect_test "demo struct serializer" =
   pp source ;
   [%expect
     {|
-    builder function_0(int self, builder b) {
+    builder f0(int self, builder b) {
       return store_int(b, self, 32);
     }
-    builder function_1(int self, builder b) {
+    builder f1(int self, builder b) {
       return store_int(b, self, 16);
     }
     builder T_serializer([int, int] self, builder b) {
-      builder b = function_0(first(self), b);
-      builder b = function_1(second(self), b);
+      builder b = f0(first(self), b);
+      builder b = f1(second(self), b);
       return b;
     }
-    builder function_2() {
+    builder f2() {
       return new_builder();
     }
     _ test() {
-      builder b = function_2();
+      builder b = f2();
       T_serializer([0, 1], b);
     } |}]
 
@@ -167,22 +167,22 @@ let%expect_test "demo struct serializer 2" =
   pp source ;
   [%expect
     {|
-    builder function_0(int self, builder b) {
+    builder f0(int self, builder b) {
       return store_int(b, self, 32);
     }
-    builder function_1(int self, builder b) {
+    builder f1(int self, builder b) {
       return store_int(b, self, 16);
     }
     builder serialize_foo([int, int] self, builder b) {
-      builder b = function_0(first(self), b);
-      builder b = function_1(second(self), b);
+      builder b = f0(first(self), b);
+      builder b = f1(second(self), b);
       return b;
     }
-    builder function_2() {
+    builder f2() {
       return new_builder();
     }
     builder test() {
-      builder b = function_2();
+      builder b = f2();
       return serialize_foo([0, 1], b);
     } |}]
 

@@ -240,7 +240,7 @@ class constructor =
     method private generate_func_name =
       let num = fn_name_counter in
       fn_name_counter <- fn_name_counter + 1 ;
-      "function_" ^ Printf.sprintf "%d" num
+      "f" ^ Printf.sprintf "%d" num
   end
 
 let codegen program =
