@@ -1921,7 +1921,9 @@ let%expect_test "implement interface op" =
       let empty = Empty.new();
     |}
   in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Ok
      ((bindings
        ((empty

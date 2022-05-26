@@ -818,7 +818,9 @@ let%expect_test "interface impls inside structs" =
         fn method()
       }
     |} in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     ((stmts
       ((Let
         ((binding_name (Ident Foo))
