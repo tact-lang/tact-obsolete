@@ -1925,8 +1925,7 @@ let%expect_test "implement interface op" =
     {|
     (Ok
      ((bindings
-       ((empty
-         (Value (StructInstance (((struct_fields ()) (struct_id <opaque>)) ()))))
+       ((empty (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
         (Empty
          (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
       (methods
@@ -1943,8 +1942,7 @@ let%expect_test "implement interface op" =
                 ((Break
                   (Expr
                    (Value
-                    (StructInstance
-                     (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))
+                    (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))
       (impls
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
          (((impl_interface (Reference (Make (Value (Type InvalidType)))))
@@ -1964,5 +1962,4 @@ let%expect_test "implement interface op" =
                      ((Break
                        (Expr
                         (Value
-                         (StructInstance
-                          (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))))))))) |}]
+                         (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))))))))) |}]
