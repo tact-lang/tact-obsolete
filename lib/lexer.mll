@@ -73,6 +73,7 @@ rule token = parse
  | "return" { RETURN }
  | "val" { VAL }
  | "case" { CASE }
+ | "impl" { IMPL }
  | '-'? integer_with_underscores as i { INT (Z.of_string i) }
  | ident { IDENT (Lexing.lexeme lexbuf) }
  | "/*" { comment_ctr := !comment_ctr + 1 ; comment lexbuf }

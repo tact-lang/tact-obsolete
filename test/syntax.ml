@@ -784,7 +784,7 @@ let%expect_test "nested multi-line comment" =
     ((stmts
       ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
        (Let ((binding_name (Ident b)) (binding_expr (Int 2))))))) |}]
-(*
+
 let%expect_test "interface impls inside structs" =
   let source =
     {|
@@ -795,5 +795,34 @@ let%expect_test "interface impls inside structs" =
       }
     |}
   in
-  pp source ; [%expect {||}]
-*)
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let
+        ((binding_name (Ident Something))
+         (binding_expr
+          (Struct
+           ((impls
+             (((interface (Reference (Ident Interface)))
+               (methods
+                (((binding_name (Ident new))
+                  (binding_expr
+                   (Function
+                    ((returns (Reference (Ident Self)))
+                     (function_body ((function_stmt (CodeBlock ()))))))))))))))))))))) |}]
+
+let%expect_test "interface impls inside structs" =
+  let source = {|
+      interface Foo {
+        fn method()
+      }
+    |} in
+  pp source ; [%expect {|
+    ((stmts
+      ((Let
+        ((binding_name (Ident Foo))
+         (binding_expr
+          (Interface
+           ((interface_members
+             (((binding_name (Ident method)) (binding_expr (Function ()))))))))))))) |}]

@@ -588,4 +588,26 @@ let%expect_test "demo struct serializer" =
                             ((integer ((field_type (Value (Type IntegerType)))))))
                            (struct_id <opaque>)))))))
                      integer)))
-                  (signed true))))))))))))))) |}]
+                  (signed true)))))))))))))
+      (impls
+       (((Type
+          (StructType
+           ((struct_fields
+             ((a
+               ((field_type
+                 (Value
+                  (Type
+                   (StructType
+                    ((struct_fields
+                      ((integer ((field_type (Value (Type IntegerType)))))))
+                     (struct_id <opaque>))))))))
+              (b
+               ((field_type
+                 (Value
+                  (Type
+                   (StructType
+                    ((struct_fields
+                      ((integer ((field_type (Value (Type IntegerType)))))))
+                     (struct_id <opaque>))))))))))
+            (struct_id <opaque>))))
+         ()))))) |}]

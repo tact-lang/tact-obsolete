@@ -190,7 +190,16 @@ let%expect_test "failed scope resolution" =
                       ((t (Value (Type HoleType)))
                        (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (BinOp
+           (Value
+            (Interface
+             ((interface_methods
+               ((op
+                 ((function_params
+                   ((left (Value (Type IntegerType)))
+                    (right (Value (Type IntegerType)))))
+                  (function_returns (Value (Type IntegerType)))))))))))))
         (methods
          (((Type (BuiltinType Builder))
            ((new
@@ -353,7 +362,21 @@ let%expect_test "basic struct definition" =
                             ((integer ((field_type (Value (Type IntegerType)))))))
                            (struct_id <opaque>)))))))
                      integer)))
-                  (signed true))))))))))))))) |}]
+                  (signed true)))))))))))))
+      (impls
+       (((Type
+          (StructType
+           ((struct_fields
+             ((t
+               ((field_type
+                 (Value
+                  (Type
+                   (StructType
+                    ((struct_fields
+                      ((integer ((field_type (Value (Type IntegerType)))))))
+                     (struct_id <opaque>))))))))))
+            (struct_id <opaque>))))
+         ()))))) |}]
 
 let%expect_test "native function evaluation" =
   let source = {|
@@ -578,7 +601,22 @@ let%expect_test "struct definition" =
                               ((integer ((field_type (Value (Type IntegerType)))))))
                              (struct_id <opaque>)))))))
                        integer)))
-                    (signed true))))))))))))))) |}]
+                    (signed true)))))))))))))
+        (impls
+         (((Type
+            (StructType
+             ((struct_fields
+               ((a
+                 ((field_type
+                   (Value
+                    (Type
+                     (StructType
+                      ((struct_fields
+                        ((integer ((field_type (Value (Type IntegerType)))))))
+                       (struct_id <opaque>))))))))
+                (b ((field_type (Value (Type BoolType)))))))
+              (struct_id <opaque>))))
+           ()))))) |}]
 
 let%expect_test "duplicate type field" =
   let source =
@@ -663,7 +701,16 @@ let%expect_test "duplicate type field" =
                       ((t (Value (Type HoleType)))
                        (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (BinOp
+           (Value
+            (Interface
+             ((interface_methods
+               ((op
+                 ((function_params
+                   ((left (Value (Type IntegerType)))
+                    (right (Value (Type IntegerType)))))
+                  (function_returns (Value (Type IntegerType)))))))))))))
         (methods
          (((Type
             (StructType
@@ -733,7 +780,22 @@ let%expect_test "duplicate type field" =
              ((function_signature
                ((function_params ())
                 (function_returns (Value (Type (BuiltinType Builder))))))
-              (function_impl (Fn ((Return (Primitive EmptyBuilder))))))))))))))) |}]
+              (function_impl (Fn ((Return (Primitive EmptyBuilder)))))))))))
+        (impls
+         (((Type
+            (StructType
+             ((struct_fields
+               ((a
+                 ((field_type
+                   (Value
+                    (Type
+                     (StructType
+                      ((struct_fields
+                        ((integer ((field_type (Value (Type IntegerType)))))))
+                       (struct_id <opaque>))))))))
+                (a ((field_type (Value (Type BoolType)))))))
+              (struct_id <opaque>))))
+           ()))))))) |}]
 
 let%expect_test "parametric struct instantiation" =
   let source =
@@ -824,6 +886,13 @@ let%expect_test "parametric struct instantiation" =
                      integer)))
                   (signed true)))))))))))
         ((Type
+          (StructType
+           ((struct_fields
+             ((a ((field_type (Reference (A (Value (Type TypeType)))))))))
+            (struct_id <opaque>))))
+         ())))
+      (impls
+       (((Type
           (StructType
            ((struct_fields
              ((a ((field_type (Reference (A (Value (Type TypeType)))))))))
@@ -1186,7 +1255,9 @@ let%expect_test "method access" =
             (function_impl
              (Fn
               ((Block
-                ((Break (Expr (Reference (i (Value (Type IntegerType))))))))))))))))))) |}]
+                ((Break (Expr (Reference (i (Value (Type IntegerType)))))))))))))))))
+      (impls
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>)))) ()))))) |}]
 
 let%expect_test "Self type resolution in methods" =
   let source =
@@ -1225,7 +1296,9 @@ let%expect_test "Self type resolution in methods" =
                     (self
                      (Value
                       (Type
-                       (StructType ((struct_fields ()) (struct_id <opaque>)))))))))))))))))))))) |}]
+                       (StructType ((struct_fields ()) (struct_id <opaque>))))))))))))))))))))
+      (impls
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>)))) ()))))) |}]
 
 let%expect_test "struct instantiation" =
   let source =
@@ -1260,6 +1333,14 @@ let%expect_test "struct instantiation" =
                (b ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>))))))))
       (methods
+       (((Type
+          (StructType
+           ((struct_fields
+             ((a ((field_type (Value (Type IntegerType)))))
+              (b ((field_type (Value (Type IntegerType)))))))
+            (struct_id <opaque>))))
+         ())))
+      (impls
        (((Type
           (StructType
            ((struct_fields
@@ -1378,7 +1459,16 @@ let%expect_test "type check error" =
                       ((t (Value (Type HoleType)))
                        (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (BinOp
+           (Value
+            (Interface
+             ((interface_methods
+               ((op
+                 ((function_params
+                   ((left (Value (Type IntegerType)))
+                    (right (Value (Type IntegerType)))))
+                  (function_returns (Value (Type IntegerType)))))))))))))
         (methods
          (((Type
             (StructType
@@ -1643,7 +1733,16 @@ let%expect_test "type check error" =
                       ((t (Value (Type HoleType)))
                        (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (BinOp
+           (Value
+            (Interface
+             ((interface_methods
+               ((op
+                 ((function_params
+                   ((left (Value (Type IntegerType)))
+                    (right (Value (Type IntegerType)))))
+                  (function_returns (Value (Type IntegerType)))))))))))))
         (methods
          (((Type
             (StructType
@@ -1749,3 +1848,60 @@ let%expect_test "type check error" =
                ((function_params ())
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl (Fn ((Return (Primitive EmptyBuilder))))))))))))))) |}]
+
+let%expect_test "implement interface op" =
+  let source =
+    {|
+      struct Left {
+        // built-in interface
+        impl BinOp {
+          fn op(left: Integer, right: Integer) -> Integer { left }
+        }
+      }
+      let one = Left.op(1, 2);
+    |}
+  in
+  pp source;
+  [%expect {|
+    (Ok
+     ((bindings
+       ((one (Value (Integer 1)))
+        (Left
+         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
+      (methods
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((op
+           ((function_signature
+             ((function_params
+               ((left (Value (Type IntegerType)))
+                (right (Value (Type IntegerType)))))
+              (function_returns (Value (Type IntegerType)))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break (Expr (Reference (left (Value (Type IntegerType)))))))))))))))))
+      (impls
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         (((impl_interface
+            (Value
+             (Interface
+              ((interface_methods
+                ((op
+                  ((function_params
+                    ((left (Value (Type IntegerType)))
+                     (right (Value (Type IntegerType)))))
+                   (function_returns (Value (Type IntegerType)))))))))))
+           (impl_methods
+            ((op
+              (Value
+               (Function
+                ((function_signature
+                  ((function_params
+                    ((left (Value (Type IntegerType)))
+                     (right (Value (Type IntegerType)))))
+                   (function_returns (Value (Type IntegerType)))))
+                 (function_impl
+                  (Fn
+                   ((Block
+                     ((Break
+                       (Expr (Reference (left (Value (Type IntegerType)))))))))))))))))))))))) |}]

@@ -16,7 +16,8 @@ functor
       | `UnexpectedType of expr
       | `TypeError of expr * expr
       | `ExpectedFunction of expr
-      | `UnallowedStmt of stmt ]
+      | `UnallowedStmt of stmt
+      | `OnlyFunctionIsAllowed ]
     [@@deriving equal, sexp_of]
 
     include Builtin
@@ -40,7 +41,7 @@ functor
         val mutable functions = 0
 
         (* Program handle we pass to builtin functions *)
-        val program = {bindings; stmts = []; methods}
+        val program = {bindings; stmts = []; methods; impls = []}
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
@@ -183,6 +184,10 @@ functor
         method build_Union _env _union = InvalidExpr
 
         method build_Expr _env expr = Expr expr
+
+        method build_impl _env intf bindings =
+          { impl_interface = Syntax.value intf;
+            impl_methods = s#of_located_list bindings }
 
         method! visit_expr env syntax_expr =
           let expr' = super#visit_expr env syntax_expr in
@@ -329,7 +334,17 @@ functor
             if_then = Syntax.value if_then;
             if_else = Option.map if_else ~f:Syntax.value }
 
-        method build_interface_definition _env _members = ()
+        method build_interface_definition _env members =
+          let signatures =
+            List.filter_map (s#of_located_list members) ~f:(fun (name, x) ->
+                match x with
+                | Value (Function f) ->
+                    Some (name, f.function_signature)
+                | _ ->
+                    errors#report `Error `OnlyFunctionIsAllowed () ;
+                    None )
+          in
+          {interface_methods = signatures}
 
         method build_program _env stmts =
           { program with
@@ -347,7 +362,7 @@ functor
               errors#report `Error (`UnexpectedType e) () ;
               ({struct_fields = []; struct_id = 0}, [])
 
-        method build_struct_definition _env struct_fields _bindings =
+        method build_struct_definition _env struct_fields _bindings _intfs =
           let struct_fields = s#of_located_list struct_fields in
           let s' = {struct_fields; struct_id = !struct_counter} in
           (* Check for duplicate fields *)
@@ -370,7 +385,8 @@ functor
               (s#visit_located s#visit_struct_field)
               env _visitors_this.fields
           in
-          let struct_ = s#build_struct_definition env _visitors_r0 []
+          let impls = s#visit_list s#visit_impl env _visitors_this.impls in
+          let struct_ = s#build_struct_definition env _visitors_r0 [] []
           and current_bindings' = current_bindings in
           current_bindings <-
             [("Self", Value (Type (StructType struct_)))] :: current_bindings' ;
@@ -389,8 +405,20 @@ functor
                 | _ ->
                     None )
           in
+          let impl_methods =
+            List.concat
+              (List.map impls ~f:(fun impl ->
+                   List.filter_map impl.impl_methods ~f:(fun (name, ex) ->
+                       match ex with
+                       | Value (Function f) ->
+                           Some (name, f)
+                       | _ ->
+                           None ) ) )
+          in
           program.methods <-
-            (Type (StructType struct_), struct_methods) :: program.methods ;
+            (Type (StructType struct_), struct_methods @ impl_methods)
+            :: program.methods ;
+          program.impls <- (Type (StructType struct_), impls) :: program.impls ;
           struct_
 
         method build_struct_field _env field_name field_type =

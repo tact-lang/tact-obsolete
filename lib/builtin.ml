@@ -145,6 +145,17 @@ let serializer =
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
+(* Only for debug purposes *)
+let bin_op_intf =
+  Value
+    (Interface
+       { interface_methods =
+           [ ( "op",
+               { function_params =
+                   [ ("left", Value (Type IntegerType));
+                     ("right", Value (Type IntegerType)) ];
+                 function_returns = Value (Type IntegerType) } ) ] } )
+
 let default_bindings =
   [ ("Builder", builder);
     ("Integer", Value (Type IntegerType));
@@ -155,6 +166,7 @@ let default_bindings =
     (* TODO: re-design the serialization API surface; this is more for demonstration
      * purposes
      *)
-    ("serializer", serializer) ]
+    ("serializer", serializer);
+    ("BinOp", bin_op_intf) ]
 
 let default_methods = [(Type (BuiltinType "Builder"), builder_methods)]

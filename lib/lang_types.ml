@@ -32,7 +32,8 @@ and binding = string * expr
 and program =
   { stmts : stmt list; [@sexp.list]
     bindings : (string * expr) list;
-    mutable methods : (value * (string * function_) list) list [@sexp.list] }
+    mutable methods : (value * (string * function_) list) list; [@sexp.list]
+    mutable impls : (value * impl list) list [@sexp.list] }
 
 and expr =
   | FunctionCall of function_call
@@ -46,6 +47,8 @@ and expr =
   | Primitive of primitive
   | InvalidExpr
 
+and interface = {interface_methods : (string * function_signature) list}
+
 and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 
 and value =
@@ -57,6 +60,7 @@ and value =
   | Bool of bool
   | String of string
   | Builtin of builtin
+  | Interface of interface
   | Type of type_
 
 and stmt =
@@ -86,6 +90,8 @@ and struct_ =
   {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
 
 and struct_field = {field_type : expr}
+
+and impl = {impl_interface : expr; impl_methods : binding list}
 
 and function_body = (stmt option[@sexp.option])
 

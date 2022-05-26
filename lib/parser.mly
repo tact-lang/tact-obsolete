@@ -291,17 +291,17 @@ let struct_definition(name) ==
   LBRACE;
   fields = list(struct_field);
   bindings = list(sugared_function_definition(option(code_block)));
-  (*impls = list(impl);*)
+  impls = list(impl);
   RBRACE;
-  { (n, Struct (make_struct_definition ~fields: fields ~struct_bindings: bindings  ())) }
+  { (n, Struct (make_struct_definition ~fields ~struct_bindings: bindings ~impls  ())) }
 
-(*let impl == 
+let impl == 
   IMPL; 
   interface = located(fexpr); 
   LBRACE;
-  functions = list(sugared_function_definition(code_block));
+  methods = list(sugared_function_definition(option(code_block)));
   RBRACE;
-  { () }*)
+  { make_impl ~interface ~methods () }
 
 (* Struct field
 
