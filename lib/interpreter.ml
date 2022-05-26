@@ -85,7 +85,7 @@ class interpreter
               Void )
         | StructField (struct_, field) -> (
           match self#interpret_expr struct_ with
-          | StructInstance (struct_, struct') -> (
+          | Struct (struct_, struct') -> (
             match List.Assoc.find struct' ~equal:String.equal field with
             | Some field ->
                 self#interpret_expr field

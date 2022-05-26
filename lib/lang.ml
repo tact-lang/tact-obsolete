@@ -179,7 +179,7 @@ functor
 
         method build_Struct _env s = Value (Type (StructType s))
 
-        method build_StructConstructor _env sc = Value (StructInstance sc)
+        method build_StructConstructor _env sc = Value (Struct sc)
 
         method build_Union _env _union = InvalidExpr
 
@@ -243,8 +243,8 @@ functor
               | None ->
                   errors#report `Error (`MethodNotFound (receiver', fn)) () ;
                   dummy )
-          | ResolvedReference (_, Value (StructInstance (struct', _)))
-          | Value (StructInstance (struct', _)) -> (
+          | ResolvedReference (_, Value (Struct (struct', _)))
+          | Value (Struct (struct', _)) -> (
               let receiver' = Value (Type (StructType struct')) in
               let methods =
                 List.Assoc.find program.methods ~equal:equal_value

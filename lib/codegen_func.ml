@@ -26,7 +26,7 @@ class constructor =
                let expr = self#cg_expr expr in
                (F.type_of expr, name, expr) ) )
 
-    method cg_StructInstance : T.struct_ * (string * T.expr) list -> F.expr =
+    method cg_Struct : T.struct_ * (string * T.expr) list -> F.expr =
       function
       | _, [(_, expr)] ->
           self#cg_expr expr
@@ -43,8 +43,8 @@ class constructor =
           F.Integer Zint.zero
       | StructField x ->
           self#cg_StructField x
-      | Value (StructInstance inst) ->
-          self#cg_StructInstance inst
+      | Value (Struct inst) ->
+          self#cg_Struct inst
       | ResolvedReference s ->
           self#cg_ResolvedReference s
       | Reference (name, ty) ->

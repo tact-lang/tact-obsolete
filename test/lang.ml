@@ -402,7 +402,7 @@ let%expect_test "Tact function evaluation" =
      ((bindings
        ((a
          (Value
-          (StructInstance
+          (Struct
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>))
@@ -934,7 +934,7 @@ let%expect_test "scoping that `let` introduces in code" =
      ((bindings
        ((b
          (Value
-          (StructInstance
+          (Struct
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>))
@@ -1238,8 +1238,7 @@ let%expect_test "method access" =
     (Ok
      ((bindings
        ((res (Value (Integer 1)))
-        (foo
-         (Value (StructInstance (((struct_fields ()) (struct_id <opaque>)) ()))))
+        (foo (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
         (Foo
          (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
       (methods
@@ -1318,7 +1317,7 @@ let%expect_test "struct instantiation" =
      ((bindings
        ((t
          (Value
-          (StructInstance
+          (Struct
            (((struct_fields
               ((a ((field_type (Value (Type IntegerType)))))
                (b ((field_type (Value (Type IntegerType)))))))
