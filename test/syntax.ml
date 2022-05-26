@@ -784,3 +784,16 @@ let%expect_test "nested multi-line comment" =
     ((stmts
       ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
        (Let ((binding_name (Ident b)) (binding_expr (Int 2))))))) |}]
+(*
+let%expect_test "interface impls inside structs" =
+  let source =
+    {|
+      struct Something {
+        impl Interface {
+          fn new() -> Self { }
+        }
+      }
+    |}
+  in
+  pp source ; [%expect {||}]
+*)

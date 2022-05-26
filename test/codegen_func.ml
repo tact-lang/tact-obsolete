@@ -149,6 +149,43 @@ let%expect_test "demo struct serializer" =
       T_serializer([0, 1], b);
     } |}]
 
+let%expect_test "demo struct serializer 2" =
+  let source =
+    {|
+      struct Foo {
+        val a: Int(32)
+        val b: Int(16)
+      }
+      let serialize_foo = serializer(Foo);
+
+      fn test() -> Builder {
+        let b = Builder.new();
+        return serialize_foo(Foo{a: Int(32).new(0), b: Int(16).new(1)}, b);
+      }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    builder function_0(int self, builder builder) {
+      return store_int(builder, self, 32);
+    }
+    builder function_1(int self, builder builder) {
+      return store_int(builder, self, 16);
+    }
+    builder serialize_foo([int, int] self, builder builder) {
+      builder builder = function_0(first(self), builder);
+      builder builder = function_1(second(self), builder);
+      return builder;
+    }
+    builder function_2() {
+      return new_builder();
+    }
+    builder test() {
+      builder b = function_2();
+      return serialize_foo([0, 1], b);
+    } |}]
+
 let%expect_test "true and false" =
   let source =
     {|

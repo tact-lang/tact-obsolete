@@ -191,7 +191,7 @@ let%expect_test "failed scope resolution" =
                     ((function_params
                       ((t (Value (Type HoleType)))
                        (builder (Value (Type (BuiltinType Builder))))))
-                     (function_returns (Value (Type VoidType))))))))))
+                     (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type (BuiltinType Builder))
@@ -668,7 +668,7 @@ let%expect_test "duplicate type field" =
                     ((function_params
                       ((t (Value (Type HoleType)))
                        (builder (Value (Type (BuiltinType Builder))))))
-                     (function_returns (Value (Type VoidType))))))))))
+                     (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
@@ -1386,7 +1386,7 @@ let%expect_test "type check error" =
                     ((function_params
                       ((t (Value (Type HoleType)))
                        (builder (Value (Type (BuiltinType Builder))))))
-                     (function_returns (Value (Type VoidType))))))))))
+                     (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
@@ -1651,7 +1651,7 @@ let%expect_test "type check error" =
                     ((function_params
                       ((t (Value (Type HoleType)))
                        (builder (Value (Type (BuiltinType Builder))))))
-                     (function_returns (Value (Type VoidType))))))))))
+                     (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type

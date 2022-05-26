@@ -288,8 +288,20 @@ let params ==
 let struct_definition(name) ==
   STRUCT;
   n = name;
-  (fields, bindings) = delimited(LBRACE, pair(list(struct_field), list(sugared_function_definition(option(code_block)))), RBRACE);
+  LBRACE;
+  fields = list(struct_field);
+  bindings = list(sugared_function_definition(option(code_block)));
+  (*impls = list(impl);*)
+  RBRACE;
   { (n, Struct (make_struct_definition ~fields: fields ~struct_bindings: bindings  ())) }
+
+(*let impl == 
+  IMPL; 
+  interface = located(fexpr); 
+  LBRACE;
+  functions = list(sugared_function_definition(code_block));
+  RBRACE;
+  { () }*)
 
 (* Struct field
 

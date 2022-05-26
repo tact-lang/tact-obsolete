@@ -107,7 +107,7 @@ class constructor =
       fun name -> function
         | Value (Function f) -> (
           try Some (F.Function (self#add_function f ~name:(Some name)))
-          with ex -> raise ex )
+          with _ -> None )
         | _ ->
             None
 

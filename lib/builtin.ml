@@ -106,7 +106,7 @@ let serializer =
              (FunctionType
                 { function_params =
                     [("t", Value (Type HoleType)); ("builder", builder)];
-                  function_returns = Value (Type VoidType) } ) ) }
+                  function_returns = builder } ) ) }
   in
   let serializer_f s p =
     let calls =
