@@ -50,8 +50,7 @@ and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 
 and value =
   | Void
-  (* Instance of a Struct *)
-  | StructInstance of (struct_ * (string * expr) list)
+  | Struct of (struct_ * (string * expr) list)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
   | Bool of bool
@@ -134,7 +133,7 @@ let rec expr_to_type = function
       InvalidType
 
 let rec type_of = function
-  | Value (StructInstance (struct_, _)) ->
+  | Value (Struct (struct_, _)) ->
       Value (Type (StructType struct_))
   | Value (Function {function_signature; _}) ->
       Value (Type (FunctionType function_signature))

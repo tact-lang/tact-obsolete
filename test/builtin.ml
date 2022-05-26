@@ -14,14 +14,14 @@ let%expect_test "Int(bits) constructor" =
      ((bindings
        ((overflow
          (Value
-          (StructInstance
+          (Struct
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>))
             ((integer (Value (Integer 1))))))))
         (i
          (Value
-          (StructInstance
+          (Struct
            (((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>))
@@ -146,7 +146,7 @@ let%expect_test "Int(bits) serializer" =
                   ((Let
                     ((i
                       (Value
-                       (StructInstance
+                       (Struct
                         (((struct_fields
                            ((integer ((field_type (Value (Type IntegerType)))))))
                           (struct_id <opaque>))
@@ -238,7 +238,7 @@ let%expect_test "demo struct serializer" =
                   (FunctionCall
                    ((ResolvedReference (T_serializer <opaque>))
                     ((Value
-                      (StructInstance
+                      (Struct
                        (((struct_fields
                           ((a
                             ((field_type
@@ -261,7 +261,7 @@ let%expect_test "demo struct serializer" =
                          (struct_id <opaque>))
                         ((a
                           (Value
-                           (StructInstance
+                           (Struct
                             (((struct_fields
                                ((integer
                                  ((field_type (Value (Type IntegerType)))))))
@@ -269,7 +269,7 @@ let%expect_test "demo struct serializer" =
                              ((integer (Value (Integer 0))))))))
                          (b
                           (Value
-                           (StructInstance
+                           (Struct
                             (((struct_fields
                                ((integer
                                  ((field_type (Value (Type IntegerType)))))))
