@@ -1861,8 +1861,9 @@ let%expect_test "implement interface op" =
       let one = Left.op(1, 2);
     |}
   in
-  pp source;
-  [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Ok
      ((bindings
        ((one (Value (Integer 1)))
@@ -1905,3 +1906,62 @@ let%expect_test "implement interface op" =
                    ((Block
                      ((Break
                        (Expr (Reference (left (Value (Type IntegerType)))))))))))))))))))))))) |}]
+
+let%expect_test "implement interface op" =
+  let source =
+    {|
+      interface Make {
+        fn new() -> Self
+      }
+      struct Empty {
+        impl Make {
+          fn new() -> Self { Self{} }
+        }
+      }
+      let empty = Empty.new();
+    |}
+  in
+  pp source ; [%expect {|
+    (Ok
+     ((bindings
+       ((empty
+         (Value (StructInstance (((struct_fields ()) (struct_id <opaque>)) ()))))
+        (Empty
+         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
+      (methods
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((new
+           ((function_signature
+             ((function_params ())
+              (function_returns
+               (Value
+                (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Value
+                    (StructInstance
+                     (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))
+      (impls
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         (((impl_interface (Reference (Make (Value (Type InvalidType)))))
+           (impl_methods
+            ((new
+              (Value
+               (Function
+                ((function_signature
+                  ((function_params ())
+                   (function_returns
+                    (Value
+                     (Type
+                      (StructType ((struct_fields ()) (struct_id <opaque>))))))))
+                 (function_impl
+                  (Fn
+                   ((Block
+                     ((Break
+                       (Expr
+                        (Value
+                         (StructInstance
+                          (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))))))))) |}]

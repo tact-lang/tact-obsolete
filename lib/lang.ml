@@ -346,6 +346,14 @@ functor
           in
           {interface_methods = signatures}
 
+        method! visit_interface_definition env def =
+          let current_bindings' = current_bindings in
+          current_bindings <-
+            [("Self", Value (Type HoleType))] :: current_bindings' ;
+          let value = super#visit_interface_definition env def in
+          current_bindings <- current_bindings' ;
+          value
+
         method build_program _env stmts =
           { program with
             stmts = s#of_located_list stmts;
@@ -385,7 +393,6 @@ functor
               (s#visit_located s#visit_struct_field)
               env _visitors_this.fields
           in
-          let impls = s#visit_list s#visit_impl env _visitors_this.impls in
           let struct_ = s#build_struct_definition env _visitors_r0 [] []
           and current_bindings' = current_bindings in
           current_bindings <-
@@ -395,6 +402,7 @@ functor
               (s#visit_located s#visit_binding)
               env _visitors_this.struct_bindings
           in
+          let impls = s#visit_list s#visit_impl env _visitors_this.impls in
           current_bindings <- current_bindings' ;
           let struct_methods =
             List.filter_map bindings ~f:(fun binding ->
