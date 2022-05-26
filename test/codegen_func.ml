@@ -104,8 +104,8 @@ let%expect_test "Int(bits) serializer codegen" =
   pp source ;
   [%expect
     {|
-    builder function_0(int self, builder builder) {
-      return store_int(builder, self, 32);
+    builder function_0(int self, builder b) {
+      return store_int(b, self, 32);
     }
     _ test(builder b) {
       int i = 100;
@@ -130,16 +130,16 @@ let%expect_test "demo struct serializer" =
   pp source ;
   [%expect
     {|
-    builder function_0(int self, builder builder) {
-      return store_int(builder, self, 32);
+    builder function_0(int self, builder b) {
+      return store_int(b, self, 32);
     }
-    builder function_1(int self, builder builder) {
-      return store_int(builder, self, 16);
+    builder function_1(int self, builder b) {
+      return store_int(b, self, 16);
     }
-    builder T_serializer([int, int] self, builder builder) {
-      builder builder = function_0(first(self), builder);
-      builder builder = function_1(second(self), builder);
-      return builder;
+    builder T_serializer([int, int] self, builder b) {
+      builder b = function_0(first(self), b);
+      builder b = function_1(second(self), b);
+      return b;
     }
     builder function_2() {
       return new_builder();
@@ -167,16 +167,16 @@ let%expect_test "demo struct serializer 2" =
   pp source ;
   [%expect
     {|
-    builder function_0(int self, builder builder) {
-      return store_int(builder, self, 32);
+    builder function_0(int self, builder b) {
+      return store_int(b, self, 32);
     }
-    builder function_1(int self, builder builder) {
-      return store_int(builder, self, 16);
+    builder function_1(int self, builder b) {
+      return store_int(b, self, 16);
     }
-    builder serialize_foo([int, int] self, builder builder) {
-      builder builder = function_0(first(self), builder);
-      builder builder = function_1(second(self), builder);
-      return builder;
+    builder serialize_foo([int, int] self, builder b) {
+      builder b = function_0(first(self), b);
+      builder b = function_1(second(self), b);
+      return b;
     }
     builder function_2() {
       return new_builder();

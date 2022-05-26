@@ -56,15 +56,14 @@ let%expect_test "scope resolution" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -134,15 +133,14 @@ let%expect_test "binding resolution" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -190,7 +188,7 @@ let%expect_test "failed scope resolution" =
                    (FunctionType
                     ((function_params
                       ((t (Value (Type HoleType)))
-                       (builder (Value (Type (BuiltinType Builder))))))
+                       (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
@@ -251,15 +249,14 @@ let%expect_test "scope resolution after let binding" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -336,15 +333,14 @@ let%expect_test "basic struct definition" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -446,15 +442,14 @@ let%expect_test "Tact function evaluation" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -563,15 +558,14 @@ let%expect_test "struct definition" =
                       ((struct_fields
                         ((integer ((field_type (Value (Type IntegerType)))))))
                        (struct_id <opaque>))))))
-                  (builder (Value (Type (BuiltinType Builder))))))
+                  (b (Value (Type (BuiltinType Builder))))))
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl
                (Fn
                 ((Return
                   (Primitive
                    (StoreInt
-                    (builder
-                     (Reference (builder (Value (Type (BuiltinType Builder))))))
+                    (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                     (length (Value (Integer 257)))
                     (integer
                      (StructField
@@ -667,7 +661,7 @@ let%expect_test "duplicate type field" =
                    (FunctionType
                     ((function_params
                       ((t (Value (Type HoleType)))
-                       (builder (Value (Type (BuiltinType Builder))))))
+                       (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
@@ -711,7 +705,7 @@ let%expect_test "duplicate type field" =
                       ((struct_fields
                         ((integer ((field_type (Value (Type IntegerType)))))))
                        (struct_id <opaque>))))))
-                  (builder (Value (Type (BuiltinType Builder))))))
+                  (b (Value (Type (BuiltinType Builder))))))
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl
                (Fn
@@ -719,7 +713,7 @@ let%expect_test "duplicate type field" =
                   (Primitive
                    (StoreInt
                     (builder
-                     (Reference (builder (Value (Type (BuiltinType Builder))))))
+                     (Reference (b (Value (Type (BuiltinType Builder))))))
                     (length (Value (Integer 257)))
                     (integer
                      (StructField
@@ -808,15 +802,14 @@ let%expect_test "parametric struct instantiation" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -945,15 +938,14 @@ let%expect_test "scoping that `let` introduces in code" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -1112,15 +1104,14 @@ let%expect_test "reference in function bodies" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -1385,7 +1376,7 @@ let%expect_test "type check error" =
                    (FunctionType
                     ((function_params
                       ((t (Value (Type HoleType)))
-                       (builder (Value (Type (BuiltinType Builder))))))
+                       (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
@@ -1415,7 +1406,7 @@ let%expect_test "type check error" =
                       ((struct_fields
                         ((integer ((field_type (Value (Type IntegerType)))))))
                        (struct_id <opaque>))))))
-                  (builder (Value (Type (BuiltinType Builder))))))
+                  (b (Value (Type (BuiltinType Builder))))))
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl
                (Fn
@@ -1423,7 +1414,7 @@ let%expect_test "type check error" =
                   (Primitive
                    (StoreInt
                     (builder
-                     (Reference (builder (Value (Type (BuiltinType Builder))))))
+                     (Reference (b (Value (Type (BuiltinType Builder))))))
                     (length (Value (Integer 64)))
                     (integer
                      (StructField
@@ -1464,7 +1455,7 @@ let%expect_test "type check error" =
                       ((struct_fields
                         ((integer ((field_type (Value (Type IntegerType)))))))
                        (struct_id <opaque>))))))
-                  (builder (Value (Type (BuiltinType Builder))))))
+                  (b (Value (Type (BuiltinType Builder))))))
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl
                (Fn
@@ -1472,7 +1463,7 @@ let%expect_test "type check error" =
                   (Primitive
                    (StoreInt
                     (builder
-                     (Reference (builder (Value (Type (BuiltinType Builder))))))
+                     (Reference (b (Value (Type (BuiltinType Builder))))))
                     (length (Value (Integer 32)))
                     (integer
                      (StructField
@@ -1650,7 +1641,7 @@ let%expect_test "type check error" =
                    (FunctionType
                     ((function_params
                       ((t (Value (Type HoleType)))
-                       (builder (Value (Type (BuiltinType Builder))))))
+                       (b (Value (Type (BuiltinType Builder))))))
                      (function_returns (Value (Type (BuiltinType Builder)))))))))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
@@ -1680,7 +1671,7 @@ let%expect_test "type check error" =
                       ((struct_fields
                         ((integer ((field_type (Value (Type IntegerType)))))))
                        (struct_id <opaque>))))))
-                  (builder (Value (Type (BuiltinType Builder))))))
+                  (b (Value (Type (BuiltinType Builder))))))
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl
                (Fn
@@ -1688,7 +1679,7 @@ let%expect_test "type check error" =
                   (Primitive
                    (StoreInt
                     (builder
-                     (Reference (builder (Value (Type (BuiltinType Builder))))))
+                     (Reference (b (Value (Type (BuiltinType Builder))))))
                     (length (Value (Integer 10)))
                     (integer
                      (StructField
@@ -1729,7 +1720,7 @@ let%expect_test "type check error" =
                       ((struct_fields
                         ((integer ((field_type (Value (Type IntegerType)))))))
                        (struct_id <opaque>))))))
-                  (builder (Value (Type (BuiltinType Builder))))))
+                  (b (Value (Type (BuiltinType Builder))))))
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl
                (Fn
@@ -1737,7 +1728,7 @@ let%expect_test "type check error" =
                   (Primitive
                    (StoreInt
                     (builder
-                     (Reference (builder (Value (Type (BuiltinType Builder))))))
+                     (Reference (b (Value (Type (BuiltinType Builder))))))
                     (length (Value (Integer 99)))
                     (integer
                      (StructField

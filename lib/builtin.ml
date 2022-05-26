@@ -68,7 +68,7 @@ let int_type =
   and int_type_s_serialize bits s =
     let self = Value (Type (StructType s)) in
     { function_signature =
-        { function_params = [("self", self); ("builder", builder)];
+        { function_params = [("self", self); ("b", builder)];
           function_returns = builder };
       function_impl =
         Fn
@@ -76,7 +76,7 @@ let int_type =
              (Return
                 (Primitive
                    (StoreInt
-                      { builder = Reference ("builder", builder);
+                      { builder = Reference ("b", builder);
                         length = Value (Integer (Z.of_int bits));
                         integer =
                           StructField
@@ -105,7 +105,7 @@ let serializer =
           (Type
              (FunctionType
                 { function_params =
-                    [("t", Value (Type HoleType)); ("builder", builder)];
+                    [("t", Value (Type HoleType)); ("b", builder)];
                   function_returns = builder } ) ) }
   in
   let serializer_f s p =
@@ -116,21 +116,21 @@ let serializer =
             List.Assoc.find methods ~equal:String.equal "serialize"
             |> Option.map ~f:(fun method_ ->
                    Let
-                     [ ( "builder",
+                     [ ( "b",
                          FunctionCall
                            ( Value (Function method_),
                              StructField
                                ( Reference ("self", Value (Type (StructType s))),
                                  name )
-                             :: [Reference ("builder", builder)] ) ) ] )
+                             :: [Reference ("b", builder)] ) ) ] )
         | _ ->
             None )
     in
-    let body = Block (calls @ [Return (Reference ("builder", builder))]) in
+    let body = Block (calls @ [Return (Reference ("b", builder))]) in
     Function
       { function_signature =
           { function_params =
-              [("self", Value (Type (StructType s))); ("builder", builder)];
+              [("self", Value (Type (StructType s))); ("b", builder)];
             function_returns = builder };
         function_impl = Fn (Some body) }
   in

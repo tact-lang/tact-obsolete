@@ -52,15 +52,14 @@ let%expect_test "Int(bits) constructor" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 8)))
                   (integer
                    (StructField
@@ -99,15 +98,14 @@ let%expect_test "Int(bits) constructor" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 257)))
                   (integer
                    (StructField
@@ -184,15 +182,14 @@ let%expect_test "Int(bits) serializer" =
                       ((struct_fields
                         ((integer ((field_type (Value (Type IntegerType)))))))
                        (struct_id <opaque>))))))
-                  (builder (Value (Type (BuiltinType Builder))))))
+                  (b (Value (Type (BuiltinType Builder))))))
                 (function_returns (Value (Type (BuiltinType Builder))))))
               (function_impl
                (Fn
                 ((Return
                   (Primitive
                    (StoreInt
-                    (builder
-                     (Reference (builder (Value (Type (BuiltinType Builder))))))
+                    (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                     (length (Value (Integer 32)))
                     (integer
                      (StructField
@@ -308,13 +305,13 @@ let%expect_test "demo struct serializer" =
                                  ((field_type (Value (Type IntegerType)))))))
                               (struct_id <opaque>))))))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Block
                 ((Let
-                  ((builder
+                  ((b
                     (FunctionCall
                      ((Value
                        (Function
@@ -328,7 +325,7 @@ let%expect_test "demo struct serializer" =
                                    ((integer
                                      ((field_type (Value (Type IntegerType)))))))
                                   (struct_id <opaque>))))))
-                             (builder (Value (Type (BuiltinType Builder))))))
+                             (b (Value (Type (BuiltinType Builder))))))
                            (function_returns
                             (Value (Type (BuiltinType Builder))))))
                          (function_impl
@@ -338,7 +335,7 @@ let%expect_test "demo struct serializer" =
                               (StoreInt
                                (builder
                                 (Reference
-                                 (builder (Value (Type (BuiltinType Builder))))))
+                                 (b (Value (Type (BuiltinType Builder))))))
                                (length (Value (Integer 32)))
                                (integer
                                 (StructField
@@ -383,9 +380,9 @@ let%expect_test "demo struct serializer" =
                                         (struct_id <opaque>))))))))))
                                (struct_id <opaque>)))))))
                          a))
-                       (Reference (builder (Value (Type (BuiltinType Builder)))))))))))
+                       (Reference (b (Value (Type (BuiltinType Builder)))))))))))
                  (Let
-                  ((builder
+                  ((b
                     (FunctionCall
                      ((Value
                        (Function
@@ -399,7 +396,7 @@ let%expect_test "demo struct serializer" =
                                    ((integer
                                      ((field_type (Value (Type IntegerType)))))))
                                   (struct_id <opaque>))))))
-                             (builder (Value (Type (BuiltinType Builder))))))
+                             (b (Value (Type (BuiltinType Builder))))))
                            (function_returns
                             (Value (Type (BuiltinType Builder))))))
                          (function_impl
@@ -409,7 +406,7 @@ let%expect_test "demo struct serializer" =
                               (StoreInt
                                (builder
                                 (Reference
-                                 (builder (Value (Type (BuiltinType Builder))))))
+                                 (b (Value (Type (BuiltinType Builder))))))
                                (length (Value (Integer 16)))
                                (integer
                                 (StructField
@@ -454,9 +451,8 @@ let%expect_test "demo struct serializer" =
                                         (struct_id <opaque>))))))))))
                                (struct_id <opaque>)))))))
                          b))
-                       (Reference (builder (Value (Type (BuiltinType Builder)))))))))))
-                 (Return
-                  (Reference (builder (Value (Type (BuiltinType Builder)))))))))))))))
+                       (Reference (b (Value (Type (BuiltinType Builder)))))))))))
+                 (Return (Reference (b (Value (Type (BuiltinType Builder)))))))))))))))
         (T
          (Value
           (Type
@@ -526,15 +522,14 @@ let%expect_test "demo struct serializer" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 16)))
                   (integer
                    (StructField
@@ -573,15 +568,14 @@ let%expect_test "demo struct serializer" =
                     ((struct_fields
                       ((integer ((field_type (Value (Type IntegerType)))))))
                      (struct_id <opaque>))))))
-                (builder (Value (Type (BuiltinType Builder))))))
+                (b (Value (Type (BuiltinType Builder))))))
               (function_returns (Value (Type (BuiltinType Builder))))))
             (function_impl
              (Fn
               ((Return
                 (Primitive
                  (StoreInt
-                  (builder
-                   (Reference (builder (Value (Type (BuiltinType Builder))))))
+                  (builder (Reference (b (Value (Type (BuiltinType Builder))))))
                   (length (Value (Integer 32)))
                   (integer
                    (StructField
