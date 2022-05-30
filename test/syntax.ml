@@ -132,6 +132,26 @@ let%expect_test "struct fields" =
               ((field_name (Ident f))
                (field_type (FunctionCall ((fn (Reference (Ident get_type))))))))))))))))) |}]
 
+let%expect_test "struct fields with semicolons" =
+  let source = {|
+  struct MyType { val a: Int(257); val f: get_type() }
+  |} in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let
+        ((binding_name (Ident MyType))
+         (binding_expr
+          (Struct
+           ((fields
+             (((field_name (Ident a))
+               (field_type
+                (FunctionCall
+                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
+              ((field_name (Ident f))
+               (field_type (FunctionCall ((fn (Reference (Ident get_type))))))))))))))))) |}]
+
 let%expect_test "struct methods" =
   let source =
     {|
