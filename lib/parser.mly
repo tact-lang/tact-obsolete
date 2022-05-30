@@ -308,7 +308,7 @@ let impl ==
    val field_name: <type expression>
 *)
 let struct_field ==
-| located ( VAL ; name = located(ident); COLON; typ = located(expr); { make_struct_field ~field_name: name ~field_type: typ () } )
+| located ( VAL ; name = located(ident); COLON; typ = located(expr); option(SEMICOLON); { make_struct_field ~field_name: name ~field_type: typ () } )
 
 (* Struct constructor 
  *
