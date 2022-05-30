@@ -108,12 +108,31 @@ let serializer =
                     [("t", Value (Type HoleType)); ("b", builder)];
                   function_returns = builder } ) ) }
   in
-  let serializer_f s p =
+  let rec serializer_f s p =
     let calls =
       List.filter_map s.struct_fields ~f:(function
         | name, {field_type = Value f} ->
             let methods = List.Assoc.find_exn p.methods ~equal:equal_value f in
-            List.Assoc.find methods ~equal:String.equal "serialize"
+            let serialize_field =
+              match List.Assoc.find methods ~equal:String.equal "serialize" with
+              | Some m ->
+                  Some m
+              | None -> (
+                match f with
+                | Type (StructType t) ->
+                    let m = serializer_f t p in
+                    p.methods <-
+                      List.map p.methods ~f:(fun (s, methods) ->
+                          match equal_value s (Type (StructType t)) with
+                          | true ->
+                              (s, ("serializer", m) :: methods)
+                          | false ->
+                              (s, methods) ) ;
+                    Some m
+                | _ ->
+                    None )
+            in
+            serialize_field
             |> Option.map ~f:(fun method_ ->
                    Let
                      [ ( "b",
@@ -127,16 +146,15 @@ let serializer =
             None )
     in
     let body = Block (calls @ [Return (Reference ("b", builder))]) in
-    Function
-      { function_signature =
-          { function_params =
-              [("self", Value (Type (StructType s))); ("b", builder)];
-            function_returns = builder };
-        function_impl = Fn (Some body) }
+    { function_signature =
+        { function_params =
+            [("self", Value (Type (StructType s))); ("b", builder)];
+          function_returns = builder };
+      function_impl = Fn (Some body) }
   in
   let function_impl p = function
     | [Type (StructType s)] ->
-        serializer_f s p
+        Function (serializer_f s p)
     | _ ->
         Void
   in

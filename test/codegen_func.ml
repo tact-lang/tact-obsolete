@@ -231,3 +231,30 @@ let%expect_test "if/then/else" =
       {
         return 2;
       }} |}]
+
+let%expect_test "serializer inner struct" =
+  let source =
+    {|
+      struct Pubkey { val x: Int(160) }
+      struct Wallet { val seqno: Int(32) val pubkey: Pubkey }
+      let serialize_wallet = serializer(Wallet);
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    builder f0(int self, builder b) {
+      return store_int(b, self, 32);
+    }
+    builder f2(int self, builder b) {
+      return store_int(b, self, 160);
+    }
+    builder f1(int self, builder b) {
+      builder b = f2(self, b);
+      return b;
+    }
+    builder serialize_wallet([int, int] self, builder b) {
+      builder b = f0(first(self), b);
+      builder b = f1(second(self), b);
+      return b;
+    } |}]
