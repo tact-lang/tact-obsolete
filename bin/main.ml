@@ -4,6 +4,7 @@ module L = MenhirLib.LexerUtil
 module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
 module Lang = Tact.Lang.Make (Syntax)
+module Show = Tact.Show.Make (Syntax)
 module CG = Tact.Codegen_func
 module Func = Tact.Func
 module Errors = Tact.Errors
@@ -17,7 +18,7 @@ let fastpath filename =
   let text, lexbuf = L.read filename in
   match Parser.program Tact.Lexer.token lexbuf with
   | stx -> (
-      let errors = new Errors.errors in
+      let errors = new Errors.errors Show.show_error in
       let constructor =
         new Lang.constructor Lang.default_bindings Lang.default_methods errors
       in

@@ -1,6 +1,7 @@
 module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
 module Lang = Tact.Lang.Make (Syntax)
+module Show = Tact.Show.Make (Syntax)
 module Interpreter = Tact.Interpreter
 module Errors = Tact.Errors
 module Zint = Tact.Zint
@@ -11,12 +12,13 @@ include Core
 type error = [Lang.error | Interpreter.error] * Lang.program
 [@@deriving sexp_of]
 
-let make_errors () = new Errors.errors
+let make_errors e = new Errors.errors e
 
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
-let build_program ?(errors = make_errors ()) ?(bindings = Lang.default_bindings)
-    ?(methods = Lang.default_methods) ?(strip_defaults = true) p =
+let build_program ?(errors = make_errors Show.show_error)
+    ?(bindings = Lang.default_bindings) ?(methods = Lang.default_methods)
+    ?(strip_defaults = true) p =
   let c = new Lang.constructor bindings methods errors in
   let p' = c#visit_program () p in
   errors#to_result {p' with stmts = []}

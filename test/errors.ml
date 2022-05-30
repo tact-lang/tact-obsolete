@@ -2,8 +2,10 @@ open Tact.Errors
 
 type severity = [`Warning | `Error]
 
+let show_e _ = ""
+
 let%test "error reporting" =
-  let e = new errors in
+  let e = new errors show_e in
   Alcotest.(check bool)
     "reports gets recorded" true
     ( e#report `Warning `Broken () ;

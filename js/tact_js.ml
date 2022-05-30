@@ -4,6 +4,7 @@ module L = MenhirLib.LexerUtil
 module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
 module Parser = Tact.Parser.Make (Syntax)
 module Lang = Tact.Lang.Make (Syntax)
+module Show = Tact.Show.Make (Syntax)
 module Errors = Tact.Errors
 module CG = Tact.Codegen_func
 module Func = Tact.Func
@@ -15,8 +16,8 @@ let _ =
        method parse (src : Js.js_string Js.t) =
          let src = Js.to_string src in
          let lexbuf = Lexing.from_string src in
+         let e = new errors Show.show_error in
          let program =
-           let e = new errors in
            let p = Parser.program Tact.Lexer.token lexbuf in
            let c =
              new Lang.constructor Lang.default_bindings Lang.default_methods e
@@ -32,5 +33,5 @@ let _ =
              Func.pp_program (Caml.Format.formatter_of_buffer buffer) generated ;
              Buffer.contents buffer |> Js.string
          | Error _ ->
-             Js.string "Error"
+             Js.string ("Cannot compile due to errors:\n" ^ e#show_errors)
     end )
