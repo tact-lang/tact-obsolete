@@ -8,7 +8,7 @@ program: VAL
 ##
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION VAL
 ##
@@ -25,7 +25,7 @@ program: UNION VAL
 ## UNION
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE VAL
 ##
@@ -39,7 +39,7 @@ program: UNION LBRACE VAL
 ## UNION LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE VAL
 ##
@@ -51,7 +51,7 @@ program: UNION LBRACE CASE VAL
 ## CASE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE UNION VAL
 ##
@@ -63,7 +63,7 @@ program: UNION LBRACE CASE UNION VAL
 ## UNION
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE UNION LBRACE VAL
 ##
@@ -75,7 +75,7 @@ program: UNION LBRACE CASE UNION LBRACE VAL
 ## UNION LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN VAL
 ##
@@ -92,7 +92,7 @@ program: ENUM LBRACE FN VAL
 ## FN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT VAL
 ##
@@ -109,7 +109,7 @@ program: ENUM LBRACE FN IDENT VAL
 ## FN IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN VAL
 ##
@@ -126,7 +126,7 @@ program: ENUM LBRACE FN IDENT LPAREN VAL
 ## FN IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN IDENT VAL
 ##
@@ -141,7 +141,7 @@ program: FN LPAREN IDENT VAL
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN IDENT COLON VAL
 ##
@@ -156,7 +156,7 @@ program: FN LPAREN IDENT COLON VAL
 ## IDENT COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN UNION VAL
 ##
@@ -169,7 +169,7 @@ program: RETURN UNION VAL
 ## UNION
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN UNION LBRACE VAL
 ##
@@ -182,7 +182,7 @@ program: RETURN UNION LBRACE VAL
 ## UNION LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -205,7 +205,7 @@ program: RETURN UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN UNION LBRACE RBRACE UNION
 ##
@@ -218,7 +218,7 @@ program: RETURN UNION LBRACE RBRACE UNION
 ## UNION LBRACE list(preceded(CASE,located(union_member))) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN LBRACE RBRACE VAL
 ##
@@ -230,7 +230,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN LBRACE RBRACE VAL
 ## function_definition(located_ident_with_params,option(code_block))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN LBRACE RBRACE VAL
 ##
@@ -242,7 +242,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LBRACE RBRACE VAL
 ## function_definition(located(ident),option(code_block))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN TILDE VAL
 ##
@@ -255,7 +255,7 @@ program: RETURN TILDE VAL
 ## TILDE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN TILDE IDENT UNION
 ##
@@ -268,7 +268,7 @@ program: RETURN TILDE IDENT UNION
 ## TILDE IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN STRUCT VAL
 ##
@@ -281,7 +281,7 @@ program: RETURN STRUCT VAL
 ## STRUCT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LPAREN VAL
 ##
@@ -294,7 +294,7 @@ program: STRUCT LPAREN VAL
 ## LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN STRUCT LPAREN RPAREN VAL
 ##
@@ -307,7 +307,7 @@ program: RETURN STRUCT LPAREN RPAREN VAL
 ## STRUCT option(params)
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN STRUCT LBRACE UNION
 ##
@@ -320,7 +320,7 @@ program: RETURN STRUCT LBRACE UNION
 ## STRUCT option(params) LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE VAL VAL
 ##
@@ -332,7 +332,7 @@ program: STRUCT LBRACE VAL VAL
 ## VAL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE VAL IDENT VAL
 ##
@@ -344,7 +344,7 @@ program: STRUCT LBRACE VAL IDENT VAL
 ## VAL IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE VAL IDENT COLON VAL
 ##
@@ -356,7 +356,7 @@ program: STRUCT LBRACE VAL IDENT COLON VAL
 ## VAL IDENT COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN STRING UNION
 ##
@@ -369,7 +369,7 @@ program: RETURN STRING UNION
 ## STRING
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN VAL
 ##
@@ -393,7 +393,7 @@ program: LPAREN VAL
 ## LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN UNION VAL
 ##
@@ -406,7 +406,7 @@ program: LPAREN UNION VAL
 ## LPAREN UNION
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN UNION LBRACE VAL
 ##
@@ -419,7 +419,7 @@ program: LPAREN UNION LBRACE VAL
 ## LPAREN UNION LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -442,7 +442,7 @@ program: LPAREN UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN UNION LBRACE RBRACE VAL
 ##
@@ -455,7 +455,7 @@ program: LPAREN UNION LBRACE RBRACE VAL
 ## LPAREN UNION LBRACE list(preceded(CASE,located(union_member))) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN TILDE VAL
 ##
@@ -468,7 +468,7 @@ program: LPAREN TILDE VAL
 ## LPAREN TILDE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN TILDE IDENT VAL
 ##
@@ -481,7 +481,7 @@ program: LPAREN TILDE IDENT VAL
 ## LPAREN TILDE IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN STRUCT VAL
 ##
@@ -494,7 +494,7 @@ program: LPAREN STRUCT VAL
 ## LPAREN STRUCT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN STRUCT LPAREN RPAREN VAL
 ##
@@ -507,7 +507,7 @@ program: LPAREN STRUCT LPAREN RPAREN VAL
 ## LPAREN STRUCT option(params)
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN STRUCT LBRACE UNION
 ##
@@ -520,7 +520,7 @@ program: LPAREN STRUCT LBRACE UNION
 ## LPAREN STRUCT option(params) LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL VAL
 ##
@@ -532,7 +532,7 @@ program: STRUCT LBRACE IMPL VAL
 ## IMPL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL UNION VAL
 ##
@@ -544,7 +544,7 @@ program: STRUCT LBRACE IMPL UNION VAL
 ## UNION
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL UNION LBRACE VAL
 ##
@@ -556,7 +556,7 @@ program: STRUCT LBRACE IMPL UNION LBRACE VAL
 ## UNION LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -578,7 +578,7 @@ program: STRUCT LBRACE IMPL UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL TILDE VAL
 ##
@@ -590,7 +590,7 @@ program: STRUCT LBRACE IMPL TILDE VAL
 ## TILDE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL STRUCT VAL
 ##
@@ -602,7 +602,7 @@ program: STRUCT LBRACE IMPL STRUCT VAL
 ## STRUCT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL STRUCT LPAREN RPAREN VAL
 ##
@@ -614,7 +614,7 @@ program: STRUCT LBRACE IMPL STRUCT LPAREN RPAREN VAL
 ## STRUCT option(params)
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL STRUCT LBRACE UNION
 ##
@@ -626,7 +626,7 @@ program: STRUCT LBRACE IMPL STRUCT LBRACE UNION
 ## STRUCT option(params) LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL LPAREN VAL
 ##
@@ -639,7 +639,7 @@ program: STRUCT LBRACE IMPL LPAREN VAL
 ## LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL INTERFACE VAL
 ##
@@ -651,7 +651,7 @@ program: STRUCT LBRACE IMPL INTERFACE VAL
 ## INTERFACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL INTERFACE LBRACE VAL
 ##
@@ -663,7 +663,7 @@ program: STRUCT LBRACE IMPL INTERFACE LBRACE VAL
 ## INTERFACE LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE FN VAL
 ##
@@ -676,7 +676,7 @@ program: INTERFACE LBRACE FN VAL
 ## FN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE FN IDENT VAL
 ##
@@ -689,7 +689,7 @@ program: INTERFACE LBRACE FN IDENT VAL
 ## FN IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE FN IDENT LPAREN VAL
 ##
@@ -702,7 +702,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN VAL
 ## FN IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -714,7 +714,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN RPAREN RARROW VAL
 ##
@@ -726,7 +726,7 @@ program: FN LPAREN RPAREN RARROW VAL
 ## RARROW
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL ENUM VAL
 ##
@@ -739,7 +739,7 @@ program: STRUCT LBRACE IMPL ENUM VAL
 ## ENUM
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL ENUM LBRACE VAL
 ##
@@ -752,7 +752,7 @@ program: STRUCT LBRACE IMPL ENUM LBRACE VAL
 ## ENUM LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE IDENT VAL
 ##
@@ -771,7 +771,7 @@ program: ENUM LBRACE IDENT VAL
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE IDENT EQUALS VAL
 ##
@@ -786,7 +786,7 @@ program: ENUM LBRACE IDENT EQUALS VAL
 ## IDENT EQUALS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN INTERFACE VAL
 ##
@@ -799,7 +799,7 @@ program: RETURN INTERFACE VAL
 ## INTERFACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN INTERFACE LBRACE VAL
 ##
@@ -812,7 +812,7 @@ program: RETURN INTERFACE LBRACE VAL
 ## INTERFACE LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN INTERFACE LBRACE RBRACE UNION
 ##
@@ -825,7 +825,7 @@ program: RETURN INTERFACE LBRACE RBRACE UNION
 ## INTERFACE LBRACE list(located(function_signature_binding)) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -844,7 +844,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ## In state 341, spurious reduction of production function_definition(located(ident),nothing) -> FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN INT UNION
 ##
@@ -857,7 +857,7 @@ program: RETURN INT UNION
 ## INT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN IDENT UNION
 ##
@@ -871,7 +871,7 @@ program: RETURN IDENT UNION
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN FN VAL
 ##
@@ -884,7 +884,7 @@ program: RETURN FN VAL
 ## FN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN FN LPAREN VAL
 ##
@@ -897,7 +897,7 @@ program: RETURN FN LPAREN VAL
 ## FN LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN FN LPAREN IDENT COLON BOOL COMMA RPAREN UNION
 ##
@@ -909,7 +909,7 @@ program: RETURN FN LPAREN IDENT COLON BOOL COMMA RPAREN UNION
 ## FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LBRACE VAL
 ##
@@ -922,7 +922,7 @@ program: LBRACE VAL
 ## LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: TILDE VAL
 ##
@@ -936,7 +936,7 @@ program: TILDE VAL
 ## TILDE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: TILDE IDENT VAL
 ##
@@ -950,7 +950,7 @@ program: TILDE IDENT VAL
 ## TILDE IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT VAL
 ##
@@ -967,7 +967,7 @@ program: STRUCT VAL
 ## STRUCT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT IDENT VAL
 ##
@@ -981,7 +981,7 @@ program: STRUCT IDENT VAL
 ## STRUCT IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT IDENT LPAREN VAL
 ##
@@ -994,7 +994,7 @@ program: STRUCT IDENT LPAREN VAL
 ## STRUCT IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -1006,7 +1006,7 @@ program: STRUCT IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE UNION
 ##
@@ -1018,7 +1018,7 @@ program: STRUCT IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE UNION
 ## STRUCT IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT IDENT LPAREN RPAREN VAL
 ##
@@ -1030,7 +1030,7 @@ program: STRUCT IDENT LPAREN RPAREN VAL
 ## STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT IDENT LPAREN RPAREN LBRACE UNION
 ##
@@ -1042,7 +1042,7 @@ program: STRUCT IDENT LPAREN RPAREN LBRACE UNION
 ## STRUCT IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT IDENT LBRACE UNION
 ##
@@ -1054,7 +1054,7 @@ program: STRUCT IDENT LBRACE UNION
 ## STRUCT IDENT LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LPAREN RPAREN VAL
 ##
@@ -1068,7 +1068,7 @@ program: STRUCT LPAREN RPAREN VAL
 ## STRUCT option(params)
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE UNION
 ##
@@ -1082,7 +1082,7 @@ program: STRUCT LBRACE UNION
 ## STRUCT option(params) LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE RBRACE VAL
 ##
@@ -1096,7 +1096,7 @@ program: STRUCT LBRACE RBRACE VAL
 ## STRUCT option(params) LBRACE list(struct_field) list(sugared_function_definition(option(code_block))) list(impl) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRING VAL
 ##
@@ -1110,7 +1110,7 @@ program: STRING VAL
 ## STRING
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN VAL
 ##
@@ -1122,7 +1122,7 @@ program: RETURN VAL
 ## RETURN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN ENUM VAL
 ##
@@ -1137,7 +1137,7 @@ program: RETURN ENUM VAL
 ## ENUM
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN ENUM LBRACE VAL
 ##
@@ -1152,7 +1152,7 @@ program: RETURN ENUM LBRACE VAL
 ## ENUM LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -1175,7 +1175,7 @@ program: RETURN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN ENUM LBRACE IDENT COMMA RBRACE UNION
 ##
@@ -1188,7 +1188,7 @@ program: RETURN ENUM LBRACE IDENT COMMA RBRACE UNION
 ## ENUM LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -1211,7 +1211,7 @@ program: RETURN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN ENUM LBRACE RBRACE UNION
 ##
@@ -1224,7 +1224,7 @@ program: RETURN ENUM LBRACE RBRACE UNION
 ## ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN BOOL UNION
 ##
@@ -1237,7 +1237,7 @@ program: RETURN BOOL UNION
 ## BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN BOOL RPAREN VAL
 ##
@@ -1250,7 +1250,7 @@ program: LPAREN BOOL RPAREN VAL
 ## type_expr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IDENT LBRACE VAL
 ##
@@ -1263,7 +1263,7 @@ program: IDENT LBRACE VAL
 ## type_expr LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IDENT LBRACE IDENT VAL
 ##
@@ -1278,7 +1278,7 @@ program: IDENT LBRACE IDENT VAL
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IDENT LBRACE IDENT COLON VAL
 ##
@@ -1293,7 +1293,7 @@ program: IDENT LBRACE IDENT COLON VAL
 ## IDENT COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN BOOL LPAREN RPAREN UNION
 ##
@@ -1307,7 +1307,7 @@ program: RETURN BOOL LPAREN RPAREN UNION
 ## function_call
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN FN LPAREN RPAREN RPAREN VAL
 ##
@@ -1320,7 +1320,7 @@ program: LPAREN FN LPAREN RPAREN RPAREN VAL
 ## fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL LPAREN VAL
 ##
@@ -1333,7 +1333,7 @@ program: BOOL LPAREN VAL
 ## fexpr LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL LPAREN BOOL VAL
 ##
@@ -1357,7 +1357,7 @@ program: BOOL LPAREN BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN BOOL DOT VAL
 ##
@@ -1371,7 +1371,7 @@ program: RETURN BOOL DOT VAL
 ## expr DOT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN BOOL DOT IDENT UNION
 ##
@@ -1385,7 +1385,7 @@ program: RETURN BOOL DOT IDENT UNION
 ## expr DOT IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN BOOL DOT IDENT LPAREN VAL
 ##
@@ -1398,7 +1398,7 @@ program: RETURN BOOL DOT IDENT LPAREN VAL
 ## expr DOT IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL LPAREN BOOL COMMA VAL
 ##
@@ -1412,7 +1412,7 @@ program: BOOL LPAREN BOOL COMMA VAL
 ## expr COMMA
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IDENT LBRACE IDENT COLON BOOL VAL
 ##
@@ -1436,7 +1436,7 @@ program: IDENT LBRACE IDENT COLON BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IDENT LBRACE IDENT COLON BOOL COMMA VAL
 ##
@@ -1450,7 +1450,7 @@ program: IDENT LBRACE IDENT COLON BOOL COMMA VAL
 ## IDENT COLON expr COMMA
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN BOOL VAL
 ##
@@ -1471,7 +1471,7 @@ program: RETURN BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET VAL
 ##
@@ -1485,7 +1485,7 @@ program: LET VAL
 ## LET
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT VAL
 ##
@@ -1499,7 +1499,7 @@ program: LET IDENT VAL
 ## LET IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT LPAREN VAL
 ##
@@ -1512,7 +1512,7 @@ program: LET IDENT LPAREN VAL
 ## LET IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -1524,7 +1524,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS VAL
 ##
@@ -1536,7 +1536,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS VAL
 ## LET IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS BOOL VAL
 ##
@@ -1557,7 +1557,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT LPAREN RPAREN VAL
 ##
@@ -1569,7 +1569,7 @@ program: LET IDENT LPAREN RPAREN VAL
 ## LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT LPAREN RPAREN EQUALS VAL
 ##
@@ -1581,7 +1581,7 @@ program: LET IDENT LPAREN RPAREN EQUALS VAL
 ## LET IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT LPAREN RPAREN EQUALS BOOL VAL
 ##
@@ -1602,7 +1602,7 @@ program: LET IDENT LPAREN RPAREN EQUALS BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT EQUALS VAL
 ##
@@ -1614,7 +1614,7 @@ program: LET IDENT EQUALS VAL
 ## LET IDENT EQUALS
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LET IDENT EQUALS BOOL VAL
 ##
@@ -1635,7 +1635,7 @@ program: LET IDENT EQUALS BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE VAL
 ##
@@ -1652,7 +1652,7 @@ program: INTERFACE VAL
 ## INTERFACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE VAL
 ##
@@ -1666,7 +1666,7 @@ program: INTERFACE LBRACE VAL
 ## INTERFACE LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE RBRACE VAL
 ##
@@ -1680,7 +1680,7 @@ program: INTERFACE LBRACE RBRACE VAL
 ## INTERFACE LBRACE list(located(function_signature_binding)) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE IDENT VAL
 ##
@@ -1694,7 +1694,7 @@ program: INTERFACE IDENT VAL
 ## INTERFACE IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE IDENT LPAREN VAL
 ##
@@ -1707,7 +1707,7 @@ program: INTERFACE IDENT LPAREN VAL
 ## INTERFACE IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -1719,7 +1719,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE VAL
 ##
@@ -1731,7 +1731,7 @@ program: INTERFACE IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE VAL
 ## INTERFACE IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE IDENT LPAREN RPAREN VAL
 ##
@@ -1743,7 +1743,7 @@ program: INTERFACE IDENT LPAREN RPAREN VAL
 ## INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE IDENT LPAREN RPAREN LBRACE VAL
 ##
@@ -1755,7 +1755,7 @@ program: INTERFACE IDENT LPAREN RPAREN LBRACE VAL
 ## INTERFACE IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE IDENT LBRACE VAL
 ##
@@ -1767,7 +1767,7 @@ program: INTERFACE IDENT LBRACE VAL
 ## INTERFACE IDENT LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INT VAL
 ##
@@ -1781,7 +1781,7 @@ program: INT VAL
 ## INT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IF VAL
 ##
@@ -1793,7 +1793,7 @@ program: IF VAL
 ## IF
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IF LPAREN VAL
 ##
@@ -1805,7 +1805,7 @@ program: IF LPAREN VAL
 ## IF LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IF LPAREN BOOL VAL
 ##
@@ -1826,7 +1826,7 @@ program: IF LPAREN BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IF LPAREN BOOL RPAREN VAL
 ##
@@ -1838,7 +1838,7 @@ program: IF LPAREN BOOL RPAREN VAL
 ## IF LPAREN expr RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IF LPAREN BOOL RPAREN LBRACE RBRACE VAL
 ##
@@ -1850,7 +1850,7 @@ program: IF LPAREN BOOL RPAREN LBRACE RBRACE VAL
 ## IF LPAREN expr RPAREN code_block
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IF LPAREN BOOL RPAREN LBRACE RBRACE ELSE VAL
 ##
@@ -1863,7 +1863,7 @@ program: IF LPAREN BOOL RPAREN LBRACE RBRACE ELSE VAL
 ## ELSE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IDENT VAL
 ##
@@ -1878,7 +1878,7 @@ program: IDENT VAL
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN VAL
 ##
@@ -1899,7 +1899,7 @@ program: FN VAL
 ## FN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN VAL
 ##
@@ -1914,7 +1914,7 @@ program: FN LPAREN VAL
 ## FN LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -1927,7 +1927,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
@@ -1946,7 +1946,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE RBRACE VAL
 ##
@@ -1959,7 +1959,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE RBRACE VAL
 ## FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN option(preceded(RARROW,located(fexpr))) code_block
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN RPAREN VAL
 ##
@@ -1972,7 +1972,7 @@ program: FN LPAREN RPAREN VAL
 ## FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -1991,7 +1991,7 @@ program: FN LPAREN RPAREN RARROW BOOL VAL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN RPAREN LBRACE RBRACE VAL
 ##
@@ -2004,7 +2004,7 @@ program: FN LPAREN RPAREN LBRACE RBRACE VAL
 ## FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr))) code_block
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT VAL
 ##
@@ -2021,7 +2021,7 @@ program: FN IDENT VAL
 ## FN IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN VAL
 ##
@@ -2038,7 +2038,7 @@ program: FN IDENT LPAREN VAL
 ## FN IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -2052,7 +2052,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN VAL
 ##
@@ -2065,7 +2065,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN VAL
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -2077,7 +2077,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT COLON BOOL C
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
@@ -2095,7 +2095,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT COLON BOOL C
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN VAL
 ##
@@ -2107,7 +2107,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN VAL
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -2125,7 +2125,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN RARROW BOOL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
@@ -2143,7 +2143,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN RPAREN VAL
 ##
@@ -2157,7 +2157,7 @@ program: FN IDENT LPAREN RPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN RPAREN LPAREN VAL
 ##
@@ -2170,7 +2170,7 @@ program: FN IDENT LPAREN RPAREN LPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -2182,7 +2182,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
@@ -2200,7 +2200,7 @@ program: FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN VAL
 ##
@@ -2212,7 +2212,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN RPAREN LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -2230,7 +2230,7 @@ program: FN IDENT LPAREN RPAREN LPAREN RPAREN RARROW BOOL VAL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -2248,7 +2248,7 @@ program: FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM VAL
 ##
@@ -2271,7 +2271,7 @@ program: ENUM VAL
 ## ENUM
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE VAL
 ##
@@ -2288,7 +2288,7 @@ program: ENUM LBRACE VAL
 ## ENUM LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2312,7 +2312,7 @@ program: ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE IDENT COMMA RBRACE VAL
 ##
@@ -2326,7 +2326,7 @@ program: ENUM LBRACE IDENT COMMA RBRACE VAL
 ## ENUM LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2350,7 +2350,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE RBRACE VAL
 ##
@@ -2364,7 +2364,7 @@ program: ENUM LBRACE RBRACE VAL
 ## ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT VAL
 ##
@@ -2381,7 +2381,7 @@ program: ENUM IDENT VAL
 ## ENUM IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN VAL
 ##
@@ -2396,7 +2396,7 @@ program: ENUM IDENT LPAREN VAL
 ## ENUM IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -2409,7 +2409,7 @@ program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE VAL
 ##
@@ -2422,7 +2422,7 @@ program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE VAL
 ## ENUM IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2444,7 +2444,7 @@ program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE IDENT COMMA FN I
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2466,7 +2466,7 @@ program: ENUM IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE FN IDENT LPAREN 
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN RPAREN VAL
 ##
@@ -2479,7 +2479,7 @@ program: ENUM IDENT LPAREN RPAREN VAL
 ## ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN RPAREN LBRACE VAL
 ##
@@ -2492,7 +2492,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACE VAL
 ## ENUM IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN RPAREN LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2514,7 +2514,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LPAREN RPAREN LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2536,7 +2536,7 @@ program: ENUM IDENT LPAREN RPAREN LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LBRACE VAL
 ##
@@ -2549,7 +2549,7 @@ program: ENUM IDENT LBRACE VAL
 ## ENUM IDENT LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2571,7 +2571,7 @@ program: ENUM IDENT LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2593,7 +2593,7 @@ program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL VAL
 ##
@@ -2607,7 +2607,7 @@ program: BOOL VAL
 ## BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: IDENT LBRACE RBRACE VAL
 ##
@@ -2620,7 +2620,7 @@ program: IDENT LBRACE RBRACE VAL
 ## struct_constructor
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL SEMICOLON VAL
 ##
@@ -2633,7 +2633,7 @@ program: BOOL SEMICOLON VAL
 ## semicolon_stmt SEMICOLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LBRACE RBRACE VAL
 ##
@@ -2646,7 +2646,7 @@ program: LBRACE RBRACE VAL
 ## non_semicolon_stmt
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL LPAREN RPAREN VAL
 ##
@@ -2661,7 +2661,7 @@ program: BOOL LPAREN RPAREN VAL
 ## function_call
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL DOT VAL
 ##
@@ -2678,7 +2678,7 @@ program: BOOL DOT VAL
 ## expr DOT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL DOT IDENT VAL
 ##
@@ -2695,7 +2695,7 @@ program: BOOL DOT IDENT VAL
 ## expr DOT IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL DOT IDENT LPAREN VAL
 ##
@@ -2710,7 +2710,7 @@ program: BOOL DOT IDENT LPAREN VAL
 ## expr DOT IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL DOT IDENT LPAREN BOOL COMMA RPAREN VAL
 ##
@@ -2723,7 +2723,7 @@ program: BOOL DOT IDENT LPAREN BOOL COMMA RPAREN VAL
 ## expr DOT IDENT LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL DOT IDENT LPAREN RPAREN VAL
 ##
@@ -2736,7 +2736,7 @@ program: BOOL DOT IDENT LPAREN RPAREN VAL
 ## expr DOT IDENT LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LBRACE BOOL EOF
 ##
@@ -2757,7 +2757,7 @@ program: LBRACE BOOL EOF
 ## In state 296, spurious reduction of production block_stmt -> stmt
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN FN LPAREN RPAREN UNION
 ##
@@ -2769,7 +2769,7 @@ program: RETURN FN LPAREN RPAREN UNION
 ## FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE IDENT EQUALS BOOL VAL
 ##
@@ -2793,7 +2793,7 @@ program: ENUM LBRACE IDENT EQUALS BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE IDENT EQUALS BOOL COMMA VAL
 ##
@@ -2807,7 +2807,7 @@ program: ENUM LBRACE IDENT EQUALS BOOL COMMA VAL
 ## IDENT EQUALS expr COMMA
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE IDENT COMMA VAL
 ##
@@ -2821,7 +2821,7 @@ program: ENUM LBRACE IDENT COMMA VAL
 ## IDENT COMMA
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2843,7 +2843,7 @@ program: STRUCT LBRACE IMPL ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -2865,7 +2865,7 @@ program: STRUCT LBRACE IMPL ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN RPAREN RARROW BOOL UNION
 ##
@@ -2879,7 +2879,7 @@ program: FN LPAREN RPAREN RARROW BOOL UNION
 ## RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: INTERFACE LBRACE FN IDENT LPAREN RPAREN VAL
 ##
@@ -2891,7 +2891,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN RPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL LPAREN IDENT VAL
 ##
@@ -2904,7 +2904,7 @@ program: STRUCT LBRACE IMPL LPAREN IDENT VAL
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN FN VAL
 ##
@@ -2917,7 +2917,7 @@ program: LPAREN FN VAL
 ## FN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN FN LPAREN VAL
 ##
@@ -2930,7 +2930,7 @@ program: LPAREN FN LPAREN VAL
 ## FN LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -2942,7 +2942,7 @@ program: LPAREN FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## FN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN FN LPAREN RPAREN VAL
 ##
@@ -2954,7 +2954,7 @@ program: LPAREN FN LPAREN RPAREN VAL
 ## FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN IDENT LBRACE RBRACE VAL
 ##
@@ -2966,7 +2966,7 @@ program: LPAREN IDENT LBRACE RBRACE VAL
 ## LPAREN struct_constructor
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN FN LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -2985,7 +2985,7 @@ program: LPAREN FN LPAREN RPAREN RARROW BOOL VAL
 ## In state 352, spurious reduction of production function_definition(nothing,nothing) -> FN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN option(preceded(RARROW,located(fexpr)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL LPAREN IDENT LPAREN RPAREN VAL
 ##
@@ -2998,7 +2998,7 @@ program: STRUCT LBRACE IMPL LPAREN IDENT LPAREN RPAREN VAL
 ## function_call
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL BOOL VAL
 ##
@@ -3012,7 +3012,7 @@ program: STRUCT LBRACE IMPL BOOL VAL
 ## IMPL fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL BOOL LBRACE VAL
 ##
@@ -3024,7 +3024,7 @@ program: STRUCT LBRACE IMPL BOOL LBRACE VAL
 ## IMPL fexpr LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL BOOL LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3046,7 +3046,7 @@ program: STRUCT LBRACE IMPL BOOL LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE IMPL BOOL LBRACE RBRACE VAL
 ##
@@ -3058,7 +3058,7 @@ program: STRUCT LBRACE IMPL BOOL LBRACE RBRACE VAL
 ## IMPL fexpr LBRACE list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN STRUCT LBRACE RBRACE VAL
 ##
@@ -3071,7 +3071,7 @@ program: LPAREN STRUCT LBRACE RBRACE VAL
 ## LPAREN STRUCT option(params) LBRACE list(struct_field) list(sugared_function_definition(option(code_block))) list(impl) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN STRING VAL
 ##
@@ -3084,7 +3084,7 @@ program: LPAREN STRING VAL
 ## LPAREN STRING
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN INTERFACE VAL
 ##
@@ -3097,7 +3097,7 @@ program: LPAREN INTERFACE VAL
 ## LPAREN INTERFACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN INTERFACE LBRACE VAL
 ##
@@ -3110,7 +3110,7 @@ program: LPAREN INTERFACE LBRACE VAL
 ## LPAREN INTERFACE LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN INTERFACE LBRACE RBRACE VAL
 ##
@@ -3123,7 +3123,7 @@ program: LPAREN INTERFACE LBRACE RBRACE VAL
 ## LPAREN INTERFACE LBRACE list(located(function_signature_binding)) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN INT VAL
 ##
@@ -3136,7 +3136,7 @@ program: LPAREN INT VAL
 ## LPAREN INT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN IDENT VAL
 ##
@@ -3150,7 +3150,7 @@ program: LPAREN IDENT VAL
 ## LPAREN IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN ENUM VAL
 ##
@@ -3165,7 +3165,7 @@ program: LPAREN ENUM VAL
 ## LPAREN ENUM
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN ENUM LBRACE VAL
 ##
@@ -3180,7 +3180,7 @@ program: LPAREN ENUM LBRACE VAL
 ## LPAREN ENUM LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3203,7 +3203,7 @@ program: LPAREN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN ENUM LBRACE IDENT COMMA RBRACE VAL
 ##
@@ -3216,7 +3216,7 @@ program: LPAREN ENUM LBRACE IDENT COMMA RBRACE VAL
 ## LPAREN ENUM LBRACE nonempty_list(terminated(enum_member,COMMA)) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3239,7 +3239,7 @@ program: LPAREN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN ENUM LBRACE RBRACE VAL
 ##
@@ -3252,7 +3252,7 @@ program: LPAREN ENUM LBRACE RBRACE VAL
 ## LPAREN ENUM LBRACE loption(separated_nonempty_list(COMMA,enum_member)) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN BOOL VAL
 ##
@@ -3265,7 +3265,7 @@ program: LPAREN BOOL VAL
 ## LPAREN BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: LPAREN BOOL LPAREN RPAREN VAL
 ##
@@ -3279,7 +3279,7 @@ program: LPAREN BOOL LPAREN RPAREN VAL
 ## LPAREN function_call
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE VAL IDENT COLON BOOL RPAREN
 ##
@@ -3300,7 +3300,7 @@ program: STRUCT LBRACE VAL IDENT COLON BOOL RPAREN
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: STRUCT LBRACE VAL IDENT COLON BOOL SEMICOLON UNION
 ##
@@ -3312,7 +3312,7 @@ program: STRUCT LBRACE VAL IDENT COLON BOOL SEMICOLON UNION
 ## VAL IDENT COLON expr option(SEMICOLON)
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: RETURN STRUCT LBRACE RBRACE UNION
 ##
@@ -3325,7 +3325,7 @@ program: RETURN STRUCT LBRACE RBRACE UNION
 ## STRUCT option(params) LBRACE list(struct_field) list(sugared_function_definition(option(code_block))) list(impl) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN IDENT COLON BOOL VAL
 ##
@@ -3349,7 +3349,7 @@ program: FN LPAREN IDENT COLON BOOL VAL
 ## In state 137, spurious reduction of production expr -> BOOL
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: FN LPAREN IDENT COLON BOOL COMMA VAL
 ##
@@ -3363,7 +3363,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA VAL
 ## IDENT COLON expr COMMA
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -3377,7 +3377,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN VAL
 ##
@@ -3390,7 +3390,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN VAL
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -3402,7 +3402,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT 
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
@@ -3420,7 +3420,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN IDENT 
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN VAL
 ##
@@ -3432,7 +3432,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN
 ## FN IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -3450,7 +3450,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LPAREN RPAREN
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
@@ -3468,7 +3468,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL V
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN VAL
 ##
@@ -3482,7 +3482,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN VAL
 ##
@@ -3495,7 +3495,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -3507,7 +3507,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
@@ -3525,7 +3525,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN IDENT COLON BOOL COMMA RPAREN
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN VAL
 ##
@@ -3537,7 +3537,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN VAL
 ## FN IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -3555,7 +3555,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LPAREN RPAREN RARROW BOOL VAL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: ENUM LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ##
@@ -3573,7 +3573,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ## In state 337, spurious reduction of production option(preceded(RARROW,located(fexpr))) -> RARROW fexpr
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3595,7 +3595,7 @@ program: UNION LBRACE CASE UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE STRUCT VAL
 ##
@@ -3607,7 +3607,7 @@ program: UNION LBRACE CASE STRUCT VAL
 ## STRUCT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE STRUCT LBRACE UNION
 ##
@@ -3619,7 +3619,7 @@ program: UNION LBRACE CASE STRUCT LBRACE UNION
 ## STRUCT LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE INTERFACE VAL
 ##
@@ -3631,7 +3631,7 @@ program: UNION LBRACE CASE INTERFACE VAL
 ## INTERFACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE INTERFACE LBRACE VAL
 ##
@@ -3643,7 +3643,7 @@ program: UNION LBRACE CASE INTERFACE LBRACE VAL
 ## INTERFACE LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE IDENT VAL
 ##
@@ -3657,7 +3657,7 @@ program: UNION LBRACE CASE IDENT VAL
 ## IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE IDENT LPAREN VAL
 ##
@@ -3670,7 +3670,7 @@ program: UNION LBRACE CASE IDENT LPAREN VAL
 ## IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE ENUM VAL
 ##
@@ -3683,7 +3683,7 @@ program: UNION LBRACE CASE ENUM VAL
 ## ENUM
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE ENUM LBRACE VAL
 ##
@@ -3696,7 +3696,7 @@ program: UNION LBRACE CASE ENUM LBRACE VAL
 ## ENUM LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3718,7 +3718,7 @@ program: UNION LBRACE CASE ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3740,7 +3740,7 @@ program: UNION LBRACE CASE ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE CASE ENUM LBRACE RBRACE VAL
 ##
@@ -3752,7 +3752,7 @@ program: UNION LBRACE CASE ENUM LBRACE RBRACE VAL
 ## CASE union_member
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3776,7 +3776,7 @@ program: UNION LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION LBRACE RBRACE VAL
 ##
@@ -3790,7 +3790,7 @@ program: UNION LBRACE RBRACE VAL
 ## UNION LBRACE list(preceded(CASE,located(union_member))) list(sugared_function_definition(option(code_block))) RBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT VAL
 ##
@@ -3804,7 +3804,7 @@ program: UNION IDENT VAL
 ## UNION IDENT
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LPAREN VAL
 ##
@@ -3817,7 +3817,7 @@ program: UNION IDENT LPAREN VAL
 ## UNION IDENT LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
@@ -3829,7 +3829,7 @@ program: UNION IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ## UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE VAL
 ##
@@ -3841,7 +3841,7 @@ program: UNION IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE VAL
 ## UNION IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3863,7 +3863,7 @@ program: UNION IDENT LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE FN IDENT LPAREN
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LPAREN RPAREN VAL
 ##
@@ -3875,7 +3875,7 @@ program: UNION IDENT LPAREN RPAREN VAL
 ## UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LPAREN RPAREN LBRACE VAL
 ##
@@ -3887,7 +3887,7 @@ program: UNION IDENT LPAREN RPAREN LBRACE VAL
 ## UNION IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LPAREN RPAREN LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3909,7 +3909,7 @@ program: UNION IDENT LPAREN RPAREN LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LBRACE VAL
 ##
@@ -3921,7 +3921,7 @@ program: UNION IDENT LBRACE VAL
 ## UNION IDENT LBRACE
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: UNION IDENT LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
@@ -3943,7 +3943,7 @@ program: UNION IDENT LBRACE FN IDENT LPAREN RPAREN IMPL
 ## In state 20, spurious reduction of production list(sugared_function_definition(option(code_block))) -> function_definition(located(ident),option(code_block)) list(sugared_function_definition(option(code_block)))
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 
 program: BOOL RBRACE
 ##
@@ -3964,5 +3964,5 @@ program: BOOL RBRACE
 ## In state 296, spurious reduction of production block_stmt -> stmt
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Invalid syntax
 

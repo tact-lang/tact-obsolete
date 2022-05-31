@@ -34,7 +34,8 @@
   lang
   func
   codegen_func
-  show)
+  show
+  compiler)
  (name tact))
 
 (ocamllex asm_lexer)
