@@ -9,7 +9,7 @@ type instr =
   | NEWC
   | STIX
   | ENDC
-[@@deriving equal, sexp_of, yojson_of]
+[@@deriving equal, sexp_of]
 
 class ['s] map =
   object (_ : 's)

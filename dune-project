@@ -17,8 +17,6 @@
    (ppx_make (>= 0.3.0))
    (js_of_ocaml-ppx (>= 4.0.0))
    (zarith_stubs_js (>= 0.15.0))
-   (yojson (>= 1.7.0))
-   (ppx_yojson_conv (>= 0.15.0))
    (dune (and :build (>= 3.1.1)))
    (js_of_ocaml (>= 4.0.0))
    (menhirLib (= 20220210))

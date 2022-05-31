@@ -10,5 +10,3 @@ class ['s] map =
   end
 
 let equal = Z.equal
-
-let yojson_of_t z = `Intlit (to_string z)

@@ -116,7 +116,6 @@ and primitive =
 [@@deriving
   equal,
     sexp_of,
-    yojson_of,
     visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
