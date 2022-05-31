@@ -49,3 +49,9 @@ to fill in the blanks. In this particular case, it's useful to run `dune test --
 
 Can be built during `dune build` or `dune build js` and will be available in
 ` _build/default/js/tact_js.bc.js`
+
+In order to build a (smaller) release build, one should run:
+
+```
+dune build js --profile=release
+```
