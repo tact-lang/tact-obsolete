@@ -10,5 +10,6 @@ let _ =
          | Ok program ->
              Js.string program
          | Error errors ->
-             Js.string errors
+             Js_error.raise_ @@ Js_error.of_error
+             @@ new%js Js.error_constr (Js.string errors)
     end )
