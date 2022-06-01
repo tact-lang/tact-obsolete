@@ -59,7 +59,6 @@ and value =
   | Bool of bool
   | String of string
   | Builtin of builtin
-  | Interface of interface
   | Type of type_
 
 and stmt =
@@ -124,8 +123,6 @@ and primitive =
 let rec expr_to_type = function
   | Value (Type type_) ->
       type_
-  | Value (Interface i) ->
-      InterfaceType i
   | FunctionCall
       ( ResolvedReference
           (_, Value (Function {function_signature = {function_returns; _}; _})),
@@ -155,8 +152,6 @@ let rec type_of = function
       Value (Type VoidType)
   | Value (Type _) ->
       Value (Type TypeType)
-  | Value (Interface i) ->
-      Value (Type (InterfaceType i))
   | Hole ->
       Value (Type HoleType)
   | FunctionCall

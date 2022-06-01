@@ -166,13 +166,14 @@ let serializer =
 (* Only for debug purposes *)
 let bin_op_intf =
   Value
-    (Interface
-       { interface_methods =
-           [ ( "op",
-               { function_params =
-                   [ ("left", Value (Type IntegerType));
-                     ("right", Value (Type IntegerType)) ];
-                 function_returns = Value (Type IntegerType) } ) ] } )
+    (Type
+       (InterfaceType
+          { interface_methods =
+              [ ( "op",
+                  { function_params =
+                      [ ("left", Value (Type IntegerType));
+                        ("right", Value (Type IntegerType)) ];
+                    function_returns = Value (Type IntegerType) } ) ] } ) )
 
 let default_bindings =
   [ ("Builder", builder);
