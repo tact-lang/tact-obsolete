@@ -1927,7 +1927,13 @@ let%expect_test "implement interface op" =
      ((bindings
        ((empty (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
         (Empty
-         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
+         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))
+        (Make
+         (Value
+          (Interface
+           ((interface_methods
+             ((new
+               ((function_params ()) (function_returns (Value (Type HoleType)))))))))))))
       (methods
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
          ((new
@@ -1945,7 +1951,13 @@ let%expect_test "implement interface op" =
                     (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))
       (impls
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
-         (((impl_interface (Reference (Make (Value (Type InvalidType)))))
+         (((impl_interface
+            (Value
+             (Interface
+              ((interface_methods
+                ((new
+                  ((function_params ())
+                   (function_returns (Value (Type HoleType)))))))))))
            (impl_methods
             ((new
               (Value

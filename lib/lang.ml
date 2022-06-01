@@ -106,7 +106,7 @@ functor
 
         method build_String _env s = Value (String s)
 
-        method build_Interface _env _iface = InvalidExpr
+        method build_Interface _env iface = Value (Interface iface)
 
         method build_Let _env let_ =
           let amend_bindings binding = function

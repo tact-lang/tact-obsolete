@@ -82,8 +82,9 @@ and type_ =
   | BuiltinType of builtin
   | StructType of struct_
   | FunctionType of function_signature
+  | InterfaceType of interface
   | HoleType
-  | InvalidType
+  | InvalidType of expr
 
 and struct_ =
   {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
@@ -123,6 +124,8 @@ and primitive =
 let rec expr_to_type = function
   | Value (Type type_) ->
       type_
+  | Value (Interface i) ->
+      InterfaceType i
   | FunctionCall
       ( ResolvedReference
           (_, Value (Function {function_signature = {function_returns; _}; _})),
@@ -130,12 +133,12 @@ let rec expr_to_type = function
   | FunctionCall
       (Value (Function {function_signature = {function_returns; _}; _}), _) ->
       expr_to_type function_returns
-  | Reference _ ->
-      InvalidType
+  | Reference (_, t) ->
+      expr_to_type t
   | ResolvedReference (_, e) ->
       expr_to_type e
-  | _other ->
-      InvalidType
+  | expr ->
+      InvalidType expr
 
 let rec type_of = function
   | Value (Struct (struct_, _)) ->
@@ -152,6 +155,8 @@ let rec type_of = function
       Value (Type VoidType)
   | Value (Type _) ->
       Value (Type TypeType)
+  | Value (Interface i) ->
+      Value (Type (InterfaceType i))
   | Hole ->
       Value (Type HoleType)
   | FunctionCall
@@ -165,8 +170,8 @@ let rec type_of = function
       t
   | ResolvedReference (_, e) ->
       type_of e
-  | _other ->
-      Value (Type InvalidType)
+  | expr ->
+      Value (Type (InvalidType expr))
 
 class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)
