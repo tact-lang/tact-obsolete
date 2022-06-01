@@ -83,6 +83,7 @@ and type_ =
   | FunctionType of function_signature
   | InterfaceType of interface
   | HoleType
+  | SelfType
   | InvalidType of expr
 
 and struct_ =

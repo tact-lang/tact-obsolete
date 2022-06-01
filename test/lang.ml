@@ -1939,7 +1939,7 @@ let%expect_test "implement interface op" =
            (InterfaceType
             ((interface_methods
               ((new
-                ((function_params ()) (function_returns (Value (Type HoleType))))))))))))))
+                ((function_params ()) (function_returns (Value (Type SelfType))))))))))))))
       (methods
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
          ((new
@@ -1964,7 +1964,7 @@ let%expect_test "implement interface op" =
                ((interface_methods
                  ((new
                    ((function_params ())
-                    (function_returns (Value (Type HoleType))))))))))))
+                    (function_returns (Value (Type SelfType))))))))))))
            (impl_methods
             ((new
               (Value

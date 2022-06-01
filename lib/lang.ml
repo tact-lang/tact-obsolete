@@ -349,7 +349,7 @@ functor
         method! visit_interface_definition env def =
           let current_bindings' = current_bindings in
           current_bindings <-
-            [("Self", Value (Type HoleType))] :: current_bindings' ;
+            [("Self", Value (Type SelfType))] :: current_bindings' ;
           let value = super#visit_interface_definition env def in
           current_bindings <- current_bindings' ;
           value
