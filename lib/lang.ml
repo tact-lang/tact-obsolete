@@ -106,7 +106,7 @@ functor
 
         method build_String _env s = Value (String s)
 
-        method build_Interface _env _iface = InvalidExpr
+        method build_Interface _env iface = Value (Type (InterfaceType iface))
 
         method build_Let _env let_ =
           let amend_bindings binding = function
@@ -349,7 +349,7 @@ functor
         method! visit_interface_definition env def =
           let current_bindings' = current_bindings in
           current_bindings <-
-            [("Self", Value (Type HoleType))] :: current_bindings' ;
+            [("Self", Value (Type SelfType))] :: current_bindings' ;
           let value = super#visit_interface_definition env def in
           current_bindings <- current_bindings' ;
           value

@@ -59,7 +59,6 @@ and value =
   | Bool of bool
   | String of string
   | Builtin of builtin
-  | Interface of interface
   | Type of type_
 
 and stmt =
@@ -82,8 +81,10 @@ and type_ =
   | BuiltinType of builtin
   | StructType of struct_
   | FunctionType of function_signature
+  | InterfaceType of interface
   | HoleType
-  | InvalidType
+  | SelfType
+  | InvalidType of expr
 
 and struct_ =
   {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
@@ -130,12 +131,12 @@ let rec expr_to_type = function
   | FunctionCall
       (Value (Function {function_signature = {function_returns; _}; _}), _) ->
       expr_to_type function_returns
-  | Reference _ ->
-      InvalidType
+  | Reference (_, t) ->
+      expr_to_type t
   | ResolvedReference (_, e) ->
       expr_to_type e
-  | _other ->
-      InvalidType
+  | expr ->
+      InvalidType expr
 
 let rec type_of = function
   | Value (Struct (struct_, _)) ->
@@ -165,8 +166,8 @@ let rec type_of = function
       t
   | ResolvedReference (_, e) ->
       type_of e
-  | _other ->
-      Value (Type InvalidType)
+  | expr ->
+      Value (Type (InvalidType expr))
 
 class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)

@@ -193,13 +193,14 @@ let%expect_test "failed scope resolution" =
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (BinOp
            (Value
-            (Interface
-             ((interface_methods
-               ((op
-                 ((function_params
-                   ((left (Value (Type IntegerType)))
-                    (right (Value (Type IntegerType)))))
-                  (function_returns (Value (Type IntegerType)))))))))))))
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params
+                    ((left (Value (Type IntegerType)))
+                     (right (Value (Type IntegerType)))))
+                   (function_returns (Value (Type IntegerType))))))))))))))
         (methods
          (((Type (BuiltinType Builder))
            ((new
@@ -704,13 +705,14 @@ let%expect_test "duplicate type field" =
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (BinOp
            (Value
-            (Interface
-             ((interface_methods
-               ((op
-                 ((function_params
-                   ((left (Value (Type IntegerType)))
-                    (right (Value (Type IntegerType)))))
-                  (function_returns (Value (Type IntegerType)))))))))))))
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params
+                    ((left (Value (Type IntegerType)))
+                     (right (Value (Type IntegerType)))))
+                   (function_returns (Value (Type IntegerType))))))))))))))
         (methods
          (((Type
             (StructType
@@ -1461,13 +1463,14 @@ let%expect_test "type check error" =
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (BinOp
            (Value
-            (Interface
-             ((interface_methods
-               ((op
-                 ((function_params
-                   ((left (Value (Type IntegerType)))
-                    (right (Value (Type IntegerType)))))
-                  (function_returns (Value (Type IntegerType)))))))))))))
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params
+                    ((left (Value (Type IntegerType)))
+                     (right (Value (Type IntegerType)))))
+                   (function_returns (Value (Type IntegerType))))))))))))))
         (methods
          (((Type
             (StructType
@@ -1735,13 +1738,14 @@ let%expect_test "type check error" =
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
           (BinOp
            (Value
-            (Interface
-             ((interface_methods
-               ((op
-                 ((function_params
-                   ((left (Value (Type IntegerType)))
-                    (right (Value (Type IntegerType)))))
-                  (function_returns (Value (Type IntegerType)))))))))))))
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params
+                    ((left (Value (Type IntegerType)))
+                     (right (Value (Type IntegerType)))))
+                   (function_returns (Value (Type IntegerType))))))))))))))
         (methods
          (((Type
             (StructType
@@ -1884,13 +1888,14 @@ let%expect_test "implement interface op" =
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
          (((impl_interface
             (Value
-             (Interface
-              ((interface_methods
-                ((op
-                  ((function_params
-                    ((left (Value (Type IntegerType)))
-                     (right (Value (Type IntegerType)))))
-                   (function_returns (Value (Type IntegerType)))))))))))
+             (Type
+              (InterfaceType
+               ((interface_methods
+                 ((op
+                   ((function_params
+                     ((left (Value (Type IntegerType)))
+                      (right (Value (Type IntegerType)))))
+                    (function_returns (Value (Type IntegerType))))))))))))
            (impl_methods
             ((op
               (Value
@@ -1927,7 +1932,14 @@ let%expect_test "implement interface op" =
      ((bindings
        ((empty (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
         (Empty
-         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
+         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))
+        (Make
+         (Value
+          (Type
+           (InterfaceType
+            ((interface_methods
+              ((new
+                ((function_params ()) (function_returns (Value (Type SelfType))))))))))))))
       (methods
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
          ((new
@@ -1945,7 +1957,14 @@ let%expect_test "implement interface op" =
                     (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))
       (impls
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
-         (((impl_interface (Reference (Make (Value (Type InvalidType)))))
+         (((impl_interface
+            (Value
+             (Type
+              (InterfaceType
+               ((interface_methods
+                 ((new
+                   ((function_params ())
+                    (function_returns (Value (Type SelfType))))))))))))
            (impl_methods
             ((new
               (Value
