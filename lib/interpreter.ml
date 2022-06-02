@@ -110,6 +110,11 @@ class interpreter
                   (name, {field_type = Value (self#interpret_expr field_type)}) )
             in
             Type (StructType {struct_fields; struct_id})
+        | Struct (s, fields) ->
+            Struct
+              ( s,
+                List.map fields ~f:(fun (n, f) ->
+                    (n, Value (self#interpret_expr f)) ) )
         | value ->
             value
 

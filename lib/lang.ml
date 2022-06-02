@@ -24,6 +24,8 @@ functor
 
     type infer_ctx = {mutable fn_returns : expr option}
 
+    type type_check_error = TypeError | NeedFromCall of expr
+
     class ['s] constructor (bindings : (string * expr) list)
       (methods : (value * (string * function_) list) list) (errors : _ errors) =
       object (s : 's)
@@ -68,20 +70,27 @@ functor
         method build_FunctionCall _env (f, args) =
           match type_of f with
           | Value (Type (FunctionType sign)) -> (
+              let no_errors = ref true in
               let types_satisfying =
-                List.for_all2 sign.function_params args
+                List.map2 sign.function_params args
                   ~f:(fun (_, expected) expr ->
-                    if equal_expr expected (type_of expr) then true
-                    else (
-                      errors#report `Error
-                        (`TypeError (expected, type_of expr))
-                        () ;
-                      false ) )
+                    match s#check_type ~expected (type_of expr) with
+                    | Ok _ ->
+                        expr
+                    | Error (NeedFromCall func) ->
+                        let s = FunctionCall (func, [expr]) in
+                        s
+                    | _ ->
+                        errors#report `Error
+                          (`TypeError (expected, type_of expr))
+                          () ;
+                        no_errors := false ;
+                        Value Void )
               in
               match types_satisfying with
-              | Ok true ->
-                  let fc = (f, args) in
-                  if is_immediate_expr (FunctionCall (f, args)) then
+              | Ok args' when !no_errors ->
+                  let fc = (f, args') in
+                  if is_immediate_expr (FunctionCall (f, args')) then
                     let inter =
                       new interpreter
                         (program, current_bindings, errors, functions)
@@ -150,7 +159,9 @@ functor
             | Ok ty ->
                 infer_ctx.fn_returns <- Some ty ;
                 Return return
-            | Error _ ->
+            | Error (NeedFromCall func) ->
+                Break (Expr (FunctionCall (func, [return])))
+            | Error TypeError ->
                 errors#report `Error
                   (`TypeError (fn_returns, type_of return))
                   () ;
@@ -168,7 +179,9 @@ functor
               | Ok ty ->
                   infer_ctx.fn_returns <- Some ty ;
                   Break stmt
-              | Error _ ->
+              | Error (NeedFromCall func) ->
+                  Break (Expr (FunctionCall (func, [ex])))
+              | Error TypeError ->
                   errors#report `Error (`TypeError (fn_returns, type_of ex)) () ;
                   Break stmt )
             | None ->
@@ -452,7 +465,31 @@ functor
               Ok actual
           | _ when equal_expr expected actual ->
               Ok actual
+          | Value x -> (
+              let from_intf_ =
+                let inter =
+                  new interpreter (program, current_bindings, errors, functions)
+                in
+                Value (inter#interpret_fc (from_intf, [actual]))
+              in
+              let impl =
+                List.find_map program.impls ~f:(fun (s, impls) ->
+                    match equal_value s x with
+                    | true ->
+                        List.find_map impls ~f:(fun i ->
+                            if equal_expr i.impl_interface from_intf_ then
+                              Some i.impl_methods
+                            else None )
+                        |> Option.bind ~f:List.hd
+                    | false ->
+                        None )
+              in
+              match impl with
+              | Some (_, m) ->
+                  Error (NeedFromCall m)
+              | _ ->
+                  Error TypeError )
           | _ ->
-              Error ()
+              Error TypeError
       end
   end

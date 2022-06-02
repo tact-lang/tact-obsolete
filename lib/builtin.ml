@@ -175,6 +175,25 @@ let bin_op_intf =
                         ("right", Value (Type IntegerType)) ];
                     function_returns = Value (Type IntegerType) } ) ] } ) )
 
+let from_intf =
+  let function_signature =
+    { function_params = [("T", Value (Type TypeType))];
+      function_returns = Value (Type HoleType) }
+  in
+  let make_from t =
+    Type
+      (InterfaceType
+         { interface_methods =
+             [ ( "from",
+                 { function_params = [("from", Value (Type t))];
+                   function_returns = Value (Type SelfType) } ) ] } )
+  in
+  let function_impl _p = function [Type t] -> make_from t | _ -> Void in
+  Value
+    (Function
+       { function_signature;
+         function_impl = BuiltinFn (builtin_fun function_impl) } )
+
 let default_bindings =
   [ ("Builder", builder);
     ("Integer", Value (Type IntegerType));
@@ -186,6 +205,7 @@ let default_bindings =
      * purposes
      *)
     ("serializer", serializer);
-    ("BinOp", bin_op_intf) ]
+    ("BinOp", bin_op_intf);
+    ("From", from_intf) ]
 
 let default_methods = [(Type (BuiltinType "Builder"), builder_methods)]

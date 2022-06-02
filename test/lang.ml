@@ -200,7 +200,14 @@ let%expect_test "failed scope resolution" =
                   ((function_params
                     ((left (Value (Type IntegerType)))
                      (right (Value (Type IntegerType)))))
-                   (function_returns (Value (Type IntegerType))))))))))))))
+                   (function_returns (Value (Type IntegerType))))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (Value (Type TypeType)))))
+                (function_returns (Value (Type HoleType)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type (BuiltinType Builder))
            ((new
@@ -712,7 +719,14 @@ let%expect_test "duplicate type field" =
                   ((function_params
                     ((left (Value (Type IntegerType)))
                      (right (Value (Type IntegerType)))))
-                   (function_returns (Value (Type IntegerType))))))))))))))
+                   (function_returns (Value (Type IntegerType))))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (Value (Type TypeType)))))
+                (function_returns (Value (Type HoleType)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
             (StructType
@@ -1470,7 +1484,14 @@ let%expect_test "type check error" =
                   ((function_params
                     ((left (Value (Type IntegerType)))
                      (right (Value (Type IntegerType)))))
-                   (function_returns (Value (Type IntegerType))))))))))))))
+                   (function_returns (Value (Type IntegerType))))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (Value (Type TypeType)))))
+                (function_returns (Value (Type HoleType)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
             (StructType
@@ -1745,7 +1766,14 @@ let%expect_test "type check error" =
                   ((function_params
                     ((left (Value (Type IntegerType)))
                      (right (Value (Type IntegerType)))))
-                   (function_returns (Value (Type IntegerType))))))))))))))
+                   (function_returns (Value (Type IntegerType))))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (Value (Type TypeType)))))
+                (function_returns (Value (Type HoleType)))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
             (StructType

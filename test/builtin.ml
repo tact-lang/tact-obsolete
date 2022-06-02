@@ -611,3 +611,132 @@ let%expect_test "demo struct serializer" =
                      (struct_id <opaque>))))))))))
             (struct_id <opaque>))))
          ()))))) |}]
+
+let%expect_test "from interface" =
+  let source =
+    {|
+      struct Value {
+        val a: Integer
+        impl From(Integer) {
+          fn from(x: Integer) -> Self {
+            Self{a: x}
+          }
+        }
+      }
+      fn check(y: Value) { y }
+
+      let var = check(10);
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((var
+         (Value
+          (Struct
+           (((struct_fields ((a ((field_type (Value (Type IntegerType)))))))
+             (struct_id <opaque>))
+            ((a (Value (Integer 10))))))))
+        (check
+         (Value
+          (Function
+           ((function_signature
+             ((function_params
+               ((y
+                 (Value
+                  (Type
+                   (StructType
+                    ((struct_fields
+                      ((a ((field_type (Value (Type IntegerType)))))))
+                     (struct_id <opaque>))))))))
+              (function_returns
+               (Value
+                (Type
+                 (StructType
+                  ((struct_fields
+                    ((a ((field_type (Value (Type IntegerType)))))))
+                   (struct_id <opaque>))))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Reference
+                    (y
+                     (Value
+                      (Type
+                       (StructType
+                        ((struct_fields
+                          ((a ((field_type (Value (Type IntegerType)))))))
+                         (struct_id <opaque>))))))))))))))))))
+        (Value
+         (Value
+          (Type
+           (StructType
+            ((struct_fields ((a ((field_type (Value (Type IntegerType)))))))
+             (struct_id <opaque>))))))))
+      (methods
+       (((Type
+          (StructType
+           ((struct_fields ((a ((field_type (Value (Type IntegerType)))))))
+            (struct_id <opaque>))))
+         ((from
+           ((function_signature
+             ((function_params ((x (Value (Type IntegerType)))))
+              (function_returns
+               (Value
+                (Type
+                 (StructType
+                  ((struct_fields
+                    ((a ((field_type (Value (Type IntegerType)))))))
+                   (struct_id <opaque>))))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Value
+                    (Struct
+                     (((struct_fields
+                        ((a ((field_type (Value (Type IntegerType)))))))
+                       (struct_id <opaque>))
+                      ((a (Reference (x (Value (Type IntegerType))))))))))))))))))))))
+      (impls
+       (((Type
+          (StructType
+           ((struct_fields ((a ((field_type (Value (Type IntegerType)))))))
+            (struct_id <opaque>))))
+         (((impl_interface
+            (Value
+             (Type
+              (InterfaceType
+               ((interface_methods
+                 ((from
+                   ((function_params ((from (Value (Type IntegerType)))))
+                    (function_returns (Value (Type SelfType))))))))))))
+           (impl_methods
+            ((from
+              (Value
+               (Function
+                ((function_signature
+                  ((function_params ((x (Value (Type IntegerType)))))
+                   (function_returns
+                    (Value
+                     (Type
+                      (StructType
+                       ((struct_fields
+                         ((a ((field_type (Value (Type IntegerType)))))))
+                        (struct_id <opaque>))))))))
+                 (function_impl
+                  (Fn
+                   ((Block
+                     ((Break
+                       (Expr
+                        (Value
+                         (Struct
+                          (((struct_fields
+                             ((a ((field_type (Value (Type IntegerType)))))))
+                            (struct_id <opaque>))
+                           ((a (Reference (x (Value (Type IntegerType))))))))))))))))))))))))))))) |}]
