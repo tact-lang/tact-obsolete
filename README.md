@@ -6,7 +6,7 @@
 * Run following commands:
 ```
 opam init
-opam switch create $(pwd) -y
+opam switch create $(pwd) --with-test -y
 eval $(opam env)
 dune build && dune install
 ```
@@ -17,7 +17,7 @@ You can now use `tact /path/to/file.tact`
 
 ### Updating dependencies
 
-Run `opam install tact --working-dir --deps-only --with-test`
+Run `opam install . --working-dir --deps-only --with-test`
 
 ### Running REPL
 
