@@ -1,5 +1,7 @@
 open Base
 
+exception InternalCompilerError
+
 class ['a, 's, 'e, 'm] errors (show_error : 'e -> string) =
   object (s : _)
     val mutable errors = []

@@ -13,7 +13,7 @@ type error =
 (*TODO: type checks for arguments*)
 class interpreter
   ((program, bindings, errors, _functions) :
-    program * (string * expr) list list * _ errors * int ) =
+    program * tbinding list list * _ errors * int ) =
   object (self)
     val global_bindings = bindings
 
@@ -156,8 +156,9 @@ class interpreter
           | {function_impl = BuiltinFn (function_impl, _); _} ->
               let program' =
                 { program with
-                  bindings = Option.value (List.hd global_bindings) ~default:[]
-                }
+                  bindings =
+                    extract_comptime_bindings
+                      (Option.value (List.hd global_bindings) ~default:[]) }
               in
               let value = function_impl program' args' in
               program.methods <- program'.methods ;
@@ -169,7 +170,7 @@ class interpreter
 
     method private find_ref : string -> expr option =
       fun ref ->
-        match find_in_scope ref vars_scope with
+        match find_in_runtime_scope ref vars_scope with
         | Some e ->
             Some (Value e)
         | None ->
@@ -177,11 +178,13 @@ class interpreter
 
     method private find_in_global_scope : string -> expr option =
       fun ref ->
-        match find_in_scope ref global_bindings with
-        | Some (Reference (ref', _)) ->
+        match find_comptime ref global_bindings with
+        | Some (Ok (Reference (ref', _))) ->
             self#find_in_global_scope ref'
-        | Some (ResolvedReference (_, e)) ->
+        | Some (Ok (ResolvedReference (_, e))) ->
             Some e
-        | not_ref ->
-            not_ref
+        | Some (Error ()) ->
+            raise Errors.InternalCompilerError
+        | _ ->
+            None
   end

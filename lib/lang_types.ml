@@ -29,9 +29,12 @@ and metadata = (string * string) list
 
 and binding = string * expr
 
+and tbinding = {tbinding : binding; binding_scope : binding_scope}
+
+and binding_scope = Comptime | Runtime
+
 and program =
-  { stmts : stmt list; [@sexp.list]
-    bindings : (string * expr) list;
+  { bindings : (string * expr) list;
     mutable methods : (value * (string * function_) list) list; [@sexp.list]
     mutable impls : (value * impl list) list [@sexp.list] }
 
@@ -120,6 +123,18 @@ and primitive =
     visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
+
+let find_comptime name bindings =
+  List.find_map bindings ~f:(fun bindings ->
+      List.find_map bindings ~f:(function
+        | {tbinding = b_name, value; binding_scope = Comptime} ->
+            if equal_string b_name name then Some (Ok value) else None
+        | {tbinding = b_name, _; binding_scope = Runtime} ->
+            if equal_string b_name name then Some (Error ()) else None ) )
+
+let extract_comptime_bindings bindings =
+  List.filter_map bindings ~f:(fun {tbinding; binding_scope} ->
+      match binding_scope with Comptime -> Some tbinding | _ -> None )
 
 let rec expr_to_type = function
   | Value (Type type_) ->
@@ -238,12 +253,16 @@ and builtin_fun f =
   builtin_fun_counter := !builtin_fun_counter + 1 ;
   res
 
-let find_in_scope : 'a. string -> (string * 'a) list list -> 'a option =
+let find_in_scope : string -> tbinding list list -> tbinding option =
  fun ref scope ->
   List.find_map scope ~f:(fun bindings ->
-      Option.map
-        (List.find bindings ~f:(fun (s, _) -> String.equal ref s))
-        ~f:(fun (_name, a) -> a) )
+      List.find bindings ~f:(fun {tbinding = s, _; _} -> String.equal ref s) )
+
+let find_in_runtime_scope : 'a. string -> (string * 'a) list list -> 'a option =
+ fun ref scope ->
+  List.find_map scope ~f:(fun bindings ->
+      List.find_map bindings ~f:(fun (name, value) ->
+          if String.equal ref name then Some value else None ) )
 
 (* We declare the struct counter here to count all structs *)
 let struct_counter = ref 0

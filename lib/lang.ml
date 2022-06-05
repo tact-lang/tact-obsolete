@@ -32,10 +32,9 @@ functor
         inherit ['s] Syntax.visitor as super
 
         (* Bindings in scope *)
-        val mutable current_bindings = [bindings]
-
-        (* Bindings that will available only in runtime *)
-        val mutable runtime_bindings = []
+        val mutable current_bindings =
+          [ List.map bindings ~f:(fun x ->
+                {tbinding = x; binding_scope = Comptime} ) ]
 
         val infer_ctx = {fn_returns = None}
 
@@ -43,22 +42,19 @@ functor
         val mutable functions = 0
 
         (* Program handle we pass to builtin functions *)
-        val program = {bindings; stmts = []; methods; impls = []}
+        val program = {bindings; methods; impls = []}
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
 
         method! visit_CodeBlock env block =
           (* new binding scope *)
-          let current_bindings' = current_bindings
-          and runtime_bindings' = runtime_bindings in
+          let current_bindings' = current_bindings in
           current_bindings <- [] :: current_bindings ;
-          runtime_bindings <- [] :: runtime_bindings ;
           (* process the body *)
           let result = super#visit_CodeBlock env block in
           (* drop binding scope *)
           current_bindings <- current_bindings' ;
-          runtime_bindings <- runtime_bindings' ;
           result
 
         method build_Enum _env _enum = InvalidExpr
@@ -127,30 +123,34 @@ functor
           let name, expr = Syntax.value let_ in
           match is_immediate_expr expr with
           | true ->
-              current_bindings <- amend_bindings (name, expr) current_bindings ;
+              current_bindings <-
+                amend_bindings
+                  {tbinding = (name, expr); binding_scope = Comptime}
+                  current_bindings ;
               Let [(name, expr)]
           | false ->
               let ty = type_of expr in
-              runtime_bindings <- amend_bindings (name, ty) runtime_bindings ;
+              current_bindings <-
+                amend_bindings
+                  {tbinding = (name, ty); binding_scope = Runtime}
+                  current_bindings ;
               Let [(name, expr)]
 
         method build_MutRef _env _mutref = InvalidExpr
 
         method build_Reference env ref =
           match find_in_scope ref current_bindings with
-          | Some (Reference (ref', _)) ->
+          | Some {tbinding = _, ty; binding_scope = Runtime} ->
+              Reference (ref, ty)
+          | Some {tbinding = _, Reference (ref', _); _} ->
               s#build_Reference env ref'
-          | Some (Value value) ->
+          | Some {tbinding = _, Value value; _} ->
               ResolvedReference (ref, Value value)
-          | Some ex ->
+          | Some {tbinding = _, ex; _} ->
               Reference (ref, type_of ex)
-          | None -> (
-            match find_in_scope ref runtime_bindings with
-            | Some ty ->
-                Reference (ref, ty)
-            | None ->
-                errors#report `Error (`UnresolvedIdentifier ref) () ;
-                Reference (ref, Value (Type HoleType)) )
+          | None ->
+              errors#report `Error (`UnresolvedIdentifier ref) () ;
+              Reference (ref, Value (Type HoleType))
 
         method build_Return _env return =
           match infer_ctx.fn_returns with
@@ -306,16 +306,19 @@ functor
             |> Option.map ~f:(fun x -> s#visit_expr env (Syntax.value x))
             |> Option.value ~default:(Value (Type HoleType))
           in
-          let bindings' = runtime_bindings in
+          let bindings' = current_bindings in
           (* inject them into current bindings *)
-          runtime_bindings <- param_bindings :: runtime_bindings ;
+          current_bindings <-
+            List.map param_bindings ~f:(fun x ->
+                {tbinding = x; binding_scope = Runtime} )
+            :: current_bindings ;
           (* process the function definition *)
           let result =
             s#with_fn_returns env function_returns (fun env' ->
                 super#visit_function_definition env' f )
           in
           (* restore bindings as before entering the function *)
-          runtime_bindings <- bindings' ;
+          current_bindings <- bindings' ;
           result
 
         method! visit_function_body env body =
@@ -362,15 +365,17 @@ functor
         method! visit_interface_definition env def =
           let current_bindings' = current_bindings in
           current_bindings <-
-            [("Self", Value (Type SelfType))] :: current_bindings' ;
+            [ { tbinding = ("Self", Value (Type SelfType));
+                binding_scope = Comptime } ]
+            :: current_bindings' ;
           let value = super#visit_interface_definition env def in
           current_bindings <- current_bindings' ;
           value
 
-        method build_program _env stmts =
+        method build_program _env _ =
           { program with
-            stmts = s#of_located_list stmts;
-            bindings = List.concat current_bindings }
+            bindings = extract_comptime_bindings (List.concat current_bindings)
+          }
 
         method build_struct_constructor _env id fields =
           match Syntax.value id with
@@ -409,7 +414,9 @@ functor
           let struct_ = s#build_struct_definition env _visitors_r0 [] []
           and current_bindings' = current_bindings in
           current_bindings <-
-            [("Self", Value (Type (StructType struct_)))] :: current_bindings' ;
+            [ { tbinding = ("Self", Value (Type (StructType struct_)));
+                binding_scope = Comptime } ]
+            :: current_bindings' ;
           let bindings =
             s#visit_list
               (s#visit_located s#visit_binding)

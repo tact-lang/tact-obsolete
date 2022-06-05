@@ -164,8 +164,7 @@ let%expect_test "failed scope resolution" =
     {|
     (Error
      (((UnresolvedIdentifier Int256)
-       ((stmts ((Let ((T (Reference (Int256 (Value (Type HoleType)))))))))
-        (bindings
+       ((bindings
          ((Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
@@ -652,24 +651,7 @@ let%expect_test "duplicate type field" =
                    (struct_id <opaque>))))))))
             (a ((field_type (Value (Type BoolType)))))))
           (struct_id <opaque>))))
-       ((stmts
-         ((Let
-           ((MyType
-             (Value
-              (Type
-               (StructType
-                ((struct_fields
-                  ((a
-                    ((field_type
-                      (Value
-                       (Type
-                        (StructType
-                         ((struct_fields
-                           ((integer ((field_type (Value (Type IntegerType)))))))
-                          (struct_id <opaque>))))))))
-                   (a ((field_type (Value (Type BoolType)))))))
-                 (struct_id <opaque>))))))))))
-        (bindings
+       ((bindings
          ((MyType
            (Value
             (Type
@@ -1385,40 +1367,7 @@ let%expect_test "type check error" =
             ((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>)))))))
-       ((stmts
-         ((Let
-           ((foo
-             (Value
-              (Function
-               ((function_signature
-                 ((function_params
-                   ((i
-                     (Value
-                      (Type
-                       (StructType
-                        ((struct_fields
-                          ((integer ((field_type (Value (Type IntegerType)))))))
-                         (struct_id <opaque>))))))))
-                  (function_returns
-                   (Value
-                    (Type
-                     (StructType
-                      ((struct_fields
-                        ((integer ((field_type (Value (Type IntegerType)))))))
-                       (struct_id <opaque>))))))))
-                (function_impl
-                 (Fn
-                  ((Block
-                    ((Return
-                      (Reference
-                       (i
-                        (Value
-                         (Type
-                          (StructType
-                           ((struct_fields
-                             ((integer ((field_type (Value (Type IntegerType)))))))
-                            (struct_id <opaque>)))))))))))))))))))))
-        (bindings
+       ((bindings
          ((foo
            (Value
             (Function
@@ -1695,43 +1644,7 @@ let%expect_test "type check error" =
             ((struct_fields
               ((integer ((field_type (Value (Type IntegerType)))))))
              (struct_id <opaque>)))))))
-       ((stmts
-         ((Block
-           ((Let
-             ((foo
-               (Value
-                (Function
-                 ((function_signature
-                   ((function_params
-                     ((x
-                       (Value
-                        (Type
-                         (StructType
-                          ((struct_fields
-                            ((integer ((field_type (Value (Type IntegerType)))))))
-                           (struct_id <opaque>))))))))
-                    (function_returns
-                     (Value
-                      (Type
-                       (StructType
-                        ((struct_fields
-                          ((integer ((field_type (Value (Type IntegerType)))))))
-                         (struct_id <opaque>))))))))
-                  (function_impl
-                   (Fn
-                    ((Block
-                      ((Return
-                        (Reference
-                         (x
-                          (Value
-                           (Type
-                            (StructType
-                             ((struct_fields
-                               ((integer
-                                 ((field_type (Value (Type IntegerType)))))))
-                              (struct_id <opaque>)))))))))))))))))))
-            (Break (Let ((a (Value Void)))))))))
-        (bindings
+       ((bindings
          ((Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
