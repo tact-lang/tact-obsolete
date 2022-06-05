@@ -39,6 +39,7 @@ functor
         (* Are we inside of a function body? How deep? *)
         val mutable functions = 0
 
+        (* TODO: can we remove duplicating bindings here and the above? *)
         (* Program handle we pass to builtin functions *)
         val program = {bindings; methods; impls = []}
 
