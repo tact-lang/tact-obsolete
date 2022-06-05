@@ -185,6 +185,8 @@ class interpreter
             Some e
         | Some (Error ()) ->
             raise Errors.InternalCompilerError
-        | _ ->
+        | Some (Ok v) ->
+            Some v
+        | None ->
             None
   end

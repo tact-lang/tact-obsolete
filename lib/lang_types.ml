@@ -126,7 +126,7 @@ and primitive =
 
 let make_runtime binding = {tbinding = binding; binding_scope = Runtime}
 
-let make_comptime binding = {tbinding = binding; binding_scope = Runtime}
+let make_comptime binding = {tbinding = binding; binding_scope = Comptime}
 
 let find_comptime name bindings =
   List.find_map bindings ~f:(fun bindings ->
