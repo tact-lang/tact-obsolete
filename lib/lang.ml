@@ -32,9 +32,7 @@ functor
         inherit ['s] Syntax.visitor as super
 
         (* Bindings in scope *)
-        val mutable current_bindings =
-          [ List.map bindings ~f:(fun x ->
-                {tbinding = x; binding_scope = Comptime} ) ]
+        val mutable current_bindings = [List.map bindings ~f:make_comptime]
 
         val infer_ctx = {fn_returns = None}
 
@@ -124,16 +122,12 @@ functor
           match is_immediate_expr expr with
           | true ->
               current_bindings <-
-                amend_bindings
-                  {tbinding = (name, expr); binding_scope = Comptime}
-                  current_bindings ;
+                amend_bindings (make_comptime (name, expr)) current_bindings ;
               Let [(name, expr)]
           | false ->
               let ty = type_of expr in
               current_bindings <-
-                amend_bindings
-                  {tbinding = (name, ty); binding_scope = Runtime}
-                  current_bindings ;
+                amend_bindings (make_runtime (name, ty)) current_bindings ;
               Let [(name, expr)]
 
         method build_MutRef _env _mutref = InvalidExpr
@@ -309,9 +303,7 @@ functor
           let bindings' = current_bindings in
           (* inject them into current bindings *)
           current_bindings <-
-            List.map param_bindings ~f:(fun x ->
-                {tbinding = x; binding_scope = Runtime} )
-            :: current_bindings ;
+            List.map param_bindings ~f:make_runtime :: current_bindings ;
           (* process the function definition *)
           let result =
             s#with_fn_returns env function_returns (fun env' ->
@@ -365,9 +357,7 @@ functor
         method! visit_interface_definition env def =
           let current_bindings' = current_bindings in
           current_bindings <-
-            [ { tbinding = ("Self", Value (Type SelfType));
-                binding_scope = Comptime } ]
-            :: current_bindings' ;
+            [make_comptime ("Self", Value (Type SelfType))] :: current_bindings' ;
           let value = super#visit_interface_definition env def in
           current_bindings <- current_bindings' ;
           value
@@ -414,8 +404,7 @@ functor
           let struct_ = s#build_struct_definition env _visitors_r0 [] []
           and current_bindings' = current_bindings in
           current_bindings <-
-            [ { tbinding = ("Self", Value (Type (StructType struct_)));
-                binding_scope = Comptime } ]
+            [make_comptime ("Self", Value (Type (StructType struct_)))]
             :: current_bindings' ;
           let bindings =
             s#visit_list

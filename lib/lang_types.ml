@@ -124,6 +124,10 @@ and primitive =
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
+let make_runtime binding = {tbinding = binding; binding_scope = Runtime}
+
+let make_comptime binding = {tbinding = binding; binding_scope = Runtime}
+
 let find_comptime name bindings =
   List.find_map bindings ~f:(fun bindings ->
       List.find_map bindings ~f:(function
