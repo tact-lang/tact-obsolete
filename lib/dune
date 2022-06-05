@@ -29,7 +29,8 @@
   func
   codegen_func
   show
-  compiler)
+  compiler
+  type_check)
  (name tact))
 
 (ocamllex asm_lexer)
