@@ -28,13 +28,15 @@ class type_checker (errors : _) (functions : _) =
     method get_fn_returns =
       match fn_returns with Some x -> x | None -> HoleType
 
-    method with_fn_returns : 'env 'a. 'env -> type_ -> ('env -> 'a) -> 'a =
+    method with_fn_returns
+        : 'env 'a. 'env -> type_ -> ('env -> 'a) -> 'a * type_ =
       fun env ty f ->
         let prev = fn_returns in
         fn_returns <- Some ty ;
         let result = f env in
+        let new_fn_returns = self#get_fn_returns in
         fn_returns <- prev ;
-        result
+        (result, new_fn_returns)
 
     method check_type ~program ~current_bindings ~expected actual =
       match expected with

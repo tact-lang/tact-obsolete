@@ -696,7 +696,7 @@ let%expect_test "parametric struct instantiation" =
                  (Type
                   (StructType
                    ((struct_fields
-                     ((a ((field_type (ReferenceType A TypeType))))))
+                     ((a ((field_type (ExprType (Reference (A TypeType))))))))
                     (struct_id <opaque>)))))))))))))))
       (methods
        (((Type
@@ -737,13 +737,15 @@ let%expect_test "parametric struct instantiation" =
                   (signed true)))))))))))
         ((Type
           (StructType
-           ((struct_fields ((a ((field_type (ReferenceType A TypeType))))))
+           ((struct_fields
+             ((a ((field_type (ExprType (Reference (A TypeType))))))))
             (struct_id <opaque>))))
          ())))
       (impls
        (((Type
           (StructType
-           ((struct_fields ((a ((field_type (ReferenceType A TypeType))))))
+           ((struct_fields
+             ((a ((field_type (ExprType (Reference (A TypeType))))))))
             (struct_id <opaque>))))
          ()))))) |}]
 
@@ -1978,3 +1980,54 @@ let%expect_test "serializer inner struct" =
                    (struct_id <opaque>))))))))
             (struct_id <opaque>))))
          ()))))) |}]
+
+let%expect_test "reference resolving in inner functions" =
+  let source =
+    {|
+      fn foo(X: Type) {
+        fn(x: X) -> X { x }
+      }
+      let one = foo(Integer)(1);
+    |}
+  in
+  pp source ; [%expect {|
+    (Ok
+     ((bindings
+       ((one (Value (Integer 1)))
+        (foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((X TypeType)))
+              (function_returns
+               (FunctionType
+                ((function_params
+                  ((x
+                    (ExprType
+                     (Value
+                      (Type (ExprType (Value (Type (Dependent X TypeType))))))))))
+                 (function_returns
+                  (ExprType
+                   (Value
+                    (Type (ExprType (Value (Type (Dependent X TypeType)))))))))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Value
+                    (Function
+                     ((function_signature
+                       ((function_params
+                         ((x
+                           (ExprType
+                            (Value (Type (ExprType (Reference (X TypeType)))))))))
+                        (function_returns
+                         (ExprType
+                          (Value (Type (ExprType (Reference (X TypeType)))))))))
+                      (function_impl
+                       (Fn
+                        ((Block
+                          ((Break
+                            (Expr
+                             (Reference (x (ExprType (Reference (X TypeType)))))))))))))))))))))))))))))) |}]

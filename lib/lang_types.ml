@@ -86,7 +86,8 @@ and type_ =
   | HoleType
   | SelfType
   | InvalidType of expr
-  | ReferenceType of string * type_
+  | ExprType of expr
+  | Dependent of string * type_
 
 and struct_ =
   {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
@@ -150,7 +151,7 @@ let rec expr_to_type = function
       (Value (Function {function_signature = {function_returns; _}; _}), _) ->
       function_returns
   | Reference (ref, ty) ->
-      ReferenceType (ref, ty)
+      ExprType (Reference (ref, ty))
   | ResolvedReference (_, e) ->
       expr_to_type e
   | expr ->
@@ -169,23 +170,50 @@ let rec type_of = function
       BoolType
   | Value Void ->
       VoidType
+  | Value (Type (Dependent (_, ty))) ->
+      ty
   | Value (Type _) ->
       TypeType
   | Hole ->
       HoleType
   | FunctionCall
       ( ResolvedReference
-          (_, Value (Function {function_signature = {function_returns; _}; _})),
-        _ )
+          ( _,
+            Value
+              (Function
+                {function_signature = {function_returns; function_params}; _} )
+          ),
+        args )
   | FunctionCall
-      (Value (Function {function_signature = {function_returns; _}; _}), _) ->
-      function_returns
+      ( Value
+          (Function
+            {function_signature = {function_returns; function_params}; _} ),
+        args ) ->
+      type_of_call args function_params function_returns
   | Reference (_, t) ->
       t
   | ResolvedReference (_, e) ->
       type_of e
   | expr ->
       InvalidType expr
+
+and type_of_call args arg_types returns =
+  match returns with
+  | Dependent (ref, _) ->
+      let associated =
+        match
+          List.map2 args arg_types ~f:(fun expr (name, _) -> (name, expr))
+        with
+        | Ok t ->
+            t
+        | _ ->
+            raise Errors.InternalCompilerError
+      in
+      List.find_map associated ~f:(fun (name, x) ->
+          if equal_string name ref then Some (type_of x) else None )
+      |> Option.value_exn
+  | x ->
+      x
 
 class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)

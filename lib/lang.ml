@@ -23,6 +23,41 @@ functor
 
     include Builtin
 
+    (* If we have signature fn(X: Type) -> X, so
+       we need to change it to fn(X: Type) -> Dependent(X) *)
+    class ['s] make_dependent_types (_errors : _) =
+      object (self : 's)
+        inherit ['s] Lang_types.map
+
+        val mutable previous_arguments = []
+
+        method! visit_Reference _ (ref, ty) =
+          let concrete_ty =
+            List.find_map previous_arguments ~f:(fun (name, x) ->
+                if equal_string name ref then Some x else None )
+          in
+          match concrete_ty with
+          | Some ty' ->
+              Value (Type (Dependent (ref, ty')))
+          | None ->
+              Value (Type (ExprType (Reference (ref, ty))))
+
+        method! visit_function_signature env sign =
+          let prev = previous_arguments in
+          let function_params =
+            List.map
+              ~f:(fun (name, ty) ->
+                let ty' = self#visit_type_ env ty in
+                let arg = (name, ty') in
+                previous_arguments <- arg :: previous_arguments ;
+                arg )
+              sign.function_params
+          in
+          let function_returns = self#visit_type_ env sign.function_returns in
+          previous_arguments <- prev ;
+          {function_params; function_returns}
+      end
+
     class ['s] constructor (bindings : (string * expr) list)
       (methods : (value * (string * function_) list) list) (errors : _ errors) =
       object (s : 's)
@@ -295,24 +330,37 @@ functor
                      s#visit_expr env @@ Syntax.value expr ) )
             |> List.map ~f:(fun (id, expr) -> (id, expr_to_type expr))
           in
+          let prev_bindings = current_bindings in
+          current_bindings <-
+            List.map param_bindings ~f:(fun (name, ty) ->
+                (name, Comptime (Value (Type (Dependent (name, ty))))) )
+            :: current_bindings ;
           let function_returns =
             f.returns
             |> Option.map ~f:(fun x ->
                    expr_to_type (s#visit_expr env (Syntax.value x)) )
             |> Option.value ~default:HoleType
           in
+          current_bindings <- prev_bindings ;
           let bindings' = current_bindings in
           (* inject them into current bindings *)
           current_bindings <-
             List.map param_bindings ~f:make_runtime :: current_bindings ;
           (* process the function definition *)
-          let result =
+          let body, fn_returns =
             type_checker#with_fn_returns env function_returns (fun env' ->
-                super#visit_function_definition env' f )
+                s#visit_option s#visit_function_body env' f.function_body )
           in
           (* restore bindings as before entering the function *)
           current_bindings <- bindings' ;
-          result
+          let function_signature =
+            let sign =
+              {function_params = param_bindings; function_returns = fn_returns}
+            in
+            let sig_maker = new make_dependent_types errors in
+            sig_maker#visit_function_signature () sign
+          in
+          {function_signature; function_impl = Fn body}
 
         method! visit_function_body env body =
           (* save the function enclosure count *)
@@ -327,15 +375,7 @@ functor
 
         method build_function_body _env stmt = stmt
 
-        method build_function_definition _env _name params _ body =
-          let function_params =
-            s#of_located_list params
-            |> List.map ~f:(fun (name, type_) ->
-                   (Syntax.value name, expr_to_type (Syntax.value type_)) )
-          and function_returns = type_checker#get_fn_returns
-          and function_impl = body in
-          { function_signature = {function_params; function_returns};
-            function_impl = Fn function_impl }
+        method build_function_definition _ _ _ _ _ = raise InternalCompilerError
 
         method build_if_ _env if_condition if_then if_else =
           { if_condition = Syntax.value if_condition;

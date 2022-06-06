@@ -103,13 +103,8 @@ class interpreter
 
     method interpret_type : type_ -> type_ =
       function
-      | ReferenceType (ref, _) -> (
-        match self#find_ref ref with
-        | Some expr' ->
-            expr_to_type (Value (self#interpret_expr expr'))
-        | None ->
-            errors#report `Error (`UnresolvedIdentifier ref) () ;
-            VoidType )
+      | ExprType ex ->
+          expr_to_type (Value (self#interpret_expr ex))
       | StructType {struct_fields; struct_id} ->
           let struct_fields =
             List.map struct_fields ~f:(fun (name, {field_type}) ->
@@ -129,6 +124,17 @@ class interpreter
               ( s,
                 List.map fields ~f:(fun (n, f) ->
                     (n, Value (self#interpret_expr f)) ) )
+        | Function
+            { function_signature = {function_params; function_returns};
+              function_impl } ->
+            Function
+              { function_signature =
+                  { function_params =
+                      List.map function_params ~f:(fun (name, x) ->
+                          (name, self#interpret_type x) );
+                    function_returns = self#interpret_type function_returns };
+                function_impl =
+                  (match function_impl with Fn b -> Fn b | x -> x) }
         | value ->
             value
 
@@ -198,6 +204,9 @@ class interpreter
         | Some (Ok (ResolvedReference (_, e))) ->
             Some e
         | Some (Error ()) ->
+            Sexplib.Sexp.pp_hum Caml.Format.std_formatter (sexp_of_string ref) ;
+            Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+              (sexp_of_list (sexp_of_list sexp_of_tbinding) global_bindings) ;
             raise Errors.InternalCompilerError
         | Some (Ok v) ->
             Some v
