@@ -14,9 +14,9 @@ functor
       [ `DuplicateField of string * struct_
       | `UnresolvedIdentifier of string
       | `MethodNotFound of expr * string
-      | `UnexpectedType of expr
-      | `TypeError of expr * expr
-      | `ExpectedFunction of expr
+      | `UnexpectedType of type_
+      | `TypeError of type_ * type_
+      | `ExpectedFunction of type_
       | `UnallowedStmt of stmt
       | `OnlyFunctionIsAllowed ]
     [@@deriving equal, sexp_of]
@@ -61,7 +61,7 @@ functor
 
         method build_FunctionCall _env (f, args) =
           match type_of f with
-          | Value (Type (FunctionType sign)) -> (
+          | FunctionType sign -> (
               let no_errors = ref true in
               let types_satisfying =
                 List.map2 sign.function_params args
@@ -132,17 +132,17 @@ functor
 
         method build_Reference env ref =
           match find_in_scope ref current_bindings with
-          | Some {tbinding = _, ty; binding_scope = Runtime} ->
+          | Some (Runtime ty) ->
               Reference (ref, ty)
-          | Some {tbinding = _, Reference (ref', _); _} ->
+          | Some (Comptime (Reference (ref', _))) ->
               s#build_Reference env ref'
-          | Some {tbinding = _, Value value; _} ->
+          | Some (Comptime (Value value)) ->
               ResolvedReference (ref, Value value)
-          | Some {tbinding = _, ex; _} ->
+          | Some (Comptime ex) ->
               Reference (ref, type_of ex)
           | None ->
               errors#report `Error (`UnresolvedIdentifier ref) () ;
-              Reference (ref, Value (Type HoleType))
+              Reference (ref, HoleType)
 
         method build_Return _env return =
           match functions with
@@ -228,8 +228,7 @@ functor
             ( Value
                 (Function
                    { function_signature =
-                       { function_params = [];
-                         function_returns = Value (Type VoidType) };
+                       {function_params = []; function_returns = VoidType};
                      function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void))
                    } ),
               [] )
@@ -284,7 +283,7 @@ functor
                   errors#report `Error (`MethodNotFound (receiver', fn)) () ;
                   dummy )
           | receiver' ->
-              errors#report `Error (`UnexpectedType receiver') () ;
+              errors#report `Error (`UnexpectedType (type_of receiver')) () ;
               dummy
 
         method! visit_function_definition env f =
@@ -294,12 +293,13 @@ functor
             |> List.map ~f:(fun (ident, expr) ->
                    ( s#visit_ident env @@ Syntax.value ident,
                      s#visit_expr env @@ Syntax.value expr ) )
-            |> List.map ~f:(fun (id, expr) -> (id, expr))
+            |> List.map ~f:(fun (id, expr) -> (id, expr_to_type expr))
           in
           let function_returns =
             f.returns
-            |> Option.map ~f:(fun x -> s#visit_expr env (Syntax.value x))
-            |> Option.value ~default:(Value (Type HoleType))
+            |> Option.map ~f:(fun x ->
+                   expr_to_type (s#visit_expr env (Syntax.value x)) )
+            |> Option.value ~default:HoleType
           in
           let bindings' = current_bindings in
           (* inject them into current bindings *)
@@ -331,7 +331,7 @@ functor
           let function_params =
             s#of_located_list params
             |> List.map ~f:(fun (name, type_) ->
-                   (Syntax.value name, Syntax.value type_) )
+                   (Syntax.value name, expr_to_type (Syntax.value type_)) )
           and function_returns = type_checker#get_fn_returns
           and function_impl = body in
           { function_signature = {function_params; function_returns};
@@ -375,7 +375,7 @@ functor
                 List.map fields ~f:(fun (name, expr) ->
                     (Syntax.value name, Syntax.value expr) ) )
           | e ->
-              errors#report `Error (`UnexpectedType e) () ;
+              errors#report `Error (`UnexpectedType (type_of e)) () ;
               ({struct_fields = []; struct_id = 0}, [])
 
         method build_struct_definition _env struct_fields _bindings _intfs =
@@ -439,7 +439,8 @@ functor
           struct_
 
         method build_struct_field _env field_name field_type =
-          (Syntax.value field_name, {field_type = Syntax.value field_type})
+          ( Syntax.value field_name,
+            {field_type = expr_to_type (Syntax.value field_type)} )
 
         method build_union_definition _env _members _bindings = ()
 

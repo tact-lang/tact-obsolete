@@ -4,11 +4,11 @@ open Interpreter
 open Builtin
 open Errors
 
-type type_check_error = TypeError of expr | NeedFromCall of expr
+type type_check_error = TypeError of type_ | NeedFromCall of expr
 
 class type_checker (errors : _) (functions : _) =
   object (self)
-    val mutable fn_returns = None
+    val mutable fn_returns : type_ option = None
 
     method check_return_type ~program ~current_bindings actual =
       match fn_returns with
@@ -26,9 +26,9 @@ class type_checker (errors : _) (functions : _) =
           raise InternalCompilerError
 
     method get_fn_returns =
-      match fn_returns with Some x -> x | None -> Value (Type HoleType)
+      match fn_returns with Some x -> x | None -> HoleType
 
-    method with_fn_returns : 'env 'a. 'env -> expr -> ('env -> 'a) -> 'a =
+    method with_fn_returns : 'env 'a. 'env -> type_ -> ('env -> 'a) -> 'a =
       fun env ty f ->
         let prev = fn_returns in
         fn_returns <- Some ty ;
@@ -38,20 +38,20 @@ class type_checker (errors : _) (functions : _) =
 
     method check_type ~program ~current_bindings ~expected actual =
       match expected with
-      | Value (Type HoleType) ->
+      | HoleType ->
           Ok actual
-      | _ when equal_expr expected actual ->
+      | _ when equal_type_ expected actual ->
           Ok actual
-      | Value x -> (
+      | x -> (
           let from_intf_ =
             let inter =
               new interpreter (program, current_bindings, errors, functions)
             in
-            Value (inter#interpret_fc (from_intf, [actual]))
+            Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in
           let impl =
             List.find_map program.impls ~f:(fun (s, impls) ->
-                match equal_value s x with
+                match equal_value s (Type x) with
                 | true ->
                     List.find_map impls ~f:(fun i ->
                         if equal_expr i.impl_interface from_intf_ then
@@ -66,6 +66,4 @@ class type_checker (errors : _) (functions : _) =
               Error (NeedFromCall m)
           | _ ->
               Error (TypeError expected) )
-      | _ ->
-          Error (TypeError expected)
   end

@@ -29,9 +29,9 @@ and metadata = (string * string) list
 
 and binding = string * expr
 
-and tbinding = {tbinding : binding; binding_scope : binding_scope}
+and tbinding = string * binding_scope
 
-and binding_scope = Comptime | Runtime
+and binding_scope = Comptime of expr | Runtime of type_
 
 and program =
   { bindings : (string * expr) list;
@@ -40,9 +40,7 @@ and program =
 
 and expr =
   | FunctionCall of function_call
-  (* Note that it is TYPE EXPR, means that `string` has `expr` type, not `string` references to `type` *)
-  (* FIXME: make new type *)
-  | Reference of (string * expr)
+  | Reference of (string * type_)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
   | Value of value
   | StructField of (expr * string)
@@ -88,11 +86,12 @@ and type_ =
   | HoleType
   | SelfType
   | InvalidType of expr
+  | ReferenceType of string * type_
 
 and struct_ =
   {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
 
-and struct_field = {field_type : expr}
+and struct_field = {field_type : type_}
 
 and impl = {impl_interface : expr; impl_methods : binding list}
 
@@ -107,7 +106,7 @@ and function_ =
   {function_signature : function_signature; function_impl : function_impl}
 
 and function_signature =
-  {function_params : (string * expr) list; function_returns : expr}
+  {function_params : (string * type_) list; function_returns : type_}
 
 and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
@@ -124,21 +123,21 @@ and primitive =
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
-let make_runtime binding = {tbinding = binding; binding_scope = Runtime}
+let make_runtime (x, type_) = (x, Runtime type_)
 
-let make_comptime binding = {tbinding = binding; binding_scope = Comptime}
+let make_comptime (x, value) = (x, Comptime value)
 
 let find_comptime name bindings =
   List.find_map bindings ~f:(fun bindings ->
       List.find_map bindings ~f:(function
-        | {tbinding = b_name, value; binding_scope = Comptime} ->
+        | b_name, Comptime value ->
             if equal_string b_name name then Some (Ok value) else None
-        | {tbinding = b_name, _; binding_scope = Runtime} ->
+        | b_name, Runtime _ ->
             if equal_string b_name name then Some (Error ()) else None ) )
 
 let extract_comptime_bindings bindings =
-  List.filter_map bindings ~f:(fun {tbinding; binding_scope} ->
-      match binding_scope with Comptime -> Some tbinding | _ -> None )
+  List.filter_map bindings ~f:(fun (name, scope) ->
+      match scope with Comptime value -> Some (name, value) | _ -> None )
 
 let rec expr_to_type = function
   | Value (Type type_) ->
@@ -149,9 +148,9 @@ let rec expr_to_type = function
         _ )
   | FunctionCall
       (Value (Function {function_signature = {function_returns; _}; _}), _) ->
-      expr_to_type function_returns
-  | Reference (_, t) ->
-      expr_to_type t
+      function_returns
+  | Reference (ref, ty) ->
+      ReferenceType (ref, ty)
   | ResolvedReference (_, e) ->
       expr_to_type e
   | expr ->
@@ -159,21 +158,21 @@ let rec expr_to_type = function
 
 let rec type_of = function
   | Value (Struct (struct_, _)) ->
-      Value (Type (StructType struct_))
+      StructType struct_
   | Value (Function {function_signature; _}) ->
-      Value (Type (FunctionType function_signature))
+      FunctionType function_signature
   | Value (Builtin builtin) ->
-      Value (Type (BuiltinType builtin))
+      BuiltinType builtin
   | Value (Integer _) ->
-      Value (Type IntegerType)
+      IntegerType
   | Value (Bool _) ->
-      Value (Type BoolType)
+      BoolType
   | Value Void ->
-      Value (Type VoidType)
+      VoidType
   | Value (Type _) ->
-      Value (Type TypeType)
+      TypeType
   | Hole ->
-      Value (Type HoleType)
+      HoleType
   | FunctionCall
       ( ResolvedReference
           (_, Value (Function {function_signature = {function_returns; _}; _})),
@@ -186,7 +185,7 @@ let rec type_of = function
   | ResolvedReference (_, e) ->
       type_of e
   | expr ->
-      Value (Type (InvalidType expr))
+      InvalidType expr
 
 class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)
@@ -257,10 +256,11 @@ and builtin_fun f =
   builtin_fun_counter := !builtin_fun_counter + 1 ;
   res
 
-let find_in_scope : string -> tbinding list list -> tbinding option =
+let find_in_scope : string -> tbinding list list -> binding_scope option =
  fun ref scope ->
   List.find_map scope ~f:(fun bindings ->
-      List.find bindings ~f:(fun {tbinding = s, _; _} -> String.equal ref s) )
+      List.find_map bindings ~f:(fun (s, x) ->
+          if String.equal ref s then Some x else None ) )
 
 let find_in_runtime_scope : 'a. string -> (string * 'a) list list -> 'a option =
  fun ref scope ->

@@ -67,12 +67,10 @@ let%test "parameterized structure equality" =
 
 let%test "builtin function equality" =
   let f1 =
-    { function_signature =
-        {function_params = []; function_returns = Value (Type VoidType)};
+    { function_signature = {function_params = []; function_returns = VoidType};
       function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }
   and f2 =
-    { function_signature =
-        {function_params = []; function_returns = Value (Type VoidType)};
+    { function_signature = {function_params = []; function_returns = VoidType};
       function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }
   in
   Alcotest.(check bool)

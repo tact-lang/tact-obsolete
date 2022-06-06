@@ -76,14 +76,14 @@ functor
           Printf.sprintf "Method `%s` not found in `%s` expr." m
             (format_to_string e pp_expr)
       | `UnexpectedType t ->
-          Printf.sprintf "Unexpected type `%s`." (format_to_string t pp_expr)
+          Printf.sprintf "Unexpected type `%s`." (format_to_string t pp_type)
       | `TypeError (expected, actual) ->
           Printf.sprintf "Type error: expected `%s` but found `%s`."
-            (format_to_string expected pp_expr)
-            (format_to_string actual pp_expr)
+            (format_to_string expected pp_type)
+            (format_to_string actual pp_type)
       | `ExpectedFunction got ->
           Printf.sprintf "Expected function but got `%s`."
-            (format_to_string got pp_expr)
+            (format_to_string got pp_type)
       | `UnallowedStmt _ ->
           Printf.sprintf "Unallowed statement at top-level."
       | `OnlyFunctionIsAllowed ->
