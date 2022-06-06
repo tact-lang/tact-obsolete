@@ -1990,7 +1990,9 @@ let%expect_test "reference resolving in inner functions" =
       let one = foo(Integer)(1);
     |}
   in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Ok
      ((bindings
        ((one (Value (Integer 1)))
