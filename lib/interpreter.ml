@@ -5,7 +5,7 @@ open Errors
 type error =
   [ `UnresolvedIdentifier of string
   | `UninterpretableStatement of stmt
-  | `UnexpectedType of expr
+  | `UnexpectedType of type_
   | `FieldNotFound of struct_ * string
   | `ArgumentNumberMismatch ]
 [@@deriving equal, sexp_of]
@@ -64,7 +64,7 @@ class interpreter
               Option.map if_else ~f:(fun stmt -> self#interpret_stmt stmt [])
               |> Option.value ~default:Void
           | value ->
-              errors#report `Error (`UnexpectedType (Value value)) () ;
+              errors#report `Error (`UnexpectedType (type_of (Value value))) () ;
               Void )
       | Invalid ->
           Void
@@ -93,7 +93,7 @@ class interpreter
                 errors#report `Error (`FieldNotFound (struct_, field)) () ;
                 Void )
           | other ->
-              errors#report `Error (`UnexpectedType (Value other)) () ;
+              errors#report `Error (`UnexpectedType (type_of (Value other))) () ;
               Void )
         | Value value ->
             self#interpret_value value
@@ -101,20 +101,40 @@ class interpreter
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
+    method interpret_type : type_ -> type_ =
+      function
+      | ExprType ex ->
+          expr_to_type (Value (self#interpret_expr ex))
+      | StructType {struct_fields; struct_id} ->
+          let struct_fields =
+            List.map struct_fields ~f:(fun (name, {field_type}) ->
+                (name, {field_type = self#interpret_type field_type}) )
+          in
+          StructType {struct_fields; struct_id}
+      | ty ->
+          ty
+
     method interpret_value : value -> value =
       fun value ->
         match value with
-        | Type (StructType {struct_fields; struct_id}) ->
-            let struct_fields =
-              List.map struct_fields ~f:(fun (name, {field_type}) ->
-                  (name, {field_type = Value (self#interpret_expr field_type)}) )
-            in
-            Type (StructType {struct_fields; struct_id})
+        | Type ty ->
+            Type (self#interpret_type ty)
         | Struct (s, fields) ->
             Struct
               ( s,
                 List.map fields ~f:(fun (n, f) ->
                     (n, Value (self#interpret_expr f)) ) )
+        | Function
+            { function_signature = {function_params; function_returns};
+              function_impl } ->
+            Function
+              { function_signature =
+                  { function_params =
+                      List.map function_params ~f:(fun (name, x) ->
+                          (name, self#interpret_type x) );
+                    function_returns = self#interpret_type function_returns };
+                function_impl =
+                  (match function_impl with Fn b -> Fn b | x -> x) }
         | value ->
             value
 
@@ -184,6 +204,9 @@ class interpreter
         | Some (Ok (ResolvedReference (_, e))) ->
             Some e
         | Some (Error ()) ->
+            Sexplib.Sexp.pp_hum Caml.Format.std_formatter (sexp_of_string ref) ;
+            Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+              (sexp_of_list (sexp_of_list sexp_of_tbinding) global_bindings) ;
             raise Errors.InternalCompilerError
         | Some (Ok v) ->
             Some v

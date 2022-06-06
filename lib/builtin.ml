@@ -1,7 +1,7 @@
 open Base
 open Lang_types
 
-let builder = Value (Type (BuiltinType "Builder"))
+let builder = BuiltinType "Builder"
 
 let builder_methods =
   let new_ =
@@ -26,8 +26,7 @@ let int_type =
           c )
     in
     let s =
-      { struct_fields = [("integer", {field_type = Value (Type IntegerType)})];
-        struct_id }
+      {struct_fields = [("integer", {field_type = IntegerType})]; struct_id}
     in
     let methods =
       [ ("new", int_type_s_new s bits);
@@ -45,8 +44,8 @@ let int_type =
           builtin_fun @@ constructor_impl bits )
     in
     { function_signature =
-        { function_params = [("integer", Value (Type IntegerType))];
-          function_returns = Value (Type (StructType self)) };
+        { function_params = [("integer", IntegerType)];
+          function_returns = StructType self };
       function_impl = BuiltinFn function_impl }
   and constructor_impl bits p = function
     | [Integer i] ->
@@ -66,7 +65,7 @@ let int_type =
         (* TODO: raise an error instead *)
         constructor_impl bits p [Integer (Zint.of_int 0)]
   and int_type_s_serialize bits s =
-    let self = Value (Type (StructType s)) in
+    let self = StructType s in
     { function_signature =
         { function_params = [("self", self); ("b", builder)];
           function_returns = builder };
@@ -80,8 +79,7 @@ let int_type =
                         length = Value (Integer (Z.of_int bits));
                         integer =
                           StructField
-                            ( Reference ("self", Value (Type (StructType s))),
-                              "integer" );
+                            (Reference ("self", StructType s), "integer");
                         signed = true } ) ) ) ) }
   and function_impl p = function
     | [Integer bits] ->
@@ -93,62 +91,55 @@ let int_type =
   Value
     (Function
        { function_signature =
-           { function_params = [("bits", Value (Type IntegerType))];
-             function_returns = Value (Type TypeType) };
+           { function_params = [("bits", IntegerType)];
+             function_returns = TypeType };
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let serializer =
   let function_signature =
-    { function_params = [("t", Value (Type TypeType))];
+    { function_params = [("t", TypeType)];
       function_returns =
-        Value
-          (Type
-             (FunctionType
-                { function_params =
-                    [("t", Value (Type HoleType)); ("b", builder)];
-                  function_returns = builder } ) ) }
+        FunctionType
+          { function_params = [("t", HoleType); ("b", builder)];
+            function_returns = builder } }
   in
   let rec serializer_f s p =
     let calls =
-      List.filter_map s.struct_fields ~f:(function
-        | name, {field_type = Value f} ->
-            let methods = List.Assoc.find_exn p.methods ~equal:equal_value f in
-            let serialize_field =
-              match List.Assoc.find methods ~equal:String.equal "serialize" with
-              | Some m ->
+      List.filter_map s.struct_fields ~f:(function name, {field_type = f} ->
+          let methods =
+            List.Assoc.find_exn p.methods ~equal:equal_value (Type f)
+          in
+          let serialize_field =
+            match List.Assoc.find methods ~equal:String.equal "serialize" with
+            | Some m ->
+                Some m
+            | None -> (
+              match f with
+              | StructType t ->
+                  let m = serializer_f t p in
+                  p.methods <-
+                    List.map p.methods ~f:(fun (s, methods) ->
+                        match equal_value s (Type (StructType t)) with
+                        | true ->
+                            (s, ("serializer", m) :: methods)
+                        | false ->
+                            (s, methods) ) ;
                   Some m
-              | None -> (
-                match f with
-                | Type (StructType t) ->
-                    let m = serializer_f t p in
-                    p.methods <-
-                      List.map p.methods ~f:(fun (s, methods) ->
-                          match equal_value s (Type (StructType t)) with
-                          | true ->
-                              (s, ("serializer", m) :: methods)
-                          | false ->
-                              (s, methods) ) ;
-                    Some m
-                | _ ->
-                    None )
-            in
-            serialize_field
-            |> Option.map ~f:(fun method_ ->
-                   Let
-                     [ ( "b",
-                         FunctionCall
-                           ( Value (Function method_),
-                             StructField
-                               ( Reference ("self", Value (Type (StructType s))),
-                                 name )
-                             :: [Reference ("b", builder)] ) ) ] )
-        | _ ->
-            None )
+              | _ ->
+                  None )
+          in
+          serialize_field
+          |> Option.map ~f:(fun method_ ->
+                 Let
+                   [ ( "b",
+                       FunctionCall
+                         ( Value (Function method_),
+                           StructField (Reference ("self", StructType s), name)
+                           :: [Reference ("b", builder)] ) ) ] ) )
     in
     let body = Block (calls @ [Return (Reference ("b", builder))]) in
     { function_signature =
-        { function_params =
-            [("self", Value (Type (StructType s))); ("b", builder)];
+        { function_params = [("self", StructType s); ("b", builder)];
           function_returns = builder };
       function_impl = Fn (Some body) }
   in
@@ -171,22 +162,20 @@ let bin_op_intf =
           { interface_methods =
               [ ( "op",
                   { function_params =
-                      [ ("left", Value (Type IntegerType));
-                        ("right", Value (Type IntegerType)) ];
-                    function_returns = Value (Type IntegerType) } ) ] } ) )
+                      [("left", IntegerType); ("right", IntegerType)];
+                    function_returns = IntegerType } ) ] } ) )
 
 let from_intf =
   let function_signature =
-    { function_params = [("T", Value (Type TypeType))];
-      function_returns = Value (Type HoleType) }
+    {function_params = [("T", TypeType)]; function_returns = HoleType}
   in
   let make_from t =
     Type
       (InterfaceType
          { interface_methods =
              [ ( "from",
-                 { function_params = [("from", Value (Type t))];
-                   function_returns = Value (Type SelfType) } ) ] } )
+                 {function_params = [("from", t)]; function_returns = SelfType}
+               ) ] } )
   in
   let function_impl _p = function [Type t] -> make_from t | _ -> Void in
   Value
@@ -195,7 +184,7 @@ let from_intf =
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let default_bindings =
-  [ ("Builder", builder);
+  [ ("Builder", Value (Type builder));
     ("Integer", Value (Type IntegerType));
     ("Int", int_type);
     ("Bool", Value (Type BoolType));

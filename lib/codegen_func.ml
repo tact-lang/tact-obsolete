@@ -48,7 +48,7 @@ class constructor =
       | ResolvedReference s ->
           self#cg_ResolvedReference s
       | Reference (name, ty) ->
-          F.Reference (name, self#lang_expr_to_type ty)
+          F.Reference (name, self#lang_type_to_type ty)
       | Primitive p ->
           self#cg_Primitive p
       | Value (Function f) ->
@@ -98,9 +98,9 @@ class constructor =
         { function_name = name;
           function_args =
             List.map fn.function_signature.function_params ~f:(fun (name, ty) ->
-                (name, self#lang_expr_to_type ty) );
+                (name, self#lang_type_to_type ty) );
           function_returns =
-            self#lang_expr_to_type fn.function_signature.function_returns;
+            self#lang_type_to_type fn.function_signature.function_returns;
           function_body = F.Fn (List.map body ~f:self#cg_stmt) }
 
     method cg_top_level_stmt : string -> T.expr -> F.top_level_expr option =
@@ -136,16 +136,16 @@ class constructor =
         F.FunctionCall (name, [struct_ty], field_ty)
       in
       match T.type_of from_expr with
-      | Value (Type (StructType {struct_fields = [_]; _})) ->
+      | StructType {struct_fields = [_]; _} ->
           self#cg_expr from_expr
-      | Value (Type (StructType s)) ->
+      | StructType s ->
           let field_id, (_, field) =
             Option.value_exn
               (List.findi s.struct_fields ~f:(fun _ (name, _) ->
                    equal_string name field ) )
           in
           build_access (self#cg_expr from_expr) field_id
-            (self#lang_expr_to_type field.field_type)
+            (self#lang_type_to_type field.field_type)
       | _ ->
           raise Invalid
 
@@ -171,15 +171,6 @@ class constructor =
 
     method cg_BuildCell builder_arg =
       F.FunctionCall ("build", [self#cg_expr builder_arg], F.CellType)
-
-    method private lang_expr_to_type : T.expr -> F.type_ =
-      function
-      | Value (Type t) ->
-          self#lang_type_to_type t
-      | ResolvedReference (_ref, expr) ->
-          self#lang_expr_to_type expr
-      | _ ->
-          raise Invalid
 
     method private lang_type_to_type : T.type_ -> F.type_ =
       function
@@ -214,11 +205,11 @@ class constructor =
     method private create_ty_from_struct : T.struct_ -> F.type_ =
       function
       | {struct_fields = [(_, {field_type})]; _} ->
-          self#lang_expr_to_type field_type
+          self#lang_type_to_type field_type
       | {struct_fields; _} ->
           let types =
             List.map struct_fields ~f:(fun (_, {field_type}) ->
-                self#lang_expr_to_type field_type )
+                self#lang_type_to_type field_type )
           in
           TupleType types
 
