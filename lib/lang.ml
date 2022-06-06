@@ -8,6 +8,7 @@ functor
     open Errors
     include Lang_types
     open Interpreter
+    open Type_check
 
     type error =
       [ `DuplicateField of string * struct_
@@ -22,10 +23,6 @@ functor
 
     include Builtin
 
-    type infer_ctx = {mutable fn_returns : expr option}
-
-    type type_check_error = TypeError | NeedFromCall of expr
-
     class ['s] constructor (bindings : (string * expr) list)
       (methods : (value * (string * function_) list) list) (errors : _ errors) =
       object (s : 's)
@@ -34,7 +31,7 @@ functor
         (* Bindings in scope *)
         val mutable current_bindings = [List.map bindings ~f:make_comptime]
 
-        val infer_ctx = {fn_returns = None}
+        val type_checker = new type_checker errors 0
 
         (* Are we inside of a function body? How deep? *)
         val mutable functions = 0
@@ -148,40 +145,43 @@ functor
               Reference (ref, Value (Type HoleType))
 
         method build_Return _env return =
-          match infer_ctx.fn_returns with
-          | Some fn_returns -> (
-            match s#check_type (type_of return) ~expected:fn_returns with
-            | Ok ty ->
-                infer_ctx.fn_returns <- Some ty ;
+          match functions with
+          | 0 ->
+              errors#report `Error (`UnallowedStmt (Return return)) () ;
+              Return return
+          | _ -> (
+            match
+              type_checker#check_return_type (type_of return) ~program
+                ~current_bindings
+            with
+            | Ok _ ->
                 Return return
             | Error (NeedFromCall func) ->
                 Break (Expr (FunctionCall (func, [return])))
-            | Error TypeError ->
+            | Error (TypeError fn_returns) ->
                 errors#report `Error
                   (`TypeError (fn_returns, type_of return))
                   () ;
                 Return return )
-          | None ->
-              errors#report `Error (`UnallowedStmt (Return return)) () ;
-              Return return
 
         method build_Break _env stmt =
           match stmt with
           | Expr ex -> (
-            match infer_ctx.fn_returns with
-            | Some fn_returns -> (
-              match s#check_type (type_of ex) ~expected:fn_returns with
-              | Ok ty ->
-                  infer_ctx.fn_returns <- Some ty ;
+            match functions with
+            | 0 ->
+                raise InternalCompilerError
+            | _ -> (
+              match
+                type_checker#check_return_type (type_of ex) ~program
+                  ~current_bindings
+              with
+              | Ok _ ->
                   Break stmt
               | Error (NeedFromCall func) ->
                   Break (Expr (FunctionCall (func, [ex])))
-              | Error TypeError ->
+              | Error (TypeError fn_returns) ->
                   errors#report `Error (`TypeError (fn_returns, type_of ex)) () ;
-                  Break stmt )
-            | None ->
-                errors#report `Error (`UnallowedStmt (Break stmt)) () ;
-                Break stmt )
+                  Break stmt ) )
           | stmt ->
               Break stmt
 
@@ -307,7 +307,7 @@ functor
             List.map param_bindings ~f:make_runtime :: current_bindings ;
           (* process the function definition *)
           let result =
-            s#with_fn_returns env function_returns (fun env' ->
+            type_checker#with_fn_returns env function_returns (fun env' ->
                 super#visit_function_definition env' f )
           in
           (* restore bindings as before entering the function *)
@@ -332,8 +332,7 @@ functor
             s#of_located_list params
             |> List.map ~f:(fun (name, type_) ->
                    (Syntax.value name, Syntax.value type_) )
-          and function_returns =
-            Option.value infer_ctx.fn_returns ~default:(Value (Type HoleType))
+          and function_returns = type_checker#get_fn_returns
           and function_impl = body in
           { function_signature = {function_params; function_returns};
             function_impl = Fn function_impl }
@@ -447,46 +446,7 @@ functor
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
 
-        method private with_fn_returns
-            : 'env 'a. 'env -> expr -> ('env -> 'a) -> 'a =
-          fun env ty f ->
-            let prev = infer_ctx.fn_returns in
-            infer_ctx.fn_returns <- Some ty ;
-            let result = f env in
-            infer_ctx.fn_returns <- prev ;
-            result
-
         method private check_type ~expected actual =
-          match expected with
-          | Value (Type HoleType) ->
-              Ok actual
-          | _ when equal_expr expected actual ->
-              Ok actual
-          | Value x -> (
-              let from_intf_ =
-                let inter =
-                  new interpreter (program, current_bindings, errors, functions)
-                in
-                Value (inter#interpret_fc (from_intf, [actual]))
-              in
-              let impl =
-                List.find_map program.impls ~f:(fun (s, impls) ->
-                    match equal_value s x with
-                    | true ->
-                        List.find_map impls ~f:(fun i ->
-                            if equal_expr i.impl_interface from_intf_ then
-                              Some i.impl_methods
-                            else None )
-                        |> Option.bind ~f:List.hd
-                    | false ->
-                        None )
-              in
-              match impl with
-              | Some (_, m) ->
-                  Error (NeedFromCall m)
-              | _ ->
-                  Error TypeError )
-          | _ ->
-              Error TypeError
+          type_checker#check_type ~program ~current_bindings ~expected actual
       end
   end
