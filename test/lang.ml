@@ -2001,15 +2001,8 @@ let%expect_test "reference resolving in inner functions" =
              ((function_params ((X TypeType)))
               (function_returns
                (FunctionType
-                ((function_params
-                  ((x
-                    (ExprType
-                     (Value
-                      (Type (ExprType (Value (Type (Dependent X TypeType))))))))))
-                 (function_returns
-                  (ExprType
-                   (Value
-                    (Type (ExprType (Value (Type (Dependent X TypeType)))))))))))))
+                ((function_params ((x (ExprType (Reference (X TypeType))))))
+                 (function_returns (ExprType (Reference (X TypeType)))))))))
             (function_impl
              (Fn
               ((Block
@@ -2019,12 +2012,8 @@ let%expect_test "reference resolving in inner functions" =
                     (Function
                      ((function_signature
                        ((function_params
-                         ((x
-                           (ExprType
-                            (Value (Type (ExprType (Reference (X TypeType)))))))))
-                        (function_returns
-                         (ExprType
-                          (Value (Type (ExprType (Reference (X TypeType)))))))))
+                         ((x (ExprType (Reference (X TypeType))))))
+                        (function_returns (ExprType (Reference (X TypeType))))))
                       (function_impl
                        (Fn
                         ((Block
