@@ -2003,8 +2003,66 @@ let%expect_test "reference resolving in inner functions" =
              ((function_params ((X TypeType)))
               (function_returns
                (FunctionType
-                ((function_params ((x (ExprType (Reference (X TypeType))))))
-                 (function_returns (ExprType (Reference (X TypeType)))))))))
+                ((function_params ((x (Dependent X TypeType))))
+                 (function_returns (Dependent X TypeType)))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Value
+                    (Function
+                     ((function_signature
+                       ((function_params
+                         ((x (ExprType (Reference (X TypeType))))))
+                        (function_returns (ExprType (Reference (X TypeType))))))
+                      (function_impl
+                       (Fn
+                        ((Block
+                          ((Break
+                            (Expr
+                             (Reference (x (ExprType (Reference (X TypeType)))))))))))))))))))))))))))))) |}]
+
+let%expect_test "dependent types" =
+  let source =
+    {|
+      fn identity(X: Type) {
+        fn(x: X) -> X { x }
+      }
+      fn test(Y: Type) {
+        identity(Y)
+      }
+    |}
+  in
+  pp source;
+  [%expect {|
+    (Ok
+     ((bindings
+       ((test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((Y TypeType)))
+              (function_returns
+               (FunctionType
+                ((function_params ((x TypeType))) (function_returns TypeType))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (FunctionCall
+                    ((ResolvedReference (identity <opaque>))
+                     ((Reference (Y TypeType))))))))))))))))
+        (identity
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((X TypeType)))
+              (function_returns
+               (FunctionType
+                ((function_params ((x (Dependent X TypeType))))
+                 (function_returns (Dependent X TypeType)))))))
             (function_impl
              (Fn
               ((Block

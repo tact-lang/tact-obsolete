@@ -24,6 +24,46 @@ functor
 
     include Builtin
 
+    (* If we have signature fn(X: Type) -> X, so
+       we need to change it to fn(X: Type) -> Dependent(X) *)
+    class ['s] make_dependent_types (_errors : _) =
+      object (self : 's)
+        inherit ['s] Lang_types.map as super
+
+        val mutable previous_arguments = []
+
+        method! visit_Reference _ (ref, ty) =
+          let concrete_ty =
+            List.find_map previous_arguments ~f:(fun (name, x) ->
+                if equal_string name ref then Some x else None )
+          in
+          match concrete_ty with
+          | Some ty' ->
+              Value (Type (Dependent (ref, ty')))
+          | None ->
+              Value (Type (ExprType (Reference (ref, ty))))
+
+        (* Unwrap ExprType(Value(Type(ty))) -> ty *)
+        method! visit_type_ env type_ =
+          let new_type = super#visit_type_ env type_ in
+          match new_type with ExprType (Value (Type t)) -> t | t -> t
+
+        method! visit_function_signature env sign =
+          let prev = previous_arguments in
+          let function_params =
+            List.map
+              ~f:(fun (name, ty) ->
+                let ty' = self#visit_type_ env ty in
+                let arg = (name, ty') in
+                previous_arguments <- arg :: previous_arguments ;
+                arg )
+              sign.function_params
+          in
+          let function_returns = self#visit_type_ env sign.function_returns in
+          previous_arguments <- prev ;
+          {function_params; function_returns}
+      end
+
     class ['s] constructor (bindings : (string * expr) list)
       (methods : (value * (string * function_) list) list) (errors : _ errors) =
       object (s : 's)
@@ -323,7 +363,8 @@ functor
             let sign =
               {function_params = param_bindings; function_returns = fn_returns}
             in
-            sign
+            let sig_maker = new make_dependent_types errors in
+            sig_maker#visit_function_signature () sign
           in
           {function_signature; function_impl = Fn body}
 

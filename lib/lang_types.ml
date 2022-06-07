@@ -198,22 +198,25 @@ let rec type_of = function
       InvalidType expr
 
 and type_of_call args arg_types returns =
-  match returns with
-  | Dependent (ref, _) ->
-      let associated =
-        match
-          List.map2 args arg_types ~f:(fun expr (name, _) -> (name, expr))
-        with
-        | Ok t ->
-            t
-        | _ ->
-            raise Errors.InternalCompilerError
-      in
-      List.find_map associated ~f:(fun (name, x) ->
-          if equal_string name ref then Some (type_of x) else None )
-      |> Option.value_exn
-  | x ->
-      x
+  let associated =
+    match List.map2 args arg_types ~f:(fun expr (name, _) -> (name, expr)) with
+    | Ok t ->
+        t
+    | _ ->
+        raise Errors.InternalCompilerError
+  in
+  let dependent_types_monomophizer (associated : (string * expr) list) =
+    object (_self : _)
+      inherit [_] map
+
+      method! visit_Dependent _ ref _ =
+        List.find_map associated ~f:(fun (name, x) ->
+            if equal_string name ref then Some (type_of x) else None )
+        |> Option.value_exn
+    end
+  in
+  let monomorphizer = dependent_types_monomophizer associated in
+  monomorphizer#visit_type_ () returns
 
 class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)
