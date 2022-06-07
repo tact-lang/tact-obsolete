@@ -149,15 +149,15 @@ let%expect_test "failed scope resolution" =
             (Function
              ((function_signature
                ((function_params ((bits IntegerType)))
-                (function_returns TypeType)))
+                (function_returns (TypeN 0))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Bool (Value (Type BoolType))) (Type (Value (Type TypeType)))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
           (Void (Value Void))
           (serializer
            (Value
             (Function
              ((function_signature
-               ((function_params ((t TypeType)))
+               ((function_params ((t (TypeN 0))))
                 (function_returns
                  (FunctionType
                   ((function_params ((t HoleType) (b (BuiltinType Builder))))
@@ -175,7 +175,7 @@ let%expect_test "failed scope resolution" =
            (Value
             (Function
              ((function_signature
-               ((function_params ((T TypeType))) (function_returns HoleType)))
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type (BuiltinType Builder))
@@ -567,15 +567,15 @@ let%expect_test "duplicate type field" =
             (Function
              ((function_signature
                ((function_params ((bits IntegerType)))
-                (function_returns TypeType)))
+                (function_returns (TypeN 0))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Bool (Value (Type BoolType))) (Type (Value (Type TypeType)))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
           (Void (Value Void))
           (serializer
            (Value
             (Function
              ((function_signature
-               ((function_params ((t TypeType)))
+               ((function_params ((t (TypeN 0))))
                 (function_returns
                  (FunctionType
                   ((function_params ((t HoleType) (b (BuiltinType Builder))))
@@ -593,7 +593,7 @@ let%expect_test "duplicate type field" =
            (Value
             (Function
              ((function_signature
-               ((function_params ((T TypeType))) (function_returns HoleType)))
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
@@ -688,7 +688,7 @@ let%expect_test "parametric struct instantiation" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((A TypeType))) (function_returns TypeType)))
+             ((function_params ((A (TypeN 0)))) (function_returns (TypeN 0))))
             (function_impl
              (Fn
               ((Expr
@@ -696,7 +696,7 @@ let%expect_test "parametric struct instantiation" =
                  (Type
                   (StructType
                    ((struct_fields
-                     ((a ((field_type (ExprType (Reference (A TypeType))))))))
+                     ((a ((field_type (ExprType (Reference (A (TypeN 0)))))))))
                     (struct_id <opaque>)))))))))))))))
       (methods
        (((Type
@@ -738,14 +738,14 @@ let%expect_test "parametric struct instantiation" =
         ((Type
           (StructType
            ((struct_fields
-             ((a ((field_type (ExprType (Reference (A TypeType))))))))
+             ((a ((field_type (ExprType (Reference (A (TypeN 0)))))))))
             (struct_id <opaque>))))
          ())))
       (impls
        (((Type
           (StructType
            ((struct_fields
-             ((a ((field_type (ExprType (Reference (A TypeType))))))))
+             ((a ((field_type (ExprType (Reference (A (TypeN 0)))))))))
             (struct_id <opaque>))))
          ()))))) |}]
 
@@ -1165,15 +1165,15 @@ let%expect_test "type check error" =
             (Function
              ((function_signature
                ((function_params ((bits IntegerType)))
-                (function_returns TypeType)))
+                (function_returns (TypeN 0))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Bool (Value (Type BoolType))) (Type (Value (Type TypeType)))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
           (Void (Value Void))
           (serializer
            (Value
             (Function
              ((function_signature
-               ((function_params ((t TypeType)))
+               ((function_params ((t (TypeN 0))))
                 (function_returns
                  (FunctionType
                   ((function_params ((t HoleType) (b (BuiltinType Builder))))
@@ -1191,7 +1191,7 @@ let%expect_test "type check error" =
            (Value
             (Function
              ((function_signature
-               ((function_params ((T TypeType))) (function_returns HoleType)))
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
@@ -1369,15 +1369,15 @@ let%expect_test "type check error" =
             (Function
              ((function_signature
                ((function_params ((bits IntegerType)))
-                (function_returns TypeType)))
+                (function_returns (TypeN 0))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))
-          (Bool (Value (Type BoolType))) (Type (Value (Type TypeType)))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
           (Void (Value Void))
           (serializer
            (Value
             (Function
              ((function_signature
-               ((function_params ((t TypeType)))
+               ((function_params ((t (TypeN 0))))
                 (function_returns
                  (FunctionType
                   ((function_params ((t HoleType) (b (BuiltinType Builder))))
@@ -1395,7 +1395,7 @@ let%expect_test "type check error" =
            (Value
             (Function
              ((function_signature
-               ((function_params ((T TypeType))) (function_returns HoleType)))
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
         (methods
          (((Type
@@ -2000,11 +2000,11 @@ let%expect_test "reference resolving in inner functions" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((X TypeType)))
+             ((function_params ((X (TypeN 0))))
               (function_returns
                (FunctionType
-                ((function_params ((x (Dependent X TypeType))))
-                 (function_returns (Dependent X TypeType)))))))
+                ((function_params ((x (Dependent X (TypeN 0)))))
+                 (function_returns (Dependent X (TypeN 0))))))))
             (function_impl
              (Fn
               ((Block
@@ -2014,14 +2014,14 @@ let%expect_test "reference resolving in inner functions" =
                     (Function
                      ((function_signature
                        ((function_params
-                         ((x (ExprType (Reference (X TypeType))))))
-                        (function_returns (ExprType (Reference (X TypeType))))))
+                         ((x (ExprType (Reference (X (TypeN 0)))))))
+                        (function_returns (ExprType (Reference (X (TypeN 0)))))))
                       (function_impl
                        (Fn
                         ((Block
                           ((Break
                             (Expr
-                             (Reference (x (ExprType (Reference (X TypeType)))))))))))))))))))))))))))))) |}]
+                             (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))))))))))) |}]
 
 let%expect_test "dependent types" =
   let source =
@@ -2034,18 +2034,19 @@ let%expect_test "dependent types" =
       }
     |}
   in
-  pp source;
-  [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Ok
      ((bindings
        ((test
          (Value
           (Function
            ((function_signature
-             ((function_params ((Y TypeType)))
+             ((function_params ((Y (TypeN 0))))
               (function_returns
                (FunctionType
-                ((function_params ((x TypeType))) (function_returns TypeType))))))
+                ((function_params ((x (TypeN 0)))) (function_returns (TypeN 0)))))))
             (function_impl
              (Fn
               ((Block
@@ -2053,16 +2054,16 @@ let%expect_test "dependent types" =
                   (Expr
                    (FunctionCall
                     ((ResolvedReference (identity <opaque>))
-                     ((Reference (Y TypeType))))))))))))))))
+                     ((Reference (Y (TypeN 0)))))))))))))))))
         (identity
          (Value
           (Function
            ((function_signature
-             ((function_params ((X TypeType)))
+             ((function_params ((X (TypeN 0))))
               (function_returns
                (FunctionType
-                ((function_params ((x (Dependent X TypeType))))
-                 (function_returns (Dependent X TypeType)))))))
+                ((function_params ((x (Dependent X (TypeN 0)))))
+                 (function_returns (Dependent X (TypeN 0))))))))
             (function_impl
              (Fn
               ((Block
@@ -2072,11 +2073,74 @@ let%expect_test "dependent types" =
                     (Function
                      ((function_signature
                        ((function_params
-                         ((x (ExprType (Reference (X TypeType))))))
-                        (function_returns (ExprType (Reference (X TypeType))))))
+                         ((x (ExprType (Reference (X (TypeN 0)))))))
+                        (function_returns (ExprType (Reference (X (TypeN 0)))))))
                       (function_impl
                        (Fn
                         ((Block
                           ((Break
                             (Expr
-                             (Reference (x (ExprType (Reference (X TypeType)))))))))))))))))))))))))))))) |}]
+                             (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))))))))))) |}]
+
+let%expect_test "TypeN" =
+  let source =
+    {|
+      fn id(X: Type) { X }
+      let must_fail = id(Type);
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Error
+     (((TypeError ((TypeN 0) (TypeN 1)))
+       ((bindings
+         ((must_fail (Value Void))
+          (id
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((X (TypeN 0)))) (function_returns (TypeN 0))))
+              (function_impl
+               (Fn ((Block ((Break (Expr (Reference (X (TypeN 0))))))))))))))
+          (Builder (Value (Type (BuiltinType Builder))))
+          (Integer (Value (Type IntegerType)))
+          (Int
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((bits IntegerType)))
+                (function_returns (TypeN 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
+          (Void (Value Void))
+          (serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (TypeN 0))))
+                (function_returns
+                 (FunctionType
+                  ((function_params ((t HoleType) (b (BuiltinType Builder))))
+                   (function_returns (BuiltinType Builder)))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (BinOp
+           (Value
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+        (methods
+         (((Type (BuiltinType Builder))
+           ((new
+             ((function_signature
+               ((function_params ()) (function_returns (BuiltinType Builder))))
+              (function_impl (Fn ((Return (Primitive EmptyBuilder))))))))))))))) |}]

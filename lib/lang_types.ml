@@ -74,7 +74,7 @@ and stmt =
 and builtin = string
 
 and type_ =
-  | TypeType
+  | TypeN of int
   | IntegerType
   | BoolType
   | StringType
@@ -124,6 +124,8 @@ and primitive =
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
+let type0 = TypeN 0
+
 let make_runtime (x, type_) = (x, Runtime type_)
 
 let make_comptime (x, value) = (x, Comptime value)
@@ -172,8 +174,8 @@ let rec type_of = function
       VoidType
   | Value (Type (Dependent (_, ty))) ->
       ty
-  | Value (Type _) ->
-      TypeType
+  | Value (Type t) ->
+      type_of_type t
   | Hole ->
       HoleType
   | FunctionCall
@@ -196,6 +198,8 @@ let rec type_of = function
       type_of e
   | expr ->
       InvalidType expr
+
+and type_of_type = function TypeN x -> TypeN (x + 1) | _otherwise -> TypeN 0
 
 and type_of_call args arg_types returns =
   let associated =

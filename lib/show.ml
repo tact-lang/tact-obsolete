@@ -51,8 +51,10 @@ functor
           pp_print_string f "<anonymous>"
 
     and pp_type f = function
-      | TypeType ->
+      | TypeN 0 ->
           pp_print_string f "Type"
+      | TypeN n ->
+          pp_print_string f "Type" ; pp_print_int f n
       | IntegerType ->
           pp_print_string f "Integer"
       | BoolType ->
