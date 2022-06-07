@@ -5,8 +5,8 @@
 (name tact)
 (source (github tact-lang/tact))
 (license Apache-2.0)
-(authors "cmxog@protonmail.com")
-(maintainers "cmxog@protonmail.com")
+(authors "cmxog@protonmail.com" "dmytro.polunin@gmail.com")
+(maintainers "cmxog@protonmail.com" "dmytro.polunin@gmail.com")
 
 (package
  (name tact)
