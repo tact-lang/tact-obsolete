@@ -1,10 +1,10 @@
 module Make =
 functor
-  (Syntax : Syntax.T)
+  (Config : Config.T)
   ->
   struct
     open Caml.Format
-    module Lang = Lang.Make (Syntax)
+    module Lang = Lang.Make (Config)
 
     let format_to_string : 'a. 'a -> (formatter -> 'a -> unit) -> string =
      fun x show ->

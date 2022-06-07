@@ -2,13 +2,14 @@ open Base
 
 module Make =
 functor
-  (Syntax : Syntax.T)
+  (Config : Config.T)
   ->
   struct
     open Errors
     include Lang_types
     open Interpreter
     open Type_check
+    module Syntax = Syntax.Make (Config)
 
     type error =
       [ `DuplicateField of string * struct_

@@ -1,6 +1,11 @@
 open Core
-module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
-module Parser = Tact.Parser.Make (Syntax)
+
+module Config = struct
+  include Tact.Located.Disabled
+end
+
+module Syntax = Tact.Syntax.Make (Config)
+module Parser = Tact.Parser.Make (Config)
 
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
