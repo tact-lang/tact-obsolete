@@ -10,6 +10,7 @@
  (preprocess
   (pps ppx_show ppx_make ppx_compare visitors.ppx ppx_sexp_conv))
  (modules
+  config
   tokens
   parser
   lexer

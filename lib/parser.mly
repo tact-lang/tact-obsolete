@@ -1,8 +1,14 @@
-%parameter<Syntax : Syntax.T>
+%parameter<Config : Config.T>
 
-%start <Syntax.program> program
+%start <program> program
 
 %{              
+  (* This is a workaround for Dune and Menhir as discovered in https://github.com/ocaml/dune/issues/2450#issuecomment-515895672 and
+   * https://github.com/ocaml/dune/issues/1504#issuecomment-434702650 that seems to fix the issue of Menhir wrongly inferring
+   * the reference to Syntax.Make as Tact.Syntax.Make which makes Parser depend on Tact, which doesn't work
+   *)
+   module Tact = struct end
+   open struct module Syntax = Syntax.Make(Config) end
    open Syntax
 %}
 

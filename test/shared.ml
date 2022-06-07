@@ -1,7 +1,11 @@
-module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
-module Parser = Tact.Parser.Make (Syntax)
-module Lang = Tact.Lang.Make (Syntax)
-module Show = Tact.Show.Make (Syntax)
+module Config = struct
+  include Tact.Located.Disabled
+end
+
+module Syntax = Tact.Syntax.Make (Config)
+module Parser = Tact.Parser.Make (Config)
+module Lang = Tact.Lang.Make (Config)
+module Show = Tact.Show.Make (Config)
 module Interpreter = Tact.Interpreter
 module Errors = Tact.Errors
 module Zint = Tact.Zint
