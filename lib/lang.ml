@@ -85,14 +85,7 @@ functor
           Block (s#of_located_list code_block)
 
         method! visit_CodeBlock env block =
-          (* new binding scope *)
-          let current_bindings' = current_bindings in
-          current_bindings <- [] :: current_bindings ;
-          (* process the body *)
-          let result = super#visit_CodeBlock env block in
-          (* drop binding scope *)
-          current_bindings <- current_bindings' ;
-          result
+          s#with_bindings [] (fun _ -> super#visit_CodeBlock env block)
 
         method build_Enum _env _enum = InvalidExpr
 
@@ -336,29 +329,21 @@ functor
                      s#visit_expr env @@ Syntax.value expr ) )
             |> List.map ~f:(fun (id, expr) -> (id, expr_to_type expr))
           in
-          let prev_bindings = current_bindings in
-          current_bindings <-
-            List.map param_bindings ~f:(fun (name, ty) ->
-                (name, Comptime (Value (Type (Dependent (name, ty))))) )
-            :: current_bindings ;
           let function_returns =
-            f.returns
-            |> Option.map ~f:(fun x ->
-                   expr_to_type (s#visit_expr env (Syntax.value x)) )
-            |> Option.value ~default:HoleType
+            s#with_bindings
+              (List.map param_bindings ~f:(fun (name, ty) ->
+                   (name, Comptime (Value (Type (Dependent (name, ty))))) ) )
+              (fun _ ->
+                f.returns
+                |> Option.map ~f:(fun x ->
+                       expr_to_type (s#visit_expr env (Syntax.value x)) )
+                |> Option.value ~default:HoleType )
           in
-          current_bindings <- prev_bindings ;
-          let bindings' = current_bindings in
-          (* inject them into current bindings *)
-          current_bindings <-
-            List.map param_bindings ~f:make_runtime :: current_bindings ;
-          (* process the function definition *)
           let body, fn_returns =
-            type_checker#with_fn_returns env function_returns (fun env' ->
-                s#visit_option s#visit_function_body env' f.function_body )
+            s#with_bindings (List.map param_bindings ~f:make_runtime) (fun _ ->
+                type_checker#with_fn_returns env function_returns (fun env' ->
+                    s#visit_option s#visit_function_body env' f.function_body ) )
           in
-          (* restore bindings as before entering the function *)
-          current_bindings <- bindings' ;
           let function_signature =
             let sign =
               {function_params = param_bindings; function_returns = fn_returns}
@@ -401,11 +386,11 @@ functor
           {interface_methods = signatures}
 
         method! visit_interface_definition env def =
-          let current_bindings' = current_bindings in
-          current_bindings <-
-            [make_comptime ("Self", Value (Type SelfType))] :: current_bindings' ;
-          let value = super#visit_interface_definition env def in
-          current_bindings <- current_bindings' ;
+          let value =
+            s#with_bindings
+              [make_comptime ("Self", Value (Type SelfType))]
+              (fun _ -> super#visit_interface_definition env def)
+          in
           value
 
         method build_program _env _ =
@@ -447,18 +432,20 @@ functor
               (s#visit_located s#visit_struct_field)
               env _visitors_this.fields
           in
-          let struct_ = s#build_struct_definition env _visitors_r0 [] []
-          and current_bindings' = current_bindings in
-          current_bindings <-
-            [make_comptime ("Self", Value (Type (StructType struct_)))]
-            :: current_bindings' ;
+          let struct_ = s#build_struct_definition env _visitors_r0 [] [] in
           let bindings =
-            s#visit_list
-              (s#visit_located s#visit_binding)
-              env _visitors_this.struct_bindings
+            s#with_bindings
+              [make_comptime ("Self", Value (Type (StructType struct_)))]
+              (fun _ ->
+                s#visit_list
+                  (s#visit_located s#visit_binding)
+                  env _visitors_this.struct_bindings )
           in
-          let impls = s#visit_list s#visit_impl env _visitors_this.impls in
-          current_bindings <- current_bindings' ;
+          let impls =
+            s#with_bindings
+              [make_comptime ("Self", Value (Type (StructType struct_)))]
+              (fun _ -> s#visit_list s#visit_impl env _visitors_this.impls)
+          in
           let struct_methods =
             List.filter_map bindings ~f:(fun binding ->
                 let name, expr = Syntax.value binding in
@@ -495,5 +482,13 @@ functor
 
         method private check_type ~expected actual =
           type_checker#check_type ~program ~current_bindings ~expected actual
+
+        method private with_bindings : 'a. tbinding list -> (unit -> 'a) -> 'a =
+          fun added_bindings f ->
+            let current_bindings' = current_bindings in
+            current_bindings <- added_bindings :: current_bindings ;
+            let result = f () in
+            current_bindings <- current_bindings' ;
+            result
       end
   end
