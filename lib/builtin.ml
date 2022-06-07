@@ -91,13 +91,12 @@ let int_type =
   Value
     (Function
        { function_signature =
-           { function_params = [("bits", IntegerType)];
-             function_returns = TypeType };
+           {function_params = [("bits", IntegerType)]; function_returns = type0};
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let serializer =
   let function_signature =
-    { function_params = [("t", TypeType)];
+    { function_params = [("t", type0)];
       function_returns =
         FunctionType
           { function_params = [("t", HoleType); ("b", builder)];
@@ -167,7 +166,7 @@ let bin_op_intf =
 
 let from_intf =
   let function_signature =
-    {function_params = [("T", TypeType)]; function_returns = HoleType}
+    {function_params = [("T", type0)]; function_returns = HoleType}
   in
   let make_from t =
     Type
@@ -188,7 +187,7 @@ let default_bindings =
     ("Integer", Value (Type IntegerType));
     ("Int", int_type);
     ("Bool", Value (Type BoolType));
-    ("Type", Value (Type TypeType));
+    ("Type", Value (Type type0));
     ("Void", Value Void);
     (* TODO: re-design the serialization API surface; this is more for demonstration
      * purposes

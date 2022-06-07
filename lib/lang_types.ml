@@ -74,7 +74,7 @@ and stmt =
 and builtin = string
 
 and type_ =
-  | TypeType
+  | TypeN of int
   | IntegerType
   | BoolType
   | StringType
@@ -124,6 +124,8 @@ and primitive =
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
     visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
+let type0 = TypeN 0
+
 let make_runtime (x, type_) = (x, Runtime type_)
 
 let make_comptime (x, value) = (x, Comptime value)
@@ -172,8 +174,8 @@ let rec type_of = function
       VoidType
   | Value (Type (Dependent (_, ty))) ->
       ty
-  | Value (Type _) ->
-      TypeType
+  | Value (Type t) ->
+      type_of_type t
   | Hole ->
       HoleType
   | FunctionCall
@@ -197,23 +199,37 @@ let rec type_of = function
   | expr ->
       InvalidType expr
 
+and type_of_type = function TypeN x -> TypeN (x + 1) | _otherwise -> TypeN 0
+
 and type_of_call args arg_types returns =
-  match returns with
-  | Dependent (ref, _) ->
-      let associated =
-        match
-          List.map2 args arg_types ~f:(fun expr (name, _) -> (name, expr))
-        with
-        | Ok t ->
-            t
-        | _ ->
-            raise Errors.InternalCompilerError
-      in
-      List.find_map associated ~f:(fun (name, x) ->
-          if equal_string name ref then Some (type_of x) else None )
-      |> Option.value_exn
-  | x ->
-      x
+  let associated =
+    match List.map2 args arg_types ~f:(fun expr (name, _) -> (name, expr)) with
+    | Ok t ->
+        t
+    | _ ->
+        raise Errors.InternalCompilerError
+  in
+  let dependent_types_monomophizer (associated : (string * expr) list) =
+    object (_self : _)
+      inherit [_] map
+
+      method! visit_Dependent _ ref _ =
+        List.find_map associated ~f:(fun (name, x) ->
+            if equal_string name ref then
+              Some
+                ( match x with
+                (* If we depend on reference, it means we depend on function argument,
+                   so type must be dependent. *)
+                | Reference (r, t) ->
+                    Dependent (r, t)
+                | x ->
+                    type_of x )
+            else None )
+        |> Option.value_exn
+    end
+  in
+  let monomorphizer = dependent_types_monomophizer associated in
+  monomorphizer#visit_type_ () returns
 
 class ['s] boolean_reduce (zero : bool) =
   object (_self : 's)
