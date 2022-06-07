@@ -206,6 +206,11 @@ class interpreter
         | Some (Error ()) ->
             Sexplib.Sexp.pp_hum Caml.Format.std_formatter (sexp_of_string ref) ;
             Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+              (sexp_of_list
+                 (sexp_of_list
+                    (Stdppx.sexp_of_pair sexp_of_string sexp_of_value) )
+                 vars_scope ) ;
+            Sexplib.Sexp.pp_hum Caml.Format.std_formatter
               (sexp_of_list (sexp_of_list sexp_of_tbinding) global_bindings) ;
             raise Errors.InternalCompilerError
         | Some (Ok v) ->

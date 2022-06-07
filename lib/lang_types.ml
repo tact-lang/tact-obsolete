@@ -215,7 +215,16 @@ and type_of_call args arg_types returns =
 
       method! visit_Dependent _ ref _ =
         List.find_map associated ~f:(fun (name, x) ->
-            if equal_string name ref then Some (type_of x) else None )
+            if equal_string name ref then
+              Some
+                ( match x with
+                (* If we depend on reference, it means we depend on function argument,
+                   so type must be dependent. *)
+                | Reference (r, t) ->
+                    Dependent (r, t)
+                | x ->
+                    type_of x )
+            else None )
         |> Option.value_exn
     end
   in

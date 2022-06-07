@@ -2027,7 +2027,8 @@ let%expect_test "dependent types" =
   let source =
     {|
       fn identity(X: Type) {
-        fn(x: X) -> X { x }
+        let f = fn(x: X) -> X { x };
+        f
       }
       fn test(Y: Type) {
         identity(Y)
@@ -2046,7 +2047,8 @@ let%expect_test "dependent types" =
              ((function_params ((Y (TypeN 0))))
               (function_returns
                (FunctionType
-                ((function_params ((x (TypeN 0)))) (function_returns (TypeN 0)))))))
+                ((function_params ((x (Dependent Y (TypeN 0)))))
+                 (function_returns (Dependent Y (TypeN 0))))))))
             (function_impl
              (Fn
               ((Block
@@ -2067,20 +2069,22 @@ let%expect_test "dependent types" =
             (function_impl
              (Fn
               ((Block
-                ((Break
-                  (Expr
-                   (Value
-                    (Function
-                     ((function_signature
-                       ((function_params
-                         ((x (ExprType (Reference (X (TypeN 0)))))))
-                        (function_returns (ExprType (Reference (X (TypeN 0)))))))
-                      (function_impl
-                       (Fn
-                        ((Block
-                          ((Break
-                            (Expr
-                             (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))))))))))) |}]
+                ((Let
+                  ((f
+                    (Value
+                     (Function
+                      ((function_signature
+                        ((function_params
+                          ((x (ExprType (Reference (X (TypeN 0)))))))
+                         (function_returns (ExprType (Reference (X (TypeN 0)))))))
+                       (function_impl
+                        (Fn
+                         ((Block
+                           ((Break
+                             (Expr
+                              (Reference
+                               (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))
+                 (Break (Expr (ResolvedReference (f <opaque>))))))))))))))))) |}]
 
 let%expect_test "TypeN" =
   let source =
