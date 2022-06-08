@@ -223,7 +223,7 @@ functor
 
         method build_StructConstructor _env sc = Value (Struct sc)
 
-        method build_Union _env _union = InvalidExpr
+        method build_Union _env union = Value (Type (UnionType union))
 
         method build_Expr _env expr = Expr expr
 
@@ -475,7 +475,8 @@ functor
           ( Syntax.value field_name,
             {field_type = expr_to_type (Syntax.value field_type)} )
 
-        method build_union_definition _env _members _bindings = ()
+        method build_union_definition _env members _bindings =
+          {cases = List.map (s#of_located_list members) ~f:expr_to_type}
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value

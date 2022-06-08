@@ -97,6 +97,11 @@ class interpreter
               Void )
         | Value value ->
             self#interpret_value value
+        | MakeUnionVariant (expr, union) ->
+            (* We assume that input of interpreter is always type-checked,
+               so we do not need to check if union can be built from the expr. *)
+            let data = self#interpret_expr expr in
+            UnionVariant (data, union)
         | Primitive _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
@@ -111,9 +116,13 @@ class interpreter
                 (name, {field_type = self#interpret_type field_type}) )
           in
           StructType {struct_fields; struct_id}
+      | UnionType u ->
+          UnionType {cases = List.map u.cases ~f:self#interpret_type}
       | ty ->
           ty
 
+    (* TBD: previously we defined value as "atom" which cannot be interpreted, but below
+       we interpret values. Should we move `Type`, `Struct` and `Function` to the `expr` type?*)
     method interpret_value : value -> value =
       fun value ->
         match value with

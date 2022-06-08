@@ -40,6 +40,7 @@ and program =
 
 and expr =
   | FunctionCall of function_call
+  | MakeUnionVariant of (expr * union)
   | Reference of (string * type_)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
   | Value of value
@@ -55,6 +56,7 @@ and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 and value =
   | Void
   | Struct of (struct_ * (string * expr) list)
+  | UnionVariant of (value * union)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
   | Bool of bool
@@ -81,6 +83,7 @@ and type_ =
   | VoidType
   | BuiltinType of builtin
   | StructType of struct_
+  | UnionType of union
   | FunctionType of function_signature
   | InterfaceType of interface
   | HoleType
@@ -88,6 +91,8 @@ and type_ =
   | InvalidType of expr
   | ExprType of expr
   | Dependent of string * type_
+
+and union = {cases : type_ list}
 
 and struct_ =
   {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
@@ -196,6 +201,8 @@ let rec type_of = function
       t
   | ResolvedReference (_, e) ->
       type_of e
+  | MakeUnionVariant (_, u) ->
+      UnionType u
   | expr ->
       InvalidType expr
 
