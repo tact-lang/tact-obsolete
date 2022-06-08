@@ -21,6 +21,8 @@ class interpreter
 
     val mutable return = Void
 
+    val mutable adding_structs = []
+
     method interpret_stmt_list : stmt list -> value =
       fun stmts ->
         match stmts with
@@ -82,7 +84,12 @@ class interpreter
               self#interpret_expr expr'
           | None ->
               errors#report `Error (`UnresolvedIdentifier name) () ;
-              Void )
+              Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+                (sexp_of_list
+                   (sexp_of_list
+                      (Stdppx.sexp_of_pair sexp_of_string sexp_of_value) )
+                   vars_scope ) ;
+              raise InternalCompilerError )
         | StructField (struct_, field) -> (
           match self#interpret_expr struct_ with
           | Struct (struct_, struct') -> (
@@ -115,6 +122,10 @@ class interpreter
             List.map struct_fields ~f:(fun (name, {field_type}) ->
                 (name, {field_type = self#interpret_type field_type}) )
           in
+          let s = {struct_fields; struct_id} in
+          if not (List.exists adding_structs ~f:(equal_struct_ s)) then
+            if is_immediate_expr (Value (Type (StructType s))) then
+              self#add_struct_to_program s ;
           StructType {struct_fields; struct_id}
       | UnionType u ->
           UnionType {cases = List.map u.cases ~f:self#interpret_type}
@@ -133,21 +144,20 @@ class interpreter
               ( s,
                 List.map fields ~f:(fun (n, f) ->
                     (n, Value (self#interpret_expr f)) ) )
-        | Function
-            { function_signature = {function_params; function_returns};
-              function_impl } ->
-            Function
-              { function_signature =
-                  { function_params =
-                      List.map function_params ~f:(fun (name, x) ->
-                          (name, self#interpret_type x) );
-                    function_returns = self#interpret_type function_returns };
-                function_impl =
-                  (match function_impl with Fn b -> Fn b | x -> x) }
+        | Function f ->
+            Function (self#interpret_function f)
         | value ->
             value
 
-    method interpret_function : function_ -> function_ = fun f -> f
+    method interpret_function : function_ -> function_ =
+      fun f ->
+        { function_signature =
+            { function_params =
+                List.map f.function_signature.function_params
+                  ~f:(fun (name, x) -> (name, self#interpret_type x));
+              function_returns =
+                self#interpret_type f.function_signature.function_returns };
+          function_impl = (match f.function_impl with Fn b -> Fn b | x -> x) }
 
     method interpret_fc : function_call -> value =
       fun (func, args) ->
@@ -226,4 +236,65 @@ class interpreter
             Some v
         | None ->
             None
+
+    method private add_struct_to_program struct_ =
+      let prev_structs = adding_structs in
+      adding_structs <- struct_ :: adding_structs ;
+      let add_methods () =
+        if
+          not
+            (List.exists program.methods ~f:(fun (s, _) ->
+                 equal_value s (Type (StructType struct_)) ) )
+        then
+          match
+            List.find_map program.methods_defs ~f:(fun (v, methods) ->
+                match v with
+                | Type (StructType s) ->
+                    if equal_struct_ s struct_ then Some methods else None
+                | _ ->
+                    None )
+          with
+          | Some methods_defs ->
+              let methods_monomorphed =
+                List.map methods_defs ~f:(fun (name, f) ->
+                    (name, self#interpret_function f) )
+              in
+              program.methods <-
+                (Type (StructType struct_), methods_monomorphed)
+                :: program.methods
+          | None ->
+              ()
+      in
+      let add_impls () =
+        if
+          not
+            (List.exists program.methods ~f:(fun (s, _) ->
+                 equal_value s (Type (StructType struct_)) ) )
+        then
+          match
+            List.find_map program.impls_defs ~f:(fun (v, impls) ->
+                match v with
+                | Type (StructType s) ->
+                    if equal_struct_ s struct_ then Some impls else None
+                | _ ->
+                    None )
+          with
+          | Some impls_defs ->
+              let impls_monomorphed =
+                List.map impls_defs ~f:(fun impl ->
+                    { impl_interface =
+                        Value (self#interpret_expr impl.impl_interface);
+                      impl_methods =
+                        List.map impl.impl_methods ~f:(fun (n, x) ->
+                            (n, Value (self#interpret_expr x)) ) } )
+              in
+              program.impls <-
+                (Type (StructType struct_), impls_monomorphed) :: program.impls
+          | None ->
+              ()
+      in
+      add_methods () ;
+      add_impls () ;
+      adding_structs <- prev_structs ;
+      ()
   end

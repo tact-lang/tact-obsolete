@@ -321,6 +321,28 @@ let%expect_test "basic struct definition" =
                   ((struct_fields ((integer ((field_type IntegerType)))))
                    (struct_id <opaque>))))))))
             (struct_id <opaque>))))
+         ())))
+      (methods_defs
+       (((Type
+          (StructType
+           ((struct_fields
+             ((t
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
+         ())))
+      (impls_defs
+       (((Type
+          (StructType
+           ((struct_fields
+             ((t
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
          ()))))) |}]
 
 let%expect_test "native function evaluation" =
@@ -522,6 +544,30 @@ let%expect_test "struct definition" =
                      (struct_id <opaque>))))))
                 (b ((field_type BoolType)))))
               (struct_id <opaque>))))
+           ())))
+        (methods_defs
+         (((Type
+            (StructType
+             ((struct_fields
+               ((a
+                 ((field_type
+                   (StructType
+                    ((struct_fields ((integer ((field_type IntegerType)))))
+                     (struct_id <opaque>))))))
+                (b ((field_type BoolType)))))
+              (struct_id <opaque>))))
+           ())))
+        (impls_defs
+         (((Type
+            (StructType
+             ((struct_fields
+               ((a
+                 ((field_type
+                   (StructType
+                    ((struct_fields ((integer ((field_type IntegerType)))))
+                     (struct_id <opaque>))))))
+                (b ((field_type BoolType)))))
+              (struct_id <opaque>))))
            ()))))) |}]
 
 let%expect_test "duplicate type field" =
@@ -659,6 +705,30 @@ let%expect_test "duplicate type field" =
                      (struct_id <opaque>))))))
                 (a ((field_type BoolType)))))
               (struct_id <opaque>))))
+           ())))
+        (methods_defs
+         (((Type
+            (StructType
+             ((struct_fields
+               ((a
+                 ((field_type
+                   (StructType
+                    ((struct_fields ((integer ((field_type IntegerType)))))
+                     (struct_id <opaque>))))))
+                (a ((field_type BoolType)))))
+              (struct_id <opaque>))))
+           ())))
+        (impls_defs
+         (((Type
+            (StructType
+             ((struct_fields
+               ((a
+                 ((field_type
+                   (StructType
+                    ((struct_fields ((integer ((field_type IntegerType)))))
+                     (struct_id <opaque>))))))
+                (a ((field_type BoolType)))))
+              (struct_id <opaque>))))
            ()))))))) |}]
 
 let%expect_test "parametric struct instantiation" =
@@ -734,14 +804,15 @@ let%expect_test "parametric struct instantiation" =
                         ((struct_fields ((integer ((field_type IntegerType)))))
                          (struct_id <opaque>)))))
                      integer)))
-                  (signed true)))))))))))
-        ((Type
+                  (signed true)))))))))))))
+      (methods_defs
+       (((Type
           (StructType
            ((struct_fields
              ((a ((field_type (ExprType (Reference (A (TypeN 0)))))))))
             (struct_id <opaque>))))
          ())))
-      (impls
+      (impls_defs
        (((Type
           (StructType
            ((struct_fields
@@ -1038,6 +1109,18 @@ let%expect_test "method access" =
             (function_impl
              (Fn ((Block ((Break (Expr (Reference (i IntegerType)))))))))))))))
       (impls
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>)))) ())))
+      (methods_defs
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((bar
+           ((function_signature
+             ((function_params
+               ((self (StructType ((struct_fields ()) (struct_id <opaque>))))
+                (i IntegerType)))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn ((Block ((Break (Expr (Reference (i IntegerType)))))))))))))))
+      (impls_defs
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>)))) ()))))) |}]
 
 let%expect_test "Self type resolution in methods" =
@@ -1073,6 +1156,23 @@ let%expect_test "Self type resolution in methods" =
                    (Reference
                     (self (StructType ((struct_fields ()) (struct_id <opaque>))))))))))))))))))
       (impls
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>)))) ())))
+      (methods_defs
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((bar
+           ((function_signature
+             ((function_params
+               ((self (StructType ((struct_fields ()) (struct_id <opaque>))))))
+              (function_returns
+               (StructType ((struct_fields ()) (struct_id <opaque>))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Reference
+                    (self (StructType ((struct_fields ()) (struct_id <opaque>))))))))))))))))))
+      (impls_defs
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>)))) ()))))) |}]
 
 let%expect_test "struct instantiation" =
@@ -1113,6 +1213,20 @@ let%expect_test "struct instantiation" =
             (struct_id <opaque>))))
          ())))
       (impls
+       (((Type
+          (StructType
+           ((struct_fields
+             ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
+            (struct_id <opaque>))))
+         ())))
+      (methods_defs
+       (((Type
+          (StructType
+           ((struct_fields
+             ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
+            (struct_id <opaque>))))
+         ())))
+      (impls_defs
        (((Type
           (StructType
            ((struct_fields
@@ -1522,6 +1636,33 @@ let%expect_test "implement interface op" =
                   ((function_params ((left IntegerType) (right IntegerType)))
                    (function_returns IntegerType)))
                  (function_impl
+                  (Fn ((Block ((Break (Expr (Reference (left IntegerType))))))))))))))))))))
+      (methods_defs
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((op
+           ((function_signature
+             ((function_params ((left IntegerType) (right IntegerType)))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn ((Block ((Break (Expr (Reference (left IntegerType)))))))))))))))
+      (impls_defs
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         (((impl_interface
+            (Value
+             (Type
+              (InterfaceType
+               ((interface_methods
+                 ((op
+                   ((function_params ((left IntegerType) (right IntegerType)))
+                    (function_returns IntegerType))))))))))
+           (impl_methods
+            ((op
+              (Value
+               (Function
+                ((function_signature
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType)))
+                 (function_impl
                   (Fn ((Block ((Break (Expr (Reference (left IntegerType)))))))))))))))))))))) |}]
 
 let%expect_test "implement interface op" =
@@ -1567,6 +1708,43 @@ let%expect_test "implement interface op" =
                    (Value
                     (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))
       (impls
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         (((impl_interface
+            (Value
+             (Type
+              (InterfaceType
+               ((interface_methods
+                 ((new ((function_params ()) (function_returns SelfType))))))))))
+           (impl_methods
+            ((new
+              (Value
+               (Function
+                ((function_signature
+                  ((function_params ())
+                   (function_returns
+                    (StructType ((struct_fields ()) (struct_id <opaque>))))))
+                 (function_impl
+                  (Fn
+                   ((Block
+                     ((Break
+                       (Expr
+                        (Value
+                         (Struct (((struct_fields ()) (struct_id <opaque>)) ())))))))))))))))))))))
+      (methods_defs
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((new
+           ((function_signature
+             ((function_params ())
+              (function_returns
+               (StructType ((struct_fields ()) (struct_id <opaque>))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Value
+                    (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))
+      (impls_defs
        (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
          (((impl_interface
             (Value
@@ -1979,6 +2157,68 @@ let%expect_test "serializer inner struct" =
                   ((struct_fields ((integer ((field_type IntegerType)))))
                    (struct_id <opaque>))))))))
             (struct_id <opaque>))))
+         ())))
+      (methods_defs
+       (((Type
+          (StructType
+           ((struct_fields
+             ((y
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))
+              (z
+               ((field_type
+                 (StructType
+                  ((struct_fields
+                    ((x
+                      ((field_type
+                        (StructType
+                         ((struct_fields ((integer ((field_type IntegerType)))))
+                          (struct_id <opaque>))))))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
+         ())
+        ((Type
+          (StructType
+           ((struct_fields
+             ((x
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
+         ())))
+      (impls_defs
+       (((Type
+          (StructType
+           ((struct_fields
+             ((y
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))
+              (z
+               ((field_type
+                 (StructType
+                  ((struct_fields
+                    ((x
+                      ((field_type
+                        (StructType
+                         ((struct_fields ((integer ((field_type IntegerType)))))
+                          (struct_id <opaque>))))))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
+         ())
+        ((Type
+          (StructType
+           ((struct_fields
+             ((x
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
          ()))))) |}]
 
 let%expect_test "reference resolving in inner functions" =
@@ -2084,7 +2324,14 @@ let%expect_test "dependent types" =
                              (Expr
                               (Reference
                                (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))
-                 (Break (Expr (ResolvedReference (f <opaque>))))))))))))))))) |}]
+                 (Break
+                  (Expr
+                   (Reference
+                    (f
+                     (FunctionType
+                      ((function_params
+                        ((x (ExprType (Reference (X (TypeN 0)))))))
+                       (function_returns (ExprType (Reference (X (TypeN 0)))))))))))))))))))))))) |}]
 
 let%expect_test "TypeN" =
   let source =
@@ -2247,3 +2494,62 @@ let%expect_test "unions" =
                          (struct_id <opaque>)))))
                      integer)))
                   (signed true))))))))))))))) |}]
+
+let%expect_test "methods monomorphization" =
+  let source =
+    {|
+      fn Foo(X: Type) -> Type {
+        struct {
+          fn id(self: Self, x: X) -> X { x }
+        }
+      }
+      let foo = Foo(Integer) {};
+      let x = foo.id(10);
+    |}
+  in
+  pp source;
+  [%expect {|
+    (Ok
+     ((bindings
+       ((x (Value (Integer 10)))
+        (foo (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
+        (Foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((X (TypeN 0)))) (function_returns (TypeN 0))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Value
+                    (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))))))))))))
+      (methods
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((id
+           ((function_signature
+             ((function_params
+               ((self (StructType ((struct_fields ()) (struct_id <opaque>))))
+                (x IntegerType)))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))
+      (methods_defs
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
+         ((id
+           ((function_signature
+             ((function_params
+               ((self (StructType ((struct_fields ()) (struct_id <opaque>))))
+                (x (ExprType (Reference (X (TypeN 0)))))))
+              (function_returns (ExprType (Reference (X (TypeN 0)))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))
+      (impls_defs
+       (((Type (StructType ((struct_fields ()) (struct_id <opaque>)))) ()))))) |}]

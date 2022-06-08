@@ -36,7 +36,10 @@ and binding_scope = Comptime of expr | Runtime of type_
 and program =
   { bindings : (string * expr) list;
     mutable methods : (value * (string * function_) list) list; [@sexp.list]
-    mutable impls : (value * impl list) list [@sexp.list] }
+    mutable impls : (value * impl list) list; [@sexp.list]
+    mutable methods_defs : (value * (string * function_) list) list;
+        [@sexp.list]
+    mutable impls_defs : (value * impl list) list [@sexp.list] }
 
 and expr =
   | FunctionCall of function_call
@@ -261,7 +264,7 @@ class ['s] primitive_presence =
 let has_primitives = (new primitive_presence)#visit_function_ ()
 
 class ['s] expr_immediacy_check =
-  object (_self : 's)
+  object (self : 's)
     inherit [_] boolean_reduce true as super
 
     val mutable in_function_call = 0
@@ -284,13 +287,15 @@ class ['s] expr_immediacy_check =
           in_function_call <- in_function_call - 1 ;
           result
 
-    method! visit_function_ _env f =
-      if in_function_call > 0 then
-        (* If we're calling this function, check if there are no primitives *)
-        not @@ has_primitives f
-      else
-        (* Any function is assumed to be immediate as it can be evaluated otherwise *)
-        true
+    method! visit_function_ env f =
+      self#plus
+        ( if in_function_call > 0 then
+          (* If we're calling this function, check if there are no primitives *)
+          not @@ has_primitives f
+        else
+          (* Any function is assumed to be immediate as it can be evaluated otherwise *)
+          true )
+        (super#visit_function_signature env f.function_signature)
   end
 
 let rec is_immediate_expr expr =

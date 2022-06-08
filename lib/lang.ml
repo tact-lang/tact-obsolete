@@ -79,7 +79,8 @@ functor
 
         (* TODO: can we remove duplicating bindings here and the above? *)
         (* Program handle we pass to builtin functions *)
-        val program = {bindings; methods; impls = []}
+        val program =
+          {bindings; methods; impls = []; methods_defs = []; impls_defs = []}
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
@@ -465,11 +466,29 @@ functor
                        | _ ->
                            None ) ) )
           in
-          program.methods <-
+          program.methods_defs <-
             (Type (StructType struct_), struct_methods @ impl_methods)
-            :: program.methods ;
-          program.impls <- (Type (StructType struct_), impls) :: program.impls ;
-          struct_
+            :: program.methods_defs ;
+          program.impls_defs <-
+            (Type (StructType struct_), impls) :: program.impls_defs ;
+          match
+            is_immediate_expr (Value (Type (StructType struct_)))
+            && List.for_all struct_methods ~f:(fun (_, x) ->
+                   is_immediate_expr (Value (Function x)) )
+            && List.for_all impls ~f:(fun i ->
+                   is_immediate_expr i.impl_interface
+                   && List.for_all i.impl_methods ~f:(fun (_, x) ->
+                          is_immediate_expr x ) )
+          with
+          | true ->
+              program.methods <-
+                (Type (StructType struct_), struct_methods @ impl_methods)
+                :: program.methods ;
+              program.impls <-
+                (Type (StructType struct_), impls) :: program.impls ;
+              struct_
+          | false ->
+              struct_
 
         method build_struct_field _env field_name field_type =
           ( Syntax.value field_name,

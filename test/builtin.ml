@@ -481,6 +481,38 @@ let%expect_test "demo struct serializer" =
                   ((struct_fields ((integer ((field_type IntegerType)))))
                    (struct_id <opaque>))))))))
             (struct_id <opaque>))))
+         ())))
+      (methods_defs
+       (((Type
+          (StructType
+           ((struct_fields
+             ((a
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))
+              (b
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
+         ())))
+      (impls_defs
+       (((Type
+          (StructType
+           ((struct_fields
+             ((a
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))
+              (b
+               ((field_type
+                 (StructType
+                  ((struct_fields ((integer ((field_type IntegerType)))))
+                   (struct_id <opaque>))))))))
+            (struct_id <opaque>))))
          ()))))) |}]
 
 let%expect_test "from interface" =
@@ -562,6 +594,61 @@ let%expect_test "from interface" =
                        (struct_id <opaque>))
                       ((a (Reference (x IntegerType))))))))))))))))))))
       (impls
+       (((Type
+          (StructType
+           ((struct_fields ((a ((field_type IntegerType)))))
+            (struct_id <opaque>))))
+         (((impl_interface
+            (Value
+             (Type
+              (InterfaceType
+               ((interface_methods
+                 ((from
+                   ((function_params ((from IntegerType)))
+                    (function_returns SelfType))))))))))
+           (impl_methods
+            ((from
+              (Value
+               (Function
+                ((function_signature
+                  ((function_params ((x IntegerType)))
+                   (function_returns
+                    (StructType
+                     ((struct_fields ((a ((field_type IntegerType)))))
+                      (struct_id <opaque>))))))
+                 (function_impl
+                  (Fn
+                   ((Block
+                     ((Break
+                       (Expr
+                        (Value
+                         (Struct
+                          (((struct_fields ((a ((field_type IntegerType)))))
+                            (struct_id <opaque>))
+                           ((a (Reference (x IntegerType)))))))))))))))))))))))))
+      (methods_defs
+       (((Type
+          (StructType
+           ((struct_fields ((a ((field_type IntegerType)))))
+            (struct_id <opaque>))))
+         ((from
+           ((function_signature
+             ((function_params ((x IntegerType)))
+              (function_returns
+               (StructType
+                ((struct_fields ((a ((field_type IntegerType)))))
+                 (struct_id <opaque>))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (Value
+                    (Struct
+                     (((struct_fields ((a ((field_type IntegerType)))))
+                       (struct_id <opaque>))
+                      ((a (Reference (x IntegerType))))))))))))))))))))
+      (impls_defs
        (((Type
           (StructType
            ((struct_fields ((a ((field_type IntegerType)))))
