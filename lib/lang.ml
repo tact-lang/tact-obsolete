@@ -467,23 +467,7 @@ functor
             ( Type (StructType struct_),
               {methods = struct_methods @ impl_methods; impls} )
             :: program.def_infos ;
-          match
-            is_immediate_expr (Value (Type (StructType struct_)))
-            && List.for_all struct_methods ~f:(fun (_, x) ->
-                   is_immediate_expr (Value (Function x)) )
-            && List.for_all impls ~f:(fun i ->
-                   is_immediate_expr i.impl_interface
-                   && List.for_all i.impl_methods ~f:(fun (_, x) ->
-                          is_immediate_expr x ) )
-          with
-          | true ->
-              program.infos <-
-                ( Type (StructType struct_),
-                  {methods = struct_methods @ impl_methods; impls} )
-                :: program.infos ;
-              struct_
-          | false ->
-              struct_
+          struct_
 
         method build_struct_field _env field_name field_type =
           ( Syntax.value field_name,
