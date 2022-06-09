@@ -34,8 +34,8 @@ let int_type =
     in
     if
       Option.is_none
-      @@ List.Assoc.find p.methods ~equal:equal_value (Type (StructType s))
-    then p.methods <- (Type (StructType s), methods) :: p.methods
+      @@ List.Assoc.find p.infos ~equal:equal_value (Type (StructType s))
+    then p.infos <- (Type (StructType s), {methods; impls = []}) :: p.infos
     else () ;
     s
   and int_type_s_new self bits =
@@ -105,24 +105,18 @@ let serializer =
   let rec serializer_f s p =
     let calls =
       List.filter_map s.struct_fields ~f:(function name, {field_type = f} ->
-          let methods =
-            List.Assoc.find_exn p.methods ~equal:equal_value (Type f)
-          in
+          let info = List.Assoc.find_exn p.infos ~equal:equal_value (Type f) in
           let serialize_field =
-            match List.Assoc.find methods ~equal:String.equal "serialize" with
+            match
+              List.Assoc.find info.methods ~equal:String.equal "serialize"
+            with
             | Some m ->
                 Some m
             | None -> (
               match f with
               | StructType t ->
                   let m = serializer_f t p in
-                  p.methods <-
-                    List.map p.methods ~f:(fun (s, methods) ->
-                        match equal_value s (Type (StructType t)) with
-                        | true ->
-                            (s, ("serializer", m) :: methods)
-                        | false ->
-                            (s, methods) ) ;
+                  info.methods <- ("serializer", m) :: info.methods ;
                   Some m
               | _ ->
                   None )
@@ -196,4 +190,5 @@ let default_bindings =
     ("BinOp", bin_op_intf);
     ("From", from_intf) ]
 
-let default_methods = [(Type (BuiltinType "Builder"), builder_methods)]
+let default_infos =
+  [(Type (BuiltinType "Builder"), {methods = builder_methods; impls = []})]

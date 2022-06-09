@@ -200,7 +200,7 @@ class interpreter
                       (Option.value (List.hd global_bindings) ~default:[]) }
               in
               let value = function_impl program' args' in
-              program.methods <- program'.methods ;
+              program.infos <- program'.infos ;
               value
           | _ ->
               Void )
@@ -240,61 +240,41 @@ class interpreter
     method private add_struct_to_program struct_ =
       let prev_structs = adding_structs in
       adding_structs <- struct_ :: adding_structs ;
-      let add_methods () =
+      let add_infos () =
         if
           not
-            (List.exists program.methods ~f:(fun (s, _) ->
+            (List.exists program.infos ~f:(fun (s, _) ->
                  equal_value s (Type (StructType struct_)) ) )
         then
           match
-            List.find_map program.methods_defs ~f:(fun (v, methods) ->
+            List.find_map program.def_infos ~f:(fun (v, info) ->
                 match v with
                 | Type (StructType s) ->
-                    if equal_struct_ s struct_ then Some methods else None
+                    if equal_struct_ s struct_ then Some info else None
                 | _ ->
                     None )
           with
-          | Some methods_defs ->
+          | Some info ->
               let methods_monomorphed =
-                List.map methods_defs ~f:(fun (name, f) ->
+                List.map info.methods ~f:(fun (name, f) ->
                     (name, self#interpret_function f) )
               in
-              program.methods <-
-                (Type (StructType struct_), methods_monomorphed)
-                :: program.methods
-          | None ->
-              ()
-      in
-      let add_impls () =
-        if
-          not
-            (List.exists program.methods ~f:(fun (s, _) ->
-                 equal_value s (Type (StructType struct_)) ) )
-        then
-          match
-            List.find_map program.impls_defs ~f:(fun (v, impls) ->
-                match v with
-                | Type (StructType s) ->
-                    if equal_struct_ s struct_ then Some impls else None
-                | _ ->
-                    None )
-          with
-          | Some impls_defs ->
               let impls_monomorphed =
-                List.map impls_defs ~f:(fun impl ->
+                List.map info.impls ~f:(fun impl ->
                     { impl_interface =
                         Value (self#interpret_expr impl.impl_interface);
                       impl_methods =
                         List.map impl.impl_methods ~f:(fun (n, x) ->
                             (n, Value (self#interpret_expr x)) ) } )
               in
-              program.impls <-
-                (Type (StructType struct_), impls_monomorphed) :: program.impls
+              program.infos <-
+                ( Type (StructType struct_),
+                  {impls = impls_monomorphed; methods = methods_monomorphed} )
+                :: program.infos
           | None ->
               ()
       in
-      add_methods () ;
-      add_impls () ;
+      add_infos () ;
       adding_structs <- prev_structs ;
       ()
   end

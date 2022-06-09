@@ -101,7 +101,7 @@ and compile_from_string ?(codegen = Codegen_func.codegen)
   | stx -> (
       let errors = new Errors.errors Show.show_error in
       let constructor =
-        new Lang.constructor Lang.default_bindings Lang.default_methods errors
+        new Lang.constructor Lang.default_bindings Lang.default_infos errors
       in
       let program = constructor#visit_program () stx in
       match errors#to_result program with

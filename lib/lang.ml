@@ -65,7 +65,7 @@ functor
       end
 
     class ['s] constructor (bindings : (string * expr) list)
-      (methods : (value * (string * function_) list) list) (errors : _ errors) =
+      (infos : (value * struct_info) list) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
@@ -79,8 +79,7 @@ functor
 
         (* TODO: can we remove duplicating bindings here and the above? *)
         (* Program handle we pass to builtin functions *)
-        val program =
-          {bindings; methods; impls = []; methods_defs = []; impls_defs = []}
+        val program = {bindings; infos; def_infos = []}
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
@@ -272,12 +271,12 @@ functor
           match receiver with
           | ResolvedReference (_, Value (Type ty)) | Value (Type ty) -> (
               let receiver' = Value (Type ty) in
-              let methods =
-                List.Assoc.find program.methods ~equal:equal_value (Type ty)
+              let info =
+                List.Assoc.find program.infos ~equal:equal_value (Type ty)
               in
               match
-                Option.bind methods ~f:(fun methods ->
-                    List.Assoc.find methods ~equal:String.equal fn )
+                Option.bind info ~f:(fun info ->
+                    List.Assoc.find info.methods ~equal:String.equal fn )
               with
               | Some fn' ->
                   ( ResolvedReference (fn, Value (Function fn')),
@@ -288,13 +287,13 @@ functor
           | ResolvedReference (_, Value (Struct (struct', _)))
           | Value (Struct (struct', _)) -> (
               let receiver' = Value (Type (StructType struct')) in
-              let methods =
-                List.Assoc.find program.methods ~equal:equal_value
+              let info =
+                List.Assoc.find program.infos ~equal:equal_value
                   (Type (StructType struct'))
               in
               match
-                Option.bind methods ~f:(fun methods ->
-                    List.Assoc.find methods ~equal:String.equal fn )
+                Option.bind info ~f:(fun info ->
+                    List.Assoc.find info.methods ~equal:String.equal fn )
               with
               | Some fn' ->
                   ( ResolvedReference (fn, Value (Function fn')),
@@ -304,12 +303,10 @@ functor
                   dummy )
           | ResolvedReference (_, Value v) | Value v -> (
               let receiver' = Value v in
-              let methods =
-                List.Assoc.find program.methods ~equal:equal_value v
-              in
+              let info = List.Assoc.find program.infos ~equal:equal_value v in
               match
-                Option.bind methods ~f:(fun methods ->
-                    List.Assoc.find methods ~equal:String.equal fn )
+                Option.bind info ~f:(fun info ->
+                    List.Assoc.find info.methods ~equal:String.equal fn )
               with
               | Some fn' ->
                   ( ResolvedReference (fn, Value (Function fn')),
@@ -466,11 +463,10 @@ functor
                        | _ ->
                            None ) ) )
           in
-          program.methods_defs <-
-            (Type (StructType struct_), struct_methods @ impl_methods)
-            :: program.methods_defs ;
-          program.impls_defs <-
-            (Type (StructType struct_), impls) :: program.impls_defs ;
+          program.def_infos <-
+            ( Type (StructType struct_),
+              {methods = struct_methods @ impl_methods; impls} )
+            :: program.def_infos ;
           match
             is_immediate_expr (Value (Type (StructType struct_)))
             && List.for_all struct_methods ~f:(fun (_, x) ->
@@ -481,11 +477,10 @@ functor
                           is_immediate_expr x ) )
           with
           | true ->
-              program.methods <-
-                (Type (StructType struct_), struct_methods @ impl_methods)
-                :: program.methods ;
-              program.impls <-
-                (Type (StructType struct_), impls) :: program.impls ;
+              program.infos <-
+                ( Type (StructType struct_),
+                  {methods = struct_methods @ impl_methods; impls} )
+                :: program.infos ;
               struct_
           | false ->
               struct_

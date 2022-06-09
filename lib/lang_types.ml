@@ -35,11 +35,12 @@ and binding_scope = Comptime of expr | Runtime of type_
 
 and program =
   { bindings : (string * expr) list;
-    mutable methods : (value * (string * function_) list) list; [@sexp.list]
-    mutable impls : (value * impl list) list; [@sexp.list]
-    mutable methods_defs : (value * (string * function_) list) list;
-        [@sexp.list]
-    mutable impls_defs : (value * impl list) list [@sexp.list] }
+    mutable infos : (value * struct_info) list;
+    mutable def_infos : (value * struct_info) list }
+
+and struct_info =
+  { mutable methods : (string * function_) list; [@sexp.list]
+    mutable impls : impl list [@sexp.list] }
 
 and expr =
   | FunctionCall of function_call

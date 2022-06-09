@@ -52,10 +52,10 @@ class type_checker (errors : _) (functions : _) =
             Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in
           let impl =
-            List.find_map program.impls ~f:(fun (s, impls) ->
+            List.find_map program.infos ~f:(fun (s, info) ->
                 match equal_value s (Type x) with
                 | true ->
-                    List.find_map impls ~f:(fun i ->
+                    List.find_map info.impls ~f:(fun i ->
                         if equal_expr i.impl_interface from_intf_ then
                           Some i.impl_methods
                         else None )
