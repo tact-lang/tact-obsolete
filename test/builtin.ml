@@ -16,87 +16,52 @@ let%expect_test "Int(bits) constructor" =
          (Value
           (Struct
            (((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))
+             (struct_methods
+              ((new
+                ((function_signature
+                  ((function_params ((integer IntegerType)))
+                   (function_returns SelfType)))
+                 (function_impl (BuiltinFn (<fun> 26)))))
+               (serialize
+                ((function_signature
+                  ((function_params ((self SelfType) (b (BuiltinType Builder))))
+                   (function_returns (BuiltinType Builder))))
+                 (function_impl
+                  (Fn
+                   ((Return
+                     (Primitive
+                      (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                       (length (Value (Integer 8)))
+                       (integer
+                        (StructField ((Reference (self SelfType)) integer)))
+                       (signed true)))))))))))
+             (struct_impls ()) (struct_id 24))
             ((integer (Value (Integer 1))))))))
         (i
          (Value
           (Struct
            (((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))
-            ((integer (Value (Integer 100))))))))))
-      (methods
-       (((Type
-          (StructType
-           ((struct_fields ((integer ((field_type IntegerType)))))
-            (struct_id <opaque>))))
-         ((new
-           ((function_signature
-             ((function_params ((integer IntegerType)))
-              (function_returns
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))
-          (serialize
-           ((function_signature
-             ((function_params
-               ((self
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))
-                (b (BuiltinType Builder))))
-              (function_returns (BuiltinType Builder))))
-            (function_impl
-             (Fn
-              ((Return
-                (Primitive
-                 (StoreInt (builder (Reference (b (BuiltinType Builder))))
-                  (length (Value (Integer 8)))
-                  (integer
-                   (StructField
-                    ((Reference
-                      (self
-                       (StructType
-                        ((struct_fields ((integer ((field_type IntegerType)))))
-                         (struct_id <opaque>)))))
-                     integer)))
-                  (signed true)))))))))))
-        ((Type
-          (StructType
-           ((struct_fields ((integer ((field_type IntegerType)))))
-            (struct_id <opaque>))))
-         ((new
-           ((function_signature
-             ((function_params ((integer IntegerType)))
-              (function_returns
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))
-          (serialize
-           ((function_signature
-             ((function_params
-               ((self
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))
-                (b (BuiltinType Builder))))
-              (function_returns (BuiltinType Builder))))
-            (function_impl
-             (Fn
-              ((Return
-                (Primitive
-                 (StoreInt (builder (Reference (b (BuiltinType Builder))))
-                  (length (Value (Integer 257)))
-                  (integer
-                   (StructField
-                    ((Reference
-                      (self
-                       (StructType
-                        ((struct_fields ((integer ((field_type IntegerType)))))
-                         (struct_id <opaque>)))))
-                     integer)))
-                  (signed true))))))))))))))) |}]
+             (struct_methods
+              ((new
+                ((function_signature
+                  ((function_params ((integer IntegerType)))
+                   (function_returns SelfType)))
+                 (function_impl (BuiltinFn (<fun> 4)))))
+               (serialize
+                ((function_signature
+                  ((function_params ((self SelfType) (b (BuiltinType Builder))))
+                   (function_returns (BuiltinType Builder))))
+                 (function_impl
+                  (Fn
+                   ((Return
+                     (Primitive
+                      (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                       (length (Value (Integer 257)))
+                       (integer
+                        (StructField ((Reference (self SelfType)) integer)))
+                       (signed true)))))))))))
+             (struct_impls ()) (struct_id 0))
+            ((integer (Value (Integer 100)))))))))))) |}]
 
 let%expect_test "Int(bits) serializer" =
   let source =
@@ -126,50 +91,35 @@ let%expect_test "Int(bits) serializer" =
                       (Value
                        (Struct
                         (((struct_fields ((integer ((field_type IntegerType)))))
-                          (struct_id <opaque>))
+                          (struct_methods
+                           ((new
+                             ((function_signature
+                               ((function_params ((integer IntegerType)))
+                                (function_returns SelfType)))
+                              (function_impl (BuiltinFn (<fun> 8)))))
+                            (serialize
+                             ((function_signature
+                               ((function_params
+                                 ((self SelfType) (b (BuiltinType Builder))))
+                                (function_returns (BuiltinType Builder))))
+                              (function_impl
+                               (Fn
+                                ((Return
+                                  (Primitive
+                                   (StoreInt
+                                    (builder (Reference (b (BuiltinType Builder))))
+                                    (length (Value (Integer 32)))
+                                    (integer
+                                     (StructField
+                                      ((Reference (self SelfType)) integer)))
+                                    (signed true)))))))))))
+                          (struct_impls ()) (struct_id 8))
                          ((integer (Value (Integer 100))))))))))
                    (Expr
                     (FunctionCall
                      ((ResolvedReference (serialize <opaque>))
                       ((ResolvedReference (i <opaque>))
-                       (Reference (b (BuiltinType Builder))))))))))))))))))
-        (methods
-         (((Type
-            (StructType
-             ((struct_fields ((integer ((field_type IntegerType)))))
-              (struct_id <opaque>))))
-           ((new
-             ((function_signature
-               ((function_params ((integer IntegerType)))
-                (function_returns
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (function_impl (BuiltinFn (<fun> <opaque>)))))
-            (serialize
-             ((function_signature
-               ((function_params
-                 ((self
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))
-                  (b (BuiltinType Builder))))
-                (function_returns (BuiltinType Builder))))
-              (function_impl
-               (Fn
-                ((Return
-                  (Primitive
-                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
-                    (length (Value (Integer 32)))
-                    (integer
-                     (StructField
-                      ((Reference
-                        (self
-                         (StructType
-                          ((struct_fields ((integer ((field_type IntegerType)))))
-                           (struct_id <opaque>)))))
-                       integer)))
-                    (signed true))))))))))))))) |}]
+                       (Reference (b (BuiltinType Builder)))))))))))))))))))) |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -189,299 +139,749 @@ let%expect_test "demo struct serializer" =
   pp source ;
   [%expect
     {|
-    (Ok
-     ((bindings
-       ((test
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ()) (function_returns HoleType)))
-            (function_impl
-             (Fn
-              ((Block
-                ((Let
-                  ((b (FunctionCall ((ResolvedReference (new <opaque>)) ())))))
-                 (Expr
-                  (FunctionCall
-                   ((ResolvedReference (T_serializer <opaque>))
-                    ((Value
-                      (Struct
-                       (((struct_fields
-                          ((a
-                            ((field_type
-                              (StructType
-                               ((struct_fields
-                                 ((integer ((field_type IntegerType)))))
-                                (struct_id <opaque>))))))
-                           (b
-                            ((field_type
-                              (StructType
-                               ((struct_fields
-                                 ((integer ((field_type IntegerType)))))
-                                (struct_id <opaque>))))))))
-                         (struct_id <opaque>))
-                        ((a
-                          (Value
-                           (Struct
-                            (((struct_fields
-                               ((integer ((field_type IntegerType)))))
-                              (struct_id <opaque>))
-                             ((integer (Value (Integer 0))))))))
-                         (b
-                          (Value
-                           (Struct
-                            (((struct_fields
-                               ((integer ((field_type IntegerType)))))
-                              (struct_id <opaque>))
-                             ((integer (Value (Integer 1))))))))))))
-                     (Reference (b (BuiltinType Builder))))))))))))))))
-        (T_serializer
-         (Value
-          (Function
-           ((function_signature
-             ((function_params
-               ((self
-                 (StructType
-                  ((struct_fields
-                    ((a
-                      ((field_type
-                        (StructType
-                         ((struct_fields ((integer ((field_type IntegerType)))))
-                          (struct_id <opaque>))))))
-                     (b
-                      ((field_type
-                        (StructType
-                         ((struct_fields ((integer ((field_type IntegerType)))))
-                          (struct_id <opaque>))))))))
-                   (struct_id <opaque>))))
-                (b (BuiltinType Builder))))
-              (function_returns (BuiltinType Builder))))
-            (function_impl
-             (Fn
-              ((Block
-                ((Let
-                  ((b
-                    (FunctionCall
-                     ((Value
-                       (Function
-                        ((function_signature
-                          ((function_params
-                            ((self
-                              (StructType
-                               ((struct_fields
-                                 ((integer ((field_type IntegerType)))))
-                                (struct_id <opaque>))))
-                             (b (BuiltinType Builder))))
-                           (function_returns (BuiltinType Builder))))
-                         (function_impl
-                          (Fn
-                           ((Return
-                             (Primitive
-                              (StoreInt
-                               (builder (Reference (b (BuiltinType Builder))))
-                               (length (Value (Integer 32)))
-                               (integer
-                                (StructField
-                                 ((Reference
-                                   (self
+    (Error
+     (((MethodNotFound ((Value (Type (BuiltinType Builder))) new))
+       ((bindings
+         ((test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ()) (function_returns HoleType)))
+              (function_impl
+               (Fn ((Block ((Let ((b (Value Void)))) (Expr (Value Void)))))))))))
+          (T_serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((self
+                   (StructType
+                    ((struct_fields
+                      ((a
+                        ((field_type
+                          (StructType
+                           ((struct_fields
+                             ((integer ((field_type IntegerType)))))
+                            (struct_methods
+                             ((new
+                               ((function_signature
+                                 ((function_params ((integer IntegerType)))
+                                  (function_returns SelfType)))
+                                (function_impl (BuiltinFn (<fun> 8)))))
+                              (serialize
+                               ((function_signature
+                                 ((function_params
+                                   ((self SelfType) (b (BuiltinType Builder))))
+                                  (function_returns (BuiltinType Builder))))
+                                (function_impl
+                                 (Fn
+                                  ((Return
+                                    (Primitive
+                                     (StoreInt
+                                      (builder
+                                       (Reference (b (BuiltinType Builder))))
+                                      (length (Value (Integer 32)))
+                                      (integer
+                                       (StructField
+                                        ((Reference (self SelfType)) integer)))
+                                      (signed true)))))))))))
+                            (struct_impls ()) (struct_id 8))))))
+                       (b
+                        ((field_type
+                          (StructType
+                           ((struct_fields
+                             ((integer ((field_type IntegerType)))))
+                            (struct_methods
+                             ((new
+                               ((function_signature
+                                 ((function_params ((integer IntegerType)))
+                                  (function_returns SelfType)))
+                                (function_impl (BuiltinFn (<fun> 17)))))
+                              (serialize
+                               ((function_signature
+                                 ((function_params
+                                   ((self SelfType) (b (BuiltinType Builder))))
+                                  (function_returns (BuiltinType Builder))))
+                                (function_impl
+                                 (Fn
+                                  ((Return
+                                    (Primitive
+                                     (StoreInt
+                                      (builder
+                                       (Reference (b (BuiltinType Builder))))
+                                      (length (Value (Integer 16)))
+                                      (integer
+                                       (StructField
+                                        ((Reference (self SelfType)) integer)))
+                                      (signed true)))))))))))
+                            (struct_impls ()) (struct_id 18))))))))
+                     (struct_methods ()) (struct_impls ()) (struct_id 25))))
+                  (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Let
+                    ((b
+                      (FunctionCall
+                       ((Value
+                         (Function
+                          ((function_signature
+                            ((function_params
+                              ((self SelfType) (b (BuiltinType Builder))))
+                             (function_returns (BuiltinType Builder))))
+                           (function_impl
+                            (Fn
+                             ((Return
+                               (Primitive
+                                (StoreInt
+                                 (builder (Reference (b (BuiltinType Builder))))
+                                 (length (Value (Integer 32)))
+                                 (integer
+                                  (StructField
+                                   ((Reference (self SelfType)) integer)))
+                                 (signed true))))))))))
+                        ((StructField
+                          ((Reference
+                            (self
+                             (StructType
+                              ((struct_fields
+                                ((a
+                                  ((field_type
                                     (StructType
                                      ((struct_fields
                                        ((integer ((field_type IntegerType)))))
-                                      (struct_id <opaque>)))))
-                                  integer)))
-                               (signed true))))))))))
-                      ((StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((a
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((integer ((field_type IntegerType)))))
-                                    (struct_id <opaque>))))))
-                               (b
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((integer ((field_type IntegerType)))))
-                                    (struct_id <opaque>))))))))
-                             (struct_id <opaque>)))))
-                         a))
-                       (Reference (b (BuiltinType Builder)))))))))
-                 (Let
-                  ((b
-                    (FunctionCall
-                     ((Value
-                       (Function
-                        ((function_signature
-                          ((function_params
-                            ((self
-                              (StructType
-                               ((struct_fields
-                                 ((integer ((field_type IntegerType)))))
-                                (struct_id <opaque>))))
-                             (b (BuiltinType Builder))))
-                           (function_returns (BuiltinType Builder))))
-                         (function_impl
-                          (Fn
-                           ((Return
-                             (Primitive
-                              (StoreInt
-                               (builder (Reference (b (BuiltinType Builder))))
-                               (length (Value (Integer 16)))
-                               (integer
-                                (StructField
-                                 ((Reference
-                                   (self
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 8)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 32)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 8))))))
+                                 (b
+                                  ((field_type
                                     (StructType
                                      ((struct_fields
                                        ((integer ((field_type IntegerType)))))
-                                      (struct_id <opaque>)))))
-                                  integer)))
-                               (signed true))))))))))
-                      ((StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((a
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((integer ((field_type IntegerType)))))
-                                    (struct_id <opaque>))))))
-                               (b
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((integer ((field_type IntegerType)))))
-                                    (struct_id <opaque>))))))))
-                             (struct_id <opaque>)))))
-                         b))
-                       (Reference (b (BuiltinType Builder)))))))))
-                 (Return (Reference (b (BuiltinType Builder)))))))))))))
-        (T
-         (Value
-          (Type
-           (StructType
-            ((struct_fields
-              ((a
-                ((field_type
-                  (StructType
-                   ((struct_fields ((integer ((field_type IntegerType)))))
-                    (struct_id <opaque>))))))
-               (b
-                ((field_type
-                  (StructType
-                   ((struct_fields ((integer ((field_type IntegerType)))))
-                    (struct_id <opaque>))))))))
-             (struct_id <opaque>))))))))
-      (methods
-       (((Type
-          (StructType
-           ((struct_fields
-             ((a
-               ((field_type
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (b
-               ((field_type
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))))
-            (struct_id <opaque>))))
-         ())
-        ((Type
-          (StructType
-           ((struct_fields ((integer ((field_type IntegerType)))))
-            (struct_id <opaque>))))
-         ((new
-           ((function_signature
-             ((function_params ((integer IntegerType)))
-              (function_returns
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))
-          (serialize
-           ((function_signature
-             ((function_params
-               ((self
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))
-                (b (BuiltinType Builder))))
-              (function_returns (BuiltinType Builder))))
-            (function_impl
-             (Fn
-              ((Return
-                (Primitive
-                 (StoreInt (builder (Reference (b (BuiltinType Builder))))
-                  (length (Value (Integer 16)))
-                  (integer
-                   (StructField
-                    ((Reference
-                      (self
-                       (StructType
-                        ((struct_fields ((integer ((field_type IntegerType)))))
-                         (struct_id <opaque>)))))
-                     integer)))
-                  (signed true)))))))))))
-        ((Type
-          (StructType
-           ((struct_fields ((integer ((field_type IntegerType)))))
-            (struct_id <opaque>))))
-         ((new
-           ((function_signature
-             ((function_params ((integer IntegerType)))
-              (function_returns
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
-            (function_impl (BuiltinFn (<fun> <opaque>)))))
-          (serialize
-           ((function_signature
-             ((function_params
-               ((self
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))
-                (b (BuiltinType Builder))))
-              (function_returns (BuiltinType Builder))))
-            (function_impl
-             (Fn
-              ((Return
-                (Primitive
-                 (StoreInt (builder (Reference (b (BuiltinType Builder))))
-                  (length (Value (Integer 32)))
-                  (integer
-                   (StructField
-                    ((Reference
-                      (self
-                       (StructType
-                        ((struct_fields ((integer ((field_type IntegerType)))))
-                         (struct_id <opaque>)))))
-                     integer)))
-                  (signed true)))))))))))))
-      (impls
-       (((Type
-          (StructType
-           ((struct_fields
-             ((a
-               ((field_type
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (b
-               ((field_type
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))))
-            (struct_id <opaque>))))
-         ()))))) |}]
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 17)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 16)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 18))))))))
+                               (struct_methods ()) (struct_impls ())
+                               (struct_id 25)))))
+                           a))
+                         (Reference (b (BuiltinType Builder)))))))))
+                   (Let
+                    ((b
+                      (FunctionCall
+                       ((Value
+                         (Function
+                          ((function_signature
+                            ((function_params
+                              ((self SelfType) (b (BuiltinType Builder))))
+                             (function_returns (BuiltinType Builder))))
+                           (function_impl
+                            (Fn
+                             ((Return
+                               (Primitive
+                                (StoreInt
+                                 (builder (Reference (b (BuiltinType Builder))))
+                                 (length (Value (Integer 16)))
+                                 (integer
+                                  (StructField
+                                   ((Reference (self SelfType)) integer)))
+                                 (signed true))))))))))
+                        ((StructField
+                          ((Reference
+                            (self
+                             (StructType
+                              ((struct_fields
+                                ((a
+                                  ((field_type
+                                    (StructType
+                                     ((struct_fields
+                                       ((integer ((field_type IntegerType)))))
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 8)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 32)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 8))))))
+                                 (b
+                                  ((field_type
+                                    (StructType
+                                     ((struct_fields
+                                       ((integer ((field_type IntegerType)))))
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 17)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 16)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 18))))))))
+                               (struct_methods ()) (struct_impls ())
+                               (struct_id 25)))))
+                           b))
+                         (Reference (b (BuiltinType Builder)))))))))
+                   (Return (Reference (b (BuiltinType Builder)))))))))))))
+          (T
+           (Value
+            (Type
+             (StructType
+              ((struct_fields
+                ((a
+                  ((field_type
+                    (StructType
+                     ((struct_fields ((integer ((field_type IntegerType)))))
+                      (struct_methods
+                       ((new
+                         ((function_signature
+                           ((function_params ((integer IntegerType)))
+                            (function_returns SelfType)))
+                          (function_impl (BuiltinFn (<fun> 8)))))
+                        (serialize
+                         ((function_signature
+                           ((function_params
+                             ((self SelfType) (b (BuiltinType Builder))))
+                            (function_returns (BuiltinType Builder))))
+                          (function_impl
+                           (Fn
+                            ((Return
+                              (Primitive
+                               (StoreInt
+                                (builder (Reference (b (BuiltinType Builder))))
+                                (length (Value (Integer 32)))
+                                (integer
+                                 (StructField
+                                  ((Reference (self SelfType)) integer)))
+                                (signed true)))))))))))
+                      (struct_impls ()) (struct_id 8))))))
+                 (b
+                  ((field_type
+                    (StructType
+                     ((struct_fields ((integer ((field_type IntegerType)))))
+                      (struct_methods
+                       ((new
+                         ((function_signature
+                           ((function_params ((integer IntegerType)))
+                            (function_returns SelfType)))
+                          (function_impl (BuiltinFn (<fun> 17)))))
+                        (serialize
+                         ((function_signature
+                           ((function_params
+                             ((self SelfType) (b (BuiltinType Builder))))
+                            (function_returns (BuiltinType Builder))))
+                          (function_impl
+                           (Fn
+                            ((Return
+                              (Primitive
+                               (StoreInt
+                                (builder (Reference (b (BuiltinType Builder))))
+                                (length (Value (Integer 16)))
+                                (integer
+                                 (StructField
+                                  ((Reference (self SelfType)) integer)))
+                                (signed true)))))))))))
+                      (struct_impls ()) (struct_id 18))))))))
+               (struct_methods ()) (struct_impls ()) (struct_id 25))))))
+          (Builder (Value (Type (BuiltinType Builder))))
+          (Integer (Value (Type IntegerType)))
+          (Int
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((bits IntegerType)))
+                (function_returns (TypeN 0))))
+              (function_impl (BuiltinFn (<fun> 0)))))))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
+          (Void (Value Void))
+          (serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (TypeN 0))))
+                (function_returns
+                 (FunctionType
+                  ((function_params ((t HoleType) (b (BuiltinType Builder))))
+                   (function_returns (BuiltinType Builder)))))))
+              (function_impl (BuiltinFn (<fun> 1)))))))
+          (BinOp
+           (Value
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
+              (function_impl (BuiltinFn (<fun> 2)))))))))))
+      ((TypeError ((BuiltinType Builder) VoidType))
+       ((bindings
+         ((test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ()) (function_returns HoleType)))
+              (function_impl
+               (Fn ((Block ((Let ((b (Value Void)))) (Expr (Value Void)))))))))))
+          (T_serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((self
+                   (StructType
+                    ((struct_fields
+                      ((a
+                        ((field_type
+                          (StructType
+                           ((struct_fields
+                             ((integer ((field_type IntegerType)))))
+                            (struct_methods
+                             ((new
+                               ((function_signature
+                                 ((function_params ((integer IntegerType)))
+                                  (function_returns SelfType)))
+                                (function_impl (BuiltinFn (<fun> 8)))))
+                              (serialize
+                               ((function_signature
+                                 ((function_params
+                                   ((self SelfType) (b (BuiltinType Builder))))
+                                  (function_returns (BuiltinType Builder))))
+                                (function_impl
+                                 (Fn
+                                  ((Return
+                                    (Primitive
+                                     (StoreInt
+                                      (builder
+                                       (Reference (b (BuiltinType Builder))))
+                                      (length (Value (Integer 32)))
+                                      (integer
+                                       (StructField
+                                        ((Reference (self SelfType)) integer)))
+                                      (signed true)))))))))))
+                            (struct_impls ()) (struct_id 8))))))
+                       (b
+                        ((field_type
+                          (StructType
+                           ((struct_fields
+                             ((integer ((field_type IntegerType)))))
+                            (struct_methods
+                             ((new
+                               ((function_signature
+                                 ((function_params ((integer IntegerType)))
+                                  (function_returns SelfType)))
+                                (function_impl (BuiltinFn (<fun> 17)))))
+                              (serialize
+                               ((function_signature
+                                 ((function_params
+                                   ((self SelfType) (b (BuiltinType Builder))))
+                                  (function_returns (BuiltinType Builder))))
+                                (function_impl
+                                 (Fn
+                                  ((Return
+                                    (Primitive
+                                     (StoreInt
+                                      (builder
+                                       (Reference (b (BuiltinType Builder))))
+                                      (length (Value (Integer 16)))
+                                      (integer
+                                       (StructField
+                                        ((Reference (self SelfType)) integer)))
+                                      (signed true)))))))))))
+                            (struct_impls ()) (struct_id 18))))))))
+                     (struct_methods ()) (struct_impls ()) (struct_id 25))))
+                  (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Let
+                    ((b
+                      (FunctionCall
+                       ((Value
+                         (Function
+                          ((function_signature
+                            ((function_params
+                              ((self SelfType) (b (BuiltinType Builder))))
+                             (function_returns (BuiltinType Builder))))
+                           (function_impl
+                            (Fn
+                             ((Return
+                               (Primitive
+                                (StoreInt
+                                 (builder (Reference (b (BuiltinType Builder))))
+                                 (length (Value (Integer 32)))
+                                 (integer
+                                  (StructField
+                                   ((Reference (self SelfType)) integer)))
+                                 (signed true))))))))))
+                        ((StructField
+                          ((Reference
+                            (self
+                             (StructType
+                              ((struct_fields
+                                ((a
+                                  ((field_type
+                                    (StructType
+                                     ((struct_fields
+                                       ((integer ((field_type IntegerType)))))
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 8)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 32)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 8))))))
+                                 (b
+                                  ((field_type
+                                    (StructType
+                                     ((struct_fields
+                                       ((integer ((field_type IntegerType)))))
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 17)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 16)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 18))))))))
+                               (struct_methods ()) (struct_impls ())
+                               (struct_id 25)))))
+                           a))
+                         (Reference (b (BuiltinType Builder)))))))))
+                   (Let
+                    ((b
+                      (FunctionCall
+                       ((Value
+                         (Function
+                          ((function_signature
+                            ((function_params
+                              ((self SelfType) (b (BuiltinType Builder))))
+                             (function_returns (BuiltinType Builder))))
+                           (function_impl
+                            (Fn
+                             ((Return
+                               (Primitive
+                                (StoreInt
+                                 (builder (Reference (b (BuiltinType Builder))))
+                                 (length (Value (Integer 16)))
+                                 (integer
+                                  (StructField
+                                   ((Reference (self SelfType)) integer)))
+                                 (signed true))))))))))
+                        ((StructField
+                          ((Reference
+                            (self
+                             (StructType
+                              ((struct_fields
+                                ((a
+                                  ((field_type
+                                    (StructType
+                                     ((struct_fields
+                                       ((integer ((field_type IntegerType)))))
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 8)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 32)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 8))))))
+                                 (b
+                                  ((field_type
+                                    (StructType
+                                     ((struct_fields
+                                       ((integer ((field_type IntegerType)))))
+                                      (struct_methods
+                                       ((new
+                                         ((function_signature
+                                           ((function_params
+                                             ((integer IntegerType)))
+                                            (function_returns SelfType)))
+                                          (function_impl (BuiltinFn (<fun> 17)))))
+                                        (serialize
+                                         ((function_signature
+                                           ((function_params
+                                             ((self SelfType)
+                                              (b (BuiltinType Builder))))
+                                            (function_returns
+                                             (BuiltinType Builder))))
+                                          (function_impl
+                                           (Fn
+                                            ((Return
+                                              (Primitive
+                                               (StoreInt
+                                                (builder
+                                                 (Reference
+                                                  (b (BuiltinType Builder))))
+                                                (length (Value (Integer 16)))
+                                                (integer
+                                                 (StructField
+                                                  ((Reference (self SelfType))
+                                                   integer)))
+                                                (signed true)))))))))))
+                                      (struct_impls ()) (struct_id 18))))))))
+                               (struct_methods ()) (struct_impls ())
+                               (struct_id 25)))))
+                           b))
+                         (Reference (b (BuiltinType Builder)))))))))
+                   (Return (Reference (b (BuiltinType Builder)))))))))))))
+          (T
+           (Value
+            (Type
+             (StructType
+              ((struct_fields
+                ((a
+                  ((field_type
+                    (StructType
+                     ((struct_fields ((integer ((field_type IntegerType)))))
+                      (struct_methods
+                       ((new
+                         ((function_signature
+                           ((function_params ((integer IntegerType)))
+                            (function_returns SelfType)))
+                          (function_impl (BuiltinFn (<fun> 8)))))
+                        (serialize
+                         ((function_signature
+                           ((function_params
+                             ((self SelfType) (b (BuiltinType Builder))))
+                            (function_returns (BuiltinType Builder))))
+                          (function_impl
+                           (Fn
+                            ((Return
+                              (Primitive
+                               (StoreInt
+                                (builder (Reference (b (BuiltinType Builder))))
+                                (length (Value (Integer 32)))
+                                (integer
+                                 (StructField
+                                  ((Reference (self SelfType)) integer)))
+                                (signed true)))))))))))
+                      (struct_impls ()) (struct_id 8))))))
+                 (b
+                  ((field_type
+                    (StructType
+                     ((struct_fields ((integer ((field_type IntegerType)))))
+                      (struct_methods
+                       ((new
+                         ((function_signature
+                           ((function_params ((integer IntegerType)))
+                            (function_returns SelfType)))
+                          (function_impl (BuiltinFn (<fun> 17)))))
+                        (serialize
+                         ((function_signature
+                           ((function_params
+                             ((self SelfType) (b (BuiltinType Builder))))
+                            (function_returns (BuiltinType Builder))))
+                          (function_impl
+                           (Fn
+                            ((Return
+                              (Primitive
+                               (StoreInt
+                                (builder (Reference (b (BuiltinType Builder))))
+                                (length (Value (Integer 16)))
+                                (integer
+                                 (StructField
+                                  ((Reference (self SelfType)) integer)))
+                                (signed true)))))))))))
+                      (struct_impls ()) (struct_id 18))))))))
+               (struct_methods ()) (struct_impls ()) (struct_id 25))))))
+          (Builder (Value (Type (BuiltinType Builder))))
+          (Integer (Value (Type IntegerType)))
+          (Int
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((bits IntegerType)))
+                (function_returns (TypeN 0))))
+              (function_impl (BuiltinFn (<fun> 0)))))))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
+          (Void (Value Void))
+          (serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (TypeN 0))))
+                (function_returns
+                 (FunctionType
+                  ((function_params ((t HoleType) (b (BuiltinType Builder))))
+                   (function_returns (BuiltinType Builder)))))))
+              (function_impl (BuiltinFn (<fun> 1)))))))
+          (BinOp
+           (Value
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
+              (function_impl (BuiltinFn (<fun> 2))))))))))))) |}]
 
 let%expect_test "from interface" =
   let source =
@@ -502,95 +902,482 @@ let%expect_test "from interface" =
   pp source ;
   [%expect
     {|
-    (Ok
-     ((bindings
-       ((var
-         (Value
-          (Struct
-           (((struct_fields ((a ((field_type IntegerType)))))
-             (struct_id <opaque>))
-            ((a (Value (Integer 10))))))))
-        (check
-         (Value
-          (Function
-           ((function_signature
-             ((function_params
-               ((y
+    (Error
+     (((UnexpectedTypeSC SelfType)
+       ((bindings
+         ((var
+           (Value
+            (Struct
+             (((struct_fields ()) (struct_methods ()) (struct_impls ())
+               (struct_id 0))
+              ()))))
+          (check
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((y
+                   (StructType
+                    ((struct_fields ((a ((field_type IntegerType)))))
+                     (struct_methods
+                      ((from
+                        ((function_signature
+                          ((function_params ((x IntegerType)))
+                           (function_returns SelfType)))
+                         (function_impl
+                          (Fn
+                           ((Block
+                             ((Break
+                               (Expr
+                                (Value
+                                 (Struct
+                                  (((struct_fields ()) (struct_methods ())
+                                    (struct_impls ()) (struct_id 0))
+                                   ()))))))))))))))
+                     (struct_impls
+                      (((impl_interface
+                         (Value
+                          (Type
+                           (InterfaceType
+                            ((interface_methods
+                              ((from
+                                ((function_params ((from IntegerType)))
+                                 (function_returns SelfType))))))))))
+                        (impl_methods
+                         ((from
+                           (Value
+                            (Function
+                             ((function_signature
+                               ((function_params ((x IntegerType)))
+                                (function_returns SelfType)))
+                              (function_impl
+                               (Fn
+                                ((Block
+                                  ((Break
+                                    (Expr
+                                     (Value
+                                      (Struct
+                                       (((struct_fields ()) (struct_methods ())
+                                         (struct_impls ()) (struct_id 0))
+                                        ())))))))))))))))))))
+                     (struct_id 26))))))
+                (function_returns
                  (StructType
                   ((struct_fields ((a ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (function_returns
-               (StructType
-                ((struct_fields ((a ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
-            (function_impl
-             (Fn
-              ((Block
-                ((Break
-                  (Expr
-                   (Reference
-                    (y
-                     (StructType
-                      ((struct_fields ((a ((field_type IntegerType)))))
-                       (struct_id <opaque>))))))))))))))))
-        (Value
-         (Value
-          (Type
-           (StructType
-            ((struct_fields ((a ((field_type IntegerType)))))
-             (struct_id <opaque>))))))))
-      (methods
-       (((Type
-          (StructType
-           ((struct_fields ((a ((field_type IntegerType)))))
-            (struct_id <opaque>))))
-         ((from
-           ((function_signature
-             ((function_params ((x IntegerType)))
-              (function_returns
-               (StructType
-                ((struct_fields ((a ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
-            (function_impl
-             (Fn
-              ((Block
-                ((Break
-                  (Expr
+                   (struct_methods
+                    ((from
+                      ((function_signature
+                        ((function_params ((x IntegerType)))
+                         (function_returns SelfType)))
+                       (function_impl
+                        (Fn
+                         ((Block
+                           ((Break
+                             (Expr
+                              (Value
+                               (Struct
+                                (((struct_fields ()) (struct_methods ())
+                                  (struct_impls ()) (struct_id 0))
+                                 ()))))))))))))))
+                   (struct_impls
+                    (((impl_interface
+                       (Value
+                        (Type
+                         (InterfaceType
+                          ((interface_methods
+                            ((from
+                              ((function_params ((from IntegerType)))
+                               (function_returns SelfType))))))))))
+                      (impl_methods
+                       ((from
+                         (Value
+                          (Function
+                           ((function_signature
+                             ((function_params ((x IntegerType)))
+                              (function_returns SelfType)))
+                            (function_impl
+                             (Fn
+                              ((Block
+                                ((Break
+                                  (Expr
+                                   (Value
+                                    (Struct
+                                     (((struct_fields ()) (struct_methods ())
+                                       (struct_impls ()) (struct_id 0))
+                                      ())))))))))))))))))))
+                   (struct_id 26))))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Break
+                    (Expr
+                     (Reference
+                      (y
+                       (StructType
+                        ((struct_fields ((a ((field_type IntegerType)))))
+                         (struct_methods
+                          ((from
+                            ((function_signature
+                              ((function_params ((x IntegerType)))
+                               (function_returns SelfType)))
+                             (function_impl
+                              (Fn
+                               ((Block
+                                 ((Break
+                                   (Expr
+                                    (Value
+                                     (Struct
+                                      (((struct_fields ()) (struct_methods ())
+                                        (struct_impls ()) (struct_id 0))
+                                       ()))))))))))))))
+                         (struct_impls
+                          (((impl_interface
+                             (Value
+                              (Type
+                               (InterfaceType
+                                ((interface_methods
+                                  ((from
+                                    ((function_params ((from IntegerType)))
+                                     (function_returns SelfType))))))))))
+                            (impl_methods
+                             ((from
+                               (Value
+                                (Function
+                                 ((function_signature
+                                   ((function_params ((x IntegerType)))
+                                    (function_returns SelfType)))
+                                  (function_impl
+                                   (Fn
+                                    ((Block
+                                      ((Break
+                                        (Expr
+                                         (Value
+                                          (Struct
+                                           (((struct_fields ())
+                                             (struct_methods ())
+                                             (struct_impls ()) (struct_id 0))
+                                            ())))))))))))))))))))
+                         (struct_id 26))))))))))))))))
+          (Value
+           (Value
+            (Type
+             (StructType
+              ((struct_fields ((a ((field_type IntegerType)))))
+               (struct_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((x IntegerType)))
+                     (function_returns SelfType)))
+                   (function_impl
+                    (Fn
+                     ((Block
+                       ((Break
+                         (Expr
+                          (Value
+                           (Struct
+                            (((struct_fields ()) (struct_methods ())
+                              (struct_impls ()) (struct_id 0))
+                             ()))))))))))))))
+               (struct_impls
+                (((impl_interface
                    (Value
-                    (Struct
-                     (((struct_fields ((a ((field_type IntegerType)))))
-                       (struct_id <opaque>))
-                      ((a (Reference (x IntegerType))))))))))))))))))))
-      (impls
-       (((Type
-          (StructType
-           ((struct_fields ((a ((field_type IntegerType)))))
-            (struct_id <opaque>))))
-         (((impl_interface
-            (Value
-             (Type
-              (InterfaceType
-               ((interface_methods
-                 ((from
-                   ((function_params ((from IntegerType)))
-                    (function_returns SelfType))))))))))
-           (impl_methods
-            ((from
-              (Value
-               (Function
-                ((function_signature
-                  ((function_params ((x IntegerType)))
-                   (function_returns
-                    (StructType
-                     ((struct_fields ((a ((field_type IntegerType)))))
-                      (struct_id <opaque>))))))
-                 (function_impl
-                  (Fn
-                   ((Block
-                     ((Break
-                       (Expr
-                        (Value
-                         (Struct
-                          (((struct_fields ((a ((field_type IntegerType)))))
-                            (struct_id <opaque>))
-                           ((a (Reference (x IntegerType))))))))))))))))))))))))))) |}]
+                    (Type
+                     (InterfaceType
+                      ((interface_methods
+                        ((from
+                          ((function_params ((from IntegerType)))
+                           (function_returns SelfType))))))))))
+                  (impl_methods
+                   ((from
+                     (Value
+                      (Function
+                       ((function_signature
+                         ((function_params ((x IntegerType)))
+                          (function_returns SelfType)))
+                        (function_impl
+                         (Fn
+                          ((Block
+                            ((Break
+                              (Expr
+                               (Value
+                                (Struct
+                                 (((struct_fields ()) (struct_methods ())
+                                   (struct_impls ()) (struct_id 0))
+                                  ())))))))))))))))))))
+               (struct_id 26))))))
+          (Builder (Value (Type (BuiltinType Builder))))
+          (Integer (Value (Type IntegerType)))
+          (Int
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((bits IntegerType)))
+                (function_returns (TypeN 0))))
+              (function_impl (BuiltinFn (<fun> 0)))))))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
+          (Void (Value Void))
+          (serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (TypeN 0))))
+                (function_returns
+                 (FunctionType
+                  ((function_params ((t HoleType) (b (BuiltinType Builder))))
+                   (function_returns (BuiltinType Builder)))))))
+              (function_impl (BuiltinFn (<fun> 1)))))))
+          (BinOp
+           (Value
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
+              (function_impl (BuiltinFn (<fun> 2)))))))))))
+      ((TypeError
+        (SelfType
+         (StructType
+          ((struct_fields ()) (struct_methods ()) (struct_impls ())
+           (struct_id 0)))))
+       ((bindings
+         ((var
+           (Value
+            (Struct
+             (((struct_fields ()) (struct_methods ()) (struct_impls ())
+               (struct_id 0))
+              ()))))
+          (check
+           (Value
+            (Function
+             ((function_signature
+               ((function_params
+                 ((y
+                   (StructType
+                    ((struct_fields ((a ((field_type IntegerType)))))
+                     (struct_methods
+                      ((from
+                        ((function_signature
+                          ((function_params ((x IntegerType)))
+                           (function_returns SelfType)))
+                         (function_impl
+                          (Fn
+                           ((Block
+                             ((Break
+                               (Expr
+                                (Value
+                                 (Struct
+                                  (((struct_fields ()) (struct_methods ())
+                                    (struct_impls ()) (struct_id 0))
+                                   ()))))))))))))))
+                     (struct_impls
+                      (((impl_interface
+                         (Value
+                          (Type
+                           (InterfaceType
+                            ((interface_methods
+                              ((from
+                                ((function_params ((from IntegerType)))
+                                 (function_returns SelfType))))))))))
+                        (impl_methods
+                         ((from
+                           (Value
+                            (Function
+                             ((function_signature
+                               ((function_params ((x IntegerType)))
+                                (function_returns SelfType)))
+                              (function_impl
+                               (Fn
+                                ((Block
+                                  ((Break
+                                    (Expr
+                                     (Value
+                                      (Struct
+                                       (((struct_fields ()) (struct_methods ())
+                                         (struct_impls ()) (struct_id 0))
+                                        ())))))))))))))))))))
+                     (struct_id 26))))))
+                (function_returns
+                 (StructType
+                  ((struct_fields ((a ((field_type IntegerType)))))
+                   (struct_methods
+                    ((from
+                      ((function_signature
+                        ((function_params ((x IntegerType)))
+                         (function_returns SelfType)))
+                       (function_impl
+                        (Fn
+                         ((Block
+                           ((Break
+                             (Expr
+                              (Value
+                               (Struct
+                                (((struct_fields ()) (struct_methods ())
+                                  (struct_impls ()) (struct_id 0))
+                                 ()))))))))))))))
+                   (struct_impls
+                    (((impl_interface
+                       (Value
+                        (Type
+                         (InterfaceType
+                          ((interface_methods
+                            ((from
+                              ((function_params ((from IntegerType)))
+                               (function_returns SelfType))))))))))
+                      (impl_methods
+                       ((from
+                         (Value
+                          (Function
+                           ((function_signature
+                             ((function_params ((x IntegerType)))
+                              (function_returns SelfType)))
+                            (function_impl
+                             (Fn
+                              ((Block
+                                ((Break
+                                  (Expr
+                                   (Value
+                                    (Struct
+                                     (((struct_fields ()) (struct_methods ())
+                                       (struct_impls ()) (struct_id 0))
+                                      ())))))))))))))))))))
+                   (struct_id 26))))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Break
+                    (Expr
+                     (Reference
+                      (y
+                       (StructType
+                        ((struct_fields ((a ((field_type IntegerType)))))
+                         (struct_methods
+                          ((from
+                            ((function_signature
+                              ((function_params ((x IntegerType)))
+                               (function_returns SelfType)))
+                             (function_impl
+                              (Fn
+                               ((Block
+                                 ((Break
+                                   (Expr
+                                    (Value
+                                     (Struct
+                                      (((struct_fields ()) (struct_methods ())
+                                        (struct_impls ()) (struct_id 0))
+                                       ()))))))))))))))
+                         (struct_impls
+                          (((impl_interface
+                             (Value
+                              (Type
+                               (InterfaceType
+                                ((interface_methods
+                                  ((from
+                                    ((function_params ((from IntegerType)))
+                                     (function_returns SelfType))))))))))
+                            (impl_methods
+                             ((from
+                               (Value
+                                (Function
+                                 ((function_signature
+                                   ((function_params ((x IntegerType)))
+                                    (function_returns SelfType)))
+                                  (function_impl
+                                   (Fn
+                                    ((Block
+                                      ((Break
+                                        (Expr
+                                         (Value
+                                          (Struct
+                                           (((struct_fields ())
+                                             (struct_methods ())
+                                             (struct_impls ()) (struct_id 0))
+                                            ())))))))))))))))))))
+                         (struct_id 26))))))))))))))))
+          (Value
+           (Value
+            (Type
+             (StructType
+              ((struct_fields ((a ((field_type IntegerType)))))
+               (struct_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((x IntegerType)))
+                     (function_returns SelfType)))
+                   (function_impl
+                    (Fn
+                     ((Block
+                       ((Break
+                         (Expr
+                          (Value
+                           (Struct
+                            (((struct_fields ()) (struct_methods ())
+                              (struct_impls ()) (struct_id 0))
+                             ()))))))))))))))
+               (struct_impls
+                (((impl_interface
+                   (Value
+                    (Type
+                     (InterfaceType
+                      ((interface_methods
+                        ((from
+                          ((function_params ((from IntegerType)))
+                           (function_returns SelfType))))))))))
+                  (impl_methods
+                   ((from
+                     (Value
+                      (Function
+                       ((function_signature
+                         ((function_params ((x IntegerType)))
+                          (function_returns SelfType)))
+                        (function_impl
+                         (Fn
+                          ((Block
+                            ((Break
+                              (Expr
+                               (Value
+                                (Struct
+                                 (((struct_fields ()) (struct_methods ())
+                                   (struct_impls ()) (struct_id 0))
+                                  ())))))))))))))))))))
+               (struct_id 26))))))
+          (Builder (Value (Type (BuiltinType Builder))))
+          (Integer (Value (Type IntegerType)))
+          (Int
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((bits IntegerType)))
+                (function_returns (TypeN 0))))
+              (function_impl (BuiltinFn (<fun> 0)))))))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
+          (Void (Value Void))
+          (serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (TypeN 0))))
+                (function_returns
+                 (FunctionType
+                  ((function_params ((t HoleType) (b (BuiltinType Builder))))
+                   (function_returns (BuiltinType Builder)))))))
+              (function_impl (BuiltinFn (<fun> 1)))))))
+          (BinOp
+           (Value
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
+              (function_impl (BuiltinFn (<fun> 2))))))))))))) |}]

@@ -79,6 +79,9 @@ functor
             (format_to_string e pp_expr)
       | `UnexpectedType t ->
           Printf.sprintf "Unexpected type `%s`." (format_to_string t pp_type)
+      | `UnexpectedTypeSC t ->
+          Printf.sprintf "Unexpected type struct const `%s`."
+            (format_to_string t pp_type)
       | `TypeError (expected, actual) ->
           Printf.sprintf "Type error: expected `%s` but found `%s`."
             (format_to_string expected pp_type)

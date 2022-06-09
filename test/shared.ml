@@ -25,22 +25,12 @@ let build_program ?(errors = make_errors Show.show_error)
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings and methods *)
-  |> Result.map ~f:(fun (program : Lang.program) ->
+  |> Result.map ~f:(fun (program : Lang.program) : Lang.program ->
          if strip_defaults then
-           { program with
-             bindings =
+           { bindings =
                List.filter program.bindings ~f:(fun binding ->
-                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) );
-             methods =
-               List.filter program.methods ~f:(fun (rcvr, rmethods) ->
-                   not
-                   @@ List.exists methods ~f:(fun (rcvr', rmethods') ->
-                          Lang.equal_value rcvr' rcvr
-                          && List.equal
-                               (fun (name, value) (name', value') ->
-                                 String.equal name' name
-                                 && Lang.equal_function_ value' value )
-                               rmethods' rmethods ) ) }
+                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) )
+           }
          else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> (err, p')) )

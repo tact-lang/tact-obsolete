@@ -10,11 +10,12 @@ class type_checker (errors : _) (functions : _) =
   object (self)
     val mutable fn_returns : type_ option = None
 
-    method check_return_type ~program ~current_bindings actual =
+    method check_return_type ~program ~current_bindings ?self:(self_ = None)
+        actual =
       match fn_returns with
       | Some fn_returns' -> (
         match
-          self#check_type actual ~program ~current_bindings
+          self#check_type actual ~program ~current_bindings ~self:self_
             ~expected:fn_returns'
         with
         | Ok ty ->
@@ -38,10 +39,19 @@ class type_checker (errors : _) (functions : _) =
         fn_returns <- prev ;
         (result, new_fn_returns)
 
-    method check_type ~program ~current_bindings ~expected actual =
+    method check_type ~program ~current_bindings ~expected ?self:(self_ = None)
+        actual =
       match expected with
       | HoleType ->
           Ok actual
+      | SelfType -> (
+          if equal_type_ actual SelfType then Ok SelfType
+          else
+            match self_ with
+            | Some (Value (Type t)) ->
+                if equal_type_ actual t then Ok t else Error (TypeError SelfType)
+            | _ ->
+                Error (TypeError SelfType) )
       | _ when equal_type_ expected actual ->
           Ok actual
       | x -> (
@@ -52,16 +62,11 @@ class type_checker (errors : _) (functions : _) =
             Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in
           let impl =
-            List.find_map program.impls ~f:(fun (s, impls) ->
-                match equal_value s (Type x) with
-                | true ->
-                    List.find_map impls ~f:(fun i ->
-                        if equal_expr i.impl_interface from_intf_ then
-                          Some i.impl_methods
-                        else None )
-                    |> Option.bind ~f:List.hd
-                | false ->
-                    None )
+            List.find_map (impls_of x) ~f:(fun i ->
+                if equal_expr i.impl_interface from_intf_ then
+                  Some i.impl_methods
+                else None )
+            |> Option.bind ~f:List.hd
           in
           match impl with
           | Some (_, m) ->

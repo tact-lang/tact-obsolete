@@ -110,12 +110,12 @@ class interpreter
       function
       | ExprType ex ->
           expr_to_type (Value (self#interpret_expr ex))
-      | StructType {struct_fields; struct_id} ->
+      | StructType ({struct_fields; _} as s) ->
           let struct_fields =
             List.map struct_fields ~f:(fun (name, {field_type}) ->
                 (name, {field_type = self#interpret_type field_type}) )
           in
-          StructType {struct_fields; struct_id}
+          StructType {s with struct_fields}
       | UnionType u ->
           UnionType {cases = List.map u.cases ~f:self#interpret_type}
       | ty ->
@@ -183,15 +183,7 @@ class interpreter
               | Error _ ->
                   Void )
           | {function_impl = BuiltinFn (function_impl, _); _} ->
-              let program' =
-                { program with
-                  bindings =
-                    extract_comptime_bindings
-                      (Option.value (List.hd global_bindings) ~default:[]) }
-              in
-              let value = function_impl program' args' in
-              program.methods <- program'.methods ;
-              value
+              function_impl program args'
           | _ ->
               Void )
         | _ ->

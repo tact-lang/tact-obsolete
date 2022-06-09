@@ -33,10 +33,7 @@ and tbinding = string * binding_scope
 
 and binding_scope = Comptime of expr | Runtime of type_
 
-and program =
-  { bindings : (string * expr) list;
-    mutable methods : (value * (string * function_) list) list; [@sexp.list]
-    mutable impls : (value * impl list) list [@sexp.list] }
+and program = {bindings : (string * expr) list}
 
 and expr =
   | FunctionCall of function_call
@@ -95,7 +92,10 @@ and type_ =
 and union = {cases : type_ list}
 
 and struct_ =
-  {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
+  { struct_fields : (string * struct_field) list;
+    struct_methods : (string * function_) list;
+    struct_impls : impl list;
+    struct_id : int }
 
 and struct_field = {field_type : type_}
 
@@ -106,7 +106,7 @@ and function_body = (stmt option[@sexp.option])
 and native_function =
   (program -> value list -> value[@visitors.opaque] [@equal.ignore])
 
-and builtin_fn = native_function * (int[@sexp.opaque])
+and builtin_fn = native_function * int
 
 and function_ =
   {function_signature : function_signature; function_impl : function_impl}
@@ -256,6 +256,8 @@ class ['s] primitive_presence =
     inherit [_] boolean_reduce false
 
     method! visit_Primitive _env _primitive = true
+
+    method! visit_type_ _env _struct = false
   end
 
 let has_primitives = (new primitive_presence)#visit_function_ ()
@@ -291,6 +293,8 @@ class ['s] expr_immediacy_check =
       else
         (* Any function is assumed to be immediate as it can be evaluated otherwise *)
         true
+
+    method! visit_struct_ _env _struct = true
   end
 
 let rec is_immediate_expr expr =
@@ -321,3 +325,7 @@ let find_in_runtime_scope : 'a. string -> (string * 'a) list list -> 'a option =
 
 (* We declare the struct counter here to count all structs *)
 let struct_counter = ref 0
+
+let methods_of = function StructType s -> s.struct_methods | _ -> []
+
+let impls_of = function StructType s -> s.struct_impls | _ -> []

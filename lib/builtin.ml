@@ -18,34 +18,28 @@ let int_type =
   (* memoize constructor funs for equality *)
   and int_constructor_funs = Hashtbl.create (module Int) in
   (* int's newtype *)
-  let rec int_type_s p bits =
+  let rec int_type_s bits =
     let struct_id =
       Hashtbl.find_or_add struct_ids bits ~default:(fun () ->
           let c = !struct_counter in
           struct_counter := c + 1 ;
           c )
     in
-    let s =
-      {struct_fields = [("integer", {field_type = IntegerType})]; struct_id}
-    in
-    let methods =
-      [ ("new", int_type_s_new s bits);
-        ("serialize", int_type_s_serialize bits s) ]
-    in
-    if
-      Option.is_none
-      @@ List.Assoc.find p.methods ~equal:equal_value (Type (StructType s))
-    then p.methods <- (Type (StructType s), methods) :: p.methods
-    else () ;
-    s
-  and int_type_s_new self bits =
+    let struct_methods =
+      [("new", int_type_s_new bits); ("serialize", int_type_s_serialize bits)]
+    and struct_impls = [] in
+    { struct_fields = [("integer", {field_type = IntegerType})];
+      struct_methods;
+      struct_impls;
+      struct_id }
+  and int_type_s_new bits =
     let function_impl =
       Hashtbl.find_or_add int_constructor_funs bits ~default:(fun () ->
           builtin_fun @@ constructor_impl bits )
     in
     { function_signature =
         { function_params = [("integer", IntegerType)];
-          function_returns = StructType self };
+          function_returns = SelfType };
       function_impl = BuiltinFn function_impl }
   and constructor_impl bits p = function
     | [Integer i] ->
@@ -60,12 +54,12 @@ let int_type =
             extract i 0 (numbits - bits)
           else i
         in
-        Struct (int_type_s p bits, [("integer", Value (Integer i))])
+        Struct (int_type_s bits, [("integer", Value (Integer i))])
     | _ ->
         (* TODO: raise an error instead *)
         constructor_impl bits p [Integer (Zint.of_int 0)]
-  and int_type_s_serialize bits s =
-    let self = StructType s in
+  and int_type_s_serialize bits =
+    let self = SelfType in
     { function_signature =
         { function_params = [("self", self); ("b", builder)];
           function_returns = builder };
@@ -78,12 +72,11 @@ let int_type =
                       { builder = Reference ("b", builder);
                         length = Value (Integer (Z.of_int bits));
                         integer =
-                          StructField
-                            (Reference ("self", StructType s), "integer");
+                          StructField (Reference ("self", self), "integer");
                         signed = true } ) ) ) ) }
-  and function_impl p = function
+  and function_impl _p = function
     | [Integer bits] ->
-        Type (StructType (int_type_s p @@ Z.to_int bits))
+        Type (StructType (int_type_s @@ Z.to_int bits))
     | _ ->
         (* TODO: raise an error instead *)
         Void
@@ -105,27 +98,13 @@ let serializer =
   let rec serializer_f s p =
     let calls =
       List.filter_map s.struct_fields ~f:(function name, {field_type = f} ->
-          let methods =
-            List.Assoc.find_exn p.methods ~equal:equal_value (Type f)
-          in
+          let methods = methods_of f in
           let serialize_field =
             match List.Assoc.find methods ~equal:String.equal "serialize" with
             | Some m ->
                 Some m
             | None -> (
-              match f with
-              | StructType t ->
-                  let m = serializer_f t p in
-                  p.methods <-
-                    List.map p.methods ~f:(fun (s, methods) ->
-                        match equal_value s (Type (StructType t)) with
-                        | true ->
-                            (s, ("serializer", m) :: methods)
-                        | false ->
-                            (s, methods) ) ;
-                  Some m
-              | _ ->
-                  None )
+              match f with StructType t -> Some (serializer_f t p) | _ -> None )
           in
           serialize_field
           |> Option.map ~f:(fun method_ ->
