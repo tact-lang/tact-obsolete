@@ -7,7 +7,7 @@ exception Invalid
 
 exception Unsupported
 
-class constructor =
+class constructor (program : T.program) =
   object (self)
     val mutable struct_representations : (T.struct_ * F.type_) list = []
 
@@ -43,8 +43,8 @@ class constructor =
           F.Integer Zint.zero
       | StructField x ->
           self#cg_StructField x
-      | Value (Struct inst) ->
-          self#cg_Struct inst
+      | Value (Struct (id, inst)) ->
+          self#cg_Struct (T.Program.get_struct program id, inst)
       | ResolvedReference s ->
           self#cg_ResolvedReference s
       | Reference (name, ty) ->
@@ -136,9 +136,9 @@ class constructor =
         F.FunctionCall (name, [struct_ty], field_ty)
       in
       match T.type_of from_expr with
-      | StructType {struct_fields = [_]; _} ->
-          self#cg_expr from_expr
+      (* TODO: return linealizing *)
       | StructType s ->
+          let s = T.Program.get_struct program s in
           let field_id, (_, field) =
             Option.value_exn
               (List.findi s.struct_fields ~f:(fun _ (name, _) ->
@@ -179,7 +179,7 @@ class constructor =
       | BoolType ->
           F.IntType
       | StructType s ->
-          self#struct_to_ty s
+          self#struct_to_ty (T.Program.get_struct program s)
       | BuiltinType "Builder" ->
           F.BuilderType
       | BuiltinType "Cell" ->
@@ -235,5 +235,5 @@ class constructor =
   end
 
 let codegen program =
-  let constructor = new constructor in
+  let constructor = new constructor program in
   constructor#cg_program program

@@ -22,43 +22,67 @@ let%expect_test "scope resolution" =
   [%expect
     {|
     (Ok
-     ((bindings
-       ((T
-         (Value
-          (Type
-           (StructType
-            ((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))))))))
-      (infos ()) (def_infos ()))) |}]
+     ((bindings ((T (Value (Type (StructType 0))))))
+      (structs
+       ((0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "binding resolution" =
-  let source =
-    {|
+  let source = {|
     let T = Int(257);
-    let T_ = T;
-    let a = 1;
-    let a_ = a;
-  |}
-  in
+  |} in
   pp source ;
   [%expect
     {|
     (Ok
-     ((bindings
-       ((a_ (Value (Integer 1))) (a (Value (Integer 1)))
-        (T_
-         (Value
-          (Type
-           (StructType
-            ((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))))))
-        (T
-         (Value
-          (Type
-           (StructType
-            ((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))))))))
-      (infos ()) (def_infos ()))) |}]
+     ((bindings ((T (Value (Type (StructType 0))))))
+      (structs
+       ((0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "failed scope resolution" =
   let source = {|
@@ -105,14 +129,7 @@ let%expect_test "failed scope resolution" =
              ((function_signature
                ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
-        (infos
-         (((Type (BuiltinType Builder))
-           ((methods
-             ((new
-               ((function_signature
-                 ((function_params ()) (function_returns (BuiltinType Builder))))
-                (function_impl (Fn ((Return (Primitive EmptyBuilder)))))))))))))
-        (def_infos ()))))) |}]
+        (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "scope resolution after let binding" =
   let source = {|
@@ -124,19 +141,32 @@ let%expect_test "scope resolution after let binding" =
     {|
     (Ok
      ((bindings
-       ((B
-         (Value
-          (Type
-           (StructType
-            ((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))))))
-        (A
-         (Value
-          (Type
-           (StructType
-            ((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))))))))
-      (infos ()) (def_infos ()))) |}]
+       ((B (Value (Type (StructType 0)))) (A (Value (Type (StructType 0))))))
+      (structs
+       ((0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "basic struct definition" =
   let source = {|
@@ -146,30 +176,35 @@ let%expect_test "basic struct definition" =
   [%expect
     {|
     (Ok
-     ((bindings
-       ((T
-         (Value
-          (Type
-           (StructType
-            ((struct_fields
-              ((t
-                ((field_type
-                  (StructType
-                   ((struct_fields ((integer ((field_type IntegerType)))))
-                    (struct_id <opaque>))))))))
-             (struct_id <opaque>))))))))
-      (infos ())
-      (def_infos
-       (((Type
-          (StructType
-           ((struct_fields
-             ((t
-               ((field_type
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))))
-            (struct_id <opaque>))))
-         ()))))) |}]
+     ((bindings ((T (Value (Type (StructType 1))))))
+      (structs
+       ((1
+         ((struct_fields ((t ((field_type (StructType 0)))))) (struct_methods ())
+          (struct_impls ()) (struct_id 1)))
+        (0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "native function evaluation" =
   let source = {|
@@ -178,7 +213,9 @@ let%expect_test "native function evaluation" =
   pp source ~bindings:(("incr", Value incr_f) :: Lang.default_bindings) ;
   [%expect
     {|
-    (Ok ((bindings ((v (Value (Integer 4))))) (infos ()) (def_infos ()))) |}]
+    (Ok
+     ((bindings ((v (Value (Integer 4))))) (structs ()) (struct_counter <opaque>)
+      (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "Tact function evaluation" =
   let source =
@@ -194,36 +231,40 @@ let%expect_test "Tact function evaluation" =
     {|
     (Ok
      ((bindings
-       ((a
-         (Value
-          (Struct
-           (((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))
-            ((integer (Value (Integer 1))))))))
+       ((a (Value (Struct (0 ((integer (Value (Integer 1))))))))
         (test
          (Value
           (Function
            ((function_signature
-             ((function_params
-               ((i
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (function_returns
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
+             ((function_params ((i (StructType 0))))
+              (function_returns (StructType 0))))
             (function_impl
-             (Fn
-              ((Block
-                ((Break
-                  (Expr
-                   (Reference
-                    (i
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))))))))))))))))
-      (infos ()) (def_infos ()))) |}]
+             (Fn ((Block ((Break (Expr (Reference (i (StructType 0))))))))))))))))
+      (structs
+       ((0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "compile-time function evaluation within a function" =
   let source =
@@ -249,7 +290,7 @@ let%expect_test "compile-time function evaluation within a function" =
               ((Block
                 ((Let ((v (Value (Integer 4)))))
                  (Break (Expr (ResolvedReference (v <opaque>)))))))))))))))
-      (infos ()) (def_infos ()))) |}]
+      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "struct definition" =
   let source =
@@ -264,32 +305,36 @@ let%expect_test "struct definition" =
   [%expect
     {|
       (Ok
-       ((bindings
-         ((MyType
-           (Value
-            (Type
-             (StructType
-              ((struct_fields
-                ((a
-                  ((field_type
-                    (StructType
-                     ((struct_fields ((integer ((field_type IntegerType)))))
-                      (struct_id <opaque>))))))
-                 (b ((field_type BoolType)))))
-               (struct_id <opaque>))))))))
-        (infos ())
-        (def_infos
-         (((Type
-            (StructType
-             ((struct_fields
-               ((a
-                 ((field_type
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
-                (b ((field_type BoolType)))))
-              (struct_id <opaque>))))
-           ()))))) |}]
+       ((bindings ((MyType (Value (Type (StructType 1))))))
+        (structs
+         ((1
+           ((struct_fields
+             ((a ((field_type (StructType 0)))) (b ((field_type BoolType)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 1)))
+          (0
+           ((struct_fields ((integer ((field_type IntegerType)))))
+            (struct_methods
+             ((new
+               ((function_signature
+                 ((function_params ((integer IntegerType)))
+                  (function_returns (StructType 0))))
+                (function_impl (BuiltinFn (<fun> <opaque>)))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 0)) (b (BuiltinType Builder))))
+                  (function_returns (BuiltinType Builder))))
+                (function_impl
+                 (Fn
+                  ((Return
+                    (Primitive
+                     (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                      (length (Value (Integer 257)))
+                      (integer
+                       (StructField ((Reference (self (StructType 0))) integer)))
+                      (signed true)))))))))))
+            (struct_impls ()) (struct_id 0)))))
+        (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "duplicate type field" =
   let source =
@@ -306,27 +351,11 @@ let%expect_test "duplicate type field" =
     (Error
      (((DuplicateField
         (a
-         ((struct_fields
-           ((a
-             ((field_type
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
-            (a ((field_type BoolType)))))
-          (struct_id <opaque>))))
+         ((mk_struct_fields
+           ((a (Value (Type (StructType 0)))) (a (Value (Type BoolType)))))
+          (mk_methods ()) (mk_impls ()) (mk_struct_id -1))))
        ((bindings
-         ((MyType
-           (Value
-            (Type
-             (StructType
-              ((struct_fields
-                ((a
-                  ((field_type
-                    (StructType
-                     ((struct_fields ((integer ((field_type IntegerType)))))
-                      (struct_id <opaque>))))))
-                 (a ((field_type BoolType)))))
-               (struct_id <opaque>))))))
+         ((MyType (Value (Type (StructType 1))))
           (Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
@@ -362,39 +391,23 @@ let%expect_test "duplicate type field" =
              ((function_signature
                ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
-        (infos
-         (((Type
-            (StructType
-             ((struct_fields
-               ((a
-                 ((field_type
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
-                (a ((field_type BoolType)))))
-              (struct_id <opaque>))))
-           ())
-          ((Type
-            (StructType
-             ((struct_fields ((integer ((field_type IntegerType)))))
-              (struct_id <opaque>))))
-           ((methods
+        (structs
+         ((1
+           ((struct_fields
+             ((a ((field_type (StructType 0)))) (a ((field_type BoolType)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 1)))
+          (0
+           ((struct_fields ((integer ((field_type IntegerType)))))
+            (struct_methods
              ((new
                ((function_signature
                  ((function_params ((integer IntegerType)))
-                  (function_returns
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
+                  (function_returns (StructType 0))))
                 (function_impl (BuiltinFn (<fun> <opaque>)))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))
-                    (b (BuiltinType Builder))))
+                   ((self (StructType 0)) (b (BuiltinType Builder))))
                   (function_returns (BuiltinType Builder))))
                 (function_impl
                  (Fn
@@ -403,33 +416,10 @@ let%expect_test "duplicate type field" =
                      (StoreInt (builder (Reference (b (BuiltinType Builder))))
                       (length (Value (Integer 257)))
                       (integer
-                       (StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((integer ((field_type IntegerType)))))
-                             (struct_id <opaque>)))))
-                         integer)))
-                      (signed true)))))))))))))
-          ((Type (BuiltinType Builder))
-           ((methods
-             ((new
-               ((function_signature
-                 ((function_params ()) (function_returns (BuiltinType Builder))))
-                (function_impl (Fn ((Return (Primitive EmptyBuilder)))))))))))))
-        (def_infos
-         (((Type
-            (StructType
-             ((struct_fields
-               ((a
-                 ((field_type
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
-                (a ((field_type BoolType)))))
-              (struct_id <opaque>))))
-           ()))))))) |}]
+                       (StructField ((Reference (self (StructType 0))) integer)))
+                      (signed true)))))))))))
+            (struct_impls ()) (struct_id 0)))))
+        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "parametric struct instantiation" =
   let source =
@@ -443,17 +433,7 @@ let%expect_test "parametric struct instantiation" =
     {|
     (Ok
      ((bindings
-       ((TA
-         (Value
-          (Type
-           (StructType
-            ((struct_fields
-              ((a
-                ((field_type
-                  (StructType
-                   ((struct_fields ((integer ((field_type IntegerType)))))
-                    (struct_id <opaque>))))))))
-             (struct_id <opaque>))))))
+       ((TA (Value (Type (StructType 1))))
         (T
          (Value
           (Function
@@ -462,20 +442,37 @@ let%expect_test "parametric struct instantiation" =
             (function_impl
              (Fn
               ((Expr
-                (Value
-                 (Type
-                  (StructType
-                   ((struct_fields
-                     ((a ((field_type (ExprType (Reference (A (TypeN 0)))))))))
-                    (struct_id <opaque>)))))))))))))))
-      (infos ())
-      (def_infos
-       (((Type
-          (StructType
-           ((struct_fields
-             ((a ((field_type (ExprType (Reference (A (TypeN 0)))))))))
-            (struct_id <opaque>))))
-         ()))))) |}]
+                (MkStructDef
+                 ((mk_struct_fields ((a (Reference (A (TypeN 0))))))
+                  (mk_methods ()) (mk_impls ()) (mk_struct_id 0)))))))))))))
+      (structs
+       ((1
+         ((struct_fields ((a ((field_type (StructType 0)))))) (struct_methods ())
+          (struct_impls ()) (struct_id 1)))
+        (0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "function without a return type" =
   let source = {|
@@ -494,7 +491,7 @@ let%expect_test "function without a return type" =
              ((function_signature
                ((function_params ()) (function_returns IntegerType)))
               (function_impl (Fn ((Block ((Break (Expr (Value (Integer 1)))))))))))))))
-        (infos ()) (def_infos ()))) |}]
+        (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "scoping that `let` introduces in code" =
   let source =
@@ -511,44 +508,43 @@ let%expect_test "scoping that `let` introduces in code" =
     {|
     (Ok
      ((bindings
-       ((b
-         (Value
-          (Struct
-           (((struct_fields ((integer ((field_type IntegerType)))))
-             (struct_id <opaque>))
-            ((integer (Value (Integer 1))))))))
+       ((b (Value (Struct (0 ((integer (Value (Integer 1))))))))
         (f
          (Value
           (Function
            ((function_signature
-             ((function_params
-               ((i
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (function_returns
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
+             ((function_params ((i (StructType 0))))
+              (function_returns (StructType 0))))
             (function_impl
              (Fn
               ((Block
-                ((Let
-                  ((a
-                    (Reference
-                     (i
-                      (StructType
-                       ((struct_fields ((integer ((field_type IntegerType)))))
-                        (struct_id <opaque>))))))))
-                 (Break
-                  (Expr
-                   (Reference
-                    (a
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))))))))))))))))
-      (infos ()) (def_infos ())))
-     |}]
+                ((Let ((a (Reference (i (StructType 0))))))
+                 (Break (Expr (Reference (a (StructType 0))))))))))))))))
+      (structs
+       ((0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "reference in function bodies" =
   let source =
@@ -572,12 +568,7 @@ let%expect_test "reference in function bodies" =
          (Value
           (Function
            ((function_signature
-             ((function_params
-               ((x
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (function_returns HoleType)))
+             ((function_params ((x (StructType 0)))) (function_returns HoleType)))
             (function_impl
              (Fn
               ((Block
@@ -585,58 +576,47 @@ let%expect_test "reference in function bodies" =
                   ((a
                     (FunctionCall
                      ((ResolvedReference (op <opaque>))
-                      ((Reference
-                        (x
-                         (StructType
-                          ((struct_fields ((integer ((field_type IntegerType)))))
-                           (struct_id <opaque>)))))
-                       (Reference
-                        (x
-                         (StructType
-                          ((struct_fields ((integer ((field_type IntegerType)))))
-                           (struct_id <opaque>)))))))))))
+                      ((Reference (x (StructType 0)))
+                       (Reference (x (StructType 0)))))))))
                  (Let
                   ((b
                     (FunctionCall
                      ((ResolvedReference (op <opaque>))
-                      ((Reference
-                        (a
-                         (StructType
-                          ((struct_fields ((integer ((field_type IntegerType)))))
-                           (struct_id <opaque>)))))
-                       (Reference
-                        (a
-                         (StructType
-                          ((struct_fields ((integer ((field_type IntegerType)))))
-                           (struct_id <opaque>))))))))))))))))))))
+                      ((Reference (a (StructType 0)))
+                       (Reference (a (StructType 0))))))))))))))))))
         (op
          (Value
           (Function
            ((function_signature
-             ((function_params
-               ((i
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))
-                (i_
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (function_returns
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))
+             ((function_params ((i (StructType 0)) (i_ (StructType 0))))
+              (function_returns (StructType 0))))
             (function_impl
-             (Fn
-              ((Block
-                ((Break
-                  (Expr
-                   (Reference
-                    (i
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))))))))))))))))
-      (infos ()) (def_infos ()))) |}]
+             (Fn ((Block ((Break (Expr (Reference (i (StructType 0))))))))))))))))
+      (structs
+       ((0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "resolving a reference from inside a function" =
   let source =
@@ -662,7 +642,7 @@ let%expect_test "resolving a reference from inside a function" =
             (function_impl
              (Fn ((Block ((Break (Expr (ResolvedReference (i <opaque>)))))))))))))
         (i (Value (Integer 1)))))
-      (infos ()) (def_infos ()))) |}]
+      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "method access" =
   let source =
@@ -681,22 +661,20 @@ let%expect_test "method access" =
     {|
     (Ok
      ((bindings
-       ((res (Value (Integer 1)))
-        (foo (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
-        (Foo
-         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
-      (infos ())
-      (def_infos
-       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
-         ((methods
+       ((res (Value (Integer 1))) (foo (Value (Struct (1 ()))))
+        (Foo (Value (Type (StructType 1))))))
+      (structs
+       ((1
+         ((struct_fields ())
+          (struct_methods
            ((bar
              ((function_signature
-               ((function_params
-                 ((self (StructType ((struct_fields ()) (struct_id <opaque>))))
-                  (i IntegerType)))
+               ((function_params ((self (StructType 1)) (i IntegerType)))
                 (function_returns IntegerType)))
               (function_impl
-               (Fn ((Block ((Break (Expr (Reference (i IntegerType))))))))))))))))))) |}]
+               (Fn ((Block ((Break (Expr (Reference (i IntegerType)))))))))))))
+          (struct_impls ()) (struct_id 1)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "Self type resolution in methods" =
   let source =
@@ -712,27 +690,19 @@ let%expect_test "Self type resolution in methods" =
   [%expect
     {|
     (Ok
-     ((bindings
-       ((Foo
-         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
-      (infos ())
-      (def_infos
-       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
-         ((methods
+     ((bindings ((Foo (Value (Type (StructType 1))))))
+      (structs
+       ((1
+         ((struct_fields ())
+          (struct_methods
            ((bar
              ((function_signature
-               ((function_params
-                 ((self (StructType ((struct_fields ()) (struct_id <opaque>))))))
-                (function_returns
-                 (StructType ((struct_fields ()) (struct_id <opaque>))))))
+               ((function_params ((self (StructType 1))))
+                (function_returns (StructType 1))))
               (function_impl
-               (Fn
-                ((Block
-                  ((Break
-                    (Expr
-                     (Reference
-                      (self
-                       (StructType ((struct_fields ()) (struct_id <opaque>)))))))))))))))))))))) |}]
+               (Fn ((Block ((Break (Expr (Reference (self (StructType 1))))))))))))))
+          (struct_impls ()) (struct_id 1)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "struct instantiation" =
   let source =
@@ -751,27 +721,14 @@ let%expect_test "struct instantiation" =
     (Ok
      ((bindings
        ((t
-         (Value
-          (Struct
-           (((struct_fields
-              ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
-             (struct_id <opaque>))
-            ((a (Value (Integer 1))) (b (Value (Integer 2))))))))
-        (T
-         (Value
-          (Type
-           (StructType
-            ((struct_fields
-              ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
-             (struct_id <opaque>))))))))
-      (infos ())
-      (def_infos
-       (((Type
-          (StructType
-           ((struct_fields
-             ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
-            (struct_id <opaque>))))
-         ()))))) |}]
+         (Value (Struct (1 ((a (Value (Integer 1))) (b (Value (Integer 2))))))))
+        (T (Value (Type (StructType 1))))))
+      (structs
+       ((1
+         ((struct_fields
+           ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 1)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "type check error" =
   let source = {|
@@ -781,36 +738,16 @@ let%expect_test "type check error" =
   [%expect
     {|
     (Error
-     (((TypeError
-        ((StructType
-          ((struct_fields ((integer ((field_type IntegerType)))))
-           (struct_id <opaque>)))
-         (StructType
-          ((struct_fields ((integer ((field_type IntegerType)))))
-           (struct_id <opaque>)))))
+     (((TypeError ((StructType 1) (StructType 0)))
        ((bindings
          ((foo
            (Value
             (Function
              ((function_signature
-               ((function_params
-                 ((i
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
-                (function_returns
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
+               ((function_params ((i (StructType 0))))
+                (function_returns (StructType 1))))
               (function_impl
-               (Fn
-                ((Block
-                  ((Return
-                    (Reference
-                     (i
-                      (StructType
-                       ((struct_fields ((integer ((field_type IntegerType)))))
-                        (struct_id <opaque>)))))))))))))))
+               (Fn ((Block ((Return (Reference (i (StructType 0)))))))))))))
           (Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
           (Int
@@ -846,28 +783,19 @@ let%expect_test "type check error" =
              ((function_signature
                ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
-        (infos
-         (((Type
-            (StructType
-             ((struct_fields ((integer ((field_type IntegerType)))))
-              (struct_id <opaque>))))
-           ((methods
+        (structs
+         ((1
+           ((struct_fields ((integer ((field_type IntegerType)))))
+            (struct_methods
              ((new
                ((function_signature
                  ((function_params ((integer IntegerType)))
-                  (function_returns
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
+                  (function_returns (StructType 1))))
                 (function_impl (BuiltinFn (<fun> <opaque>)))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))
-                    (b (BuiltinType Builder))))
+                   ((self (StructType 1)) (b (BuiltinType Builder))))
                   (function_returns (BuiltinType Builder))))
                 (function_impl
                  (Fn
@@ -876,36 +804,21 @@ let%expect_test "type check error" =
                      (StoreInt (builder (Reference (b (BuiltinType Builder))))
                       (length (Value (Integer 64)))
                       (integer
-                       (StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((integer ((field_type IntegerType)))))
-                             (struct_id <opaque>)))))
-                         integer)))
-                      (signed true)))))))))))))
-          ((Type
-            (StructType
-             ((struct_fields ((integer ((field_type IntegerType)))))
-              (struct_id <opaque>))))
-           ((methods
+                       (StructField ((Reference (self (StructType 1))) integer)))
+                      (signed true)))))))))))
+            (struct_impls ()) (struct_id 1)))
+          (0
+           ((struct_fields ((integer ((field_type IntegerType)))))
+            (struct_methods
              ((new
                ((function_signature
                  ((function_params ((integer IntegerType)))
-                  (function_returns
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
+                  (function_returns (StructType 0))))
                 (function_impl (BuiltinFn (<fun> <opaque>)))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))
-                    (b (BuiltinType Builder))))
+                   ((self (StructType 0)) (b (BuiltinType Builder))))
                   (function_returns (BuiltinType Builder))))
                 (function_impl
                  (Fn
@@ -914,22 +827,10 @@ let%expect_test "type check error" =
                      (StoreInt (builder (Reference (b (BuiltinType Builder))))
                       (length (Value (Integer 32)))
                       (integer
-                       (StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((integer ((field_type IntegerType)))))
-                             (struct_id <opaque>)))))
-                         integer)))
-                      (signed true)))))))))))))
-          ((Type (BuiltinType Builder))
-           ((methods
-             ((new
-               ((function_signature
-                 ((function_params ()) (function_returns (BuiltinType Builder))))
-                (function_impl (Fn ((Return (Primitive EmptyBuilder)))))))))))))
-        (def_infos ()))))) |}]
+                       (StructField ((Reference (self (StructType 0))) integer)))
+                      (signed true)))))))))))
+            (struct_impls ()) (struct_id 0)))))
+        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "type inference" =
   let source = {|
@@ -946,7 +847,7 @@ let%expect_test "type inference" =
            ((function_signature
              ((function_params ((i IntegerType))) (function_returns IntegerType)))
             (function_impl (Fn ((Block ((Return (Reference (i IntegerType))))))))))))))
-      (infos ()) (def_infos ()))) |}]
+      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "scope doesn't leak bindings" =
   let source = {|
@@ -954,7 +855,12 @@ let%expect_test "scope doesn't leak bindings" =
      let a = 1;
     }
   |} in
-  pp source ; [%expect {| (Ok ((bindings ()) (infos ()) (def_infos ()))) |}]
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ()) (structs ()) (struct_counter <opaque>)
+      (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "compile-time if/then/else" =
   let source =
@@ -999,7 +905,7 @@ let%expect_test "compile-time if/then/else" =
            ((function_signature
              ((function_params ()) (function_returns BoolType)))
             (function_impl (Fn ((Block ((Break (Expr (Value (Bool true)))))))))))))))
-      (infos ()) (def_infos ()))) |}]
+      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "type check error" =
   let source =
@@ -1015,13 +921,7 @@ let%expect_test "type check error" =
   [%expect
     {|
     (Error
-     (((TypeError
-        ((StructType
-          ((struct_fields ((integer ((field_type IntegerType)))))
-           (struct_id <opaque>)))
-         (StructType
-          ((struct_fields ((integer ((field_type IntegerType)))))
-           (struct_id <opaque>)))))
+     (((TypeError ((StructType 0) (StructType 1)))
        ((bindings
          ((Builder (Value (Type (BuiltinType Builder))))
           (Integer (Value (Type IntegerType)))
@@ -1058,28 +958,19 @@ let%expect_test "type check error" =
              ((function_signature
                ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
-        (infos
-         (((Type
-            (StructType
-             ((struct_fields ((integer ((field_type IntegerType)))))
-              (struct_id <opaque>))))
-           ((methods
+        (structs
+         ((1
+           ((struct_fields ((integer ((field_type IntegerType)))))
+            (struct_methods
              ((new
                ((function_signature
                  ((function_params ((integer IntegerType)))
-                  (function_returns
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
+                  (function_returns (StructType 1))))
                 (function_impl (BuiltinFn (<fun> <opaque>)))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))
-                    (b (BuiltinType Builder))))
+                   ((self (StructType 1)) (b (BuiltinType Builder))))
                   (function_returns (BuiltinType Builder))))
                 (function_impl
                  (Fn
@@ -1088,36 +979,21 @@ let%expect_test "type check error" =
                      (StoreInt (builder (Reference (b (BuiltinType Builder))))
                       (length (Value (Integer 10)))
                       (integer
-                       (StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((integer ((field_type IntegerType)))))
-                             (struct_id <opaque>)))))
-                         integer)))
-                      (signed true)))))))))))))
-          ((Type
-            (StructType
-             ((struct_fields ((integer ((field_type IntegerType)))))
-              (struct_id <opaque>))))
-           ((methods
+                       (StructField ((Reference (self (StructType 1))) integer)))
+                      (signed true)))))))))))
+            (struct_impls ()) (struct_id 1)))
+          (0
+           ((struct_fields ((integer ((field_type IntegerType)))))
+            (struct_methods
              ((new
                ((function_signature
                  ((function_params ((integer IntegerType)))
-                  (function_returns
-                   (StructType
-                    ((struct_fields ((integer ((field_type IntegerType)))))
-                     (struct_id <opaque>))))))
+                  (function_returns (StructType 0))))
                 (function_impl (BuiltinFn (<fun> <opaque>)))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self
-                     (StructType
-                      ((struct_fields ((integer ((field_type IntegerType)))))
-                       (struct_id <opaque>))))
-                    (b (BuiltinType Builder))))
+                   ((self (StructType 0)) (b (BuiltinType Builder))))
                   (function_returns (BuiltinType Builder))))
                 (function_impl
                  (Fn
@@ -1126,22 +1002,10 @@ let%expect_test "type check error" =
                      (StoreInt (builder (Reference (b (BuiltinType Builder))))
                       (length (Value (Integer 99)))
                       (integer
-                       (StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((integer ((field_type IntegerType)))))
-                             (struct_id <opaque>)))))
-                         integer)))
-                      (signed true)))))))))))))
-          ((Type (BuiltinType Builder))
-           ((methods
-             ((new
-               ((function_signature
-                 ((function_params ()) (function_returns (BuiltinType Builder))))
-                (function_impl (Fn ((Return (Primitive EmptyBuilder)))))))))))))
-        (def_infos ()))))) |}]
+                       (StructField ((Reference (self (StructType 0))) integer)))
+                      (signed true)))))))))))
+            (struct_impls ()) (struct_id 0)))))
+        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "implement interface op" =
   let source =
@@ -1159,21 +1023,18 @@ let%expect_test "implement interface op" =
   [%expect
     {|
     (Ok
-     ((bindings
-       ((one (Value (Integer 1)))
-        (Left
-         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))
-      (infos ())
-      (def_infos
-       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
-         ((methods
+     ((bindings ((one (Value (Integer 1))) (Left (Value (Type (StructType 1))))))
+      (structs
+       ((1
+         ((struct_fields ())
+          (struct_methods
            ((op
              ((function_signature
                ((function_params ((left IntegerType) (right IntegerType)))
                 (function_returns IntegerType)))
               (function_impl
                (Fn ((Block ((Break (Expr (Reference (left IntegerType)))))))))))))
-          (impls
+          (struct_impls
            (((impl_interface
               (Value
                (Type
@@ -1191,7 +1052,9 @@ let%expect_test "implement interface op" =
                      (function_returns IntegerType)))
                    (function_impl
                     (Fn
-                     ((Block ((Break (Expr (Reference (left IntegerType)))))))))))))))))))))))) |}]
+                     ((Block ((Break (Expr (Reference (left IntegerType))))))))))))))))))
+          (struct_id 1)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "implement interface op" =
   let source =
@@ -1212,32 +1075,23 @@ let%expect_test "implement interface op" =
     {|
     (Ok
      ((bindings
-       ((empty (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
-        (Empty
-         (Value (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))
+       ((empty (Value (Struct (0 ())))) (Empty (Value (Type (StructType 1))))
         (Make
          (Value
           (Type
            (InterfaceType
             ((interface_methods
               ((new ((function_params ()) (function_returns SelfType))))))))))))
-      (infos ())
-      (def_infos
-       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
-         ((methods
+      (structs
+       ((1
+         ((struct_fields ())
+          (struct_methods
            ((new
              ((function_signature
-               ((function_params ())
-                (function_returns
-                 (StructType ((struct_fields ()) (struct_id <opaque>))))))
+               ((function_params ()) (function_returns (StructType 1))))
               (function_impl
-               (Fn
-                ((Block
-                  ((Break
-                    (Expr
-                     (Value
-                      (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))
-          (impls
+               (Fn ((Block ((Break (Expr (Value (Struct (0 ()))))))))))))))
+          (struct_impls
            (((impl_interface
               (Value
                (Type
@@ -1249,17 +1103,11 @@ let%expect_test "implement interface op" =
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ())
-                     (function_returns
-                      (StructType ((struct_fields ()) (struct_id <opaque>))))))
+                    ((function_params ()) (function_returns (StructType 1))))
                    (function_impl
-                    (Fn
-                     ((Block
-                       ((Break
-                         (Expr
-                          (Value
-                           (Struct
-                            (((struct_fields ()) (struct_id <opaque>)) ()))))))))))))))))))))))))) |}]
+                    (Fn ((Block ((Break (Expr (Value (Struct (0 ())))))))))))))))))))
+          (struct_id 1)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "serializer inner struct" =
   let source =
@@ -1278,28 +1126,7 @@ let%expect_test "serializer inner struct" =
          (Value
           (Function
            ((function_signature
-             ((function_params
-               ((self
-                 (StructType
-                  ((struct_fields
-                    ((y
-                      ((field_type
-                        (StructType
-                         ((struct_fields ((integer ((field_type IntegerType)))))
-                          (struct_id <opaque>))))))
-                     (z
-                      ((field_type
-                        (StructType
-                         ((struct_fields
-                           ((x
-                             ((field_type
-                               (StructType
-                                ((struct_fields
-                                  ((integer ((field_type IntegerType)))))
-                                 (struct_id <opaque>))))))))
-                          (struct_id <opaque>))))))))
-                   (struct_id <opaque>))))
-                (b (BuiltinType Builder))))
+             ((function_params ((self (StructType 3)) (b (BuiltinType Builder))))
               (function_returns (BuiltinType Builder))))
             (function_impl
              (Fn
@@ -1311,12 +1138,7 @@ let%expect_test "serializer inner struct" =
                        (Function
                         ((function_signature
                           ((function_params
-                            ((self
-                              (StructType
-                               ((struct_fields
-                                 ((integer ((field_type IntegerType)))))
-                                (struct_id <opaque>))))
-                             (b (BuiltinType Builder))))
+                            ((self (StructType 0)) (b (BuiltinType Builder))))
                            (function_returns (BuiltinType Builder))))
                          (function_impl
                           (Fn
@@ -1327,202 +1149,45 @@ let%expect_test "serializer inner struct" =
                                (length (Value (Integer 32)))
                                (integer
                                 (StructField
-                                 ((Reference
-                                   (self
-                                    (StructType
-                                     ((struct_fields
-                                       ((integer ((field_type IntegerType)))))
-                                      (struct_id <opaque>)))))
-                                  integer)))
+                                 ((Reference (self (StructType 0))) integer)))
                                (signed true))))))))))
-                      ((StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((y
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((integer ((field_type IntegerType)))))
-                                    (struct_id <opaque>))))))
-                               (z
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((x
-                                       ((field_type
-                                         (StructType
-                                          ((struct_fields
-                                            ((integer ((field_type IntegerType)))))
-                                           (struct_id <opaque>))))))))
-                                    (struct_id <opaque>))))))))
-                             (struct_id <opaque>)))))
-                         y))
-                       (Reference (b (BuiltinType Builder)))))))))
-                 (Let
-                  ((b
-                    (FunctionCall
-                     ((Value
-                       (Function
-                        ((function_signature
-                          ((function_params
-                            ((self
-                              (StructType
-                               ((struct_fields
-                                 ((x
-                                   ((field_type
-                                     (StructType
-                                      ((struct_fields
-                                        ((integer ((field_type IntegerType)))))
-                                       (struct_id <opaque>))))))))
-                                (struct_id <opaque>))))
-                             (b (BuiltinType Builder))))
-                           (function_returns (BuiltinType Builder))))
-                         (function_impl
-                          (Fn
-                           ((Block
-                             ((Let
-                               ((b
-                                 (FunctionCall
-                                  ((Value
-                                    (Function
-                                     ((function_signature
-                                       ((function_params
-                                         ((self
-                                           (StructType
-                                            ((struct_fields
-                                              ((integer
-                                                ((field_type IntegerType)))))
-                                             (struct_id <opaque>))))
-                                          (b (BuiltinType Builder))))
-                                        (function_returns (BuiltinType Builder))))
-                                      (function_impl
-                                       (Fn
-                                        ((Return
-                                          (Primitive
-                                           (StoreInt
-                                            (builder
-                                             (Reference
-                                              (b (BuiltinType Builder))))
-                                            (length (Value (Integer 32)))
-                                            (integer
-                                             (StructField
-                                              ((Reference
-                                                (self
-                                                 (StructType
-                                                  ((struct_fields
-                                                    ((integer
-                                                      ((field_type IntegerType)))))
-                                                   (struct_id <opaque>)))))
-                                               integer)))
-                                            (signed true))))))))))
-                                   ((StructField
-                                     ((Reference
-                                       (self
-                                        (StructType
-                                         ((struct_fields
-                                           ((x
-                                             ((field_type
-                                               (StructType
-                                                ((struct_fields
-                                                  ((integer
-                                                    ((field_type IntegerType)))))
-                                                 (struct_id <opaque>))))))))
-                                          (struct_id <opaque>)))))
-                                      x))
-                                    (Reference (b (BuiltinType Builder)))))))))
-                              (Return (Reference (b (BuiltinType Builder))))))))))))
-                      ((StructField
-                        ((Reference
-                          (self
-                           (StructType
-                            ((struct_fields
-                              ((y
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((integer ((field_type IntegerType)))))
-                                    (struct_id <opaque>))))))
-                               (z
-                                ((field_type
-                                  (StructType
-                                   ((struct_fields
-                                     ((x
-                                       ((field_type
-                                         (StructType
-                                          ((struct_fields
-                                            ((integer ((field_type IntegerType)))))
-                                           (struct_id <opaque>))))))))
-                                    (struct_id <opaque>))))))))
-                             (struct_id <opaque>)))))
-                         z))
+                      ((StructField ((Reference (self (StructType 3))) y))
                        (Reference (b (BuiltinType Builder)))))))))
                  (Return (Reference (b (BuiltinType Builder)))))))))))))
-        (Outer
-         (Value
-          (Type
-           (StructType
-            ((struct_fields
-              ((y
-                ((field_type
-                  (StructType
-                   ((struct_fields ((integer ((field_type IntegerType)))))
-                    (struct_id <opaque>))))))
-               (z
-                ((field_type
-                  (StructType
-                   ((struct_fields
-                     ((x
-                       ((field_type
-                         (StructType
-                          ((struct_fields ((integer ((field_type IntegerType)))))
-                           (struct_id <opaque>))))))))
-                    (struct_id <opaque>))))))))
-             (struct_id <opaque>))))))
-        (Inner
-         (Value
-          (Type
-           (StructType
-            ((struct_fields
-              ((x
-                ((field_type
-                  (StructType
-                   ((struct_fields ((integer ((field_type IntegerType)))))
-                    (struct_id <opaque>))))))))
-             (struct_id <opaque>))))))))
-      (infos ())
-      (def_infos
-       (((Type
-          (StructType
-           ((struct_fields
-             ((y
-               ((field_type
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))
-              (z
-               ((field_type
-                 (StructType
-                  ((struct_fields
-                    ((x
-                      ((field_type
-                        (StructType
-                         ((struct_fields ((integer ((field_type IntegerType)))))
-                          (struct_id <opaque>))))))))
-                   (struct_id <opaque>))))))))
-            (struct_id <opaque>))))
-         ())
-        ((Type
-          (StructType
-           ((struct_fields
-             ((x
-               ((field_type
-                 (StructType
-                  ((struct_fields ((integer ((field_type IntegerType)))))
-                   (struct_id <opaque>))))))))
-            (struct_id <opaque>))))
-         ()))))) |}]
+        (Outer (Value (Type (StructType 3))))
+        (Inner (Value (Type (StructType 1))))))
+      (structs
+       ((3
+         ((struct_fields
+           ((y ((field_type (StructType 0)))) (z ((field_type (StructType 1))))))
+          (struct_methods ()) (struct_impls ()) (struct_id 3)))
+        (1
+         ((struct_fields ((x ((field_type (StructType 0)))))) (struct_methods ())
+          (struct_impls ()) (struct_id 1)))
+        (0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 32)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "reference resolving in inner functions" =
   let source =
@@ -1565,7 +1230,7 @@ let%expect_test "reference resolving in inner functions" =
                           ((Break
                             (Expr
                              (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))))))))))))
-      (infos ()) (def_infos ()))) |}]
+      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "dependent types" =
   let source =
@@ -1636,7 +1301,7 @@ let%expect_test "dependent types" =
                       ((function_params
                         ((x (ExprType (Reference (X (TypeN 0)))))))
                        (function_returns (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
-      (infos ()) (def_infos ()))) |}]
+      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "TypeN" =
   let source =
@@ -1694,14 +1359,7 @@ let%expect_test "TypeN" =
              ((function_signature
                ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
               (function_impl (BuiltinFn (<fun> <opaque>)))))))))
-        (infos
-         (((Type (BuiltinType Builder))
-           ((methods
-             ((new
-               ((function_signature
-                 ((function_params ()) (function_returns (BuiltinType Builder))))
-                (function_impl (Fn ((Return (Primitive EmptyBuilder)))))))))))))
-        (def_infos ()))))) |}]
+        (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "unions" =
   let source =
@@ -1718,17 +1376,55 @@ let%expect_test "unions" =
     (Ok
      ((bindings
        ((Test
-         (Value
-          (Type
-           (UnionType
-            ((cases
-              ((StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>)))
-               (StructType
-                ((struct_fields ((integer ((field_type IntegerType)))))
-                 (struct_id <opaque>))))))))))))
-      (infos ()) (def_infos ()))) |}]
+         (Value (Type (UnionType ((cases ((StructType 0) (StructType 1))))))))))
+      (structs
+       ((1
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 1))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 1)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 64)))
+                    (integer
+                     (StructField ((Reference (self (StructType 1))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 1)))
+        (0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 0)) (b (BuiltinType Builder))))
+                (function_returns (BuiltinType Builder))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt (builder (Reference (b (BuiltinType Builder))))
+                    (length (Value (Integer 257)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "methods monomorphization" =
   let source =
@@ -1747,8 +1443,7 @@ let%expect_test "methods monomorphization" =
     {|
     (Ok
      ((bindings
-       ((x (Value (Integer 10)))
-        (foo (Value (Struct (((struct_fields ()) (struct_id <opaque>)) ()))))
+       ((x (Value (Integer 10))) (foo (Value (Struct (1 ()))))
         (Foo
          (Value
           (Function
@@ -1759,20 +1454,36 @@ let%expect_test "methods monomorphization" =
               ((Block
                 ((Break
                   (Expr
-                   (Value
-                    (Type (StructType ((struct_fields ()) (struct_id <opaque>))))))))))))))))))
-      (infos ())
-      (def_infos
-       (((Type (StructType ((struct_fields ()) (struct_id <opaque>))))
-         ((methods
+                   (MkStructDef
+                    ((mk_struct_fields ())
+                     (mk_methods
+                      ((id
+                        ((function_signature
+                          ((function_params
+                            ((self (StructType 0))
+                             (x (ExprType (Reference (X (TypeN 0)))))))
+                           (function_returns
+                            (ExprType (Reference (X (TypeN 0)))))))
+                         (function_impl
+                          (Fn
+                           ((Block
+                             ((Break
+                               (Expr
+                                (Reference
+                                 (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
+                     (mk_impls ()) (mk_struct_id 0))))))))))))))))
+      (structs
+       ((1
+         ((struct_fields ())
+          (struct_methods
            ((id
              ((function_signature
-               ((function_params
-                 ((self (StructType ((struct_fields ()) (struct_id <opaque>))))
-                  (x (ExprType (Reference (X (TypeN 0)))))))
-                (function_returns (ExprType (Reference (X (TypeN 0)))))))
+               ((function_params ((self (StructType 1)) (x IntegerType)))
+                (function_returns IntegerType)))
               (function_impl
                (Fn
                 ((Block
                   ((Break
-                    (Expr (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))) |}]
+                    (Expr (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
+          (struct_impls ()) (struct_id 1)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]

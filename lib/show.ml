@@ -69,9 +69,8 @@ functor
           pp_print_string f "<anonymous>"
 
     let show_error : error -> string = function
-      | `DuplicateField (field, s) ->
-          Printf.sprintf "Duplicate field `%s` in the `%i` struct." field
-            s.struct_id
+      | `DuplicateField (field, _) ->
+          Printf.sprintf "Duplicate field `%s`." field
       | `UnresolvedIdentifier id ->
           Printf.sprintf "Unresolved identifier `%s`." id
       | `MethodNotFound (e, m) ->

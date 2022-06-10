@@ -35,15 +35,14 @@ and binding_scope = Comptime of expr | Runtime of type_
 
 and program =
   { bindings : (string * expr) list;
-    mutable infos : (value * struct_info) list;
-    mutable def_infos : (value * struct_info) list }
-
-and struct_info =
-  { mutable methods : (string * function_) list; [@sexp.list]
-    mutable impls : impl list [@sexp.list] }
+    mutable structs : (int * struct_) list;
+    mutable struct_counter : (int[@sexp.opaque]);
+    mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
+  }
 
 and expr =
   | FunctionCall of function_call
+  | MkStructDef of mk_struct
   | MakeUnionVariant of (expr * union)
   | Reference of (string * type_)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
@@ -59,7 +58,8 @@ and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 
 and value =
   | Void
-  | Struct of (struct_ * (string * expr) list)
+  | Struct of (int * (string * expr) list)
+  | StructDef of struct_
   | UnionVariant of (value * union)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
@@ -86,7 +86,7 @@ and type_ =
   | StringType
   | VoidType
   | BuiltinType of builtin
-  | StructType of struct_
+  | StructType of int
   | UnionType of union
   | FunctionType of function_signature
   | InterfaceType of interface
@@ -98,8 +98,17 @@ and type_ =
 
 and union = {cases : type_ list}
 
+and mk_struct =
+  { mk_struct_fields : (string * expr) list;
+    mk_methods : (string * function_) list;
+    mk_impls : impl list;
+    mk_struct_id : int }
+
 and struct_ =
-  {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
+  { struct_fields : (string * struct_field) list;
+    struct_methods : (string * function_) list;
+    struct_impls : impl list;
+    struct_id : int }
 
 and struct_field = {field_type : type_}
 
@@ -169,8 +178,8 @@ let rec expr_to_type = function
       InvalidType expr
 
 let rec type_of = function
-  | Value (Struct (struct_, _)) ->
-      StructType struct_
+  | Value (Struct (sid, _)) ->
+      StructType sid
   | Value (Function {function_signature; _}) ->
       FunctionType function_signature
   | Value (Builtin builtin) ->
@@ -207,6 +216,8 @@ let rec type_of = function
       type_of e
   | MakeUnionVariant (_, u) ->
       UnionType u
+  | MkStructDef _ ->
+      type0
   | expr ->
       InvalidType expr
 
@@ -325,5 +336,33 @@ let find_in_runtime_scope : 'a. string -> (string * 'a) list list -> 'a option =
       List.find_map bindings ~f:(fun (name, value) ->
           if String.equal ref name then Some value else None ) )
 
-(* We declare the struct counter here to count all structs *)
-let struct_counter = ref 0
+let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+
+module Program = struct
+  let methods_of p = function
+    | StructType s ->
+        List.find_map_exn p.structs ~f:(fun (id, s') ->
+            if equal_int id s then Some s'.struct_methods else None )
+    | _ ->
+        []
+
+  let get_struct p s = List.Assoc.find_exn p.structs s ~equal:equal_int
+
+  let rec update_list id new_s = function
+    | [] ->
+        raise Errors.InternalCompilerError
+    | (xid, old_s) :: xs ->
+        if equal_int xid id then
+          match new_s with
+          | Ok new_s ->
+              (new_s.struct_id, new_s) :: xs
+          | Error _ ->
+              xs
+        else (xid, old_s) :: update_list id new_s xs
+
+  let with_struct p s f =
+    p.structs <- (s.struct_id, s) :: p.structs ;
+    let new_s = f () in
+    p.structs <- update_list s.struct_id new_s p.structs ;
+    new_s
+end

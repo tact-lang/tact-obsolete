@@ -6,9 +6,30 @@ type error =
   [ `UnresolvedIdentifier of string
   | `UninterpretableStatement of stmt
   | `UnexpectedType of type_
-  | `FieldNotFound of struct_ * string
+  | `FieldNotFound of int * string
   | `ArgumentNumberMismatch ]
 [@@deriving equal, sexp_of]
+
+class ['s] struct_updater (old : int) (new_s : int) =
+  object
+    inherit ['s] map
+
+    method! visit_StructType _ s =
+      if equal_int s old then StructType new_s else StructType s
+  end
+
+let get_memoized_or_execute p (f, args) ~execute =
+  match
+    List.Assoc.find p.memoized_fcalls (f, args)
+      ~equal:(fun (f1, args1) (f2, args2) ->
+        equal_value f1 f2 && equal_list equal_value args1 args2 )
+  with
+  | Some v ->
+      v
+  | None ->
+      let res = execute f args in
+      p.memoized_fcalls <- ((f, args), res) :: p.memoized_fcalls ;
+      res
 
 (*TODO: type checks for arguments*)
 class interpreter
@@ -109,6 +130,52 @@ class interpreter
                so we do not need to check if union can be built from the expr. *)
             let data = self#interpret_expr expr in
             UnionVariant (data, union)
+        | MkStructDef {mk_struct_fields; mk_methods; mk_impls; mk_struct_id} ->
+            let struct_fields =
+              List.map mk_struct_fields ~f:(fun (name, field_type) ->
+                  ( name,
+                    { field_type =
+                        expr_to_type (Value (self#interpret_expr field_type)) }
+                  ) )
+            in
+            let struct_id = program.struct_counter in
+            program.struct_counter <- program.struct_counter + 1 ;
+            let struct_ty = struct_id in
+            let struct_ =
+              {struct_fields; struct_methods = []; struct_impls = []; struct_id}
+            in
+            let struct_updater = new struct_updater mk_struct_id struct_id in
+            let s =
+              Program.with_struct program struct_ (fun _ ->
+                  let struct_methods =
+                    List.map mk_methods ~f:(fun (name, fn) ->
+                        let prev_scope = vars_scope in
+                        vars_scope <-
+                          [("Self", Type (StructType struct_ty))] :: vars_scope ;
+                        let output =
+                          self#interpret_function
+                            (struct_updater#visit_function_ () fn)
+                        in
+                        vars_scope <- prev_scope ;
+                        (name, output) )
+                  in
+                  let struct_impls =
+                    List.map mk_impls ~f:(fun impl ->
+                        { impl_interface =
+                            Value (self#interpret_expr impl.impl_interface);
+                          impl_methods =
+                            List.map impl.impl_methods ~f:(fun (n, x) ->
+                                ( n,
+                                  Value
+                                    (self#interpret_expr
+                                       (struct_updater#visit_expr () x) ) ) ) } )
+                  in
+                  Ok {struct_fields; struct_methods; struct_impls; struct_id} )
+            in
+            let _ =
+              match s with Ok t -> t | Error _ -> raise InternalCompilerError
+            in
+            Type (StructType struct_ty)
         | Primitive _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
@@ -117,16 +184,6 @@ class interpreter
       function
       | ExprType ex ->
           expr_to_type (Value (self#interpret_expr ex))
-      | StructType {struct_fields; struct_id} ->
-          let struct_fields =
-            List.map struct_fields ~f:(fun (name, {field_type}) ->
-                (name, {field_type = self#interpret_type field_type}) )
-          in
-          let s = {struct_fields; struct_id} in
-          if not (List.exists adding_structs ~f:(equal_struct_ s)) then
-            if is_immediate_expr (Value (Type (StructType s))) then
-              self#add_struct_to_program s ;
-          StructType {struct_fields; struct_id}
       | UnionType u ->
           UnionType {cases = List.map u.cases ~f:self#interpret_type}
       | ty ->
@@ -157,6 +214,7 @@ class interpreter
                   ~f:(fun (name, x) -> (name, self#interpret_type x));
               function_returns =
                 self#interpret_type f.function_signature.function_returns };
+          (* TODO: partial evaluation of fn *)
           function_impl = (match f.function_impl with Fn b -> Fn b | x -> x) }
 
     method interpret_fc : function_call -> value =
@@ -172,40 +230,35 @@ class interpreter
           | _ ->
               Error mk_err
         in
-        match self#interpret_expr func with
-        | Function f -> (
-          match f with
-          | { function_signature = {function_params; _};
-              function_impl = Fn function_impl;
-              _ } -> (
-              let args_scope = args_to_list function_params args' in
-              match args_scope with
-              | Ok args_scope -> (
-                match function_impl with
-                | Some body ->
-                    let prev_scope = vars_scope in
-                    vars_scope <- args_scope :: vars_scope ;
-                    let output = self#interpret_stmt body [] in
-                    vars_scope <- prev_scope ;
-                    output
-                | None ->
-                    Void )
-              | Error _ ->
+        let f = self#interpret_expr func in
+        get_memoized_or_execute program (f, args') ~execute:(fun f args' ->
+            match f with
+            | Function f -> (
+              match f with
+              | { function_signature = {function_params; _};
+                  function_impl = Fn function_impl;
+                  _ } -> (
+                  let args_scope = args_to_list function_params args' in
+                  match args_scope with
+                  | Ok args_scope -> (
+                    match function_impl with
+                    | Some body ->
+                        let prev_scope = vars_scope in
+                        vars_scope <- args_scope :: vars_scope ;
+                        let output = self#interpret_stmt body [] in
+                        vars_scope <- prev_scope ;
+                        output
+                    | None ->
+                        Void )
+                  | Error _ ->
+                      Void )
+              | {function_impl = BuiltinFn (function_impl, _); _} ->
+                  let value = function_impl program args' in
+                  value
+              | _ ->
                   Void )
-          | {function_impl = BuiltinFn (function_impl, _); _} ->
-              let program' =
-                { program with
-                  bindings =
-                    extract_comptime_bindings
-                      (Option.value (List.hd global_bindings) ~default:[]) }
-              in
-              let value = function_impl program' args' in
-              program.infos <- program'.infos ;
-              value
-          | _ ->
-              Void )
-        | _ ->
-            Void
+            | _ ->
+                Void )
 
     method private find_ref : string -> expr option =
       fun ref ->
@@ -236,45 +289,4 @@ class interpreter
             Some v
         | None ->
             None
-
-    method private add_struct_to_program struct_ =
-      let prev_structs = adding_structs in
-      adding_structs <- struct_ :: adding_structs ;
-      let add_infos () =
-        if
-          not
-            (List.exists program.infos ~f:(fun (s, _) ->
-                 equal_value s (Type (StructType struct_)) ) )
-        then
-          match
-            List.find_map program.def_infos ~f:(fun (v, info) ->
-                match v with
-                | Type (StructType s) ->
-                    if equal_struct_ s struct_ then Some info else None
-                | _ ->
-                    None )
-          with
-          | Some info ->
-              let methods_monomorphed =
-                List.map info.methods ~f:(fun (name, f) ->
-                    (name, self#interpret_function f) )
-              in
-              let impls_monomorphed =
-                List.map info.impls ~f:(fun impl ->
-                    { impl_interface =
-                        Value (self#interpret_expr impl.impl_interface);
-                      impl_methods =
-                        List.map impl.impl_methods ~f:(fun (n, x) ->
-                            (n, Value (self#interpret_expr x)) ) } )
-              in
-              program.infos <-
-                ( Type (StructType struct_),
-                  {impls = impls_monomorphed; methods = methods_monomorphed} )
-                :: program.infos
-          | None ->
-              ()
-      in
-      add_infos () ;
-      adding_structs <- prev_structs ;
-      ()
   end

@@ -21,23 +21,25 @@ let int_type =
   let rec int_type_s p bits =
     let struct_id =
       Hashtbl.find_or_add struct_ids bits ~default:(fun () ->
-          let c = !struct_counter in
-          struct_counter := c + 1 ;
+          let c = p.struct_counter in
+          p.struct_counter <- c + 1 ;
           c )
     in
-    let s =
-      {struct_fields = [("integer", {field_type = IntegerType})]; struct_id}
-    in
+    let s_ty = struct_id in
     let methods =
-      [ ("new", int_type_s_new s bits);
-        ("serialize", int_type_s_serialize bits s) ]
+      [ ("new", int_type_s_new s_ty bits);
+        ("serialize", int_type_s_serialize bits s_ty) ]
     in
-    if
-      Option.is_none
-      @@ List.Assoc.find p.infos ~equal:equal_value (Type (StructType s))
-    then p.infos <- (Type (StructType s), {methods; impls = []}) :: p.infos
+    let s =
+      { struct_fields = [("integer", {field_type = IntegerType})];
+        struct_methods = methods;
+        struct_impls = [];
+        struct_id }
+    in
+    if Option.is_none @@ List.Assoc.find p.structs ~equal:equal_int s_ty then
+      p.structs <- (s_ty, s) :: p.structs
     else () ;
-    s
+    s_ty
   and int_type_s_new self bits =
     let function_impl =
       Hashtbl.find_or_add int_constructor_funs bits ~default:(fun () ->
@@ -102,24 +104,19 @@ let serializer =
           { function_params = [("t", HoleType); ("b", builder)];
             function_returns = builder } }
   in
-  let rec serializer_f s p =
+  let serializer_f s p =
+    let s = List.Assoc.find_exn p.structs s ~equal:equal_int in
     let calls =
       List.filter_map s.struct_fields ~f:(function name, {field_type = f} ->
-          let info = List.Assoc.find_exn p.infos ~equal:equal_value (Type f) in
           let serialize_field =
             match
-              List.Assoc.find info.methods ~equal:String.equal "serialize"
+              List.Assoc.find (Program.methods_of p f) ~equal:String.equal
+                "serialize"
             with
             | Some m ->
                 Some m
-            | None -> (
-              match f with
-              | StructType t ->
-                  let m = serializer_f t p in
-                  info.methods <- ("serializer", m) :: info.methods ;
-                  Some m
-              | _ ->
-                  None )
+            | None ->
+                None
           in
           serialize_field
           |> Option.map ~f:(fun method_ ->
@@ -127,12 +124,13 @@ let serializer =
                    [ ( "b",
                        FunctionCall
                          ( Value (Function method_),
-                           StructField (Reference ("self", StructType s), name)
+                           StructField
+                             (Reference ("self", StructType s.struct_id), name)
                            :: [Reference ("b", builder)] ) ) ] ) )
     in
     let body = Block (calls @ [Return (Reference ("b", builder))]) in
     { function_signature =
-        { function_params = [("self", StructType s); ("b", builder)];
+        { function_params = [("self", StructType s.struct_id); ("b", builder)];
           function_returns = builder };
       function_impl = Fn (Some body) }
   in
@@ -189,6 +187,3 @@ let default_bindings =
     ("serializer", serializer);
     ("BinOp", bin_op_intf);
     ("From", from_intf) ]
-
-let default_infos =
-  [(Type (BuiltinType "Builder"), {methods = builder_methods; impls = []})]

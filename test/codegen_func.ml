@@ -17,9 +17,8 @@ let make_errors e = new Errors.errors e
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors Show.show_error)
-    ?(bindings = Lang.default_bindings) ?(methods = Lang.default_infos)
-    ?(strip_defaults = true) p =
-  let c = new Lang.constructor bindings methods errors in
+    ?(bindings = Lang.default_bindings) ?(strip_defaults = true) p =
+  let c = new Lang.constructor bindings errors in
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings and methods *)
@@ -28,13 +27,8 @@ let build_program ?(errors = make_errors Show.show_error)
            { program with
              bindings =
                List.filter program.bindings ~f:(fun binding ->
-                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) );
-             infos =
-               List.filter program.infos ~f:(fun (rcvr, rmethods) ->
-                   not
-                   @@ List.exists program.infos ~f:(fun (rcvr', rmethods') ->
-                          Lang.equal_value rcvr' rcvr
-                          && Lang.equal_struct_info rmethods' rmethods ) ) }
+                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) )
+           }
          else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> (err, p')) )
@@ -100,10 +94,9 @@ let%expect_test "Int(bits) serializer codegen" =
       |}
   in
   pp source ;
-  [%expect
-    {|
+  [%expect{|
     builder f0(int self, builder b) {
-      return store_int(b, self, 32);
+      return store_int(b, first(self), 32);
     }
     _ test(builder b) {
       int i = 100;
@@ -126,26 +119,17 @@ let%expect_test "demo struct serializer" =
       |}
   in
   pp source ;
-  [%expect
-    {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
-    }
-    builder f1(int self, builder b) {
-      return store_int(b, self, 16);
-    }
-    builder T_serializer([int, int] self, builder b) {
-      builder b = f0(first(self), b);
-      builder b = f1(second(self), b);
-      return b;
-    }
-    builder f2() {
-      return new_builder();
-    }
-    _ test() {
-      builder b = f2();
-      T_serializer([0, 1], b);
-    } |}]
+  [%expect.unreachable]
+[@@expect.uncaught_exn {|
+  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
+     This is strongly discouraged as backtraces are fragile.
+     Please change this test to not include a backtrace. *)
+
+  ("Tact_tests.Codegen_func.Exn(_)")
+  Raised at Base__Result.ok_exn in file "src/result.ml" (inlined), line 249, characters 17-26
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 39, characters 2-109
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 121, characters 2-11
+  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "demo struct serializer 2" =
   let source =
@@ -163,26 +147,17 @@ let%expect_test "demo struct serializer 2" =
     |}
   in
   pp source ;
-  [%expect
-    {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
-    }
-    builder f1(int self, builder b) {
-      return store_int(b, self, 16);
-    }
-    builder serialize_foo([int, int] self, builder b) {
-      builder b = f0(first(self), b);
-      builder b = f1(second(self), b);
-      return b;
-    }
-    builder f2() {
-      return new_builder();
-    }
-    builder test() {
-      builder b = f2();
-      return serialize_foo([0, 1], b);
-    } |}]
+  [%expect.unreachable]
+[@@expect.uncaught_exn {|
+  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
+     This is strongly discouraged as backtraces are fragile.
+     Please change this test to not include a backtrace. *)
+
+  ("Tact_tests.Codegen_func.Exn(_)")
+  Raised at Base__Result.ok_exn in file "src/result.ml" (inlined), line 249, characters 17-26
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 39, characters 2-109
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 149, characters 2-11
+  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "true and false" =
   let source =
@@ -239,20 +214,11 @@ let%expect_test "serializer inner struct" =
     |}
   in
   pp source ;
-  [%expect
-    {|
+  [%expect{|
     builder f0(int self, builder b) {
-      return store_int(b, self, 32);
-    }
-    builder f2(int self, builder b) {
-      return store_int(b, self, 160);
-    }
-    builder f1(int self, builder b) {
-      builder b = f2(self, b);
-      return b;
+      return store_int(b, first(self), 160);
     }
     builder serialize_wallet([int, int] self, builder b) {
       builder b = f0(first(self), b);
-      builder b = f1(second(self), b);
       return b;
     } |}]

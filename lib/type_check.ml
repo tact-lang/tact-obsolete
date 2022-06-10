@@ -44,7 +44,7 @@ class type_checker (errors : _) (functions : _) =
           Ok actual
       | _ when equal_type_ expected actual ->
           Ok actual
-      | x -> (
+      | StructType s -> (
           let from_intf_ =
             let inter =
               new interpreter (program, current_bindings, errors, functions)
@@ -52,20 +52,19 @@ class type_checker (errors : _) (functions : _) =
             Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in
           let impl =
-            List.find_map program.infos ~f:(fun (s, info) ->
-                match equal_value s (Type x) with
-                | true ->
-                    List.find_map info.impls ~f:(fun i ->
-                        if equal_expr i.impl_interface from_intf_ then
-                          Some i.impl_methods
-                        else None )
-                    |> Option.bind ~f:List.hd
-                | false ->
-                    None )
+            (List.Assoc.find_exn program.structs s ~equal:equal_int)
+              .struct_impls
+            |> List.find_map ~f:(fun i ->
+                   if equal_expr i.impl_interface from_intf_ then
+                     Some i.impl_methods
+                   else None )
+            |> Option.bind ~f:List.hd
           in
           match impl with
           | Some (_, m) ->
               Error (NeedFromCall m)
           | _ ->
               Error (TypeError expected) )
+      | _otherwise ->
+          Error (TypeError expected)
   end
