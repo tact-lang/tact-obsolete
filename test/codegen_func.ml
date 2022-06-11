@@ -94,7 +94,8 @@ let%expect_test "Int(bits) serializer codegen" =
       |}
   in
   pp source ;
-  [%expect{|
+  [%expect
+    {|
     builder f0(int self, builder b) {
       return store_int(b, first(self), 32);
     }
@@ -118,9 +119,9 @@ let%expect_test "demo struct serializer" =
         }
       |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -146,9 +147,9 @@ let%expect_test "demo struct serializer 2" =
       }
     |}
   in
-  pp source ;
-  [%expect.unreachable]
-[@@expect.uncaught_exn {|
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
+    {|
   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
      This is strongly discouraged as backtraces are fragile.
      Please change this test to not include a backtrace. *)
@@ -214,7 +215,8 @@ let%expect_test "serializer inner struct" =
     |}
   in
   pp source ;
-  [%expect{|
+  [%expect
+    {|
     builder f0(int self, builder b) {
       return store_int(b, first(self), 160);
     }

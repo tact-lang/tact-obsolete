@@ -8,7 +8,8 @@ let%expect_test "Int(bits) constructor" =
     |}
   in
   pp source ;
-  [%expect{|
+  [%expect
+    {|
     (Ok
      ((bindings
        ((overflow (Value (Struct (0 ((integer (Value (Integer 513))))))))
@@ -49,7 +50,8 @@ let%expect_test "Int(bits) serializer" =
     |}
   in
   pp source ;
-  [%expect{|
+  [%expect
+    {|
     (Ok
      ((bindings
        ((test
@@ -110,7 +112,8 @@ let%expect_test "demo struct serializer" =
     |}
   in
   pp source ;
-  [%expect{|
+  [%expect
+    {|
     (Error
      (((UnexpectedType (TypeN 0))
        ((bindings
