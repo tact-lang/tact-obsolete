@@ -1521,6 +1521,10 @@ let%expect_test "methods monomorphization" =
       }
       let foo = Foo(Integer) {};
       let x = foo.id(10);
+
+      struct Empty {}
+      let foo_empty = Foo(Empty) {};
+      let y = foo_empty.id(Empty{});
     |}
   in
   pp source ;
@@ -1528,7 +1532,9 @@ let%expect_test "methods monomorphization" =
     {|
     (Ok
      ((bindings
-       ((x (Value (Integer 10))) (foo (Value (Struct (101 ()))))
+       ((y (Value (Struct (103 ())))) (foo_empty (Value (Struct (104 ()))))
+        (Empty (Value (Type (StructType 103)))) (x (Value (Integer 10)))
+        (foo (Value (Struct (101 ()))))
         (Foo
          (Value
           (Function
@@ -1558,7 +1564,23 @@ let%expect_test "methods monomorphization" =
                                  (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
                      (mk_impls ()) (mk_struct_id 100))))))))))))))))
       (structs
-       ((101
+       ((104
+         ((struct_fields ())
+          (struct_methods
+           ((id
+             ((function_signature
+               ((function_params ((self (StructType 104)) (x (StructType 103))))
+                (function_returns (StructType 103))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Break
+                    (Expr (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
+          (struct_impls ()) (struct_id 104)))
+        (103
+         ((struct_fields ()) (struct_methods ()) (struct_impls ())
+          (struct_id 103)))
+        (101
          ((struct_fields ())
           (struct_methods
            ((id
