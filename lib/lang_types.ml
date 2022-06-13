@@ -365,4 +365,13 @@ module Program = struct
     let new_s = f () in
     p.structs <- update_list s.struct_id new_s p.structs ;
     new_s
+
+  (* Creates new struct id, calls function with this new id and then
+     places returning struct to the program.structs *)
+  let with_id p f =
+    let id = p.struct_counter in
+    p.struct_counter <- p.struct_counter + 1 ;
+    let new_s = f id in
+    p.structs <- (id, new_s) :: p.structs ;
+    new_s
 end

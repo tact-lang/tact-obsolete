@@ -1,14 +1,35 @@
 open Base
 open Lang_types
 
+(* If you add new built-in struct, increase previous struct id and add it below, from 0 up to 99. *)
+let builder_id = 0
+
 let builder = BuiltinType "Builder"
 
-let builder_methods =
-  let new_ =
-    { function_signature = {function_params = []; function_returns = builder};
-      function_impl = Fn (Some (Return (Primitive EmptyBuilder))) }
+let builder_struct_info =
+  let id = builder_id in
+  let builder_methods =
+    let new_ =
+      { function_signature =
+          {function_params = []; function_returns = StructType id};
+        function_impl =
+          Fn
+            (Some
+               (Return
+                  (Value (Struct (id, [("builder", Primitive EmptyBuilder)])))
+               ) ) }
+    in
+    [("new", new_)]
   in
-  [("new", new_)]
+  let builder_struct =
+    { struct_fields = [("builder", {field_type = builder})];
+      struct_methods = builder_methods;
+      struct_impls = [];
+      struct_id = id }
+  in
+  builder_struct
+
+let builder_struct = StructType builder_id
 
 let cell = Value (Type (BuiltinType "Cell"))
 
@@ -69,15 +90,17 @@ let int_type =
   and int_type_s_serialize bits s =
     let self = StructType s in
     { function_signature =
-        { function_params = [("self", self); ("b", builder)];
-          function_returns = builder };
+        { function_params = [("self", self); ("b", builder_struct)];
+          function_returns = builder_struct };
       function_impl =
         Fn
           (Some
              (Return
                 (Primitive
                    (StoreInt
-                      { builder = Reference ("b", builder);
+                      { builder =
+                          StructField
+                            (Reference ("b", builder_struct), "builder");
                         length = Value (Integer (Z.of_int bits));
                         integer =
                           StructField
@@ -101,8 +124,8 @@ let serializer =
     { function_params = [("t", type0)];
       function_returns =
         FunctionType
-          { function_params = [("t", HoleType); ("b", builder)];
-            function_returns = builder } }
+          { function_params = [("t", HoleType); ("b", builder_struct)];
+            function_returns = builder_struct } }
   in
   let serializer_f s p =
     let s = List.Assoc.find_exn p.structs s ~equal:equal_int in
@@ -126,12 +149,13 @@ let serializer =
                          ( Value (Function method_),
                            StructField
                              (Reference ("self", StructType s.struct_id), name)
-                           :: [Reference ("b", builder)] ) ) ] ) )
+                           :: [Reference ("b", builder_struct)] ) ) ] ) )
     in
-    let body = Block (calls @ [Return (Reference ("b", builder))]) in
+    let body = Block (calls @ [Return (Reference ("b", builder_struct))]) in
     { function_signature =
-        { function_params = [("self", StructType s.struct_id); ("b", builder)];
-          function_returns = builder };
+        { function_params =
+            [("self", StructType s.struct_id); ("b", builder_struct)];
+          function_returns = builder_struct };
       function_impl = Fn (Some body) }
   in
   let function_impl p = function
@@ -175,7 +199,7 @@ let from_intf =
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let default_bindings =
-  [ ("Builder", Value (Type builder));
+  [ ("Builder", Value (Type builder_struct));
     ("Integer", Value (Type IntegerType));
     ("Int", int_type);
     ("Bool", Value (Type BoolType));
@@ -187,3 +211,5 @@ let default_bindings =
     ("serializer", serializer);
     ("BinOp", bin_op_intf);
     ("From", from_intf) ]
+
+let default_structs = [(builder_id, builder_struct_info)]

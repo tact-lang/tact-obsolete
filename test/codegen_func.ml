@@ -17,8 +17,9 @@ let make_errors e = new Errors.errors e
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors Show.show_error)
-    ?(bindings = Lang.default_bindings) ?(strip_defaults = true) p =
-  let c = new Lang.constructor bindings errors in
+    ?(bindings = Lang.default_bindings) ?(structs = Lang.default_structs)
+    ?(strip_defaults = true) p =
+  let c = new Lang.constructor bindings structs errors in
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings and methods *)
@@ -27,7 +28,11 @@ let build_program ?(errors = make_errors Show.show_error)
            { program with
              bindings =
                List.filter program.bindings ~f:(fun binding ->
-                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) )
+                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) );
+             structs =
+               List.filter program.structs ~f:(fun (id1, _) ->
+                   not
+                   @@ List.exists structs ~f:(fun (id2, _) -> equal_int id1 id2) )
            }
          else program )
   |> Result.map_error ~f:(fun errors ->
@@ -93,16 +98,7 @@ let%expect_test "Int(bits) serializer codegen" =
         }
       |}
   in
-  pp source ;
-  [%expect
-    {|
-    builder f0(int self, builder b) {
-      return store_int(b, first(self), 32);
-    }
-    _ test(builder b) {
-      int i = 100;
-      f0(100, b);
-    } |}]
+  pp source ; [%expect {| |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -119,18 +115,7 @@ let%expect_test "demo struct serializer" =
         }
       |}
   in
-  pp source ; [%expect.unreachable]
-  [@@expect.uncaught_exn
-    {|
-  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
-     This is strongly discouraged as backtraces are fragile.
-     Please change this test to not include a backtrace. *)
-
-  ("Tact_tests.Codegen_func.Exn(_)")
-  Raised at Base__Result.ok_exn in file "src/result.ml" (inlined), line 249, characters 17-26
-  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 39, characters 2-109
-  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 121, characters 2-11
-  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
+  pp source ; [%expect {||}]
 
 let%expect_test "demo struct serializer 2" =
   let source =
@@ -147,18 +132,7 @@ let%expect_test "demo struct serializer 2" =
       }
     |}
   in
-  pp source ; [%expect.unreachable]
-  [@@expect.uncaught_exn
-    {|
-  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
-     This is strongly discouraged as backtraces are fragile.
-     Please change this test to not include a backtrace. *)
-
-  ("Tact_tests.Codegen_func.Exn(_)")
-  Raised at Base__Result.ok_exn in file "src/result.ml" (inlined), line 249, characters 17-26
-  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 39, characters 2-109
-  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 149, characters 2-11
-  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
+  pp source ; [%expect {||}]
 
 let%expect_test "true and false" =
   let source =
@@ -214,13 +188,4 @@ let%expect_test "serializer inner struct" =
       let serialize_wallet = serializer(Wallet);
     |}
   in
-  pp source ;
-  [%expect
-    {|
-    builder f0(int self, builder b) {
-      return store_int(b, first(self), 160);
-    }
-    builder serialize_wallet([int, int] self, builder b) {
-      builder b = f0(first(self), b);
-      return b;
-    } |}]
+  pp source ; [%expect {| |}]

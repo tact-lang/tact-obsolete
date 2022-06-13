@@ -64,8 +64,8 @@ functor
           {function_params; function_returns}
       end
 
-    class ['s] constructor (bindings : (string * expr) list) (errors : _ errors)
-      =
+    class ['s] constructor (bindings : (string * expr) list)
+      (structs : (int * struct_) list) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
@@ -78,9 +78,10 @@ functor
         val mutable functions = 0
 
         (* TODO: can we remove duplicating bindings here and the above? *)
-        (* Program handle we pass to builtin functions *)
+        (* Program handle we pass to builtin functions. *)
+        (* IDs from 0 to 99 inlusevily is reserved for built-in structs. *)
         val mutable program =
-          {bindings; structs = []; struct_counter = 0; memoized_fcalls = []}
+          {bindings; structs; struct_counter = 100; memoized_fcalls = []}
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
