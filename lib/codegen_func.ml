@@ -136,16 +136,19 @@ class constructor (program : T.program) =
         F.FunctionCall (name, [struct_ty], field_ty)
       in
       match T.type_of from_expr with
-      (* TODO: return linealizing *)
-      | StructType s ->
+      | StructType s -> (
           let s = T.Program.get_struct program s in
-          let field_id, (_, field) =
-            Option.value_exn
-              (List.findi s.struct_fields ~f:(fun _ (name, _) ->
-                   equal_string name field ) )
-          in
-          build_access (self#cg_expr from_expr) field_id
-            (self#lang_type_to_type field.field_type)
+          match s.struct_fields with
+          | [_] ->
+              self#cg_expr from_expr
+          | _ ->
+              let field_id, (_, field) =
+                Option.value_exn
+                  (List.findi s.struct_fields ~f:(fun _ (name, _) ->
+                       equal_string name field ) )
+              in
+              build_access (self#cg_expr from_expr) field_id
+                (self#lang_type_to_type field.field_type) )
       | _ ->
           raise Invalid
 

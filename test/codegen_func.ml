@@ -18,7 +18,7 @@ let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors Show.show_error)
     ?(bindings = Lang.default_bindings) ?(structs = Lang.default_structs)
-    ?(strip_defaults = true) p =
+    ?(strip_defaults = false) p =
   let c = new Lang.constructor bindings structs errors in
   let p' = c#visit_program () p in
   errors#to_result p'
@@ -92,13 +92,22 @@ let%expect_test "function calls " =
 let%expect_test "Int(bits) serializer codegen" =
   let source =
     {|
-        fn test(b: Builder) {
+        fn test_int(b: Builder) {
           let i = Int(32).new(100);
           i.serialize(b);
         }
       |}
   in
-  pp source ; [%expect {| |}]
+  pp source ;
+  [%expect
+    {|
+    builder f0(int self, builder b) {
+      return store_int(b, self, 32);
+    }
+    _ test_int(builder b) {
+      int i = 100;
+      f0(100, b);
+    } |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -115,7 +124,24 @@ let%expect_test "demo struct serializer" =
         }
       |}
   in
-  pp source ; [%expect {||}]
+  pp source ;
+  [%expect
+    {|
+    builder f0(int self, builder b) {
+      return store_int(b, self, 32);
+    }
+    builder T_serializer([int, int] self, builder b) {
+      builder b = f0(first(self), b);
+      builder b = f0(second(self), b);
+      return b;
+    }
+    builder f1() {
+      return new_builder();
+    }
+    _ test() {
+      builder b = f1();
+      T_serializer([0, 1], b);
+    } |}]
 
 let%expect_test "demo struct serializer 2" =
   let source =
@@ -132,7 +158,24 @@ let%expect_test "demo struct serializer 2" =
       }
     |}
   in
-  pp source ; [%expect {||}]
+  pp source ;
+  [%expect
+    {|
+    builder f0(int self, builder b) {
+      return store_int(b, self, 32);
+    }
+    builder serialize_foo([int, int] self, builder b) {
+      builder b = f0(first(self), b);
+      builder b = f0(second(self), b);
+      return b;
+    }
+    builder f1() {
+      return new_builder();
+    }
+    builder test() {
+      builder b = f1();
+      return serialize_foo([0, 1], b);
+    } |}]
 
 let%expect_test "true and false" =
   let source =
@@ -188,4 +231,13 @@ let%expect_test "serializer inner struct" =
       let serialize_wallet = serializer(Wallet);
     |}
   in
-  pp source ; [%expect {| |}]
+  pp source ;
+  [%expect
+    {|
+    builder f0(int self, builder b) {
+      return store_int(b, self, 160);
+    }
+    builder serialize_wallet([int, int] self, builder b) {
+      builder b = f0(first(self), b);
+      return b;
+    } |}]
