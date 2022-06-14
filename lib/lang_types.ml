@@ -35,11 +35,14 @@ and binding_scope = Comptime of expr | Runtime of type_
 
 and program =
   { bindings : (string * expr) list;
-    mutable methods : (value * (string * function_) list) list; [@sexp.list]
-    mutable impls : (value * impl list) list [@sexp.list] }
+    mutable structs : (int * struct_) list;
+    mutable struct_counter : (int[@sexp.opaque]);
+    mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
+  }
 
 and expr =
   | FunctionCall of function_call
+  | MkStructDef of mk_struct
   | MakeUnionVariant of (expr * union)
   | Reference of (string * type_)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
@@ -55,7 +58,8 @@ and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 
 and value =
   | Void
-  | Struct of (struct_ * (string * expr) list)
+  | Struct of (int * (string * expr) list)
+  | StructDef of struct_
   | UnionVariant of (value * union)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
@@ -82,7 +86,7 @@ and type_ =
   | StringType
   | VoidType
   | BuiltinType of builtin
-  | StructType of struct_
+  | StructType of int
   | UnionType of union
   | FunctionType of function_signature
   | InterfaceType of interface
@@ -94,8 +98,17 @@ and type_ =
 
 and union = {cases : type_ list}
 
+and mk_struct =
+  { mk_struct_fields : (string * expr) list;
+    mk_methods : (string * function_) list;
+    mk_impls : impl list;
+    mk_struct_id : int }
+
 and struct_ =
-  {struct_fields : (string * struct_field) list; struct_id : (int[@sexp.opaque])}
+  { struct_fields : (string * struct_field) list;
+    struct_methods : (string * function_) list;
+    struct_impls : impl list;
+    struct_id : int }
 
 and struct_field = {field_type : type_}
 
@@ -165,8 +178,8 @@ let rec expr_to_type = function
       InvalidType expr
 
 let rec type_of = function
-  | Value (Struct (struct_, _)) ->
-      StructType struct_
+  | Value (Struct (sid, _)) ->
+      StructType sid
   | Value (Function {function_signature; _}) ->
       FunctionType function_signature
   | Value (Builtin builtin) ->
@@ -203,6 +216,8 @@ let rec type_of = function
       type_of e
   | MakeUnionVariant (_, u) ->
       UnionType u
+  | MkStructDef _ ->
+      type0
   | expr ->
       InvalidType expr
 
@@ -261,7 +276,7 @@ class ['s] primitive_presence =
 let has_primitives = (new primitive_presence)#visit_function_ ()
 
 class ['s] expr_immediacy_check =
-  object (_self : 's)
+  object (self : 's)
     inherit [_] boolean_reduce true as super
 
     val mutable in_function_call = 0
@@ -284,13 +299,15 @@ class ['s] expr_immediacy_check =
           in_function_call <- in_function_call - 1 ;
           result
 
-    method! visit_function_ _env f =
-      if in_function_call > 0 then
-        (* If we're calling this function, check if there are no primitives *)
-        not @@ has_primitives f
-      else
-        (* Any function is assumed to be immediate as it can be evaluated otherwise *)
-        true
+    method! visit_function_ env f =
+      self#plus
+        ( if in_function_call > 0 then
+          (* If we're calling this function, check if there are no primitives *)
+          not @@ has_primitives f
+        else
+          (* Any function is assumed to be immediate as it can be evaluated otherwise *)
+          true )
+        (super#visit_function_signature env f.function_signature)
   end
 
 let rec is_immediate_expr expr =
@@ -319,5 +336,42 @@ let find_in_runtime_scope : 'a. string -> (string * 'a) list list -> 'a option =
       List.find_map bindings ~f:(fun (name, value) ->
           if String.equal ref name then Some value else None ) )
 
-(* We declare the struct counter here to count all structs *)
-let struct_counter = ref 0
+let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+
+module Program = struct
+  let methods_of p = function
+    | StructType s ->
+        List.find_map_exn p.structs ~f:(fun (id, s') ->
+            if equal_int id s then Some s'.struct_methods else None )
+    | _ ->
+        []
+
+  let get_struct p s = List.Assoc.find_exn p.structs s ~equal:equal_int
+
+  let rec update_list id new_s = function
+    | [] ->
+        raise Errors.InternalCompilerError
+    | (xid, old_s) :: xs ->
+        if equal_int xid id then
+          match new_s with
+          | Ok new_s ->
+              (new_s.struct_id, new_s) :: xs
+          | Error _ ->
+              xs
+        else (xid, old_s) :: update_list id new_s xs
+
+  let with_struct p s f =
+    p.structs <- (s.struct_id, s) :: p.structs ;
+    let new_s = f () in
+    p.structs <- update_list s.struct_id new_s p.structs ;
+    new_s
+
+  (* Creates new struct id, calls function with this new id and then
+     places returning struct to the program.structs *)
+  let with_id p f =
+    let id = p.struct_counter in
+    p.struct_counter <- p.struct_counter + 1 ;
+    let new_s = f id in
+    p.structs <- (id, new_s) :: p.structs ;
+    new_s
+end

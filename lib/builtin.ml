@@ -1,14 +1,35 @@
 open Base
 open Lang_types
 
+(* If you add new built-in struct, increase previous struct id and add it below, from 0 up to 99. *)
+let builder_id = 0
+
 let builder = BuiltinType "Builder"
 
-let builder_methods =
-  let new_ =
-    { function_signature = {function_params = []; function_returns = builder};
-      function_impl = Fn (Some (Return (Primitive EmptyBuilder))) }
+let builder_struct_info =
+  let id = builder_id in
+  let builder_methods =
+    let new_ =
+      { function_signature =
+          {function_params = []; function_returns = StructType id};
+        function_impl =
+          Fn
+            (Some
+               (Return
+                  (Value (Struct (id, [("builder", Primitive EmptyBuilder)])))
+               ) ) }
+    in
+    [("new", new_)]
   in
-  [("new", new_)]
+  let builder_struct =
+    { struct_fields = [("builder", {field_type = builder})];
+      struct_methods = builder_methods;
+      struct_impls = [];
+      struct_id = id }
+  in
+  builder_struct
+
+let builder_struct = StructType builder_id
 
 let cell = Value (Type (BuiltinType "Cell"))
 
@@ -21,23 +42,25 @@ let int_type =
   let rec int_type_s p bits =
     let struct_id =
       Hashtbl.find_or_add struct_ids bits ~default:(fun () ->
-          let c = !struct_counter in
-          struct_counter := c + 1 ;
+          let c = p.struct_counter in
+          p.struct_counter <- c + 1 ;
           c )
     in
-    let s =
-      {struct_fields = [("integer", {field_type = IntegerType})]; struct_id}
-    in
+    let s_ty = struct_id in
     let methods =
-      [ ("new", int_type_s_new s bits);
-        ("serialize", int_type_s_serialize bits s) ]
+      [ ("new", int_type_s_new s_ty bits);
+        ("serialize", int_type_s_serialize bits s_ty) ]
     in
-    if
-      Option.is_none
-      @@ List.Assoc.find p.methods ~equal:equal_value (Type (StructType s))
-    then p.methods <- (Type (StructType s), methods) :: p.methods
+    let s =
+      { struct_fields = [("integer", {field_type = IntegerType})];
+        struct_methods = methods;
+        struct_impls = [];
+        struct_id }
+    in
+    if Option.is_none @@ List.Assoc.find p.structs ~equal:equal_int s_ty then
+      p.structs <- (s_ty, s) :: p.structs
     else () ;
-    s
+    s_ty
   and int_type_s_new self bits =
     let function_impl =
       Hashtbl.find_or_add int_constructor_funs bits ~default:(fun () ->
@@ -67,15 +90,17 @@ let int_type =
   and int_type_s_serialize bits s =
     let self = StructType s in
     { function_signature =
-        { function_params = [("self", self); ("b", builder)];
-          function_returns = builder };
+        { function_params = [("self", self); ("b", builder_struct)];
+          function_returns = builder_struct };
       function_impl =
         Fn
           (Some
              (Return
                 (Primitive
                    (StoreInt
-                      { builder = Reference ("b", builder);
+                      { builder =
+                          StructField
+                            (Reference ("b", builder_struct), "builder");
                         length = Value (Integer (Z.of_int bits));
                         integer =
                           StructField
@@ -99,33 +124,22 @@ let serializer =
     { function_params = [("t", type0)];
       function_returns =
         FunctionType
-          { function_params = [("t", HoleType); ("b", builder)];
-            function_returns = builder } }
+          { function_params = [("t", HoleType); ("b", builder_struct)];
+            function_returns = builder_struct } }
   in
-  let rec serializer_f s p =
+  let serializer_f s p =
+    let s = List.Assoc.find_exn p.structs s ~equal:equal_int in
     let calls =
       List.filter_map s.struct_fields ~f:(function name, {field_type = f} ->
-          let methods =
-            List.Assoc.find_exn p.methods ~equal:equal_value (Type f)
-          in
           let serialize_field =
-            match List.Assoc.find methods ~equal:String.equal "serialize" with
+            match
+              List.Assoc.find (Program.methods_of p f) ~equal:String.equal
+                "serialize"
+            with
             | Some m ->
                 Some m
-            | None -> (
-              match f with
-              | StructType t ->
-                  let m = serializer_f t p in
-                  p.methods <-
-                    List.map p.methods ~f:(fun (s, methods) ->
-                        match equal_value s (Type (StructType t)) with
-                        | true ->
-                            (s, ("serializer", m) :: methods)
-                        | false ->
-                            (s, methods) ) ;
-                  Some m
-              | _ ->
-                  None )
+            | None ->
+                None
           in
           serialize_field
           |> Option.map ~f:(fun method_ ->
@@ -133,13 +147,15 @@ let serializer =
                    [ ( "b",
                        FunctionCall
                          ( Value (Function method_),
-                           StructField (Reference ("self", StructType s), name)
-                           :: [Reference ("b", builder)] ) ) ] ) )
+                           StructField
+                             (Reference ("self", StructType s.struct_id), name)
+                           :: [Reference ("b", builder_struct)] ) ) ] ) )
     in
-    let body = Block (calls @ [Return (Reference ("b", builder))]) in
+    let body = Block (calls @ [Return (Reference ("b", builder_struct))]) in
     { function_signature =
-        { function_params = [("self", StructType s); ("b", builder)];
-          function_returns = builder };
+        { function_params =
+            [("self", StructType s.struct_id); ("b", builder_struct)];
+          function_returns = builder_struct };
       function_impl = Fn (Some body) }
   in
   let function_impl p = function
@@ -183,7 +199,7 @@ let from_intf =
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
 let default_bindings =
-  [ ("Builder", Value (Type builder));
+  [ ("Builder", Value (Type builder_struct));
     ("Integer", Value (Type IntegerType));
     ("Int", int_type);
     ("Bool", Value (Type BoolType));
@@ -196,4 +212,4 @@ let default_bindings =
     ("BinOp", bin_op_intf);
     ("From", from_intf) ]
 
-let default_methods = [(Type (BuiltinType "Builder"), builder_methods)]
+let default_structs = [(builder_id, builder_struct_info)]

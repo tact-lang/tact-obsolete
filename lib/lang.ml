@@ -12,7 +12,7 @@ functor
     module Syntax = Syntax.Make (Config)
 
     type error =
-      [ `DuplicateField of string * struct_
+      [ `DuplicateField of string * mk_struct
       | `UnresolvedIdentifier of string
       | `MethodNotFound of expr * string
       | `UnexpectedType of type_
@@ -65,7 +65,7 @@ functor
       end
 
     class ['s] constructor (bindings : (string * expr) list)
-      (methods : (value * (string * function_) list) list) (errors : _ errors) =
+      (structs : (int * struct_) list) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
@@ -78,8 +78,10 @@ functor
         val mutable functions = 0
 
         (* TODO: can we remove duplicating bindings here and the above? *)
-        (* Program handle we pass to builtin functions *)
-        val program = {bindings; methods; impls = []}
+        (* Program handle we pass to builtin functions. *)
+        (* IDs from 0 to 99 inlusevily is reserved for built-in structs. *)
+        val mutable program =
+          {bindings; structs; struct_counter = 100; memoized_fcalls = []}
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
@@ -121,7 +123,8 @@ functor
                       new interpreter
                         (program, current_bindings, errors, functions)
                     in
-                    Value (inter#interpret_fc fc)
+                    let fc = inter#interpret_fc fc in
+                    Value fc
                   else FunctionCall fc
               | _ ->
                   Value Void )
@@ -219,7 +222,7 @@ functor
           | stmt ->
               Break stmt
 
-        method build_Struct _env s = Value (Type (StructType s))
+        method build_Struct _env s = MkStructDef s
 
         method build_StructConstructor _env sc = Value (Struct sc)
 
@@ -267,55 +270,27 @@ functor
                    } ),
               [] )
           in
+          let make_call receiver ~mk_args =
+            let receiver' = Value (Type (StructType receiver)) in
+            match
+              (Program.get_struct program receiver).struct_methods
+              |> fun ms -> List.Assoc.find ms fn ~equal:String.equal
+            with
+            | Some fn' ->
+                ( ResolvedReference (fn, Value (Function fn')),
+                  mk_args (s#of_located_list args) )
+            | None ->
+                errors#report `Error (`MethodNotFound (receiver', fn)) () ;
+                dummy
+          in
           (* TODO: check method signatures *)
           match receiver with
-          | ResolvedReference (_, Value (Type ty)) | Value (Type ty) -> (
-              let receiver' = Value (Type ty) in
-              let methods =
-                List.Assoc.find program.methods ~equal:equal_value (Type ty)
-              in
-              match
-                Option.bind methods ~f:(fun methods ->
-                    List.Assoc.find methods ~equal:String.equal fn )
-              with
-              | Some fn' ->
-                  ( ResolvedReference (fn, Value (Function fn')),
-                    s#of_located_list args )
-              | None ->
-                  errors#report `Error (`MethodNotFound (receiver', fn)) () ;
-                  dummy )
-          | ResolvedReference (_, Value (Struct (struct', _)))
-          | Value (Struct (struct', _)) -> (
-              let receiver' = Value (Type (StructType struct')) in
-              let methods =
-                List.Assoc.find program.methods ~equal:equal_value
-                  (Type (StructType struct'))
-              in
-              match
-                Option.bind methods ~f:(fun methods ->
-                    List.Assoc.find methods ~equal:String.equal fn )
-              with
-              | Some fn' ->
-                  ( ResolvedReference (fn, Value (Function fn')),
-                    receiver :: s#of_located_list args )
-              | None ->
-                  errors#report `Error (`MethodNotFound (receiver', fn)) () ;
-                  dummy )
-          | ResolvedReference (_, Value v) | Value v -> (
-              let receiver' = Value v in
-              let methods =
-                List.Assoc.find program.methods ~equal:equal_value v
-              in
-              match
-                Option.bind methods ~f:(fun methods ->
-                    List.Assoc.find methods ~equal:String.equal fn )
-              with
-              | Some fn' ->
-                  ( ResolvedReference (fn, Value (Function fn')),
-                    receiver :: s#of_located_list args )
-              | None ->
-                  errors#report `Error (`MethodNotFound (receiver', fn)) () ;
-                  dummy )
+          | ResolvedReference (_, Value (Type (StructType st)))
+          | Value (Type (StructType st)) ->
+              make_call st ~mk_args:(fun x -> x)
+          | ResolvedReference (_, Value (Struct (st, _)))
+          | Value (Struct (st, _)) ->
+              make_call st ~mk_args:(fun args -> receiver :: args)
           | receiver' ->
               errors#report `Error (`UnexpectedType (type_of receiver')) () ;
               dummy
@@ -407,46 +382,11 @@ functor
                     (Syntax.value name, Syntax.value expr) ) )
           | e ->
               errors#report `Error (`UnexpectedType (type_of e)) () ;
-              ({struct_fields = []; struct_id = 0}, [])
+              (-1, [])
 
-        method build_struct_definition _env struct_fields _bindings _intfs =
-          let struct_fields = s#of_located_list struct_fields in
-          let s' = {struct_fields; struct_id = !struct_counter} in
-          (* Check for duplicate fields *)
-          ( match
-              List.find_a_dup struct_fields
-                ~compare:(fun (name1, _) (name2, _) ->
-                  String.compare name1 name2 )
-            with
-          | Some (name, _) ->
-              errors#report `Error (`DuplicateField (name, s')) ()
-          | None ->
-              () ) ;
-          (* Increment next struct's ID *)
-          struct_counter := !struct_counter + 1 ;
-          s'
-
-        method! visit_struct_definition env _visitors_this =
-          let _visitors_r0 =
-            s#visit_list
-              (s#visit_located s#visit_struct_field)
-              env _visitors_this.fields
-          in
-          let struct_ = s#build_struct_definition env _visitors_r0 [] [] in
-          let bindings =
-            s#with_bindings
-              [make_comptime ("Self", Value (Type (StructType struct_)))]
-              (fun _ ->
-                s#visit_list
-                  (s#visit_located s#visit_binding)
-                  env _visitors_this.struct_bindings )
-          in
-          let impls =
-            s#with_bindings
-              [make_comptime ("Self", Value (Type (StructType struct_)))]
-              (fun _ -> s#visit_list s#visit_impl env _visitors_this.impls)
-          in
-          let struct_methods =
+        method build_struct_definition _env struct_fields bindings impls =
+          let mk_struct_fields = s#of_located_list struct_fields in
+          let mk_methods =
             List.filter_map bindings ~f:(fun binding ->
                 let name, expr = Syntax.value binding in
                 match expr with
@@ -465,15 +405,73 @@ functor
                        | _ ->
                            None ) ) )
           in
-          program.methods <-
-            (Type (StructType struct_), struct_methods @ impl_methods)
-            :: program.methods ;
-          program.impls <- (Type (StructType struct_), impls) :: program.impls ;
-          struct_
+          let s' =
+            { mk_struct_fields;
+              mk_methods = mk_methods @ impl_methods;
+              mk_impls = impls;
+              mk_struct_id = -1 }
+          in
+          (* Check for duplicate fields *)
+          ( match
+              List.find_a_dup mk_struct_fields
+                ~compare:(fun (name1, _) (name2, _) ->
+                  String.compare name1 name2 )
+            with
+          | Some (name, _) ->
+              errors#report `Error (`DuplicateField (name, s')) ()
+          | None ->
+              () ) ;
+          s'
 
-        method build_struct_field _env field_name field_type =
-          ( Syntax.value field_name,
-            {field_type = expr_to_type (Syntax.value field_type)} )
+        method! visit_struct_definition env syn_struct_def =
+          let fields =
+            s#visit_list
+              (s#visit_located s#visit_struct_field)
+              env syn_struct_def.fields
+          in
+          let struct_ =
+            { struct_fields =
+                List.map (s#of_located_list fields) ~f:(fun (name, expr) ->
+                    (name, {field_type = ExprType expr}) );
+              struct_methods = [];
+              struct_impls = [];
+              struct_id = program.struct_counter }
+          in
+          program.struct_counter <- program.struct_counter + 1 ;
+          let mk_struct =
+            Program.with_struct program struct_ (fun _ ->
+                let methods =
+                  s#with_bindings
+                    [ make_comptime
+                        ("Self", Value (Type (StructType struct_.struct_id))) ]
+                    (fun _ ->
+                      s#visit_list
+                        (s#visit_located s#visit_binding)
+                        env syn_struct_def.struct_bindings )
+                in
+                let impls =
+                  s#with_bindings
+                    [ make_comptime
+                        ("Self", Value (Type (StructType struct_.struct_id))) ]
+                    (fun _ -> s#visit_list s#visit_impl env syn_struct_def.impls)
+                in
+                let mk_struct =
+                  s#build_struct_definition env fields methods impls
+                in
+                Error {mk_struct with mk_struct_id = struct_.struct_id} )
+          in
+          let mk_struct =
+            match mk_struct with
+            | Error mk ->
+                mk
+            | Ok _ ->
+                raise InternalCompilerError
+          in
+          mk_struct
+
+        method build_struct_field : _ -> _ -> _ -> string * expr =
+          fun _env field_name field_type ->
+            (Syntax.value field_name, Syntax.value field_type)
 
         method build_union_definition _env members _bindings =
           {cases = List.map (s#of_located_list members) ~f:expr_to_type}

@@ -17,9 +17,9 @@ let make_errors e = new Errors.errors e
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors Show.show_error)
-    ?(bindings = Lang.default_bindings) ?(methods = Lang.default_methods)
-    ?(strip_defaults = true) p =
-  let c = new Lang.constructor bindings methods errors in
+    ?(bindings = Lang.default_bindings) ?(structs = Lang.default_structs)
+    ?(strip_defaults = false) p =
+  let c = new Lang.constructor bindings structs errors in
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings and methods *)
@@ -29,16 +29,11 @@ let build_program ?(errors = make_errors Show.show_error)
              bindings =
                List.filter program.bindings ~f:(fun binding ->
                    not @@ List.exists bindings ~f:(Lang.equal_binding binding) );
-             methods =
-               List.filter program.methods ~f:(fun (rcvr, rmethods) ->
+             structs =
+               List.filter program.structs ~f:(fun (id1, _) ->
                    not
-                   @@ List.exists methods ~f:(fun (rcvr', rmethods') ->
-                          Lang.equal_value rcvr' rcvr
-                          && List.equal
-                               (fun (name, value) (name', value') ->
-                                 String.equal name' name
-                                 && Lang.equal_function_ value' value )
-                               rmethods' rmethods ) ) }
+                   @@ List.exists structs ~f:(fun (id2, _) -> equal_int id1 id2) )
+           }
          else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> (err, p')) )
@@ -97,7 +92,7 @@ let%expect_test "function calls " =
 let%expect_test "Int(bits) serializer codegen" =
   let source =
     {|
-        fn test(b: Builder) {
+        fn test_int(b: Builder) {
           let i = Int(32).new(100);
           i.serialize(b);
         }
@@ -109,7 +104,7 @@ let%expect_test "Int(bits) serializer codegen" =
     builder f0(int self, builder b) {
       return store_int(b, self, 32);
     }
-    _ test(builder b) {
+    _ test_int(builder b) {
       int i = 100;
       f0(100, b);
     } |}]
@@ -135,19 +130,16 @@ let%expect_test "demo struct serializer" =
     builder f0(int self, builder b) {
       return store_int(b, self, 32);
     }
-    builder f1(int self, builder b) {
-      return store_int(b, self, 16);
-    }
     builder T_serializer([int, int] self, builder b) {
       builder b = f0(first(self), b);
-      builder b = f1(second(self), b);
+      builder b = f0(second(self), b);
       return b;
     }
-    builder f2() {
+    builder f1() {
       return new_builder();
     }
     _ test() {
-      builder b = f2();
+      builder b = f1();
       T_serializer([0, 1], b);
     } |}]
 
@@ -172,19 +164,16 @@ let%expect_test "demo struct serializer 2" =
     builder f0(int self, builder b) {
       return store_int(b, self, 32);
     }
-    builder f1(int self, builder b) {
-      return store_int(b, self, 16);
-    }
     builder serialize_foo([int, int] self, builder b) {
       builder b = f0(first(self), b);
-      builder b = f1(second(self), b);
+      builder b = f0(second(self), b);
       return b;
     }
-    builder f2() {
+    builder f1() {
       return new_builder();
     }
     builder test() {
-      builder b = f2();
+      builder b = f1();
       return serialize_foo([0, 1], b);
     } |}]
 
@@ -246,17 +235,9 @@ let%expect_test "serializer inner struct" =
   [%expect
     {|
     builder f0(int self, builder b) {
-      return store_int(b, self, 32);
-    }
-    builder f2(int self, builder b) {
       return store_int(b, self, 160);
-    }
-    builder f1(int self, builder b) {
-      builder b = f2(self, b);
-      return b;
     }
     builder serialize_wallet([int, int] self, builder b) {
       builder b = f0(first(self), b);
-      builder b = f1(second(self), b);
       return b;
     } |}]

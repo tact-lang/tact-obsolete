@@ -19,9 +19,9 @@ let make_errors e = new Errors.errors e
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors Show.show_error)
-    ?(bindings = Lang.default_bindings) ?(methods = Lang.default_methods)
+    ?(bindings = Lang.default_bindings) ?(structs = Lang.default_structs)
     ?(strip_defaults = true) p =
-  let c = new Lang.constructor bindings methods errors in
+  let c = new Lang.constructor bindings structs errors in
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings and methods *)
@@ -31,16 +31,11 @@ let build_program ?(errors = make_errors Show.show_error)
              bindings =
                List.filter program.bindings ~f:(fun binding ->
                    not @@ List.exists bindings ~f:(Lang.equal_binding binding) );
-             methods =
-               List.filter program.methods ~f:(fun (rcvr, rmethods) ->
+             structs =
+               List.filter program.structs ~f:(fun (id1, _) ->
                    not
-                   @@ List.exists methods ~f:(fun (rcvr', rmethods') ->
-                          Lang.equal_value rcvr' rcvr
-                          && List.equal
-                               (fun (name, value) (name', value') ->
-                                 String.equal name' name
-                                 && Lang.equal_function_ value' value )
-                               rmethods' rmethods ) ) }
+                   @@ List.exists structs ~f:(fun (id2, _) -> equal_int id1 id2) )
+           }
          else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> (err, p')) )
