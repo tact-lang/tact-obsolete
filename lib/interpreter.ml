@@ -7,7 +7,8 @@ type error =
   | `UninterpretableStatement of stmt
   | `UnexpectedType of type_
   | `FieldNotFound of int * string
-  | `ArgumentNumberMismatch ]
+  | `ArgumentNumberMismatch
+  | `DuplicateVariant of type_ ]
 [@@deriving equal, sexp_of]
 
 class ['s] struct_updater (old : int) (new_s : int) =
@@ -16,6 +17,22 @@ class ['s] struct_updater (old : int) (new_s : int) =
 
     method! visit_StructType _ s =
       if equal_int s old then StructType new_s else StructType s
+  end
+
+class ['s] union_updater (old : int) (new_s : int) =
+  object
+    inherit ['s] map
+
+    method! visit_UnionType _ s =
+      if equal_int s old then UnionType new_s else UnionType s
+
+    method! visit_UnionVariant _ (expr, s) =
+      if equal_int s old then UnionVariant (expr, new_s)
+      else UnionVariant (expr, s)
+
+    method! visit_MakeUnionVariant _ (expr, s) =
+      if equal_int s old then MakeUnionVariant (expr, new_s)
+      else MakeUnionVariant (expr, s)
   end
 
 let get_memoized_or_execute p (f, args) ~execute =
@@ -171,18 +188,66 @@ class interpreter
               match s with Ok t -> t | Error _ -> raise InternalCompilerError
             in
             Type (StructType struct_ty)
+        | MkUnionDef mk_union ->
+            let compose f g x = g (f x) in
+            let cases =
+              List.map mk_union.mk_cases
+                ~f:
+                  (compose self#interpret_expr (fun x -> expr_to_type (Value x)))
+              |> self#check_unions_for_doubled_types
+            in
+            let union =
+              Program.with_union_id program
+                (fun id ->
+                  { cases =
+                      Discriminator.LocalDiscriminators.choose_discriminators ()
+                        id cases;
+                    union_methods = [];
+                    union_impls = [];
+                    union_id = id } )
+                (fun u_base ->
+                  let union_updater =
+                    new union_updater mk_union.mk_union_id u_base.union_id
+                  in
+                  let union_methods =
+                    List.map mk_union.mk_union_methods ~f:(fun (name, fn) ->
+                        let prev_scope = vars_scope in
+                        vars_scope <-
+                          [("Self", Type (UnionType u_base.union_id))]
+                          :: vars_scope ;
+                        let output =
+                          self#interpret_function
+                            (union_updater#visit_function_ () fn)
+                        in
+                        vars_scope <- prev_scope ;
+                        (name, output) )
+                  in
+                  let union_impls =
+                    List.map mk_union.mk_union_impls ~f:(fun impl ->
+                        { impl_interface =
+                            Value (self#interpret_expr impl.impl_interface);
+                          impl_methods =
+                            List.map impl.impl_methods ~f:(fun (n, x) ->
+                                ( n,
+                                  Value
+                                    (self#interpret_expr
+                                       (union_updater#visit_expr () x) ) ) ) } )
+                  in
+                  Ok
+                    { cases = u_base.cases;
+                      union_methods;
+                      union_impls;
+                      union_id = u_base.union_id } )
+              |> Result.ok_exn
+            in
+            Type (UnionType union.union_id)
         | Primitive _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
     method interpret_type : type_ -> type_ =
       function
-      | ExprType ex ->
-          expr_to_type (Value (self#interpret_expr ex))
-      | UnionType u ->
-          UnionType {cases = List.map u.cases ~f:self#interpret_type}
-      | ty ->
-          ty
+      | ExprType ex -> expr_to_type (Value (self#interpret_expr ex)) | ty -> ty
 
     (* TBD: previously we defined value as "atom" which cannot be interpreted, but below
        we interpret values. Should we move `Type`, `Struct` and `Function` to the `expr` type?*)
@@ -284,4 +349,14 @@ class interpreter
             Some v
         | None ->
             None
+
+    method private check_unions_for_doubled_types : type_ list -> type_ list =
+      fun xs ->
+        List.fold xs ~init:[] ~f:(fun acc x ->
+            match List.exists acc ~f:(equal_type_ x) with
+            | true ->
+                errors#report `Error (`DuplicateVariant x) () ;
+                acc
+            | false ->
+                x :: acc )
   end

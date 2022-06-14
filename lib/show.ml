@@ -71,6 +71,9 @@ functor
     let show_error : error -> string = function
       | `DuplicateField (field, _) ->
           Printf.sprintf "Duplicate field `%s`." field
+      | `DuplicateVariant ty ->
+          Printf.sprintf "Duplicate variant with type `%s`."
+            (format_to_string ty pp_type)
       | `UnresolvedIdentifier id ->
           Printf.sprintf "Unresolved identifier `%s`." id
       | `MethodNotFound (e, m) ->

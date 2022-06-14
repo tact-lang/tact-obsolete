@@ -31,7 +31,8 @@
   codegen_func
   show
   compiler
-  type_check)
+  type_check
+  discriminator)
  (name tact))
 
 (ocamllex asm_lexer)

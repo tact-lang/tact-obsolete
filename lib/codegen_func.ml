@@ -61,8 +61,26 @@ class constructor (program : T.program) =
               F.FunctionCall (name, args, f.function_returns)
           | _ ->
               raise Invalid )
+      | MakeUnionVariant (expr, union) ->
+          self#cg_union_variant expr union
+      | Value (UnionVariant (v, u)) ->
+          self#cg_union_variant (Value v) u
       | _ ->
           raise Unsupported
+
+    method cg_union_variant expr union =
+      (* FIXME: actually, ExprType should not be here, this is bug. It is flows from
+         `Lang.constructor.(#make_from_impls)` fn but I do not know why it does not
+         handled in the interpreter. *)
+      let e_ty =
+        match T.type_of expr with ExprType (Value (Type t)) -> t | ty -> ty
+      in
+      let expr = self#cg_expr expr in
+      let union = List.Assoc.find_exn program.unions union ~equal:equal_int in
+      let (T.Discriminator discr) =
+        List.Assoc.find_exn union.cases e_ty ~equal:T.equal_type_
+      in
+      F.Tuple [F.Integer (Z.of_int discr); expr]
 
     method cg_stmt : T.stmt -> F.stmt =
       function
@@ -107,7 +125,7 @@ class constructor (program : T.program) =
       fun name -> function
         | Value (Function f) -> (
           try Some (F.Function (self#add_function f ~name:(Some name)))
-          with _ -> None )
+          with ex -> if equal_string name "test_try" then raise ex else None )
         | _ ->
             None
 
@@ -183,12 +201,28 @@ class constructor (program : T.program) =
           F.IntType
       | StructType s ->
           self#struct_to_ty (T.Program.get_struct program s)
+      | UnionType u ->
+          self#create_ty_from_union
+            (List.Assoc.find_exn program.unions u ~equal:equal_int)
       | BuiltinType "Builder" ->
           F.BuilderType
       | BuiltinType "Cell" ->
           F.CellType
       | HoleType ->
           F.InferType
+      (* FIXME: actually, ExprType should not be here, this is bug. It is flows from
+         `Lang.constructor.(#make_from_impls)` fn but I do not know why it does not
+         handled in the interpreter. *)
+      | ExprType ex ->
+          let inter =
+            new Interpreter.interpreter
+              ( program,
+                [List.map program.bindings ~f:T.make_comptime],
+                new Errors.errors (fun _ -> ""),
+                0 )
+          in
+          self#lang_type_to_type @@ T.expr_to_type
+          @@ Value (inter#interpret_expr ex)
       | _ ->
           raise Invalid
 
@@ -215,6 +249,9 @@ class constructor (program : T.program) =
                 self#lang_type_to_type field_type )
           in
           TupleType types
+
+    method private create_ty_from_union : T.union -> F.type_ =
+      function _ -> UnknownTuple
 
     method private add_function
         : ?name:string option -> T.function_ -> F.function_ =

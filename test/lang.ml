@@ -1444,13 +1444,18 @@ let%expect_test "TypeN" =
             (struct_impls ()) (struct_id 0)))))
         (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
-let%expect_test "unions" =
+let%expect_test "union variants constructing" =
   let source =
     {|
-      union Test {
-        case Int(257)
-        case Int(64)
+      union Uni {
+        case Integer
+        case Int(32)
       }
+      fn test(value: Uni) -> Uni {
+        value
+      }
+      let a = test(10);
+      let b = test(Int(32).new(1));
     |}
   in
   pp source ;
@@ -1458,8 +1463,418 @@ let%expect_test "unions" =
     {|
     (Ok
      ((bindings
-       ((Test
-         (Value (Type (UnionType ((cases ((StructType 100) (StructType 101))))))))))
+       ((b
+         (Value
+          (UnionVariant ((Struct (100 ((integer (Value (Integer 1)))))) 101))))
+        (a (Value (UnionVariant ((Integer 10) 101))))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((value (UnionType 101))))
+              (function_returns (UnionType 101))))
+            (function_impl
+             (Fn ((Block ((Break (Expr (Reference (value (UnionType 101))))))))))))))
+        (Uni (Value (Type (UnionType 101))))))
+      (structs
+       ((100
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 100))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params ((self (StructType 100)) (b (StructType 0))))
+                (function_returns (StructType 0))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt
+                    (builder
+                     (StructField ((Reference (b (StructType 0))) builder)))
+                    (length (Value (Integer 32)))
+                    (integer
+                     (StructField ((Reference (self (StructType 100))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 100)))))
+      (unions
+       ((101
+         ((cases
+           (((StructType 100) (Discriminator 0)) (IntegerType (Discriminator 1))))
+          (union_methods ())
+          (union_impls
+           (((impl_interface
+              (Value
+               (Type
+                (InterfaceType
+                 ((interface_methods
+                   ((from
+                     ((function_params ((from IntegerType)))
+                      (function_returns SelfType))))))))))
+             (impl_methods
+              ((from
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((v IntegerType)))
+                     (function_returns (UnionType 101))))
+                   (function_impl
+                    (Fn
+                     ((Return
+                       (MakeUnionVariant
+                        ((Reference (v (ExprType (Value (Type IntegerType)))))
+                         101)))))))))))))
+            ((impl_interface
+              (Value
+               (Type
+                (InterfaceType
+                 ((interface_methods
+                   ((from
+                     ((function_params ((from (StructType 100))))
+                      (function_returns SelfType))))))))))
+             (impl_methods
+              ((from
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((v (StructType 100))))
+                     (function_returns (UnionType 101))))
+                   (function_impl
+                    (Fn
+                     ((Return
+                       (MakeUnionVariant
+                        ((Reference
+                          (v (ExprType (Value (Type (StructType 100))))))
+                         101)))))))))))))))
+          (union_id 101)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+
+let%expect_test "unions duplicate variant" =
+  let source =
+    {|
+      fn Test(T: Type) {
+        union {
+          case Integer
+          case T
+        }
+      }
+      let a = Test(Builder); // should be OK
+      let b = Test(Integer); // should fail
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Error
+     (((DuplicateVariant IntegerType)
+       ((bindings
+         ((b (Value (Type (UnionType 102)))) (a (Value (Type (UnionType 101))))
+          (Test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0))))
+                (function_returns
+                 (InvalidType
+                  (MkUnionDef
+                   ((mk_cases
+                     ((ResolvedReference (Integer <opaque>))
+                      (Value (Type (Dependent T (TypeN 0))))))
+                    (mk_union_methods ())
+                    (mk_union_impls
+                     (((impl_interface
+                        (FunctionCall
+                         ((Value
+                           (Function
+                            ((function_signature
+                              ((function_params ((T (TypeN 0))))
+                               (function_returns HoleType)))
+                             (function_impl (BuiltinFn (<fun> <opaque>))))))
+                          ((Value
+                            (Type
+                             (ExprType (ResolvedReference (Integer <opaque>)))))))))
+                       (impl_methods
+                        ((from
+                          (Value
+                           (Function
+                            ((function_signature
+                              ((function_params
+                                ((v
+                                  (ExprType
+                                   (ResolvedReference (Integer <opaque>))))))
+                               (function_returns (UnionType 100))))
+                             (function_impl
+                              (Fn
+                               ((Return
+                                 (MakeUnionVariant
+                                  ((Value
+                                    (Type
+                                     (ExprType
+                                      (Reference
+                                       (v
+                                        (ExprType
+                                         (ResolvedReference (Integer <opaque>))))))))
+                                   100)))))))))))))
+                      ((impl_interface
+                        (FunctionCall
+                         ((Value
+                           (Function
+                            ((function_signature
+                              ((function_params ((T (TypeN 0))))
+                               (function_returns HoleType)))
+                             (function_impl (BuiltinFn (<fun> <opaque>))))))
+                          ((Value (Type (Dependent T (TypeN 0))))))))
+                       (impl_methods
+                        ((from
+                          (Value
+                           (Function
+                            ((function_signature
+                              ((function_params ((v (Dependent T (TypeN 0)))))
+                               (function_returns (UnionType 100))))
+                             (function_impl
+                              (Fn
+                               ((Return
+                                 (MakeUnionVariant
+                                  ((Value
+                                    (Type
+                                     (ExprType
+                                      (Reference
+                                       (v (ExprType (Reference (T (TypeN 0)))))))))
+                                   100)))))))))))))))
+                    (mk_union_id 100)))))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Break
+                    (Expr
+                     (MkUnionDef
+                      ((mk_cases
+                        ((ResolvedReference (Integer <opaque>))
+                         (Reference (T (TypeN 0)))))
+                       (mk_union_methods ())
+                       (mk_union_impls
+                        (((impl_interface
+                           (FunctionCall
+                            ((Value
+                              (Function
+                               ((function_signature
+                                 ((function_params ((T (TypeN 0))))
+                                  (function_returns HoleType)))
+                                (function_impl (BuiltinFn (<fun> <opaque>))))))
+                             ((Value
+                               (Type
+                                (ExprType (ResolvedReference (Integer <opaque>)))))))))
+                          (impl_methods
+                           ((from
+                             (Value
+                              (Function
+                               ((function_signature
+                                 ((function_params
+                                   ((v
+                                     (ExprType
+                                      (ResolvedReference (Integer <opaque>))))))
+                                  (function_returns (UnionType 100))))
+                                (function_impl
+                                 (Fn
+                                  ((Return
+                                    (MakeUnionVariant
+                                     ((Reference
+                                       (v
+                                        (ExprType
+                                         (ResolvedReference (Integer <opaque>)))))
+                                      100)))))))))))))
+                         ((impl_interface
+                           (FunctionCall
+                            ((Value
+                              (Function
+                               ((function_signature
+                                 ((function_params ((T (TypeN 0))))
+                                  (function_returns HoleType)))
+                                (function_impl (BuiltinFn (<fun> <opaque>))))))
+                             ((Value (Type (ExprType (Reference (T (TypeN 0))))))))))
+                          (impl_methods
+                           ((from
+                             (Value
+                              (Function
+                               ((function_signature
+                                 ((function_params
+                                   ((v (ExprType (Reference (T (TypeN 0)))))))
+                                  (function_returns (UnionType 100))))
+                                (function_impl
+                                 (Fn
+                                  ((Return
+                                    (MakeUnionVariant
+                                     ((Reference
+                                       (v (ExprType (Reference (T (TypeN 0))))))
+                                      100)))))))))))))))
+                       (mk_union_id 100))))))))))))))
+          (Builder (Value (Type (StructType 0))))
+          (Integer (Value (Type IntegerType)))
+          (Int
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((bits IntegerType)))
+                (function_returns (TypeN 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
+          (Void (Value Void))
+          (serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (TypeN 0))))
+                (function_returns
+                 (FunctionType
+                  ((function_params ((t HoleType) (b (StructType 0))))
+                   (function_returns (StructType 0)))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (BinOp
+           (Value
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+        (structs
+         ((0
+           ((struct_fields ((builder ((field_type (BuiltinType Builder))))))
+            (struct_methods
+             ((new
+               ((function_signature
+                 ((function_params ()) (function_returns (StructType 0))))
+                (function_impl
+                 (Fn
+                  ((Return
+                    (Value (Struct (0 ((builder (Primitive EmptyBuilder))))))))))))))
+            (struct_impls ()) (struct_id 0)))))
+        (unions
+         ((102
+           ((cases ((IntegerType (Discriminator 0)))) (union_methods ())
+            (union_impls
+             (((impl_interface
+                (Value
+                 (Type
+                  (InterfaceType
+                   ((interface_methods
+                     ((from
+                       ((function_params ((from IntegerType)))
+                        (function_returns SelfType))))))))))
+               (impl_methods
+                ((from
+                  (Value
+                   (Function
+                    ((function_signature
+                      ((function_params ((v IntegerType)))
+                       (function_returns (UnionType 102))))
+                     (function_impl
+                      (Fn
+                       ((Return
+                         (MakeUnionVariant
+                          ((Reference
+                            (v (ExprType (ResolvedReference (Integer <opaque>)))))
+                           102)))))))))))))
+              ((impl_interface
+                (Value
+                 (Type
+                  (InterfaceType
+                   ((interface_methods
+                     ((from
+                       ((function_params ((from IntegerType)))
+                        (function_returns SelfType))))))))))
+               (impl_methods
+                ((from
+                  (Value
+                   (Function
+                    ((function_signature
+                      ((function_params ((v IntegerType)))
+                       (function_returns (UnionType 102))))
+                     (function_impl
+                      (Fn
+                       ((Return
+                         (MakeUnionVariant
+                          ((Reference (v (ExprType (Reference (T (TypeN 0))))))
+                           102)))))))))))))))
+            (union_id 102)))
+          (101
+           ((cases
+             (((StructType 0) (Discriminator 0)) (IntegerType (Discriminator 1))))
+            (union_methods ())
+            (union_impls
+             (((impl_interface
+                (Value
+                 (Type
+                  (InterfaceType
+                   ((interface_methods
+                     ((from
+                       ((function_params ((from IntegerType)))
+                        (function_returns SelfType))))))))))
+               (impl_methods
+                ((from
+                  (Value
+                   (Function
+                    ((function_signature
+                      ((function_params ((v IntegerType)))
+                       (function_returns (UnionType 101))))
+                     (function_impl
+                      (Fn
+                       ((Return
+                         (MakeUnionVariant
+                          ((Reference
+                            (v (ExprType (ResolvedReference (Integer <opaque>)))))
+                           101)))))))))))))
+              ((impl_interface
+                (Value
+                 (Type
+                  (InterfaceType
+                   ((interface_methods
+                     ((from
+                       ((function_params ((from (StructType 0))))
+                        (function_returns SelfType))))))))))
+               (impl_methods
+                ((from
+                  (Value
+                   (Function
+                    ((function_signature
+                      ((function_params ((v (StructType 0))))
+                       (function_returns (UnionType 101))))
+                     (function_impl
+                      (Fn
+                       ((Return
+                         (MakeUnionVariant
+                          ((Reference (v (ExprType (Reference (T (TypeN 0))))))
+                           101)))))))))))))))
+            (union_id 101)))))
+        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
+
+let%expect_test "unions" =
+  let source =
+    {|
+      union Test {
+        case Int(257)
+        case Int(64)
+        fn id(self: Self) -> Self {
+          self
+        }
+      }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((Test (Value (Type (UnionType 101))))))
       (structs
        ((101
          ((struct_fields ((integer ((field_type IntegerType)))))
@@ -1509,6 +1924,64 @@ let%expect_test "unions" =
                      (StructField ((Reference (self (StructType 100))) integer)))
                     (signed true)))))))))))
           (struct_impls ()) (struct_id 100)))))
+      (unions
+       ((101
+         ((cases
+           (((StructType 101) (Discriminator 0))
+            ((StructType 100) (Discriminator 1))))
+          (union_methods
+           ((id
+             ((function_signature
+               ((function_params ((self (UnionType 101))))
+                (function_returns (UnionType 101))))
+              (function_impl
+               (Fn ((Block ((Break (Expr (Reference (self (UnionType 101))))))))))))))
+          (union_impls
+           (((impl_interface
+              (Value
+               (Type
+                (InterfaceType
+                 ((interface_methods
+                   ((from
+                     ((function_params ((from (StructType 100))))
+                      (function_returns SelfType))))))))))
+             (impl_methods
+              ((from
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((v (StructType 100))))
+                     (function_returns (UnionType 101))))
+                   (function_impl
+                    (Fn
+                     ((Return
+                       (MakeUnionVariant
+                        ((Reference
+                          (v (ExprType (Value (Type (StructType 100))))))
+                         101)))))))))))))
+            ((impl_interface
+              (Value
+               (Type
+                (InterfaceType
+                 ((interface_methods
+                   ((from
+                     ((function_params ((from (StructType 101))))
+                      (function_returns SelfType))))))))))
+             (impl_methods
+              ((from
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((v (StructType 101))))
+                     (function_returns (UnionType 101))))
+                   (function_impl
+                    (Fn
+                     ((Return
+                       (MakeUnionVariant
+                        ((Reference
+                          (v (ExprType (Value (Type (StructType 101))))))
+                         101)))))))))))))))
+          (union_id 101)))))
       (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "methods monomorphization" =

@@ -19,7 +19,7 @@ let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 let build_program ?(errors = make_errors Show.show_error)
     ?(bindings = Lang.default_bindings) ?(structs = Lang.default_structs)
     ?(strip_defaults = false) p =
-  let c = new Lang.constructor bindings structs errors in
+  let c = new Lang.constructor bindings structs [] errors in
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings and methods *)
@@ -240,4 +240,36 @@ let%expect_test "serializer inner struct" =
     builder serialize_wallet([int, int] self, builder b) {
       builder b = f0(first(self), b);
       return b;
+    } |}]
+
+let%expect_test "unions" =
+  let source =
+    {|
+    struct Empty{}
+    union Uni {
+      case Integer
+      case Empty
+    }
+    fn try(x: Uni) -> Uni { x }
+    fn test_try(x: Integer, y: Empty) {
+      let test1 = try(x);
+      let test2 = try(y);
+    }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    tuple try(tuple x) {
+      x;
+    }
+    tuple f0(int v) {
+      return [1, v];
+    }
+    tuple f1([] v) {
+      return [0, v];
+    }
+    _ test_try(int x, [] y) {
+      tuple test1 = try(f0(x));
+      tuple test2 = try(f1(y));
     } |}]

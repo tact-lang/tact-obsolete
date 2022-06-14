@@ -36,6 +36,7 @@ and binding_scope = Comptime of expr | Runtime of type_
 and program =
   { bindings : (string * expr) list;
     mutable structs : (int * struct_) list;
+    mutable unions : (int * union) list; [@sexp.list]
     mutable struct_counter : (int[@sexp.opaque]);
     mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
   }
@@ -43,7 +44,8 @@ and program =
 and expr =
   | FunctionCall of function_call
   | MkStructDef of mk_struct
-  | MakeUnionVariant of (expr * union)
+  | MkUnionDef of mk_union
+  | MakeUnionVariant of (expr * int)
   | Reference of (string * type_)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
   | Value of value
@@ -60,7 +62,7 @@ and value =
   | Void
   | Struct of (int * (string * expr) list)
   | StructDef of struct_
-  | UnionVariant of (value * union)
+  | UnionVariant of (value * int)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
   | Bool of bool
@@ -87,7 +89,7 @@ and type_ =
   | VoidType
   | BuiltinType of builtin
   | StructType of int
-  | UnionType of union
+  | UnionType of int
   | FunctionType of function_signature
   | InterfaceType of interface
   | HoleType
@@ -96,7 +98,17 @@ and type_ =
   | ExprType of expr
   | Dependent of string * type_
 
-and union = {cases : type_ list}
+and mk_union =
+  { mk_cases : expr list;
+    mk_union_methods : (string * function_) list;
+    mk_union_impls : impl list; [@sexp.list]
+    mk_union_id : int }
+
+and union =
+  { cases : (type_ * discriminator) list;
+    union_methods : (string * function_) list;
+    union_impls : impl list; [@sexp.list]
+    union_id : int }
 
 and mk_struct =
   { mk_struct_fields : (string * expr) list;
@@ -109,6 +121,8 @@ and struct_ =
     struct_methods : (string * function_) list;
     struct_impls : impl list;
     struct_id : int }
+
+and discriminator = Discriminator of int
 
 and struct_field = {field_type : type_}
 
@@ -353,11 +367,7 @@ module Program = struct
         raise Errors.InternalCompilerError
     | (xid, old_s) :: xs ->
         if equal_int xid id then
-          match new_s with
-          | Ok new_s ->
-              (new_s.struct_id, new_s) :: xs
-          | Error _ ->
-              xs
+          match new_s with Ok new_s -> (id, new_s) :: xs | Error _ -> xs
         else (xid, old_s) :: update_list id new_s xs
 
   let with_struct p s f =
@@ -374,4 +384,21 @@ module Program = struct
     let new_s = f id in
     p.structs <- (id, new_s) :: p.structs ;
     new_s
+
+  let with_union p u f =
+    p.unions <- (u.union_id, u) :: p.unions ;
+    let new_u = f () in
+    p.unions <- update_list u.union_id new_u p.unions ;
+    new_u
+
+  (* Creates new struct id, calls function with this new id and then
+     places returning union to the program.unions *)
+  let with_union_id p mk_union f =
+    let id = p.struct_counter in
+    p.struct_counter <- p.struct_counter + 1 ;
+    let u = mk_union id in
+    p.unions <- (u.union_id, u) :: p.unions ;
+    let new_union = f u in
+    p.unions <- update_list id new_union p.unions ;
+    new_union
 end
