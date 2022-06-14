@@ -65,6 +65,26 @@ class type_checker (errors : _) (functions : _) =
               Error (NeedFromCall m)
           | _ ->
               Error (TypeError expected) )
+      | UnionType u -> (
+          let from_intf_ =
+            let inter =
+              new interpreter (program, current_bindings, errors, functions)
+            in
+            Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
+          in
+          let impl =
+            (List.Assoc.find_exn program.unions u ~equal:equal_int).union_impls
+            |> List.find_map ~f:(fun i ->
+                   if equal_expr i.impl_interface from_intf_ then
+                     Some i.impl_methods
+                   else None )
+            |> Option.bind ~f:List.hd
+          in
+          match impl with
+          | Some (_, m) ->
+              Error (NeedFromCall m)
+          | _ ->
+              Error (TypeError expected) )
       | _otherwise ->
           Error (TypeError expected)
   end

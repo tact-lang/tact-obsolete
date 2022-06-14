@@ -504,10 +504,11 @@ functor
                        | _ ->
                            raise InternalCompilerError )
               in
+              let convert_impls = s#make_from_impls cases u_base.union_id in
               Error
                 { mk_cases = cases;
                   mk_union_id = u_base.union_id;
-                  mk_union_impls = [];
+                  mk_union_impls = convert_impls;
                   mk_union_methods = methods } )
           |> Result.error |> Option.value_exn
 
@@ -524,5 +525,27 @@ functor
             let result = f () in
             current_bindings <- current_bindings' ;
             result
+
+        method private make_from_impls : expr list -> int -> impl list =
+          fun cases union ->
+            List.map cases ~f:(fun case ->
+                let from_intf_ =
+                  FunctionCall (from_intf, [Value (Type (ExprType case))])
+                in
+                { impl_interface = from_intf_;
+                  impl_methods = [("from", s#make_from_impl_fn case union)] } )
+
+        method private make_from_impl_fn case union =
+          Value
+            (Function
+               { function_signature =
+                   { function_params = [("v", ExprType case)];
+                     function_returns = UnionType union };
+                 function_impl =
+                   Fn
+                     (Some
+                        (Return
+                           (MakeUnionVariant
+                              (Reference ("v", ExprType case), union) ) ) ) } )
       end
   end

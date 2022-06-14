@@ -25,6 +25,14 @@ class ['s] union_updater (old : int) (new_s : int) =
 
     method! visit_UnionType _ s =
       if equal_int s old then UnionType new_s else UnionType s
+
+    method! visit_UnionVariant _ (expr, s) =
+      if equal_int s old then UnionVariant (expr, new_s)
+      else UnionVariant (expr, s)
+
+    method! visit_MakeUnionVariant _ (expr, s) =
+      if equal_int s old then MakeUnionVariant (expr, new_s)
+      else MakeUnionVariant (expr, s)
   end
 
 let get_memoized_or_execute p (f, args) ~execute =
