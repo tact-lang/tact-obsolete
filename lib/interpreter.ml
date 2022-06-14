@@ -18,6 +18,14 @@ class ['s] struct_updater (old : int) (new_s : int) =
       if equal_int s old then StructType new_s else StructType s
   end
 
+class ['s] union_updater (old : int) (new_s : int) =
+  object
+    inherit ['s] map
+
+    method! visit_UnionType _ s =
+      if equal_int s old then UnionType new_s else UnionType s
+  end
+
 let get_memoized_or_execute p (f, args) ~execute =
   match
     List.Assoc.find p.memoized_fcalls (f, args)
@@ -171,18 +179,44 @@ class interpreter
               match s with Ok t -> t | Error _ -> raise InternalCompilerError
             in
             Type (StructType struct_ty)
+        | MkUnionDef mk_union ->
+            let compose f g x = g (f x) in
+            let cases =
+              List.map mk_union.mk_cases
+                ~f:
+                  (compose self#interpret_expr (fun x -> expr_to_type (Value x)))
+            in
+            let union =
+              Program.with_union_id program
+                (fun id -> {cases; union_methods = []; union_id = id})
+                (fun u_base ->
+                  let union_updater =
+                    new union_updater mk_union.mk_union_id u_base.union_id
+                  in
+                  let union_methods =
+                    List.map mk_union.mk_union_methods ~f:(fun (name, fn) ->
+                        let prev_scope = vars_scope in
+                        vars_scope <-
+                          [("Self", Type (UnionType u_base.union_id))]
+                          :: vars_scope ;
+                        let output =
+                          self#interpret_function
+                            (union_updater#visit_function_ () fn)
+                        in
+                        vars_scope <- prev_scope ;
+                        (name, output) )
+                  in
+                  Ok {cases; union_methods; union_id = u_base.union_id} )
+              |> Result.ok_exn
+            in
+            Type (UnionType union.union_id)
         | Primitive _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
     method interpret_type : type_ -> type_ =
       function
-      | ExprType ex ->
-          expr_to_type (Value (self#interpret_expr ex))
-      | UnionType u ->
-          UnionType {cases = List.map u.cases ~f:self#interpret_type}
-      | ty ->
-          ty
+      | ExprType ex -> expr_to_type (Value (self#interpret_expr ex)) | ty -> ty
 
     (* TBD: previously we defined value as "atom" which cannot be interpreted, but below
        we interpret values. Should we move `Type`, `Struct` and `Function` to the `expr` type?*)

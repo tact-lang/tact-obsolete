@@ -1450,6 +1450,9 @@ let%expect_test "unions" =
       union Test {
         case Int(257)
         case Int(64)
+        fn id(self: Self) -> Self {
+          self
+        }
       }
     |}
   in
@@ -1457,9 +1460,7 @@ let%expect_test "unions" =
   [%expect
     {|
     (Ok
-     ((bindings
-       ((Test
-         (Value (Type (UnionType ((cases ((StructType 100) (StructType 101))))))))))
+     ((bindings ((Test (Value (Type (UnionType 101))))))
       (structs
        ((101
          ((struct_fields ((integer ((field_type IntegerType)))))
@@ -1509,6 +1510,17 @@ let%expect_test "unions" =
                      (StructField ((Reference (self (StructType 100))) integer)))
                     (signed true)))))))))))
           (struct_impls ()) (struct_id 100)))))
+      (unions
+       ((101
+         ((cases ((StructType 100) (StructType 101)))
+          (union_methods
+           ((id
+             ((function_signature
+               ((function_params ((self (UnionType 101))))
+                (function_returns (UnionType 101))))
+              (function_impl
+               (Fn ((Block ((Break (Expr (Reference (self (UnionType 101))))))))))))))
+          (union_id 101)))))
       (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "methods monomorphization" =

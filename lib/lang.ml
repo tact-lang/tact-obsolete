@@ -65,7 +65,8 @@ functor
       end
 
     class ['s] constructor (bindings : (string * expr) list)
-      (structs : (int * struct_) list) (errors : _ errors) =
+      (structs : (int * struct_) list) (unions : (int * union) list)
+      (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
@@ -81,7 +82,7 @@ functor
         (* Program handle we pass to builtin functions. *)
         (* IDs from 0 to 99 inlusevily is reserved for built-in structs. *)
         val mutable program =
-          {bindings; structs; struct_counter = 100; memoized_fcalls = []}
+          {bindings; structs; unions; struct_counter = 100; memoized_fcalls = []}
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
@@ -226,7 +227,7 @@ functor
 
         method build_StructConstructor _env sc = Value (Struct sc)
 
-        method build_Union _env union = Value (Type (UnionType union))
+        method build_Union _env union = MkUnionDef union
 
         method build_Expr _env expr = Expr expr
 
@@ -473,8 +474,40 @@ functor
           fun _env field_name field_type ->
             (Syntax.value field_name, Syntax.value field_type)
 
-        method build_union_definition _env members _bindings =
-          {cases = List.map (s#of_located_list members) ~f:expr_to_type}
+        method build_union_definition _ _ _ = raise InternalCompilerError
+
+        method! visit_union_definition env def =
+          let members =
+            s#visit_list (s#visit_located s#visit_expr) env def.union_members
+          in
+          let cases = s#of_located_list members in
+          Program.with_union_id program
+            (fun id ->
+              { cases = List.map cases ~f:expr_to_type;
+                union_methods = [];
+                union_id = id } )
+            (fun u_base ->
+              let methods =
+                s#with_bindings
+                  [ make_comptime
+                      ("Self", Value (Type (UnionType u_base.union_id))) ]
+                  (fun _ ->
+                    s#visit_list
+                      (s#visit_located s#visit_binding)
+                      env def.union_bindings )
+                |> s#of_located_list
+                |> List.map ~f:(fun (name, e) ->
+                       match e with
+                       | Value (Function f) ->
+                           (name, f)
+                       | _ ->
+                           raise InternalCompilerError )
+              in
+              Error
+                { mk_cases = cases;
+                  mk_union_id = u_base.union_id;
+                  mk_union_methods = methods } )
+          |> Result.error |> Option.value_exn
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
