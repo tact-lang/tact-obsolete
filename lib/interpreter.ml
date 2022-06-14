@@ -199,8 +199,12 @@ class interpreter
             let union =
               Program.with_union_id program
                 (fun id ->
-                  {cases; union_methods = []; union_impls = []; union_id = id}
-                  )
+                  { cases =
+                      Discriminator.LocalDiscriminators.choose_discriminators ()
+                        id cases;
+                    union_methods = [];
+                    union_impls = [];
+                    union_id = id } )
                 (fun u_base ->
                   let union_updater =
                     new union_updater mk_union.mk_union_id u_base.union_id
@@ -230,7 +234,7 @@ class interpreter
                                        (union_updater#visit_expr () x) ) ) ) } )
                   in
                   Ok
-                    { cases;
+                    { cases = u_base.cases;
                       union_methods;
                       union_impls;
                       union_id = u_base.union_id } )

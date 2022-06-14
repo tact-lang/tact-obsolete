@@ -105,7 +105,7 @@ and mk_union =
     mk_union_id : int }
 
 and union =
-  { cases : type_ list;
+  { cases : (type_ * discriminator) list;
     union_methods : (string * function_) list;
     union_impls : impl list; [@sexp.list]
     union_id : int }
@@ -121,6 +121,8 @@ and struct_ =
     struct_methods : (string * function_) list;
     struct_impls : impl list;
     struct_id : int }
+
+and discriminator = Discriminator of int
 
 and struct_field = {field_type : type_}
 

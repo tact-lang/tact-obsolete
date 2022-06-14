@@ -483,7 +483,8 @@ functor
           let cases = s#of_located_list members in
           Program.with_union_id program
             (fun id ->
-              { cases = List.map cases ~f:expr_to_type;
+              { cases =
+                  List.map cases ~f:(fun x -> (expr_to_type x, Discriminator 0));
                 union_methods = [];
                 union_impls = [];
                 union_id = id } )

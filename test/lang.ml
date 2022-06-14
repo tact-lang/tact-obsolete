@@ -1503,7 +1503,9 @@ let%expect_test "union variants constructing" =
           (struct_impls ()) (struct_id 100)))))
       (unions
        ((101
-         ((cases ((StructType 100) IntegerType)) (union_methods ())
+         ((cases
+           (((StructType 100) (Discriminator 0)) (IntegerType (Discriminator 1))))
+          (union_methods ())
           (union_impls
            (((impl_interface
               (Value
@@ -1759,7 +1761,7 @@ let%expect_test "unions duplicate variant" =
             (struct_impls ()) (struct_id 0)))))
         (unions
          ((102
-           ((cases (IntegerType)) (union_methods ())
+           ((cases ((IntegerType (Discriminator 0)))) (union_methods ())
             (union_impls
              (((impl_interface
                 (Value
@@ -1806,7 +1808,9 @@ let%expect_test "unions duplicate variant" =
                            102)))))))))))))))
             (union_id 102)))
           (101
-           ((cases ((StructType 0) IntegerType)) (union_methods ())
+           ((cases
+             (((StructType 0) (Discriminator 0)) (IntegerType (Discriminator 1))))
+            (union_methods ())
             (union_impls
              (((impl_interface
                 (Value
@@ -1922,7 +1926,9 @@ let%expect_test "unions" =
           (struct_impls ()) (struct_id 100)))))
       (unions
        ((101
-         ((cases ((StructType 101) (StructType 100)))
+         ((cases
+           (((StructType 101) (Discriminator 0))
+            ((StructType 100) (Discriminator 1))))
           (union_methods
            ((id
              ((function_signature
