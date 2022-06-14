@@ -35,6 +35,7 @@ and type_ =
   | SliceType
   | BuilderType
   | TupleType of type_ list
+  | UnknownTuple
   | TensorType of type_ list
   | FunctionType of function_
   | ContType
@@ -197,6 +198,8 @@ and pp_type f = function
         ~f:(fun (t : type_) -> pp_type f t ; pp_print_string f ", ")
         ~flast:(pp_type f) ;
       pp_print_string f "]"
+  | UnknownTuple ->
+      pp_print_string f "tuple"
   | TensorType tuple ->
       pp_print_string f "(" ;
       list_iter tuple
