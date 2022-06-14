@@ -485,6 +485,7 @@ functor
             (fun id ->
               { cases = List.map cases ~f:expr_to_type;
                 union_methods = [];
+                union_impls = [];
                 union_id = id } )
             (fun u_base ->
               let methods =
@@ -506,6 +507,7 @@ functor
               Error
                 { mk_cases = cases;
                   mk_union_id = u_base.union_id;
+                  mk_union_impls = [];
                   mk_union_methods = methods } )
           |> Result.error |> Option.value_exn
 

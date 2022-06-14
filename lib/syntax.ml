@@ -47,6 +47,7 @@ functor
       { enum_name : ident located;
         enum_value : expr located option [@sexp.option] }
 
+    (* TODO: union impls *)
     and union_definition =
       { union_members : expr located list; [@sexpa.list]
         union_bindings : binding located list [@sexp.list] }

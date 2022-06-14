@@ -190,7 +190,9 @@ class interpreter
             in
             let union =
               Program.with_union_id program
-                (fun id -> {cases; union_methods = []; union_id = id})
+                (fun id ->
+                  {cases; union_methods = []; union_impls = []; union_id = id}
+                  )
                 (fun u_base ->
                   let union_updater =
                     new union_updater mk_union.mk_union_id u_base.union_id
@@ -208,7 +210,22 @@ class interpreter
                         vars_scope <- prev_scope ;
                         (name, output) )
                   in
-                  Ok {cases; union_methods; union_id = u_base.union_id} )
+                  let union_impls =
+                    List.map mk_union.mk_union_impls ~f:(fun impl ->
+                        { impl_interface =
+                            Value (self#interpret_expr impl.impl_interface);
+                          impl_methods =
+                            List.map impl.impl_methods ~f:(fun (n, x) ->
+                                ( n,
+                                  Value
+                                    (self#interpret_expr
+                                       (union_updater#visit_expr () x) ) ) ) } )
+                  in
+                  Ok
+                    { cases;
+                      union_methods;
+                      union_impls;
+                      union_id = u_base.union_id } )
               |> Result.ok_exn
             in
             Type (UnionType union.union_id)

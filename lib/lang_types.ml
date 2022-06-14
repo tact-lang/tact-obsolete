@@ -101,10 +101,14 @@ and type_ =
 and mk_union =
   { mk_cases : expr list;
     mk_union_methods : (string * function_) list;
+    mk_union_impls : impl list; [@sexp.list]
     mk_union_id : int }
 
 and union =
-  {cases : type_ list; union_methods : (string * function_) list; union_id : int}
+  { cases : type_ list;
+    union_methods : (string * function_) list;
+    union_impls : impl list; [@sexp.list]
+    union_id : int }
 
 and mk_struct =
   { mk_struct_fields : (string * expr) list;
