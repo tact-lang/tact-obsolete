@@ -1444,6 +1444,102 @@ let%expect_test "TypeN" =
             (struct_impls ()) (struct_id 0)))))
         (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
+let%expect_test "unions duplicate variant" =
+  let source =
+    {|
+      fn Test(T: Type) {
+        union {
+          case Integer
+          case T
+        }
+      }
+      let a = Test(Builder); // should be OK
+      let b = Test(Integer); // should fail
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Error
+     (((DuplicateVariant IntegerType)
+       ((bindings
+         ((b (Value (Type (UnionType 102)))) (a (Value (Type (UnionType 101))))
+          (Test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0))))
+                (function_returns
+                 (InvalidType
+                  (MkUnionDef
+                   ((mk_cases
+                     ((ResolvedReference (Integer <opaque>))
+                      (Value (Type (Dependent T (TypeN 0))))))
+                    (mk_union_methods ()) (mk_union_id 100)))))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Break
+                    (Expr
+                     (MkUnionDef
+                      ((mk_cases
+                        ((ResolvedReference (Integer <opaque>))
+                         (Reference (T (TypeN 0)))))
+                       (mk_union_methods ()) (mk_union_id 100))))))))))))))
+          (Builder (Value (Type (StructType 0))))
+          (Integer (Value (Type IntegerType)))
+          (Int
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((bits IntegerType)))
+                (function_returns (TypeN 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (Bool (Value (Type BoolType))) (Type (Value (Type (TypeN 0))))
+          (Void (Value Void))
+          (serializer
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (TypeN 0))))
+                (function_returns
+                 (FunctionType
+                  ((function_params ((t HoleType) (b (StructType 0))))
+                   (function_returns (StructType 0)))))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))
+          (BinOp
+           (Value
+            (Type
+             (InterfaceType
+              ((interface_methods
+                ((op
+                  ((function_params ((left IntegerType) (right IntegerType)))
+                   (function_returns IntegerType))))))))))
+          (From
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((T (TypeN 0)))) (function_returns HoleType)))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))))))
+        (structs
+         ((0
+           ((struct_fields ((builder ((field_type (BuiltinType Builder))))))
+            (struct_methods
+             ((new
+               ((function_signature
+                 ((function_params ()) (function_returns (StructType 0))))
+                (function_impl
+                 (Fn
+                  ((Return
+                    (Value (Struct (0 ((builder (Primitive EmptyBuilder))))))))))))))
+            (struct_impls ()) (struct_id 0)))))
+        (unions
+         ((102 ((cases (IntegerType)) (union_methods ()) (union_id 102)))
+          (101
+           ((cases ((StructType 0) IntegerType)) (union_methods ())
+            (union_id 101)))))
+        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
+
 let%expect_test "unions" =
   let source =
     {|
@@ -1512,7 +1608,7 @@ let%expect_test "unions" =
           (struct_impls ()) (struct_id 100)))))
       (unions
        ((101
-         ((cases ((StructType 100) (StructType 101)))
+         ((cases ((StructType 101) (StructType 100)))
           (union_methods
            ((id
              ((function_signature

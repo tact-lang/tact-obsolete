@@ -7,7 +7,8 @@ type error =
   | `UninterpretableStatement of stmt
   | `UnexpectedType of type_
   | `FieldNotFound of int * string
-  | `ArgumentNumberMismatch ]
+  | `ArgumentNumberMismatch
+  | `DuplicateVariant of type_ ]
 [@@deriving equal, sexp_of]
 
 class ['s] struct_updater (old : int) (new_s : int) =
@@ -185,6 +186,7 @@ class interpreter
               List.map mk_union.mk_cases
                 ~f:
                   (compose self#interpret_expr (fun x -> expr_to_type (Value x)))
+              |> self#check_unions_for_doubled_types
             in
             let union =
               Program.with_union_id program
@@ -318,4 +320,14 @@ class interpreter
             Some v
         | None ->
             None
+
+    method private check_unions_for_doubled_types : type_ list -> type_ list =
+      fun xs ->
+        List.fold xs ~init:[] ~f:(fun acc x ->
+            match List.exists acc ~f:(equal_type_ x) with
+            | true ->
+                errors#report `Error (`DuplicateVariant x) () ;
+                acc
+            | false ->
+                x :: acc )
   end
