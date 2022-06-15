@@ -80,9 +80,13 @@ functor
 
         (* TODO: can we remove duplicating bindings here and the above? *)
         (* Program handle we pass to builtin functions. *)
-        (* IDs from 0 to 99 inlusevily is reserved for built-in structs. *)
         val mutable program =
-          {bindings; structs; unions; struct_counter = 100; memoized_fcalls = []}
+          { bindings;
+            structs;
+            unions;
+            (* these IDs always come after built-in ones, which are all below 0 *)
+            struct_counter = 0;
+            memoized_fcalls = [] }
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
