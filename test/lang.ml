@@ -2081,74 +2081,74 @@ let%expect_test "switch statement" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((i (UnionType 101))))
+             ((function_params ((i (UnionType 1))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               ((Block
                 ((Break
                   (Switch
-                   ((switch_condition (Reference (i (UnionType 101))))
+                   ((switch_condition (Reference (i (UnionType 1))))
                     (branches
-                     (((branch_ty (StructType 100)) (branch_var vax)
+                     (((branch_ty (StructType 0)) (branch_var vax)
                        (branch_stmt (Block ((Return (Value (Integer 32)))))))
-                      ((branch_ty (StructType 101)) (branch_var vax)
+                      ((branch_ty (StructType 1)) (branch_var vax)
                        (branch_stmt (Block ((Return (Value (Integer 64)))))))))))))))))))))
-        (Ints (Value (Type (UnionType 101))))))
+        (Ints (Value (Type (UnionType 1))))))
       (structs
-       ((101
+       ((1
          ((struct_fields ((integer ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((integer IntegerType)))
-                (function_returns (StructType 101))))
+                (function_returns (StructType 1))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))
             (serialize
              ((function_signature
-               ((function_params ((self (StructType 101)) (b (StructType 0))))
-                (function_returns (StructType 0))))
+               ((function_params ((self (StructType 1)) (b (StructType -1))))
+                (function_returns (StructType -1))))
               (function_impl
                (Fn
                 ((Return
                   (Primitive
                    (StoreInt
                     (builder
-                     (StructField ((Reference (b (StructType 0))) builder)))
+                     (StructField ((Reference (b (StructType -1))) builder)))
                     (length (Value (Integer 64)))
                     (integer
-                     (StructField ((Reference (self (StructType 101))) integer)))
+                     (StructField ((Reference (self (StructType 1))) integer)))
                     (signed true)))))))))))
-          (struct_impls ()) (struct_id 101)))
-        (100
+          (struct_impls ()) (struct_id 1)))
+        (0
          ((struct_fields ((integer ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((integer IntegerType)))
-                (function_returns (StructType 100))))
+                (function_returns (StructType 0))))
               (function_impl (BuiltinFn (<fun> <opaque>)))))
             (serialize
              ((function_signature
-               ((function_params ((self (StructType 100)) (b (StructType 0))))
-                (function_returns (StructType 0))))
+               ((function_params ((self (StructType 0)) (b (StructType -1))))
+                (function_returns (StructType -1))))
               (function_impl
                (Fn
                 ((Return
                   (Primitive
                    (StoreInt
                     (builder
-                     (StructField ((Reference (b (StructType 0))) builder)))
+                     (StructField ((Reference (b (StructType -1))) builder)))
                     (length (Value (Integer 32)))
                     (integer
-                     (StructField ((Reference (self (StructType 100))) integer)))
+                     (StructField ((Reference (self (StructType 0))) integer)))
                     (signed true)))))))))))
-          (struct_impls ()) (struct_id 100)))))
+          (struct_impls ()) (struct_id 0)))))
       (unions
-       ((101
+       ((1
          ((cases
-           (((StructType 101) (Discriminator 0))
-            ((StructType 100) (Discriminator 1))))
+           (((StructType 1) (Discriminator 0))
+            ((StructType 0) (Discriminator 1))))
           (union_methods ())
           (union_impls
            (((impl_interface
@@ -2157,43 +2157,41 @@ let%expect_test "switch statement" =
                 (InterfaceType
                  ((interface_methods
                    ((from
-                     ((function_params ((from (StructType 100))))
+                     ((function_params ((from (StructType 0))))
                       (function_returns SelfType))))))))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v (StructType 100))))
-                     (function_returns (UnionType 101))))
+                    ((function_params ((v (StructType 0))))
+                     (function_returns (UnionType 1))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
-                        ((Reference
-                          (v (ExprType (Value (Type (StructType 100))))))
-                         101)))))))))))))
+                        ((Reference (v (ExprType (Value (Type (StructType 0))))))
+                         1)))))))))))))
             ((impl_interface
               (Value
                (Type
                 (InterfaceType
                  ((interface_methods
                    ((from
-                     ((function_params ((from (StructType 101))))
+                     ((function_params ((from (StructType 1))))
                       (function_returns SelfType))))))))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v (StructType 101))))
-                     (function_returns (UnionType 101))))
+                    ((function_params ((v (StructType 1))))
+                     (function_returns (UnionType 1))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
-                        ((Reference
-                          (v (ExprType (Value (Type (StructType 101))))))
-                         101)))))))))))))))
-          (union_id 101)))))
+                        ((Reference (v (ExprType (Value (Type (StructType 1))))))
+                         1)))))))))))))))
+          (union_id 1)))))
       (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
