@@ -9,30 +9,6 @@
   sexplib)
  (preprocess
   (pps ppx_show ppx_make ppx_compare visitors.ppx ppx_sexp_conv))
- (modules
-  config
-  tokens
-  parser
-  lexer
-  located
-  syntax
-  unitActionsParser
-  parserMessages
-  asm
-  asm_lexer
-  asm_parser
-  zint
-  errors
-  lang_types
-  builtin
-  interpreter
-  lang
-  func
-  codegen_func
-  show
-  compiler
-  type_check
-  discriminator)
  (name tact))
 
 (ocamllex asm_lexer)
