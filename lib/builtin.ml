@@ -1,8 +1,14 @@
 open Base
 open Lang_types
 
-(* If you add new built-in struct, increase previous struct id and add it below, from 0 up to 99. *)
-let builder_id = 0
+let builtin_struct_id = ref (-1)
+
+let next_builtin_struct_id () =
+  let id = !builtin_struct_id in
+  builtin_struct_id := id - 1 ;
+  id
+
+let builder_id = next_builtin_struct_id ()
 
 let builder = BuiltinType "Builder"
 
