@@ -227,11 +227,15 @@ functor
           | stmt ->
               Break stmt
 
-        method build_Switch _ _ = raise InternalCompilerError
+        method build_Switch _ s = Switch s
 
-        method build_switch_branch _ _ = raise InternalCompilerError
+        method build_switch_branch _env ty var stmt =
+          { branch_ty = expr_to_type (Syntax.value ty);
+            branch_var = Syntax.value var;
+            branch_stmt = stmt }
 
-        method build_switch _ _ = raise InternalCompilerError
+        method build_switch _env cond branches =
+          {switch_condition = Syntax.value cond; branches}
 
         method build_Struct _env s = MkStructDef s
 

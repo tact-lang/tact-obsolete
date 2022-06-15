@@ -77,6 +77,7 @@ and stmt =
   | Break of stmt
   | Expr of expr
   | Block of stmt list
+  | Switch of switch
   | Invalid
 
 and builtin = string
@@ -144,6 +145,10 @@ and function_signature =
 and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
 and function_call = expr * expr list
+
+and switch = {switch_condition : expr; branches : branch list}
+
+and branch = {branch_ty : type_; branch_var : string; branch_stmt : stmt}
 
 and primitive =
   | EmptyBuilder

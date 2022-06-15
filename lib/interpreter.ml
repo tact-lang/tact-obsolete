@@ -106,6 +106,25 @@ class interpreter
           | value ->
               errors#report `Error (`UnexpectedType (type_of (Value value))) () ;
               Void )
+      | Switch {switch_condition; branches} -> (
+          let cond = self#interpret_expr switch_condition in
+          match cond with
+          | UnionVariant (v, _) -> (
+              let v_ty = type_of (Value v) in
+              let correct_branch =
+                List.find branches ~f:(fun b -> equal_type_ b.branch_ty v_ty)
+              in
+              match correct_branch with
+              | Some branch ->
+                  let prev_scope = vars_scope in
+                  vars_scope <- [(branch.branch_var, v)] :: vars_scope ;
+                  let res = self#interpret_stmt branch.branch_stmt [] in
+                  vars_scope <- prev_scope ;
+                  res
+              | None ->
+                  Void )
+          | _ ->
+              Void )
       | Invalid ->
           Void
 
