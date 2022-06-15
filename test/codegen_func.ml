@@ -273,3 +273,40 @@ let%expect_test "unions" =
       tuple test1 = try(f0(x));
       tuple test2 = try(f1(y));
     } |}]
+
+let%expect_test "switch statement" =
+  let source =
+    {|
+      union Ints {
+        case Int(32)
+        case Int(64)
+      }
+      fn test(i: Ints) -> Integer {
+        switch (i) {
+          case Int(32) vax => { return 32; }
+          case Int(64) vax => { return 64; }
+        }
+      }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    int test(tuple i) {
+      {
+      tuple temp = i;
+    int discr =
+    first(temp);
+    if (discr == 1)
+    {
+      int vax = second(temp);
+    {
+      return 32;
+    }} else if (discr == 0)
+    {
+      int vax = second(temp);
+    {
+      return 64;
+    }} else
+    {
+      }}} |}]

@@ -82,6 +82,13 @@ class constructor (program : T.program) =
       in
       F.Tuple [F.Integer (Z.of_int discr); expr]
 
+    method get_discriminator : T.union -> T.type_ -> int =
+      fun union ty ->
+        let (T.Discriminator discr) =
+          List.Assoc.find_exn union.cases ty ~equal:T.equal_type_
+        in
+        discr
+
     method cg_stmt : T.stmt -> F.stmt =
       function
       | Let bindings ->
@@ -99,8 +106,52 @@ class constructor (program : T.program) =
               Option.map if_else ~f:self#cg_stmt )
       | Break stmt ->
           self#cg_stmt stmt (* FIXME: this is unlikely to be correct *)
+      | Switch s ->
+          self#cg_switch s
       | _ ->
           raise Unsupported
+
+    method cg_switch switch =
+      let f_cond =
+        F.Vars [(F.UnknownTuple, "temp", self#cg_expr switch.switch_condition)]
+      in
+      let f_discr =
+        F.Vars
+          [ ( F.IntType,
+              "discr",
+              F.FunctionCall
+                ("first", [Reference ("temp", F.UnknownTuple)], F.IntType) ) ]
+      in
+      let union =
+        match T.type_of switch.switch_condition with
+        | UnionType u ->
+            List.Assoc.find_exn program.unions u ~equal:equal_int
+        | _ ->
+            raise InternalCompilerError
+      in
+      let branches =
+        List.fold (List.rev switch.branches) ~init:(F.Block []) ~f:(fun acc b ->
+            let ty_discr = self#get_discriminator union b.branch_ty in
+            let cond =
+              F.Operator
+                ( F.Reference ("discr", F.IntType),
+                  EqualityOperator,
+                  F.Integer (Z.of_int ty_discr) )
+            in
+            let inner =
+              F.Block
+                [ F.Vars
+                    [ ( self#lang_type_to_type b.branch_ty,
+                        b.branch_var,
+                        F.FunctionCall
+                          ( "second",
+                            [Reference ("temp", F.UnknownTuple)],
+                            F.IntType ) ) ];
+                  self#cg_stmt b.branch_stmt ]
+            in
+            F.If (cond, inner, Some acc) )
+      in
+      F.Block [f_cond; f_discr; branches]
 
     method cg_function_ : string -> T.function_ -> F.function_ =
       fun name fn ->
