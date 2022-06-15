@@ -75,6 +75,11 @@ functor
       | Return of expr
       | Break of stmt
       | Expr of expr
+      | Switch of switch
+
+    and switch = {switch_condition : expr located; branches : switch_branch list}
+
+    and switch_branch = {ty : expr located; var : ident located; stmt : stmt}
 
     and struct_constructor =
       { constructor_id : expr located;

@@ -227,6 +227,12 @@ functor
           | stmt ->
               Break stmt
 
+        method build_Switch _ _ = raise InternalCompilerError
+
+        method build_switch_branch _ _ = raise InternalCompilerError
+
+        method build_switch _ _ = raise InternalCompilerError
+
         method build_Struct _env s = MkStructDef s
 
         method build_StructConstructor _env sc = Value (Struct sc)

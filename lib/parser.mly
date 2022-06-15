@@ -175,6 +175,31 @@ let code_block :=
   | c = delimited(LBRACE, block_stmt, RBRACE); { CodeBlock c }
   | LBRACE; RBRACE; { CodeBlock [] }
 
+let switch_branch := 
+  | CASE; 
+    ty = located(type_expr);
+    var = located(ident);
+    REARROW;
+    (* TODO: what kind of stmts should be allowed here? *)
+    stmt = code_block;
+    { make_switch_branch ~ty ~var ~stmt () }
+
+(*
+  Switch stmt
+
+  switch (<expr>) {
+    case Type1 var => { <stmts> }
+    case Type2 var => { <stmts> }
+    ...
+  }
+*)
+
+let switch :=
+  | SWITCH; LPAREN; switch_condition = located(expr); RPAREN; LBRACE;
+    branches = list(switch_branch);
+    RBRACE;
+    { Switch (make_switch ~switch_condition ~branches ()) }
+
 let block_stmt :=
   | left = located(non_semicolon_stmt); right = block_stmt;
     { left :: right }
@@ -199,6 +224,7 @@ let non_semicolon_stmt :=
   | ~= shorthand_binding(some(code_block)); <Let>
   | if_
   | code_block
+  | switch
 
 (* Type expression
   
