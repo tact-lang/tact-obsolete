@@ -853,3 +853,49 @@ let%expect_test "interface impls inside structs" =
           (Interface
            ((interface_members
              (((binding_name (Ident method)) (binding_expr (Function ()))))))))))))) |}]
+
+let%expect_test "switch statement" =
+  let source =
+    {|
+    fn test() {
+      switch (expr) {
+        case Type(T) vax => { let a = 10; }
+        case Baz vax => {
+          let a = 10;
+          let b = 20;
+        }
+      }
+    }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let
+        ((binding_name (Ident test))
+         (binding_expr
+          (Function
+           ((function_body
+             ((function_stmt
+               (CodeBlock
+                ((Break
+                  (Switch
+                   ((switch_condition (Reference (Ident expr)))
+                    (branches
+                     (((ty
+                        (FunctionCall
+                         ((fn (Reference (Ident Type)))
+                          (arguments ((Reference (Ident T)))))))
+                       (var (Ident vax))
+                       (stmt
+                        (CodeBlock
+                         ((Let
+                           ((binding_name (Ident a)) (binding_expr (Int 10))))))))
+                      ((ty (Reference (Ident Baz))) (var (Ident vax))
+                       (stmt
+                        (CodeBlock
+                         ((Let
+                           ((binding_name (Ident a)) (binding_expr (Int 10))))
+                          (Let
+                           ((binding_name (Ident b)) (binding_expr (Int 20)))))))))))))))))))))))))) |}]

@@ -2053,3 +2053,145 @@ let%expect_test "methods monomorphization" =
                     (Expr (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
           (struct_impls ()) (struct_id 1)))))
       (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+
+let%expect_test "switch statement" =
+  let source =
+    {|
+      union Ints {
+        case Int(32)
+        case Int(64)
+      }
+      fn test(i: Ints) -> Integer {
+        switch (i) {
+          case Int(32) vax => { return 32; }
+          case Int(64) vax => { return 64; }
+        }
+      }
+      let must_be_32 = test(Int(32).new(0));
+      let must_be_64 = test(Int(64).new(0));
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((must_be_64 (Value (Integer 64))) (must_be_32 (Value (Integer 32)))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((i (UnionType 1))))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Switch
+                   ((switch_condition (Reference (i (UnionType 1))))
+                    (branches
+                     (((branch_ty (StructType 0)) (branch_var vax)
+                       (branch_stmt (Block ((Return (Value (Integer 32)))))))
+                      ((branch_ty (StructType 1)) (branch_var vax)
+                       (branch_stmt (Block ((Return (Value (Integer 64)))))))))))))))))))))
+        (Ints (Value (Type (UnionType 1))))))
+      (structs
+       ((1
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 1))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params ((self (StructType 1)) (b (StructType -1))))
+                (function_returns (StructType -1))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt
+                    (builder
+                     (StructField ((Reference (b (StructType -1))) builder)))
+                    (length (Value (Integer 64)))
+                    (integer
+                     (StructField ((Reference (self (StructType 1))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 1)))
+        (0
+         ((struct_fields ((integer ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((integer IntegerType)))
+                (function_returns (StructType 0))))
+              (function_impl (BuiltinFn (<fun> <opaque>)))))
+            (serialize
+             ((function_signature
+               ((function_params ((self (StructType 0)) (b (StructType -1))))
+                (function_returns (StructType -1))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Primitive
+                   (StoreInt
+                    (builder
+                     (StructField ((Reference (b (StructType -1))) builder)))
+                    (length (Value (Integer 32)))
+                    (integer
+                     (StructField ((Reference (self (StructType 0))) integer)))
+                    (signed true)))))))))))
+          (struct_impls ()) (struct_id 0)))))
+      (unions
+       ((1
+         ((cases
+           (((StructType 1) (Discriminator 0))
+            ((StructType 0) (Discriminator 1))))
+          (union_methods ())
+          (union_impls
+           (((impl_interface
+              (Value
+               (Type
+                (InterfaceType
+                 ((interface_methods
+                   ((from
+                     ((function_params ((from (StructType 0))))
+                      (function_returns SelfType))))))))))
+             (impl_methods
+              ((from
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((v (StructType 0))))
+                     (function_returns (UnionType 1))))
+                   (function_impl
+                    (Fn
+                     ((Return
+                       (MakeUnionVariant
+                        ((Reference (v (ExprType (Value (Type (StructType 0))))))
+                         1)))))))))))))
+            ((impl_interface
+              (Value
+               (Type
+                (InterfaceType
+                 ((interface_methods
+                   ((from
+                     ((function_params ((from (StructType 1))))
+                      (function_returns SelfType))))))))))
+             (impl_methods
+              ((from
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((v (StructType 1))))
+                     (function_returns (UnionType 1))))
+                   (function_impl
+                    (Fn
+                     ((Return
+                       (MakeUnionVariant
+                        ((Reference (v (ExprType (Value (Type (StructType 1))))))
+                         1)))))))))))))))
+          (union_id 1)))))
+      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]

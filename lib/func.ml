@@ -26,6 +26,9 @@ and expr =
   | Reference of (ident * type_)
   | Tuple of expr list
   | FunctionCall of (ident * expr list * type_)
+  | Operator of (expr * operator * expr)
+
+and operator = EqualityOperator
 
 and ident = string
 
@@ -56,6 +59,8 @@ let rec type_of = function
       TupleType (List.map exprs ~f:type_of)
   | FunctionCall (_, _, ty) ->
       ty
+  | Operator (_, EqualityOperator, _) ->
+      IntType
 
 open Caml.Format
 
@@ -180,6 +185,14 @@ and pp_expr f = function
         ~f:(fun t -> pp_expr f t ; pp_print_string f ", ")
         ~flast:(pp_expr f) ;
       pp_print_string f "]"
+  | Operator (left, op, right) ->
+      pp_expr f left ;
+      pp_print_space f () ;
+      pp_operator f op ;
+      pp_print_space f () ;
+      pp_expr f right
+
+and pp_operator f = function EqualityOperator -> pp_print_string f "=="
 
 and pp_type f = function
   | IntType ->

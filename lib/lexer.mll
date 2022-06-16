@@ -48,6 +48,7 @@ rule token = parse
  | ':' { COLON }
  | ';' { SEMICOLON }
  | "->" { RARROW }
+ | "=>" { REARROW }
  | '{' { LBRACE }
  | '}' { RBRACE }
  | '(' { LPAREN }
@@ -74,6 +75,7 @@ rule token = parse
  | "val" { VAL }
  | "case" { CASE }
  | "impl" { IMPL }
+ | "switch" { SWITCH }
  | '-'? integer_with_underscores as i { INT (Z.of_string i) }
  | ident { IDENT (Lexing.lexeme lexbuf) }
  | "/*" { comment_ctr := !comment_ctr + 1 ; comment lexbuf }
