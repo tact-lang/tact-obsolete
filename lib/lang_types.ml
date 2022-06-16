@@ -61,7 +61,6 @@ and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 and value =
   | Void
   | Struct of (int * (string * expr) list)
-  | StructDef of struct_
   | UnionVariant of (value * int)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
