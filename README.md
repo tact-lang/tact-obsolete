@@ -1,4 +1,12 @@
 # Tact
+<div align="left">
+  <a href="https://github.com/tact-lang/tact/actions">
+    <img src="https://github.com/tact-lang/tact/actions/workflows/ci.yml/badge.svg">
+  </a>
+  <a href="https://t.me/tactlang">
+    <img src="https://img.shields.io/badge/help-t.me%2Ftactlang-blue">
+  </a>
+</div>
 
 ## Building from source
 
