@@ -100,7 +100,7 @@ functor
 
         method build_FieldAccess _env _fieldaccess = InvalidExpr
 
-        method build_Function _env fn = Value (Function fn)
+        method build_Function _env fn = MkFunction fn
 
         method build_FunctionCall _env (f, args) =
           match type_of f with
@@ -407,8 +407,8 @@ functor
             List.filter_map bindings ~f:(fun binding ->
                 let name, expr = Syntax.value binding in
                 match expr with
-                | Value (Function f) ->
-                    Some (name, f)
+                | Value (Function _) | MkFunction _ ->
+                    Some (name, expr)
                 | _ ->
                     None )
           in
@@ -417,8 +417,8 @@ functor
               (List.map impls ~f:(fun impl ->
                    List.filter_map impl.impl_methods ~f:(fun (name, ex) ->
                        match ex with
-                       | Value (Function f) ->
-                           Some (name, f)
+                       | Value (Function _) | MkFunction _ ->
+                           Some (name, ex)
                        | _ ->
                            None ) ) )
           in
@@ -516,8 +516,8 @@ functor
                 |> s#of_located_list
                 |> List.map ~f:(fun (name, e) ->
                        match e with
-                       | Value (Function f) ->
-                           (name, f)
+                       | Value (Function _) | MkFunction _ ->
+                           (name, e)
                        | _ ->
                            raise InternalCompilerError )
               in

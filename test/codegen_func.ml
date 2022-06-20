@@ -20,7 +20,8 @@ let build_program ?(errors = make_errors Show.show_error)
     ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) p =
   let c = new Lang.constructor ~program:prev_program errors in
   let p' = c#visit_program () p in
-  errors#to_result p'
+  errors#to_result ()
+  |> Result.map ~f:(fun _ -> p')
   (* remove default bindings and methods *)
   |> Result.map ~f:(fun (program : Lang.program) ->
          if strip_defaults then program else program )
@@ -150,8 +151,8 @@ let%expect_test "Int(bits) serializer codegen" =
   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
   Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
   Called from Tact_tests__Codegen_func.build_program in file "test/codegen_func.ml", line 22, characters 11-31
-  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 33, characters 2-50
-  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 109, characters 2-11
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 34, characters 2-50
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 113, characters 2-11
   Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "demo struct serializer" =
@@ -212,8 +213,8 @@ let%expect_test "demo struct serializer" =
   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
   Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
   Called from Tact_tests__Codegen_func.build_program in file "test/codegen_func.ml", line 22, characters 11-31
-  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 33, characters 2-50
-  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 169, characters 2-11
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 34, characters 2-50
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 173, characters 2-11
   Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "demo struct serializer 2" =
@@ -274,8 +275,8 @@ let%expect_test "demo struct serializer 2" =
   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
   Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
   Called from Tact_tests__Codegen_func.build_program in file "test/codegen_func.ml", line 22, characters 11-31
-  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 33, characters 2-50
-  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 231, characters 2-11
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 34, characters 2-50
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 235, characters 2-11
   Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "true and false" =

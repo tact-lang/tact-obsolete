@@ -45,6 +45,7 @@ and expr =
   | FunctionCall of function_call
   | MkStructDef of mk_struct
   | MkUnionDef of mk_union
+  | MkFunction of function_
   | MakeUnionVariant of (expr * int)
   | Reference of (string * type_)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
@@ -100,7 +101,7 @@ and type_ =
 
 and mk_union =
   { mk_cases : expr list;
-    mk_union_methods : (string * function_) list;
+    mk_union_methods : (string * expr) list;
     mk_union_impls : impl list; [@sexp.list]
     mk_union_id : int }
 
@@ -112,7 +113,7 @@ and union =
 
 and mk_struct =
   { mk_struct_fields : (string * expr) list;
-    mk_methods : (string * function_) list;
+    mk_methods : (string * expr) list;
     mk_impls : impl list;
     mk_struct_id : int }
 

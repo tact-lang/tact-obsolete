@@ -117,10 +117,10 @@ and compile_to_ir ?(prev_program = Lang.default_program ()) ~filename text =
       let errors = new Errors.errors Show.show_error in
       let constructor = new Lang.constructor ~program:prev_program errors in
       let program = constructor#visit_program () stx in
-      match errors#to_result program with
+      match errors#to_result () with
       | Error _ ->
           Error errors#show_errors
-      | Ok program ->
+      | Ok _ ->
           Ok program )
   | exception Lexer.Error msg ->
       Error ("lexing error: " ^ msg)

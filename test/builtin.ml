@@ -115,7 +115,7 @@ let%expect_test "Int(bits) serializer" =
   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
   Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
   Called from Shared.build_program in file "test/shared.ml", line 24, characters 11-31
-  Called from Shared.pp in file "test/shared.ml", line 51, characters 2-48
+  Called from Shared.pp in file "test/shared.ml", line 52, characters 2-48
   Called from Tact_tests__Builtin.(fun) in file "test/builtin.ml", line 77, characters 2-11
   Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
@@ -177,7 +177,7 @@ let%expect_test "demo struct serializer" =
   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
   Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
   Called from Shared.build_program in file "test/shared.ml", line 24, characters 11-31
-  Called from Shared.pp in file "test/shared.ml", line 51, characters 2-48
+  Called from Shared.pp in file "test/shared.ml", line 52, characters 2-48
   Called from Tact_tests__Builtin.(fun) in file "test/builtin.ml", line 137, characters 2-11
   Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 

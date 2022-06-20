@@ -1305,26 +1305,36 @@ let%expect_test "reference resolving in inner functions" =
            ((function_signature
              ((function_params ((X (TypeN 0))))
               (function_returns
-               (FunctionType
-                ((function_params ((x (Dependent X (TypeN 0)))))
-                 (function_returns (Dependent X (TypeN 0))))))))
+               (InvalidType
+                (MkFunction
+                 ((function_signature
+                   ((function_params ((x (Dependent X (TypeN 0)))))
+                    (function_returns (Dependent X (TypeN 0)))))
+                  (function_impl
+                   (Fn
+                    ((Block
+                      ((Break
+                        (Expr
+                         (Value
+                          (Type
+                           (ExprType
+                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
             (function_impl
              (Fn
               ((Block
                 ((Break
                   (Expr
-                   (Value
-                    (Function
-                     ((function_signature
-                       ((function_params
-                         ((x (ExprType (Reference (X (TypeN 0)))))))
-                        (function_returns (ExprType (Reference (X (TypeN 0)))))))
-                      (function_impl
-                       (Fn
-                        ((Block
-                          ((Break
-                            (Expr
-                             (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))))))))))))
+                   (MkFunction
+                    ((function_signature
+                      ((function_params
+                        ((x (ExprType (Reference (X (TypeN 0)))))))
+                       (function_returns (ExprType (Reference (X (TypeN 0)))))))
+                     (function_impl
+                      (Fn
+                       ((Block
+                         ((Break
+                           (Expr
+                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))))))))
       (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "dependent types" =
@@ -1350,9 +1360,20 @@ let%expect_test "dependent types" =
            ((function_signature
              ((function_params ((Y (TypeN 0))))
               (function_returns
-               (FunctionType
-                ((function_params ((x (Dependent Y (TypeN 0)))))
-                 (function_returns (Dependent Y (TypeN 0))))))))
+               (InvalidType
+                (MkFunction
+                 ((function_signature
+                   ((function_params ((x (Dependent Y (TypeN 0)))))
+                    (function_returns (Dependent Y (TypeN 0)))))
+                  (function_impl
+                   (Fn
+                    ((Block
+                      ((Break
+                        (Expr
+                         (Value
+                          (Type
+                           (ExprType
+                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
             (function_impl
              (Fn
               ((Block
@@ -1367,35 +1388,53 @@ let%expect_test "dependent types" =
            ((function_signature
              ((function_params ((X (TypeN 0))))
               (function_returns
-               (FunctionType
-                ((function_params ((x (Dependent X (TypeN 0)))))
-                 (function_returns (Dependent X (TypeN 0))))))))
+               (InvalidType
+                (MkFunction
+                 ((function_signature
+                   ((function_params ((x (Dependent X (TypeN 0)))))
+                    (function_returns (Dependent X (TypeN 0)))))
+                  (function_impl
+                   (Fn
+                    ((Block
+                      ((Break
+                        (Expr
+                         (Value
+                          (Type
+                           (ExprType
+                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
             (function_impl
              (Fn
               ((Block
                 ((Let
                   ((f
-                    (Value
-                     (Function
-                      ((function_signature
-                        ((function_params
-                          ((x (ExprType (Reference (X (TypeN 0)))))))
-                         (function_returns (ExprType (Reference (X (TypeN 0)))))))
-                       (function_impl
-                        (Fn
-                         ((Block
-                           ((Break
-                             (Expr
-                              (Reference
-                               (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))
+                    (MkFunction
+                     ((function_signature
+                       ((function_params
+                         ((x (ExprType (Reference (X (TypeN 0)))))))
+                        (function_returns (ExprType (Reference (X (TypeN 0)))))))
+                      (function_impl
+                       (Fn
+                        ((Block
+                          ((Break
+                            (Expr
+                             (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))
                  (Break
                   (Expr
                    (Reference
                     (f
-                     (FunctionType
-                      ((function_params
-                        ((x (ExprType (Reference (X (TypeN 0)))))))
-                       (function_returns (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
+                     (InvalidType
+                      (MkFunction
+                       ((function_signature
+                         ((function_params
+                           ((x (ExprType (Reference (X (TypeN 0)))))))
+                          (function_returns (ExprType (Reference (X (TypeN 0)))))))
+                        (function_impl
+                         (Fn
+                          ((Block
+                            ((Break
+                              (Expr
+                               (Reference
+                                (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))))))))))))))
       (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "TypeN" =
@@ -1549,7 +1588,8 @@ let%expect_test "union variants constructing" =
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v IntegerType)))
+                    ((function_params
+                      ((v (ExprType (Value (Type IntegerType))))))
                      (function_returns (UnionType 2))))
                    (function_impl
                     (Fn
@@ -1569,7 +1609,8 @@ let%expect_test "union variants constructing" =
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v (StructType 0))))
+                    ((function_params
+                      ((v (ExprType (Value (Type (StructType 0)))))))
                      (function_returns (UnionType 2))))
                    (function_impl
                     (Fn
@@ -1810,7 +1851,8 @@ let%expect_test "unions duplicate variant" =
                   (Value
                    (Function
                     ((function_signature
-                      ((function_params ((v IntegerType)))
+                      ((function_params
+                        ((v (ExprType (ResolvedReference (Integer <opaque>))))))
                        (function_returns (UnionType 2))))
                      (function_impl
                       (Fn
@@ -1832,7 +1874,8 @@ let%expect_test "unions duplicate variant" =
                   (Value
                    (Function
                     ((function_signature
-                      ((function_params ((v IntegerType)))
+                      ((function_params
+                        ((v (ExprType (Reference (T (TypeN 0)))))))
                        (function_returns (UnionType 2))))
                      (function_impl
                       (Fn
@@ -1860,7 +1903,8 @@ let%expect_test "unions duplicate variant" =
                   (Value
                    (Function
                     ((function_signature
-                      ((function_params ((v IntegerType)))
+                      ((function_params
+                        ((v (ExprType (ResolvedReference (Integer <opaque>))))))
                        (function_returns (UnionType 1))))
                      (function_impl
                       (Fn
@@ -1882,7 +1926,8 @@ let%expect_test "unions duplicate variant" =
                   (Value
                    (Function
                     ((function_signature
-                      ((function_params ((v (BuiltinType Builder))))
+                      ((function_params
+                        ((v (ExprType (Reference (T (TypeN 0)))))))
                        (function_returns (UnionType 1))))
                      (function_impl
                       (Fn
@@ -1985,7 +2030,8 @@ let%expect_test "unions" =
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v (StructType 0))))
+                    ((function_params
+                      ((v (ExprType (Value (Type (StructType 0)))))))
                      (function_returns (UnionType 3))))
                    (function_impl
                     (Fn
@@ -2006,7 +2052,8 @@ let%expect_test "unions" =
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v (StructType 1))))
+                    ((function_params
+                      ((v (ExprType (Value (Type (StructType 1)))))))
                      (function_returns (UnionType 3))))
                    (function_impl
                     (Fn
@@ -2055,19 +2102,20 @@ let%expect_test "methods monomorphization" =
                     ((mk_struct_fields ())
                      (mk_methods
                       ((id
-                        ((function_signature
-                          ((function_params
-                            ((self (StructType 0))
-                             (x (ExprType (Reference (X (TypeN 0)))))))
-                           (function_returns
-                            (ExprType (Reference (X (TypeN 0)))))))
-                         (function_impl
-                          (Fn
-                           ((Block
-                             ((Break
-                               (Expr
-                                (Reference
-                                 (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
+                        (MkFunction
+                         ((function_signature
+                           ((function_params
+                             ((self (StructType 0))
+                              (x (ExprType (Reference (X (TypeN 0)))))))
+                            (function_returns
+                             (ExprType (Reference (X (TypeN 0)))))))
+                          (function_impl
+                           (Fn
+                            ((Block
+                              ((Break
+                                (Expr
+                                 (Reference
+                                  (x (ExprType (Reference (X (TypeN 0))))))))))))))))))
                      (mk_impls ()) (mk_struct_id 0))))))))))))))))
       (structs
        ((4
@@ -2078,10 +2126,7 @@ let%expect_test "methods monomorphization" =
                ((function_params ((self (StructType 4)) (x (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
-               (Fn
-                ((Block
-                  ((Break
-                    (Expr (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
+               (Fn ((Block ((Break (Expr (Reference (x (StructType 3))))))))))))))
           (struct_impls ()) (struct_id 4)))
         (3
          ((struct_fields ()) (struct_methods ()) (struct_impls ()) (struct_id 3)))
@@ -2093,10 +2138,7 @@ let%expect_test "methods monomorphization" =
                ((function_params ((self (StructType 1)) (x IntegerType)))
                 (function_returns IntegerType)))
               (function_impl
-               (Fn
-                ((Block
-                  ((Break
-                    (Expr (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))))
+               (Fn ((Block ((Break (Expr (Reference (x IntegerType)))))))))))))
           (struct_impls ()) (struct_id 1)))))
       (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
@@ -2210,7 +2252,8 @@ let%expect_test "switch statement" =
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v (StructType 0))))
+                    ((function_params
+                      ((v (ExprType (Value (Type (StructType 0)))))))
                      (function_returns (UnionType 3))))
                    (function_impl
                     (Fn
@@ -2231,7 +2274,8 @@ let%expect_test "switch statement" =
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((v (StructType 1))))
+                    ((function_params
+                      ((v (ExprType (Value (Type (StructType 1)))))))
                      (function_returns (UnionType 3))))
                    (function_impl
                     (Fn
@@ -2241,3 +2285,85 @@ let%expect_test "switch statement" =
                          3)))))))))))))))
           (union_id 3)))))
       (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+
+let%expect_test "partial evaluation of a function" =
+  let source =
+    {|
+      fn left(x: Integer, y: Integer) -> Integer {
+        x
+      }
+      fn test(x: Integer) {
+        fn(y: Integer) {
+          left(x, y)
+        }
+      }
+      let a = test(10);
+      let b = a(20);
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((b (Value (Integer 10)))
+        (a
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((y IntegerType))) (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (FunctionCall
+                    ((ResolvedReference (left <opaque>))
+                     ((Value (Integer 10)) (Reference (y IntegerType))))))))))))))))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((x IntegerType)))
+              (function_returns
+               (InvalidType
+                (MkFunction
+                 ((function_signature
+                   ((function_params ((y IntegerType)))
+                    (function_returns IntegerType)))
+                  (function_impl
+                   (Fn
+                    ((Block
+                      ((Break
+                        (Expr
+                         (FunctionCall
+                          ((ResolvedReference (left <opaque>))
+                           ((Value (Type (Dependent x IntegerType)))
+                            (Value (Type (ExprType (Reference (y IntegerType)))))))))))))))))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (MkFunction
+                    ((function_signature
+                      ((function_params ((y IntegerType)))
+                       (function_returns IntegerType)))
+                     (function_impl
+                      (Fn
+                       ((Block
+                         ((Break
+                           (Expr
+                            (FunctionCall
+                             ((ResolvedReference (left <opaque>))
+                              ((Reference (x IntegerType))
+                               (Reference (y IntegerType)))))))))))))))))))))))))
+        (left
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((x IntegerType) (y IntegerType)))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn ((Block ((Break (Expr (Reference (x IntegerType)))))))))))))))
+      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
