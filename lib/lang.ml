@@ -64,14 +64,22 @@ functor
           {function_params; function_returns}
       end
 
-    class ['s] constructor (bindings : (string * expr) list)
-      (structs : (int * struct_) list) (unions : (int * union) list)
-      (errors : _ errors) =
+    (* Unit is important, because this function should return
+       new program for each call, not one global mutable variable. *)
+    let default_program () =
+      { bindings = Builtin.default_bindings ();
+        structs = Builtin.default_structs;
+        unions = [];
+        struct_counter = 0;
+        memoized_fcalls = [] }
+
+    class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
         (* Bindings in scope *)
-        val mutable current_bindings = [List.map bindings ~f:make_comptime]
+        val mutable current_bindings =
+          [List.map program.bindings ~f:make_comptime]
 
         val type_checker = new type_checker errors 0
 
@@ -80,13 +88,7 @@ functor
 
         (* TODO: can we remove duplicating bindings here and the above? *)
         (* Program handle we pass to builtin functions. *)
-        val mutable program =
-          { bindings;
-            structs;
-            unions;
-            (* these IDs always come after built-in ones, which are all below 0 *)
-            struct_counter = 0;
-            memoized_fcalls = [] }
+        val mutable program = program
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)

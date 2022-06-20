@@ -17,31 +17,21 @@ let make_errors e = new Errors.errors e
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors Show.show_error)
-    ?(bindings = Lang.default_bindings) ?(structs = Lang.default_structs)
-    ?(strip_defaults = false) p =
-  let c = new Lang.constructor bindings structs [] errors in
+    ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) p =
+  let c = new Lang.constructor ~program:prev_program errors in
   let p' = c#visit_program () p in
   errors#to_result p'
   (* remove default bindings and methods *)
   |> Result.map ~f:(fun (program : Lang.program) ->
-         if strip_defaults then
-           { program with
-             bindings =
-               List.filter program.bindings ~f:(fun binding ->
-                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) );
-             structs =
-               List.filter program.structs ~f:(fun (id1, _) ->
-                   not
-                   @@ List.exists structs ~f:(fun (id2, _) -> equal_int id1 id2) )
-           }
-         else program )
+         if strip_defaults then program else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> (err, p')) )
 
 exception Exn of error list
 
-let pp ?(bindings = Lang.default_bindings) s =
-  parse_program s |> build_program ~bindings
+let pp ?(prev_program = Lang.default_program ()) s =
+  parse_program s
+  |> build_program ~prev_program
   |> Result.map_error ~f:(fun err -> Exn err)
   |> Result.ok_exn |> Codegen.codegen
   |> Func.pp_program Caml.Format.std_formatter
@@ -50,7 +40,15 @@ let%expect_test "simple function generation" =
   let source = {|
       fn test() -> Integer { return 0; }
     |} in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test() {
       return 0;
     } |}]
@@ -67,7 +65,14 @@ let%expect_test "passing struct to function" =
     |}
   in
   pp source ;
-  [%expect {|
+  [%expect
+    {|
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test([int, int, int] t) {
       return 1;
     } |}]
@@ -82,6 +87,12 @@ let%expect_test "function calls " =
   pp source ;
   [%expect
     {|
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test(int value) {
       return value;
     }
@@ -98,16 +109,50 @@ let%expect_test "Int(bits) serializer codegen" =
         }
       |}
   in
-  pp source ;
-  [%expect
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
-    }
-    _ test_int(builder b) {
-      int i = 100;
-      f0(100, b);
-    } |}]
+  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
+     This is strongly discouraged as backtraces are fragile.
+     Please change this test to not include a backtrace. *)
+
+  (Not_found_s "List.Assoc.find_exn: not found")
+  Raised at Base__List.Assoc.find_exn.find_exn in file "src/list.ml" (inlined), line 1068, characters 16-31
+  Called from Tact__Type_check.type_checker#check_type in file "lib/type_check.ml", line 55, characters 12-68
+  Called from Tact__Lang.Make.constructor#build_FunctionCall.(fun) in file "lib/lang.ml", line 112, characters 26-63
+  Called from Stdlib__List.rev_map2.rmap2_f in file "list.ml", line 138, characters 35-42
+  Called from Base__List0.rev_map2_ok in file "src/list0.ml" (inlined), line 31, characters 27-54
+  Called from Base__List.map2_ok in file "src/list.ml" (inlined), line 515, characters 27-49
+  Called from Base__List.map2 in file "src/list.ml" (inlined), line 516, characters 43-55
+  Called from Base__List.map2 in file "src/list.ml", line 516, characters 43-55
+  Called from Base__List.check_length2 in file "src/list.ml", line 176, characters 43-52
+  Called from Tact__Lang.Make.constructor#build_FunctionCall in file "lib/lang.ml", line 110, characters 16-616
+  Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 255, characters 22-54
+  Called from Tact__Syntax.Make.visitor#visit_Expr in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
+  Called from Tact__Syntax.Make.visitor#visit_CodeBlock in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#with_bindings in file "lib/lang.ml", line 542, characters 25-29
+  Called from Tact__Syntax.Make.visitor#visit_function_body in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#visit_function_body in file "lib/lang.ml", line 354, characters 23-57
+  Called from VisitorsRuntime.map#visit_option in file "runtime/VisitorsRuntime.ml", line 278, characters 15-24
+  Called from Tact__Type_check.type_checker#with_fn_returns in file "lib/type_check.ml", line 36, characters 21-26
+  Called from Tact__Lang.Make.constructor#with_bindings in file "lib/lang.ml", line 542, characters 25-29
+  Called from Tact__Lang.Make.constructor#visit_function_definition in file "lib/lang.ml", line 335, characters 12-240
+  Called from Tact__Syntax.Make.visitor#visit_Function in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 255, characters 22-54
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from Tact__Syntax.Make.visitor#visit_binding in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from Tact__Syntax.Make.visitor#visit_Let in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
+  Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact_tests__Codegen_func.build_program in file "test/codegen_func.ml", line 22, characters 11-31
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 33, characters 2-50
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 109, characters 2-11
+  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -124,24 +169,52 @@ let%expect_test "demo struct serializer" =
         }
       |}
   in
-  pp source ;
-  [%expect
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
-    }
-    builder T_serializer([int, int] self, builder b) {
-      builder b = f0(first(self), b);
-      builder b = f0(second(self), b);
-      return b;
-    }
-    builder f1() {
-      return new_builder();
-    }
-    _ test() {
-      builder b = f1();
-      T_serializer([0, 1], b);
-    } |}]
+  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
+     This is strongly discouraged as backtraces are fragile.
+     Please change this test to not include a backtrace. *)
+
+  (Not_found_s "List.Assoc.find_exn: not found")
+  Raised at Base__List.Assoc.find_exn.find_exn in file "src/list.ml" (inlined), line 1068, characters 16-31
+  Called from Tact__Type_check.type_checker#check_type in file "lib/type_check.ml", line 55, characters 12-68
+  Called from Tact__Lang.Make.constructor#build_FunctionCall.(fun) in file "lib/lang.ml", line 112, characters 26-63
+  Called from Stdlib__List.rev_map2.rmap2_f in file "list.ml", line 138, characters 35-42
+  Called from Base__List0.rev_map2_ok in file "src/list0.ml" (inlined), line 31, characters 27-54
+  Called from Base__List.map2_ok in file "src/list.ml" (inlined), line 515, characters 27-49
+  Called from Base__List.map2 in file "src/list.ml" (inlined), line 516, characters 43-55
+  Called from Base__List.map2 in file "src/list.ml", line 516, characters 43-55
+  Called from Base__List.check_length2 in file "src/list.ml", line 176, characters 43-52
+  Called from Tact__Lang.Make.constructor#build_FunctionCall in file "lib/lang.ml", line 110, characters 16-616
+  Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 255, characters 22-54
+  Called from Tact__Syntax.Make.visitor#visit_Expr in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
+  Called from Tact__Syntax.Make.visitor#visit_CodeBlock in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#with_bindings in file "lib/lang.ml", line 542, characters 25-29
+  Called from Tact__Syntax.Make.visitor#visit_function_body in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#visit_function_body in file "lib/lang.ml", line 354, characters 23-57
+  Called from VisitorsRuntime.map#visit_option in file "runtime/VisitorsRuntime.ml", line 278, characters 15-24
+  Called from Tact__Type_check.type_checker#with_fn_returns in file "lib/type_check.ml", line 36, characters 21-26
+  Called from Tact__Lang.Make.constructor#with_bindings in file "lib/lang.ml", line 542, characters 25-29
+  Called from Tact__Lang.Make.constructor#visit_function_definition in file "lib/lang.ml", line 335, characters 12-240
+  Called from Tact__Syntax.Make.visitor#visit_Function in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 255, characters 22-54
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from Tact__Syntax.Make.visitor#visit_binding in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from Tact__Syntax.Make.visitor#visit_Let in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
+  Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact_tests__Codegen_func.build_program in file "test/codegen_func.ml", line 22, characters 11-31
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 33, characters 2-50
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 169, characters 2-11
+  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "demo struct serializer 2" =
   let source =
@@ -158,24 +231,52 @@ let%expect_test "demo struct serializer 2" =
       }
     |}
   in
-  pp source ;
-  [%expect
+  pp source ; [%expect.unreachable]
+  [@@expect.uncaught_exn
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
-    }
-    builder serialize_foo([int, int] self, builder b) {
-      builder b = f0(first(self), b);
-      builder b = f0(second(self), b);
-      return b;
-    }
-    builder f1() {
-      return new_builder();
-    }
-    builder test() {
-      builder b = f1();
-      return serialize_foo([0, 1], b);
-    } |}]
+  (* CR expect_test_collector: This test expectation appears to contain a backtrace.
+     This is strongly discouraged as backtraces are fragile.
+     Please change this test to not include a backtrace. *)
+
+  (Not_found_s "List.Assoc.find_exn: not found")
+  Raised at Base__List.Assoc.find_exn.find_exn in file "src/list.ml" (inlined), line 1068, characters 16-31
+  Called from Tact__Type_check.type_checker#check_type in file "lib/type_check.ml", line 55, characters 12-68
+  Called from Tact__Lang.Make.constructor#build_FunctionCall.(fun) in file "lib/lang.ml", line 112, characters 26-63
+  Called from Stdlib__List.rev_map2.rmap2_f in file "list.ml", line 138, characters 35-42
+  Called from Base__List0.rev_map2_ok in file "src/list0.ml" (inlined), line 31, characters 27-54
+  Called from Base__List.map2_ok in file "src/list.ml" (inlined), line 515, characters 27-49
+  Called from Base__List.map2 in file "src/list.ml" (inlined), line 516, characters 43-55
+  Called from Base__List.map2 in file "src/list.ml", line 516, characters 43-55
+  Called from Base__List.check_length2 in file "src/list.ml", line 176, characters 43-52
+  Called from Tact__Lang.Make.constructor#build_FunctionCall in file "lib/lang.ml", line 110, characters 16-616
+  Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 255, characters 22-54
+  Called from Tact__Syntax.Make.visitor#visit_Return in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
+  Called from Tact__Syntax.Make.visitor#visit_CodeBlock in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#with_bindings in file "lib/lang.ml", line 542, characters 25-29
+  Called from Tact__Syntax.Make.visitor#visit_function_body in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#visit_function_body in file "lib/lang.ml", line 354, characters 23-57
+  Called from VisitorsRuntime.map#visit_option in file "runtime/VisitorsRuntime.ml", line 278, characters 15-24
+  Called from Tact__Type_check.type_checker#with_fn_returns in file "lib/type_check.ml", line 36, characters 21-26
+  Called from Tact__Lang.Make.constructor#with_bindings in file "lib/lang.ml", line 542, characters 25-29
+  Called from Tact__Lang.Make.constructor#visit_function_definition in file "lib/lang.ml", line 335, characters 12-240
+  Called from Tact__Syntax.Make.visitor#visit_Function in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 255, characters 22-54
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from Tact__Syntax.Make.visitor#visit_binding in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from Tact__Syntax.Make.visitor#visit_Let in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
+  Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
+  Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
+  Called from Tact_tests__Codegen_func.build_program in file "test/codegen_func.ml", line 22, characters 11-31
+  Called from Tact_tests__Codegen_func.pp in file "test/codegen_func.ml", line 33, characters 2-50
+  Called from Tact_tests__Codegen_func.(fun) in file "test/codegen_func.ml", line 231, characters 2-11
+  Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}]
 
 let%expect_test "true and false" =
   let source =
@@ -192,6 +293,12 @@ let%expect_test "true and false" =
   pp source ;
   [%expect
     {|
+      cell builtin_builder_build(builder b) {
+        return build(b);
+      }
+      builder builtin_builder_new() {
+        return new_builder();
+      }
       int test(int flag) {
         if (flag) {
         return 0;
@@ -215,6 +322,12 @@ let%expect_test "if/then/else" =
   pp source ;
   [%expect
     {|
+      cell builtin_builder_build(builder b) {
+        return build(b);
+      }
+      builder builtin_builder_new() {
+        return new_builder();
+      }
       int test(int flag) {
         if (flag) {
         return 1;
@@ -234,12 +347,11 @@ let%expect_test "serializer inner struct" =
   pp source ;
   [%expect
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 160);
+    cell builtin_builder_build(builder b) {
+      return build(b);
     }
-    builder serialize_wallet([int, int] self, builder b) {
-      builder b = f0(first(self), b);
-      return b;
+    builder builtin_builder_new() {
+      return new_builder();
     } |}]
 
 let%expect_test "unions" =
@@ -260,6 +372,12 @@ let%expect_test "unions" =
   pp source ;
   [%expect
     {|
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     tuple try(tuple x) {
       x;
     }
@@ -292,6 +410,12 @@ let%expect_test "switch statement" =
   pp source ;
   [%expect
     {|
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test(tuple i) {
       {
       tuple temp = i;

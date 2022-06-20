@@ -39,7 +39,7 @@ let builder_struct = StructType builder_id
 
 let cell = Value (Type (BuiltinType "Cell"))
 
-let int_type =
+let int_type () =
   (* memoize struct ids for equality *)
   let struct_ids = Hashtbl.create (module Int)
   (* memoize constructor funs for equality *)
@@ -204,10 +204,33 @@ let from_intf =
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
-let default_bindings =
-  [ ("Builder", Value (Type builder_struct));
-    ("Integer", Value (Type IntegerType));
-    ("Int", int_type);
+let builtin_bindings =
+  [ ("builtin_Builder", Value (Type (BuiltinType "Builder")));
+    ("builtin_Cell", Value (Type (BuiltinType "Cell")));
+    ( "builtin_builder_new",
+      Value
+        (Function
+           { function_signature =
+               {function_params = []; function_returns = BuiltinType "Builder"};
+             function_impl = Fn (Some (Return (Primitive EmptyBuilder))) } ) );
+    ( "builtin_builder_build",
+      Value
+        (Function
+           { function_signature =
+               { function_params = [("b", BuiltinType "Builder")];
+                 function_returns = BuiltinType "Cell" };
+             function_impl =
+               Fn
+                 (Some
+                    (Return
+                       (Primitive
+                          (BuildCell
+                             {builder = Reference ("b", BuiltinType "Builder")}
+                          ) ) ) ) } ) ) ]
+
+let default_bindings () =
+  [ ("Integer", Value (Type IntegerType));
+    ("Int", int_type ());
     ("Bool", Value (Type BoolType));
     ("Type", Value (Type type0));
     ("Void", Value Void);
@@ -217,5 +240,20 @@ let default_bindings =
     ("serializer", serializer);
     ("BinOp", bin_op_intf);
     ("From", from_intf) ]
+  @ builtin_bindings
 
-let default_structs = [(builder_id, builder_struct_info)]
+let default_structs = []
+
+let std =
+  {|
+struct Builder {
+  val b: builtin_Builder
+
+  fn new() -> Self {
+    Self { b: builtin_new_builder() }
+  }
+  fn build(self: Self) -> builtin_Cell {
+    builtin_builder_build(self.b)
+  }
+}
+|}

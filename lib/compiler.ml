@@ -89,30 +89,39 @@ open struct
     I.loop_handle succeed (fail ebuffer text buffer) supplier checkpoint
 end
 
-let rec compile ?(codegen = Codegen_func.codegen) ?(filename = "<unnamed>") ch =
+let rec compile ?(codegen_impl = Codegen_func.codegen) ?(filename = "<unnamed>")
+    ch =
   let text = really_input_string ch (in_channel_length ch) in
   close_in ch ;
-  compile_from_string ~codegen ~filename text
+  compile_from_string ~codegen_impl ~filename text
 
-and compile_from_string ?(codegen = Codegen_func.codegen)
-    ?(filename = "<unnamed>") text =
+and compile_from_string ?(codegen_impl = Codegen_func.codegen)
+    ?(filename = "<unnamed>") src =
+  let std = Result.get_ok (compile_to_ir ~filename:"std" Builtin.std) in
+  codegen ~codegen_impl (compile_to_ir ~prev_program:std ~filename src)
+
+and codegen ?(codegen_impl = Codegen_func.codegen) program =
+  match program with
+  | Ok program' ->
+      let generated_code = codegen_impl program' and buffer = Buffer.create 0 in
+      let formatter = Caml.Format.formatter_of_buffer buffer in
+      Func.pp_program formatter generated_code ;
+      Ok (Buffer.contents buffer)
+  | Error e ->
+      Error e
+
+and compile_to_ir ?(prev_program = Lang.default_program ()) ~filename text =
   let lexbuf = L.init filename @@ Lexing.from_string text in
   match Parser.program Lexer.token lexbuf with
   | stx -> (
       let errors = new Errors.errors Show.show_error in
-      let constructor =
-        new Lang.constructor
-          Lang.default_bindings Lang.default_structs [] errors
-      in
+      let constructor = new Lang.constructor ~program:prev_program errors in
       let program = constructor#visit_program () stx in
       match errors#to_result program with
       | Error _ ->
           Error errors#show_errors
       | Ok program ->
-          let generated_code = codegen program and buffer = Buffer.create 0 in
-          let formatter = Caml.Format.formatter_of_buffer buffer in
-          Func.pp_program formatter generated_code ;
-          Ok (Buffer.contents buffer) )
+          Ok program )
   | exception Lexer.Error msg ->
       Error ("lexing error: " ^ msg)
   | exception Parser.Error ->
