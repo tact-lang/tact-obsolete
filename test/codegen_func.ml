@@ -17,31 +17,27 @@ let make_errors e = new Errors.errors e
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
 let build_program ?(errors = make_errors Show.show_error)
-    ?(bindings = Lang.default_bindings) ?(structs = Lang.default_structs)
-    ?(strip_defaults = false) p =
-  let c = new Lang.constructor bindings structs [] errors in
+    ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) p =
+  let std =
+    let c = new Lang.constructor ~program:prev_program errors in
+    let p' = c#visit_program () (parse_program Tact.Builtin.std) in
+    p'
+  in
+  let c = new Lang.constructor ~program:std errors in
   let p' = c#visit_program () p in
-  errors#to_result p'
+  errors#to_result ()
+  |> Result.map ~f:(fun _ -> p')
   (* remove default bindings and methods *)
   |> Result.map ~f:(fun (program : Lang.program) ->
-         if strip_defaults then
-           { program with
-             bindings =
-               List.filter program.bindings ~f:(fun binding ->
-                   not @@ List.exists bindings ~f:(Lang.equal_binding binding) );
-             structs =
-               List.filter program.structs ~f:(fun (id1, _) ->
-                   not
-                   @@ List.exists structs ~f:(fun (id2, _) -> equal_int id1 id2) )
-           }
-         else program )
+         if strip_defaults then program else program )
   |> Result.map_error ~f:(fun errors ->
          List.map errors ~f:(fun (_, err, _) -> (err, p')) )
 
 exception Exn of error list
 
-let pp ?(bindings = Lang.default_bindings) s =
-  parse_program s |> build_program ~bindings
+let pp ?(prev_program = Lang.default_program ()) s =
+  parse_program s
+  |> build_program ~prev_program
   |> Result.map_error ~f:(fun err -> Exn err)
   |> Result.ok_exn |> Codegen.codegen
   |> Func.pp_program Caml.Format.std_formatter
@@ -50,12 +46,23 @@ let%expect_test "simple function generation" =
   let source = {|
       fn test() -> Integer { return 0; }
     |} in
-  pp source ; [%expect {|
+  pp source ;
+  [%expect
+    {|
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test() {
       return 0;
     } |}]
 
-let%expect_test "passing struct to function" =
+let%expect_test "passing struct to a function" =
   let source =
     {|
       struct T { 
@@ -67,12 +74,22 @@ let%expect_test "passing struct to function" =
     |}
   in
   pp source ;
-  [%expect {|
+  [%expect
+    {|
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test([int, int, int] t) {
       return 1;
     } |}]
 
-let%expect_test "function calls " =
+let%expect_test "function calls" =
   let source =
     {|
       fn test(value: Integer) -> Integer { return value; }
@@ -82,6 +99,15 @@ let%expect_test "function calls " =
   pp source ;
   [%expect
     {|
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test(int value) {
       return value;
     }
@@ -101,8 +127,21 @@ let%expect_test "Int(bits) serializer codegen" =
   pp source ;
   [%expect
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
+    builder f1(builder self, int int, int bits) {
+      cell b = builtin_builder_store_int(self, int, bits);
+      b;
+    }
+    builder f0(int self, builder builder) {
+      f1(builder, self, 32);
     }
     _ test_int(builder b) {
       int i = 100;
@@ -127,19 +166,35 @@ let%expect_test "demo struct serializer" =
   pp source ;
   [%expect
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
+    builder f1(builder self, int int, int bits) {
+      cell b = builtin_builder_store_int(self, int, bits);
+      b;
+    }
+    builder f0(int self, builder builder) {
+      f1(builder, self, 32);
+    }
+    builder f2(int self, builder builder) {
+      f1(builder, self, 16);
     }
     builder T_serializer([int, int] self, builder b) {
       builder b = f0(first(self), b);
-      builder b = f0(second(self), b);
+      builder b = f2(second(self), b);
       return b;
     }
-    builder f1() {
-      return new_builder();
+    builder f3() {
+      builtin_builder_new();
     }
     _ test() {
-      builder b = f1();
+      builder b = f3();
       T_serializer([0, 1], b);
     } |}]
 
@@ -161,19 +216,35 @@ let%expect_test "demo struct serializer 2" =
   pp source ;
   [%expect
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 32);
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
+    builder f1(builder self, int int, int bits) {
+      cell b = builtin_builder_store_int(self, int, bits);
+      b;
+    }
+    builder f0(int self, builder builder) {
+      f1(builder, self, 32);
+    }
+    builder f2(int self, builder builder) {
+      f1(builder, self, 16);
     }
     builder serialize_foo([int, int] self, builder b) {
       builder b = f0(first(self), b);
-      builder b = f0(second(self), b);
+      builder b = f2(second(self), b);
       return b;
     }
-    builder f1() {
-      return new_builder();
+    builder f3() {
+      builtin_builder_new();
     }
     builder test() {
-      builder b = f1();
+      builder b = f3();
       return serialize_foo([0, 1], b);
     } |}]
 
@@ -192,6 +263,15 @@ let%expect_test "true and false" =
   pp source ;
   [%expect
     {|
+      cell builtin_builder_store_int(builder b, int int, int bits) {
+        return store_int(b, int, bits);
+      }
+      cell builtin_builder_build(builder b) {
+        return build(b);
+      }
+      builder builtin_builder_new() {
+        return new_builder();
+      }
       int test(int flag) {
         if (flag) {
         return 0;
@@ -215,6 +295,15 @@ let%expect_test "if/then/else" =
   pp source ;
   [%expect
     {|
+      cell builtin_builder_store_int(builder b, int int, int bits) {
+        return store_int(b, int, bits);
+      }
+      cell builtin_builder_build(builder b) {
+        return build(b);
+      }
+      builder builtin_builder_new() {
+        return new_builder();
+      }
       int test(int flag) {
         if (flag) {
         return 1;
@@ -234,8 +323,21 @@ let%expect_test "serializer inner struct" =
   pp source ;
   [%expect
     {|
-    builder f0(int self, builder b) {
-      return store_int(b, self, 160);
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
+    builder f1(builder self, int int, int bits) {
+      cell b = builtin_builder_store_int(self, int, bits);
+      b;
+    }
+    builder f0(int self, builder builder) {
+      f1(builder, self, 32);
     }
     builder serialize_wallet([int, int] self, builder b) {
       builder b = f0(first(self), b);
@@ -260,6 +362,15 @@ let%expect_test "unions" =
   pp source ;
   [%expect
     {|
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     tuple try(tuple x) {
       x;
     }
@@ -292,6 +403,15 @@ let%expect_test "switch statement" =
   pp source ;
   [%expect
     {|
+    cell builtin_builder_store_int(builder b, int int, int bits) {
+      return store_int(b, int, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return build(b);
+    }
+    builder builtin_builder_new() {
+      return new_builder();
+    }
     int test(tuple i) {
       {
       tuple temp = i;

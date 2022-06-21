@@ -19,7 +19,8 @@ functor
       | `TypeError of type_ * type_
       | `ExpectedFunction of type_
       | `UnallowedStmt of stmt
-      | `OnlyFunctionIsAllowed ]
+      | `OnlyFunctionIsAllowed
+      | `FieldNotFoundF of string ]
     [@@deriving equal, sexp_of]
 
     include Builtin
@@ -64,14 +65,22 @@ functor
           {function_params; function_returns}
       end
 
-    class ['s] constructor (bindings : (string * expr) list)
-      (structs : (int * struct_) list) (unions : (int * union) list)
-      (errors : _ errors) =
+    (* Unit is important, because this function should return
+       new program for each call, not one global mutable variable. *)
+    let default_program () =
+      { bindings = Builtin.default_bindings ();
+        structs = Builtin.default_structs;
+        unions = [];
+        struct_counter = 0;
+        memoized_fcalls = [] }
+
+    class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
         (* Bindings in scope *)
-        val mutable current_bindings = [List.map bindings ~f:make_comptime]
+        val mutable current_bindings =
+          [List.map program.bindings ~f:make_comptime]
 
         val type_checker = new type_checker errors 0
 
@@ -80,13 +89,7 @@ functor
 
         (* TODO: can we remove duplicating bindings here and the above? *)
         (* Program handle we pass to builtin functions. *)
-        val mutable program =
-          { bindings;
-            structs;
-            unions;
-            (* these IDs always come after built-in ones, which are all below 0 *)
-            struct_counter = 0;
-            memoized_fcalls = [] }
+        val mutable program = program
 
         method build_CodeBlock _env code_block =
           Block (s#of_located_list code_block)
@@ -96,9 +99,9 @@ functor
 
         method build_Enum _env _enum = InvalidExpr
 
-        method build_FieldAccess _env _fieldaccess = InvalidExpr
+        method build_FieldAccess _env fieldaccess = StructField fieldaccess
 
-        method build_Function _env fn = Value (Function fn)
+        method build_Function _env fn = MkFunction fn
 
         method build_FunctionCall _env (f, args) =
           match type_of f with
@@ -268,7 +271,23 @@ functor
 
         method build_enum_member _env _name _value = ()
 
-        method build_field_access _env _expr _field = ()
+        method build_field_access _env expr field =
+          let expr = Syntax.value expr in
+          let field = Syntax.value field in
+          match type_of expr with
+          | StructType s -> (
+              let struct_ = Program.get_struct program s in
+              match
+                List.Assoc.find struct_.struct_fields field ~equal:equal_string
+              with
+              | Some {field_type} ->
+                  (expr, field, field_type)
+              | None ->
+                  errors#report `Error (`FieldNotFoundF field) () ;
+                  (Value Void, field, VoidType) )
+          | _ ->
+              errors#report `Error (`FieldNotFoundF field) () ;
+              (Value Void, field, VoidType)
 
         method build_function_call _env fn args =
           (Syntax.value fn, s#of_located_list args)
@@ -306,9 +325,14 @@ functor
           | ResolvedReference (_, Value (Struct (st, _)))
           | Value (Struct (st, _)) ->
               make_call st ~mk_args:(fun args -> receiver :: args)
-          | receiver' ->
-              errors#report `Error (`UnexpectedType (type_of receiver')) () ;
-              dummy
+          | receiver' -> (
+            match type_of receiver' with
+            | StructType s ->
+                make_call s ~mk_args:(fun args -> receiver :: args)
+            | _ ->
+                print_sexp (sexp_of_expr receiver') ;
+                errors#report `Error (`UnexpectedType (type_of receiver')) () ;
+                dummy )
 
         method! visit_function_definition env f =
           (* prepare parameter bindings *)
@@ -405,8 +429,8 @@ functor
             List.filter_map bindings ~f:(fun binding ->
                 let name, expr = Syntax.value binding in
                 match expr with
-                | Value (Function f) ->
-                    Some (name, f)
+                | Value (Function _) | MkFunction _ ->
+                    Some (name, expr)
                 | _ ->
                     None )
           in
@@ -415,8 +439,8 @@ functor
               (List.map impls ~f:(fun impl ->
                    List.filter_map impl.impl_methods ~f:(fun (name, ex) ->
                        match ex with
-                       | Value (Function f) ->
-                           Some (name, f)
+                       | Value (Function _) | MkFunction _ ->
+                           Some (name, ex)
                        | _ ->
                            None ) ) )
           in
@@ -514,8 +538,8 @@ functor
                 |> s#of_located_list
                 |> List.map ~f:(fun (name, e) ->
                        match e with
-                       | Value (Function f) ->
-                           (name, f)
+                       | Value (Function _) | MkFunction _ ->
+                           (name, e)
                        | _ ->
                            raise InternalCompilerError )
               in

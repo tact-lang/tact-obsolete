@@ -189,7 +189,7 @@ class constructor (program : T.program) =
         in
         List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
 
-    method cg_StructField (from_expr, field) =
+    method cg_StructField (from_expr, field, _) =
       let build_access struct_ty field field_ty =
         let name =
           match field with

@@ -12,11 +12,15 @@ type error =
 [@@deriving equal, sexp_of]
 
 class ['s] struct_updater (old : int) (new_s : int) =
-  object
+  object (self : 's)
     inherit ['s] map
 
     method! visit_StructType _ s =
       if equal_int s old then StructType new_s else StructType s
+
+    method! visit_Struct env (s, fields) =
+      let fields' = self#visit_list self#visit_binding env fields in
+      if equal_int s old then Struct (new_s, fields') else Struct (s, fields')
   end
 
 class ['s] union_updater (old : int) (new_s : int) =
@@ -60,6 +64,8 @@ class interpreter
     val mutable return = Void
 
     val mutable adding_structs = []
+
+    val mutable errors = errors
 
     method interpret_stmt_list : stmt list -> value =
       fun stmts ->
@@ -142,7 +148,7 @@ class interpreter
           | None ->
               errors#report `Error (`UnresolvedIdentifier name) () ;
               Void )
-        | StructField (struct_, field) -> (
+        | StructField (struct_, field, _) -> (
           match self#interpret_expr struct_ with
           | Struct (struct_, struct') -> (
             match List.Assoc.find struct' ~equal:String.equal field with
@@ -184,8 +190,14 @@ class interpreter
                         vars_scope <-
                           [("Self", Type (StructType struct_ty))] :: vars_scope ;
                         let output =
-                          self#interpret_function
-                            (struct_updater#visit_function_ () fn)
+                          match
+                            self#interpret_expr
+                              (struct_updater#visit_expr () fn)
+                          with
+                          | Function f ->
+                              f
+                          | _ ->
+                              raise InternalCompilerError
                         in
                         vars_scope <- prev_scope ;
                         (name, output) )
@@ -235,8 +247,13 @@ class interpreter
                           [("Self", Type (UnionType u_base.union_id))]
                           :: vars_scope ;
                         let output =
-                          self#interpret_function
-                            (union_updater#visit_function_ () fn)
+                          match
+                            self#interpret_expr (union_updater#visit_expr () fn)
+                          with
+                          | Function f ->
+                              f
+                          | _ ->
+                              raise InternalCompilerError
                         in
                         vars_scope <- prev_scope ;
                         (name, output) )
@@ -260,13 +277,20 @@ class interpreter
               |> Result.ok_exn
             in
             Type (UnionType union.union_id)
+        | MkFunction f ->
+            Function (self#interpret_function f)
         | Primitive _ | InvalidExpr | Hole ->
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
     method interpret_type : type_ -> type_ =
       function
-      | ExprType ex -> expr_to_type (Value (self#interpret_expr ex)) | ty -> ty
+      | ExprType (Value (Type t)) ->
+          self#interpret_type t
+      | ExprType ex ->
+          expr_to_type (Value (self#interpret_expr ex))
+      | ty ->
+          ty
 
     (* TBD: previously we defined value as "atom" which cannot be interpreted, but below
        we interpret values. Should we move `Type`, `Struct` and `Function` to the `expr` type?*)
@@ -280,24 +304,15 @@ class interpreter
               ( s,
                 List.map fields ~f:(fun (n, f) ->
                     (n, Value (self#interpret_expr f)) ) )
-        | Function f ->
-            Function (self#interpret_function f)
         | value ->
             value
 
     method interpret_function : function_ -> function_ =
-      fun f ->
-        { function_signature =
-            { function_params =
-                List.map f.function_signature.function_params
-                  ~f:(fun (name, x) -> (name, self#interpret_type x));
-              function_returns =
-                self#interpret_type f.function_signature.function_returns };
-          (* TODO: partial evaluation of fn *)
-          function_impl = (match f.function_impl with Fn b -> Fn b | x -> x) }
+      fun f -> self#partial_evaluate_function f
 
     method interpret_fc : function_call -> value =
       fun (func, args) ->
+        let f = self#interpret_expr func in
         let args' = List.map args ~f:(fun arg -> self#interpret_expr arg) in
         let mk_err = Expr (FunctionCall (func, args)) in
         let args_to_list params values =
@@ -309,7 +324,6 @@ class interpreter
           | _ ->
               Error mk_err
         in
-        let f = self#interpret_expr func in
         get_memoized_or_execute program (f, args') ~execute:(fun f args' ->
             match f with
             | Function f -> (
@@ -378,4 +392,82 @@ class interpreter
                 acc
             | false ->
                 x :: acc )
+
+    (* This method resolves references that can be resolved at this point of execution. *)
+    method private partial_evaluate_function : function_ -> function_ =
+      fun fn ->
+        (* TODO: This should evaluate everything that can. *)
+        let evaluator =
+          object (self_eval)
+            inherit [_] Lang_types.map as super
+
+            val mutable local_vars = []
+
+            method! visit_expr env =
+              function
+              | Reference (ref, ty) -> (
+                match
+                  List.find_map local_vars ~f:(fun binds ->
+                      List.find binds ~f:(fun x -> equal_string x ref) )
+                with
+                | Some ref ->
+                    let new_ty = self_eval#visit_type_ env ty in
+                    Reference (ref, new_ty)
+                | None -> (
+                  match self#find_ref ref with
+                  | Some ex ->
+                      ex
+                  | None ->
+                      let new_ty = self_eval#visit_type_ env ty in
+                      Reference (ref, new_ty) ) )
+              | ex ->
+                  super#visit_expr env ex
+
+            (* TODO: I do not know why `ExprType` flows into output. *)
+            method! visit_type_ env ty =
+              self_eval#unwrap_expr_types (super#visit_type_ env ty)
+
+            method private unwrap_expr_types =
+              function
+              | ExprType (Value (Type t)) ->
+                  self_eval#unwrap_expr_types t
+              | ExprType (ResolvedReference (_, Value (Type t))) ->
+                  self_eval#unwrap_expr_types t
+              | t ->
+                  t
+
+            method! visit_Block env b =
+              self_eval#with_vars [] (fun _ -> super#visit_Block env b)
+
+            method! visit_Let env vars =
+              (* TODO: this does not work if `vars` will be actually a list. *)
+              let vars' = super#visit_Let env vars in
+              let vars_names = List.map vars ~f:(fun (name, _) -> name) in
+              local_vars <- vars_names :: local_vars ;
+              vars'
+
+            method! visit_function_ env f =
+              let sign =
+                self_eval#visit_function_signature env f.function_signature
+              in
+              let args =
+                List.map sign.function_params ~f:(fun (name, _) -> name)
+              in
+              self_eval#with_vars args (fun _ ->
+                  let body =
+                    self_eval#visit_function_impl env f.function_impl
+                  in
+                  {function_signature = sign; function_impl = body} )
+
+            method private with_vars : 'a. _ -> (unit -> 'a) -> 'a =
+              fun vars f ->
+                let prev_vars = local_vars in
+                local_vars <- vars :: local_vars ;
+                let out = f () in
+                local_vars <- prev_vars ;
+                out
+          end
+        in
+        let new_fn = evaluator#visit_function_ () fn in
+        new_fn
   end
