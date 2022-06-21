@@ -37,7 +37,7 @@ and program =
   { bindings : (string * expr) list;
     mutable structs : (int * struct_) list;
     mutable unions : (int * union) list; [@sexp.list]
-    mutable struct_counter : (int[@sexp.opaque]);
+    mutable type_counter : (int[@sexp.opaque]);
     mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
   }
 
@@ -398,8 +398,8 @@ module Program = struct
   (* Creates new struct id, calls function with this new id and then
      places returning struct to the program.structs *)
   let with_id p f =
-    let id = p.struct_counter in
-    p.struct_counter <- p.struct_counter + 1 ;
+    let id = p.type_counter in
+    p.type_counter <- p.type_counter + 1 ;
     let new_s = f id in
     p.structs <- (id, new_s) :: p.structs ;
     new_s
@@ -413,8 +413,8 @@ module Program = struct
   (* Creates new struct id, calls function with this new id and then
      places returning union to the program.unions *)
   let with_union_id p mk_union f =
-    let id = p.struct_counter in
-    p.struct_counter <- p.struct_counter + 1 ;
+    let id = p.type_counter in
+    p.type_counter <- p.type_counter + 1 ;
     let u = mk_union id in
     p.unions <- (u.union_id, u) :: p.unions ;
     let new_union = f u in

@@ -175,8 +175,8 @@ class interpreter
                         expr_to_type (Value (self#interpret_expr field_type)) }
                   ) )
             in
-            let struct_id = program.struct_counter in
-            program.struct_counter <- program.struct_counter + 1 ;
+            let struct_id = program.type_counter in
+            program.type_counter <- program.type_counter + 1 ;
             let struct_ty = struct_id in
             let struct_ =
               {struct_fields; struct_methods = []; struct_impls = []; struct_id}

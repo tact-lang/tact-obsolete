@@ -97,7 +97,7 @@ let%expect_test "scope resolution" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "binding resolution" =
   let source = {|
@@ -172,7 +172,7 @@ let%expect_test "binding resolution" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "failed scope resolution" =
   let source = {|
@@ -183,7 +183,7 @@ let%expect_test "failed scope resolution" =
     {|
     (Error
      (((UnresolvedIdentifier Int256)
-       ((bindings ()) (structs ()) (struct_counter <opaque>)
+       ((bindings ()) (structs ()) (type_counter <opaque>)
         (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "scope resolution after let binding" =
@@ -261,7 +261,7 @@ let%expect_test "scope resolution after let binding" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "basic struct definition" =
   let source = {|
@@ -339,7 +339,7 @@ let%expect_test "basic struct definition" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "native function evaluation" =
   let source = {|
@@ -352,7 +352,7 @@ let%expect_test "native function evaluation" =
   [%expect
     {|
     (Ok
-     ((bindings ((v (Value (Integer 4))))) (structs ()) (struct_counter <opaque>)
+     ((bindings ((v (Value (Integer 4))))) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "Tact function evaluation" =
@@ -442,7 +442,7 @@ let%expect_test "Tact function evaluation" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "compile-time function evaluation within a function" =
   let source =
@@ -471,7 +471,7 @@ let%expect_test "compile-time function evaluation within a function" =
               ((Block
                 ((Let ((v (Value (Integer 4)))))
                  (Break (Expr (ResolvedReference (v <opaque>)))))))))))))))
-      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "struct definition" =
   let source =
@@ -555,7 +555,7 @@ let%expect_test "struct definition" =
                             (Value
                              (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
             (struct_id 3)))))
-        (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+        (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "duplicate type field" =
   let source =
@@ -644,7 +644,7 @@ let%expect_test "duplicate type field" =
                             (Value
                              (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
             (struct_id 3)))))
-        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
+        (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "parametric struct instantiation" =
   let source =
@@ -737,7 +737,7 @@ let%expect_test "parametric struct instantiation" =
                           (Value
                            (Struct (4 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "function without a return type" =
   let source = {|
@@ -756,7 +756,7 @@ let%expect_test "function without a return type" =
              ((function_signature
                ((function_params ()) (function_returns IntegerType)))
               (function_impl (Fn ((Block ((Break (Expr (Value (Integer 1)))))))))))))))
-        (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+        (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "scoping that `let` introduces in code" =
   let source =
@@ -849,7 +849,7 @@ let%expect_test "scoping that `let` introduces in code" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "reference in function bodies" =
   let source =
@@ -961,7 +961,7 @@ let%expect_test "reference in function bodies" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "resolving a reference from inside a function" =
   let source =
@@ -987,7 +987,7 @@ let%expect_test "resolving a reference from inside a function" =
             (function_impl
              (Fn ((Block ((Break (Expr (ResolvedReference (i <opaque>)))))))))))))
         (i (Value (Integer 1)))))
-      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "method access" =
   let source =
@@ -1019,7 +1019,7 @@ let%expect_test "method access" =
               (function_impl
                (Fn ((Block ((Break (Expr (Reference (i IntegerType)))))))))))))
           (struct_impls ()) (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "Self type resolution in methods" =
   let source =
@@ -1047,7 +1047,7 @@ let%expect_test "Self type resolution in methods" =
               (function_impl
                (Fn ((Block ((Break (Expr (Reference (self (StructType 4))))))))))))))
           (struct_impls ()) (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "struct instantiation" =
   let source =
@@ -1073,7 +1073,7 @@ let%expect_test "struct instantiation" =
          ((struct_fields
            ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
           (struct_methods ()) (struct_impls ()) (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "type check error" =
   let source = {|
@@ -1220,7 +1220,7 @@ let%expect_test "type check error" =
                             (Value
                              (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
             (struct_id 3)))))
-        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
+        (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "type inference" =
   let source = {|
@@ -1237,7 +1237,7 @@ let%expect_test "type inference" =
            ((function_signature
              ((function_params ((i IntegerType))) (function_returns IntegerType)))
             (function_impl (Fn ((Block ((Return (Reference (i IntegerType))))))))))))))
-      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "scope doesn't leak bindings" =
   let source = {|
@@ -1249,7 +1249,7 @@ let%expect_test "scope doesn't leak bindings" =
   [%expect
     {|
     (Ok
-     ((bindings ()) (structs ()) (struct_counter <opaque>)
+     ((bindings ()) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "compile-time if/then/else" =
@@ -1295,7 +1295,7 @@ let%expect_test "compile-time if/then/else" =
            ((function_signature
              ((function_params ()) (function_returns BoolType)))
             (function_impl (Fn ((Block ((Break (Expr (Value (Bool true)))))))))))))))
-      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "type check error" =
   let source =
@@ -1440,7 +1440,7 @@ let%expect_test "type check error" =
                             (Value
                              (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
             (struct_id 3)))))
-        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
+        (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "implement interface op" =
   let source =
@@ -1491,7 +1491,7 @@ let%expect_test "implement interface op" =
                     (Fn
                      ((Block ((Break (Expr (Reference (left IntegerType))))))))))))))))))
           (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "implement interface op" =
   let source =
@@ -1544,7 +1544,7 @@ let%expect_test "implement interface op" =
                    (function_impl
                     (Fn ((Block ((Break (Expr (Value (Struct (4 ())))))))))))))))))))
           (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "serializer inner struct" =
   let source =
@@ -1666,7 +1666,7 @@ let%expect_test "serializer inner struct" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "reference resolving in inner functions" =
   let source =
@@ -1719,7 +1719,7 @@ let%expect_test "reference resolving in inner functions" =
                          ((Break
                            (Expr
                             (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))))))))
-      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "dependent types" =
   let source =
@@ -1819,7 +1819,7 @@ let%expect_test "dependent types" =
                               (Expr
                                (Reference
                                 (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))))))))))))))
-      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "TypeN" =
   let source =
@@ -1842,7 +1842,7 @@ let%expect_test "TypeN" =
                ((function_params ((X (TypeN 0)))) (function_returns (TypeN 0))))
               (function_impl
                (Fn ((Block ((Break (Expr (Reference (X (TypeN 0))))))))))))))))
-        (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
+        (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "union variants constructing" =
   let source =
@@ -1988,7 +1988,7 @@ let%expect_test "union variants constructing" =
                         ((Reference (v (ExprType (Value (Type (StructType 3))))))
                          5)))))))))))))))
           (union_id 5)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "unions duplicate variant" =
   let source =
@@ -2225,7 +2225,7 @@ let%expect_test "unions duplicate variant" =
                           ((Reference (v (ExprType (Reference (T (TypeN 0))))))
                            4)))))))))))))))
             (union_id 4)))))
-        (struct_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
+        (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "unions" =
   let source =
@@ -2429,7 +2429,7 @@ let%expect_test "unions" =
                         ((Reference (v (ExprType (Value (Type (StructType 4))))))
                          6)))))))))))))))
           (union_id 6)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "methods monomorphization" =
   let source =
@@ -2507,7 +2507,7 @@ let%expect_test "methods monomorphization" =
               (function_impl
                (Fn ((Block ((Break (Expr (Reference (x IntegerType)))))))))))))
           (struct_impls ()) (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "switch statement" =
   let source =
@@ -2729,7 +2729,7 @@ let%expect_test "switch statement" =
                         ((Reference (v (ExprType (Value (Type (StructType 4))))))
                          6)))))))))))))))
           (union_id 6)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "partial evaluation of a function" =
   let source =
@@ -2811,4 +2811,4 @@ let%expect_test "partial evaluation of a function" =
               (function_returns IntegerType)))
             (function_impl
              (Fn ((Block ((Break (Expr (Reference (x IntegerType)))))))))))))))
-      (structs ()) (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]

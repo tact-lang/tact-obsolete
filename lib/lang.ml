@@ -71,7 +71,7 @@ functor
       { bindings = Builtin.default_bindings ();
         structs = Builtin.default_structs;
         unions = [];
-        struct_counter = 0;
+        type_counter = 0;
         memoized_fcalls = [] }
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
@@ -474,9 +474,9 @@ functor
                     (name, {field_type = ExprType expr}) );
               struct_methods = [];
               struct_impls = [];
-              struct_id = program.struct_counter }
+              struct_id = program.type_counter }
           in
-          program.struct_counter <- program.struct_counter + 1 ;
+          program.type_counter <- program.type_counter + 1 ;
           let mk_struct =
             Program.with_struct program struct_ (fun _ ->
                 let methods =

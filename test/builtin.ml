@@ -141,7 +141,7 @@ let%expect_test "Int(bits) constructor" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "Int(bits) serializer" =
   let source =
@@ -235,7 +235,7 @@ let%expect_test "Int(bits) serializer" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -466,7 +466,7 @@ let%expect_test "demo struct serializer" =
                           (Value
                            (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
           (struct_id 3)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "from interface" =
   let source =
@@ -535,4 +535,4 @@ let%expect_test "from interface" =
                          (Expr
                           (Value (Struct (4 ((a (Reference (x IntegerType)))))))))))))))))))))))
           (struct_id 4)))))
-      (struct_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]

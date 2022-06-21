@@ -1,13 +1,6 @@
 open Base
 open Lang_types
 
-let builtin_struct_id = ref (-1)
-
-let next_builtin_struct_id () =
-  let id = !builtin_struct_id in
-  builtin_struct_id := id - 1 ;
-  id
-
 let builder = BuiltinType "Builder"
 
 (* Builder is first struct in the std, so its ID will be 0+1=1 *)
