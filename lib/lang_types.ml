@@ -50,7 +50,7 @@ and expr =
   | Reference of (string * type_)
   | ResolvedReference of (string * (expr[@sexp.opaque]))
   | Value of value
-  | StructField of (expr * string)
+  | StructField of (expr * string * type_)
   | Hole
   | Primitive of primitive
   | InvalidExpr
@@ -194,7 +194,7 @@ let rec expr_to_type = function
   | ResolvedReference (_, e) ->
       expr_to_type e
   | expr ->
-      InvalidType expr
+      ExprType expr
 
 let rec type_of = function
   | Value (Struct (sid, _)) ->
@@ -210,7 +210,7 @@ let rec type_of = function
   | Value Void ->
       VoidType
   | Value (Type (Dependent (_, ty))) ->
-      ty
+      unwrap_type_ @@ ty
   | Value (Type t) ->
       type_of_type t
   | Hole ->
@@ -228,17 +228,27 @@ let rec type_of = function
           (Function
             {function_signature = {function_returns; function_params}; _} ),
         args ) ->
-      type_of_call args function_params function_returns
+      unwrap_type_ @@ type_of_call args function_params function_returns
   | Reference (_, t) ->
-      t
+      unwrap_type_ t
   | ResolvedReference (_, e) ->
-      type_of e
+      unwrap_type_ @@ type_of e
   | MakeUnionVariant (_, u) ->
       UnionType u
   | MkStructDef _ ->
       type0
+  | StructField (_, _, ty) ->
+      unwrap_type_ ty
   | expr ->
       InvalidType expr
+
+and unwrap_type_ = function
+  | ExprType (Value (Type ty)) ->
+      unwrap_type_ ty
+  | ExprType (ResolvedReference (_, Value (Type t))) ->
+      unwrap_type_ t
+  | type_ ->
+      type_
 
 and type_of_type = function TypeN x -> TypeN (x + 1) | _otherwise -> TypeN 0
 
@@ -290,6 +300,8 @@ class ['s] primitive_presence =
     inherit [_] boolean_reduce false
 
     method! visit_Primitive _env _primitive = true
+
+    method! visit_mk_struct _ _ = false
   end
 
 let has_primitives = (new primitive_presence)#visit_function_ ()
@@ -327,6 +339,8 @@ class ['s] expr_immediacy_check =
           (* Any function is assumed to be immediate as it can be evaluated otherwise *)
           true )
         (super#visit_function_signature env f.function_signature)
+
+    method! visit_mk_struct _ _ = true
   end
 
 let rec is_immediate_expr expr =

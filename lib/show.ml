@@ -35,7 +35,7 @@ functor
           pp_print_string f ")"
       | Reference (name, _) | ResolvedReference (name, _) ->
           pp_print_string f name
-      | StructField (s, field) ->
+      | StructField (s, field, _) ->
           pp_expr f s ; pp_print_string f "." ; pp_print_string f field
       | _ ->
           pp_print_string f "<anonymous>"
@@ -63,8 +63,10 @@ functor
           pp_print_string f "VoidType"
       | BuiltinType t ->
           pp_print_string f t
-      | StructType _ ->
-          pp_print_string f "<struct>"
+      | StructType s ->
+          pp_print_string f "<struct " ;
+          pp_print_int f s ;
+          pp_print_string f ">"
       | _ ->
           pp_print_string f "<anonymous>"
 
@@ -96,6 +98,6 @@ functor
           Printf.sprintf "Argument number mismatch."
       | `UninterpretableStatement _ ->
           Printf.sprintf "Uninterpretable statement."
-      | `FieldNotFound (_, field) ->
+      | `FieldNotFoundF field | `FieldNotFound (_, field) ->
           Printf.sprintf "Field `%s` not found." field
   end

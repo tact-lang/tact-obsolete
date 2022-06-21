@@ -8,34 +8,10 @@ let next_builtin_struct_id () =
   builtin_struct_id := id - 1 ;
   id
 
-let builder_id = next_builtin_struct_id ()
-
 let builder = BuiltinType "Builder"
 
-let builder_struct_info =
-  let id = builder_id in
-  let builder_methods =
-    let new_ =
-      { function_signature =
-          {function_params = []; function_returns = StructType id};
-        function_impl =
-          Fn
-            (Some
-               (Return
-                  (Value (Struct (id, [("builder", Primitive EmptyBuilder)])))
-               ) ) }
-    in
-    [("new", new_)]
-  in
-  let builder_struct =
-    { struct_fields = [("builder", {field_type = builder})];
-      struct_methods = builder_methods;
-      struct_impls = [];
-      struct_id = id }
-  in
-  builder_struct
-
-let builder_struct = StructType builder_id
+(* Builder is first struct in the std, so its ID will be 0+1=1 *)
+let builder_struct = StructType 1
 
 let cell = Value (Type (BuiltinType "Cell"))
 
@@ -106,11 +82,15 @@ let int_type () =
                    (StoreInt
                       { builder =
                           StructField
-                            (Reference ("b", builder_struct), "builder");
+                            ( Reference ("b", builder_struct),
+                              "builder",
+                              BuiltinType "Builder" );
                         length = Value (Integer (Z.of_int bits));
                         integer =
                           StructField
-                            (Reference ("self", StructType s), "integer");
+                            ( Reference ("self", StructType s),
+                              "integer",
+                              BuiltinType "Builder" );
                         signed = true } ) ) ) ) }
   and function_impl p = function
     | [Integer bits] ->
@@ -154,7 +134,9 @@ let serializer =
                        FunctionCall
                          ( Value (Function method_),
                            StructField
-                             (Reference ("self", StructType s.struct_id), name)
+                             ( Reference ("self", StructType s.struct_id),
+                               name,
+                               f )
                            :: [Reference ("b", builder_struct)] ) ) ] ) )
     in
     let body = Block (calls @ [Return (Reference ("b", builder_struct))]) in
@@ -174,17 +156,6 @@ let serializer =
     (Function
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
-
-(* Only for debug purposes *)
-let bin_op_intf =
-  Value
-    (Type
-       (InterfaceType
-          { interface_methods =
-              [ ( "op",
-                  { function_params =
-                      [("left", IntegerType); ("right", IntegerType)];
-                    function_returns = IntegerType } ) ] } ) )
 
 let from_intf =
   let function_signature =
@@ -226,11 +197,29 @@ let builtin_bindings =
                        (Primitive
                           (BuildCell
                              {builder = Reference ("b", BuiltinType "Builder")}
-                          ) ) ) ) } ) ) ]
+                          ) ) ) ) } ) );
+    ( "builtin_builder_store_int",
+      Value
+        (Function
+           { function_signature =
+               { function_params =
+                   [ ("b", BuiltinType "Builder");
+                     ("int", IntegerType);
+                     ("bits", IntegerType) ];
+                 function_returns = BuiltinType "Cell" };
+             function_impl =
+               Fn
+                 (Some
+                    (Return
+                       (Primitive
+                          (StoreInt
+                             { builder = Reference ("b", BuiltinType "Builder");
+                               length = Reference ("bits", IntegerType);
+                               integer = Reference ("int", IntegerType);
+                               signed = true } ) ) ) ) } ) ) ]
 
 let default_bindings () =
   [ ("Integer", Value (Type IntegerType));
-    ("Int", int_type ());
     ("Bool", Value (Type BoolType));
     ("Type", Value (Type type0));
     ("Void", Value Void);
@@ -238,7 +227,6 @@ let default_bindings () =
      * purposes
      *)
     ("serializer", serializer);
-    ("BinOp", bin_op_intf);
     ("From", from_intf) ]
   @ builtin_bindings
 
@@ -250,10 +238,32 @@ struct Builder {
   val b: builtin_Builder
 
   fn new() -> Self {
-    Self { b: builtin_new_builder() }
+    Self { b: builtin_builder_new() }
   }
   fn build(self: Self) -> builtin_Cell {
     builtin_builder_build(self.b)
+  }
+  fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
+    let b = builtin_builder_store_int(self.b, int, bits);
+    Self { b: b }
+  }
+}
+
+struct Int(bits: Integer) {
+  val value: Integer
+
+  fn new(i: Integer) -> Self {
+    Self { value: i }
+  }
+
+  fn serialize(self: Self, builder: Builder) -> Builder {
+    builder.serialize_int(self.value, bits)
+  }
+
+  impl From(Integer) {
+    fn from(i: Integer) -> Self {
+      Self { value: i }
+    }
   }
 }
 |}

@@ -97,8 +97,7 @@ let rec compile ?(codegen_impl = Codegen_func.codegen) ?(filename = "<unnamed>")
 
 and compile_from_string ?(codegen_impl = Codegen_func.codegen)
     ?(filename = "<unnamed>") src =
-  let std = Result.get_ok (compile_to_ir ~filename:"std" Builtin.std) in
-  codegen ~codegen_impl (compile_to_ir ~prev_program:std ~filename src)
+  codegen ~codegen_impl (compile_to_ir ~filename src)
 
 and codegen ?(codegen_impl = Codegen_func.codegen) program =
   match program with

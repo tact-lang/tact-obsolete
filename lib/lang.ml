@@ -19,7 +19,8 @@ functor
       | `TypeError of type_ * type_
       | `ExpectedFunction of type_
       | `UnallowedStmt of stmt
-      | `OnlyFunctionIsAllowed ]
+      | `OnlyFunctionIsAllowed
+      | `FieldNotFoundF of string ]
     [@@deriving equal, sexp_of]
 
     include Builtin
@@ -98,7 +99,7 @@ functor
 
         method build_Enum _env _enum = InvalidExpr
 
-        method build_FieldAccess _env _fieldaccess = InvalidExpr
+        method build_FieldAccess _env fieldaccess = StructField fieldaccess
 
         method build_Function _env fn = MkFunction fn
 
@@ -270,7 +271,23 @@ functor
 
         method build_enum_member _env _name _value = ()
 
-        method build_field_access _env _expr _field = ()
+        method build_field_access _env expr field =
+          let expr = Syntax.value expr in
+          let field = Syntax.value field in
+          match type_of expr with
+          | StructType s -> (
+              let struct_ = Program.get_struct program s in
+              match
+                List.Assoc.find struct_.struct_fields field ~equal:equal_string
+              with
+              | Some {field_type} ->
+                  (expr, field, field_type)
+              | None ->
+                  errors#report `Error (`FieldNotFoundF field) () ;
+                  (Value Void, field, VoidType) )
+          | _ ->
+              errors#report `Error (`FieldNotFoundF field) () ;
+              (Value Void, field, VoidType)
 
         method build_function_call _env fn args =
           (Syntax.value fn, s#of_located_list args)
@@ -308,9 +325,14 @@ functor
           | ResolvedReference (_, Value (Struct (st, _)))
           | Value (Struct (st, _)) ->
               make_call st ~mk_args:(fun args -> receiver :: args)
-          | receiver' ->
-              errors#report `Error (`UnexpectedType (type_of receiver')) () ;
-              dummy
+          | receiver' -> (
+            match type_of receiver' with
+            | StructType s ->
+                make_call s ~mk_args:(fun args -> receiver :: args)
+            | _ ->
+                print_sexp (sexp_of_expr receiver') ;
+                errors#report `Error (`UnexpectedType (type_of receiver')) () ;
+                dummy )
 
         method! visit_function_definition env f =
           (* prepare parameter bindings *)

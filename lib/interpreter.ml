@@ -12,11 +12,15 @@ type error =
 [@@deriving equal, sexp_of]
 
 class ['s] struct_updater (old : int) (new_s : int) =
-  object
+  object (self : 's)
     inherit ['s] map
 
     method! visit_StructType _ s =
       if equal_int s old then StructType new_s else StructType s
+
+    method! visit_Struct env (s, fields) =
+      let fields' = self#visit_list self#visit_binding env fields in
+      if equal_int s old then Struct (new_s, fields') else Struct (s, fields')
   end
 
 class ['s] union_updater (old : int) (new_s : int) =
@@ -144,7 +148,7 @@ class interpreter
           | None ->
               errors#report `Error (`UnresolvedIdentifier name) () ;
               Void )
-        | StructField (struct_, field) -> (
+        | StructField (struct_, field, _) -> (
           match self#interpret_expr struct_ with
           | Struct (struct_, struct') -> (
             match List.Assoc.find struct' ~equal:String.equal field with
@@ -421,9 +425,14 @@ class interpreter
 
             (* TODO: I do not know why `ExprType` flows into output. *)
             method! visit_type_ env ty =
-              match super#visit_type_ env ty with
+              self_eval#unwrap_expr_types (super#visit_type_ env ty)
+
+            method private unwrap_expr_types =
+              function
               | ExprType (Value (Type t)) ->
-                  t
+                  self_eval#unwrap_expr_types t
+              | ExprType (ResolvedReference (_, Value (Type t))) ->
+                  self_eval#unwrap_expr_types t
               | t ->
                   t
 
