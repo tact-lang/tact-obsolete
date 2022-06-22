@@ -119,13 +119,30 @@ let builtin_bindings =
                              { builder = Reference ("b", BuiltinType "Builder");
                                length = Reference ("bits", IntegerType);
                                integer = Reference ("int", IntegerType);
-                               signed = true } ) ) ) ) } ) ) ]
+                               signed = true } ) ) ) ) } ) );
+    ( "builtin_send_raw_msg",
+      Value
+        (Function
+           { function_signature =
+               { function_params =
+                   [("msg", BuiltinType "Cell"); ("flags", IntegerType)];
+                 function_returns = VoidType };
+             function_impl =
+               Fn
+                 (Some
+                    (Return
+                       (Primitive
+                          (SendRawMsg
+                             { msg = Reference ("msg", BuiltinType "Cell");
+                               flags = Reference ("flags", IntegerType) } ) ) )
+                 ) } ) ) ]
 
 let default_bindings () =
   [ ("Integer", Value (Type IntegerType));
     ("Bool", Value (Type BoolType));
     ("Type", Value (Type type0));
     ("Void", Value Void);
+    ("VoidType", Value (Type VoidType));
     (* TODO: re-design the serialization API surface; this is more for demonstration
      * purposes
      *)

@@ -12,26 +12,26 @@ let%expect_test "Int(bits) constructor" =
     {|
     (Ok
      ((bindings
-       ((overflow (Value (Struct (4 ((value (Value (Integer 513))))))))
-        (i (Value (Struct (3 ((value (Value (Integer 100))))))))))
+       ((overflow (Value (Struct (6 ((value (Value (Integer 513))))))))
+        (i (Value (Struct (5 ((value (Value (Integer 100))))))))))
       (structs
-       ((4
+       ((6
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 4))))
+                (function_returns (StructType 6))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (4 ((value (Reference (i IntegerType))))))))))))))))
+                     (Value (Struct (6 ((value (Reference (i IntegerType))))))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 4)) (builder (StructType 1))))
+                 ((self (StructType 6)) (builder (StructType 1))))
                 (function_returns (StructType 1))))
               (function_impl
                (Fn
@@ -42,18 +42,18 @@ let%expect_test "Int(bits) constructor" =
                       ((ResolvedReference (serialize_int <opaque>))
                        ((Reference (builder (StructType 1)))
                         (StructField
-                         ((Reference (self (StructType 4))) value IntegerType))
+                         ((Reference (self (StructType 6))) value IntegerType))
                         (Value (Integer 8))))))))))))))
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 4))))
+                (function_returns (StructType 6))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (4 ((value (Reference (i IntegerType))))))))))))))))))
+                     (Value (Struct (6 ((value (Reference (i IntegerType))))))))))))))))))
           (struct_impls
            (((impl_interface
               (Value
@@ -69,32 +69,32 @@ let%expect_test "Int(bits) constructor" =
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 4))))
+                     (function_returns (StructType 6))))
                    (function_impl
                     (Fn
                      ((Block
                        ((Break
                          (Expr
                           (Value
-                           (Struct (4 ((value (Reference (i IntegerType)))))))))))))))))))))))
-          (struct_id 4)))
-        (3
+                           (Struct (6 ((value (Reference (i IntegerType)))))))))))))))))))))))
+          (struct_id 6)))
+        (5
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 3))))
+                (function_returns (StructType 5))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (3 ((value (Reference (i IntegerType))))))))))))))))
+                     (Value (Struct (5 ((value (Reference (i IntegerType))))))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 3)) (builder (StructType 1))))
+                 ((self (StructType 5)) (builder (StructType 1))))
                 (function_returns (StructType 1))))
               (function_impl
                (Fn
@@ -105,18 +105,18 @@ let%expect_test "Int(bits) constructor" =
                       ((ResolvedReference (serialize_int <opaque>))
                        ((Reference (builder (StructType 1)))
                         (StructField
-                         ((Reference (self (StructType 3))) value IntegerType))
+                         ((Reference (self (StructType 5))) value IntegerType))
                         (Value (Integer 257))))))))))))))
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 3))))
+                (function_returns (StructType 5))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (3 ((value (Reference (i IntegerType))))))))))))))))))
+                     (Value (Struct (5 ((value (Reference (i IntegerType))))))))))))))))))
           (struct_impls
            (((impl_interface
               (Value
@@ -132,15 +132,15 @@ let%expect_test "Int(bits) constructor" =
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 3))))
+                     (function_returns (StructType 5))))
                    (function_impl
                     (Fn
                      ((Block
                        ((Break
                          (Expr
                           (Value
-                           (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
-          (struct_id 3)))))
+                           (Struct (5 ((value (Reference (i IntegerType)))))))))))))))))))))))
+          (struct_id 5)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "Int(bits) serializer" =
@@ -165,30 +165,30 @@ let%expect_test "Int(bits) serializer" =
             (function_impl
              (Fn
               ((Block
-                ((Let ((i (Value (Struct (3 ((value (Value (Integer 100))))))))))
+                ((Let ((i (Value (Struct (5 ((value (Value (Integer 100))))))))))
                  (Expr
                   (FunctionCall
                    ((ResolvedReference (serialize <opaque>))
                     ((ResolvedReference (i <opaque>))
                      (Reference (b (StructType 1))))))))))))))))))
       (structs
-       ((3
+       ((5
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 3))))
+                (function_returns (StructType 5))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (3 ((value (Reference (i IntegerType))))))))))))))))
+                     (Value (Struct (5 ((value (Reference (i IntegerType))))))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 3)) (builder (StructType 1))))
+                 ((self (StructType 5)) (builder (StructType 1))))
                 (function_returns (StructType 1))))
               (function_impl
                (Fn
@@ -199,18 +199,18 @@ let%expect_test "Int(bits) serializer" =
                       ((ResolvedReference (serialize_int <opaque>))
                        ((Reference (builder (StructType 1)))
                         (StructField
-                         ((Reference (self (StructType 3))) value IntegerType))
+                         ((Reference (self (StructType 5))) value IntegerType))
                         (Value (Integer 32))))))))))))))
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 3))))
+                (function_returns (StructType 5))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (3 ((value (Reference (i IntegerType))))))))))))))))))
+                     (Value (Struct (5 ((value (Reference (i IntegerType))))))))))))))))))
           (struct_impls
            (((impl_interface
               (Value
@@ -226,15 +226,15 @@ let%expect_test "Int(bits) serializer" =
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 3))))
+                     (function_returns (StructType 5))))
                    (function_impl
                     (Fn
                      ((Block
                        ((Break
                          (Expr
                           (Value
-                           (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
-          (struct_id 3)))))
+                           (Struct (5 ((value (Reference (i IntegerType)))))))))))))))))))))))
+          (struct_id 5)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "demo struct serializer" =
@@ -272,15 +272,15 @@ let%expect_test "demo struct serializer" =
                    ((ResolvedReference (T_serializer <opaque>))
                     ((Value
                       (Struct
-                       (6
-                        ((a (Value (Struct (3 ((value (Value (Integer 0))))))))
-                         (b (Value (Struct (4 ((value (Value (Integer 1))))))))))))
+                       (8
+                        ((a (Value (Struct (5 ((value (Value (Integer 0))))))))
+                         (b (Value (Struct (6 ((value (Value (Integer 1))))))))))))
                      (Reference (b (StructType 1))))))))))))))))
         (T_serializer
          (Value
           (Function
            ((function_signature
-             ((function_params ((self (StructType 6)) (b (StructType 1))))
+             ((function_params ((self (StructType 8)) (b (StructType 1))))
               (function_returns (StructType 1))))
             (function_impl
              (Fn
@@ -292,7 +292,7 @@ let%expect_test "demo struct serializer" =
                        (Function
                         ((function_signature
                           ((function_params
-                            ((self (StructType 3)) (builder (StructType 1))))
+                            ((self (StructType 5)) (builder (StructType 1))))
                            (function_returns (StructType 1))))
                          (function_impl
                           (Fn
@@ -303,11 +303,11 @@ let%expect_test "demo struct serializer" =
                                  ((ResolvedReference (serialize_int <opaque>))
                                   ((Reference (builder (StructType 1)))
                                    (StructField
-                                    ((Reference (self (StructType 3))) value
+                                    ((Reference (self (StructType 5))) value
                                      IntegerType))
                                    (Value (Integer 32)))))))))))))))
                       ((StructField
-                        ((Reference (self (StructType 6))) a (StructType 3)))
+                        ((Reference (self (StructType 8))) a (StructType 5)))
                        (Reference (b (StructType 1)))))))))
                  (Let
                   ((b
@@ -316,7 +316,7 @@ let%expect_test "demo struct serializer" =
                        (Function
                         ((function_signature
                           ((function_params
-                            ((self (StructType 4)) (builder (StructType 1))))
+                            ((self (StructType 6)) (builder (StructType 1))))
                            (function_returns (StructType 1))))
                          (function_impl
                           (Fn
@@ -327,36 +327,36 @@ let%expect_test "demo struct serializer" =
                                  ((ResolvedReference (serialize_int <opaque>))
                                   ((Reference (builder (StructType 1)))
                                    (StructField
-                                    ((Reference (self (StructType 4))) value
+                                    ((Reference (self (StructType 6))) value
                                      IntegerType))
                                    (Value (Integer 16)))))))))))))))
                       ((StructField
-                        ((Reference (self (StructType 6))) b (StructType 4)))
+                        ((Reference (self (StructType 8))) b (StructType 6)))
                        (Reference (b (StructType 1)))))))))
                  (Return (Reference (b (StructType 1)))))))))))))
-        (T (Value (Type (StructType 6))))))
+        (T (Value (Type (StructType 8))))))
       (structs
-       ((6
+       ((8
          ((struct_fields
-           ((a ((field_type (StructType 3)))) (b ((field_type (StructType 4))))))
-          (struct_methods ()) (struct_impls ()) (struct_id 6)))
-        (4
+           ((a ((field_type (StructType 5)))) (b ((field_type (StructType 6))))))
+          (struct_methods ()) (struct_impls ()) (struct_id 8)))
+        (6
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 4))))
+                (function_returns (StructType 6))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (4 ((value (Reference (i IntegerType))))))))))))))))
+                     (Value (Struct (6 ((value (Reference (i IntegerType))))))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 4)) (builder (StructType 1))))
+                 ((self (StructType 6)) (builder (StructType 1))))
                 (function_returns (StructType 1))))
               (function_impl
                (Fn
@@ -367,18 +367,18 @@ let%expect_test "demo struct serializer" =
                       ((ResolvedReference (serialize_int <opaque>))
                        ((Reference (builder (StructType 1)))
                         (StructField
-                         ((Reference (self (StructType 4))) value IntegerType))
+                         ((Reference (self (StructType 6))) value IntegerType))
                         (Value (Integer 16))))))))))))))
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 4))))
+                (function_returns (StructType 6))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (4 ((value (Reference (i IntegerType))))))))))))))))))
+                     (Value (Struct (6 ((value (Reference (i IntegerType))))))))))))))))))
           (struct_impls
            (((impl_interface
               (Value
@@ -394,32 +394,32 @@ let%expect_test "demo struct serializer" =
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 4))))
+                     (function_returns (StructType 6))))
                    (function_impl
                     (Fn
                      ((Block
                        ((Break
                          (Expr
                           (Value
-                           (Struct (4 ((value (Reference (i IntegerType)))))))))))))))))))))))
-          (struct_id 4)))
-        (3
+                           (Struct (6 ((value (Reference (i IntegerType)))))))))))))))))))))))
+          (struct_id 6)))
+        (5
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 3))))
+                (function_returns (StructType 5))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (3 ((value (Reference (i IntegerType))))))))))))))))
+                     (Value (Struct (5 ((value (Reference (i IntegerType))))))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 3)) (builder (StructType 1))))
+                 ((self (StructType 5)) (builder (StructType 1))))
                 (function_returns (StructType 1))))
               (function_impl
                (Fn
@@ -430,18 +430,18 @@ let%expect_test "demo struct serializer" =
                       ((ResolvedReference (serialize_int <opaque>))
                        ((Reference (builder (StructType 1)))
                         (StructField
-                         ((Reference (self (StructType 3))) value IntegerType))
+                         ((Reference (self (StructType 5))) value IntegerType))
                         (Value (Integer 32))))))))))))))
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 3))))
+                (function_returns (StructType 5))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
                     (Expr
-                     (Value (Struct (3 ((value (Reference (i IntegerType))))))))))))))))))
+                     (Value (Struct (5 ((value (Reference (i IntegerType))))))))))))))))))
           (struct_impls
            (((impl_interface
               (Value
@@ -457,15 +457,15 @@ let%expect_test "demo struct serializer" =
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 3))))
+                     (function_returns (StructType 5))))
                    (function_impl
                     (Fn
                      ((Block
                        ((Break
                          (Expr
                           (Value
-                           (Struct (3 ((value (Reference (i IntegerType)))))))))))))))))))))))
-          (struct_id 3)))))
+                           (Struct (5 ((value (Reference (i IntegerType)))))))))))))))))))))))
+          (struct_id 5)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "from interface" =
@@ -489,29 +489,29 @@ let%expect_test "from interface" =
     {|
     (Ok
      ((bindings
-       ((var (Value (Struct (4 ((a (Value (Integer 10))))))))
+       ((var (Value (Struct (6 ((a (Value (Integer 10))))))))
         (check
          (Value
           (Function
            ((function_signature
-             ((function_params ((y (StructType 4))))
-              (function_returns (StructType 4))))
+             ((function_params ((y (StructType 6))))
+              (function_returns (StructType 6))))
             (function_impl
-             (Fn ((Block ((Break (Expr (Reference (y (StructType 4))))))))))))))
-        (Value (Value (Type (StructType 4))))))
+             (Fn ((Block ((Break (Expr (Reference (y (StructType 6))))))))))))))
+        (Value (Value (Type (StructType 6))))))
       (structs
-       ((4
+       ((6
          ((struct_fields ((a ((field_type IntegerType)))))
           (struct_methods
            ((from
              ((function_signature
                ((function_params ((x IntegerType)))
-                (function_returns (StructType 4))))
+                (function_returns (StructType 6))))
               (function_impl
                (Fn
                 ((Block
                   ((Break
-                    (Expr (Value (Struct (4 ((a (Reference (x IntegerType))))))))))))))))))
+                    (Expr (Value (Struct (6 ((a (Reference (x IntegerType))))))))))))))))))
           (struct_impls
            (((impl_interface
               (Value
@@ -527,12 +527,12 @@ let%expect_test "from interface" =
                  (Function
                   ((function_signature
                     ((function_params ((x IntegerType)))
-                     (function_returns (StructType 4))))
+                     (function_returns (StructType 6))))
                    (function_impl
                     (Fn
                      ((Block
                        ((Break
                          (Expr
-                          (Value (Struct (4 ((a (Reference (x IntegerType)))))))))))))))))))))))
-          (struct_id 4)))))
+                          (Value (Struct (6 ((a (Reference (x IntegerType)))))))))))))))))))))))
+          (struct_id 6)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]

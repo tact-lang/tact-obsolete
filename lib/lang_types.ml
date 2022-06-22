@@ -154,6 +154,7 @@ and primitive =
   | EmptyBuilder
   | StoreInt of {builder : expr; length : expr; integer : expr; signed : bool}
   | BuildCell of {builder : expr}
+  | SendRawMsg of {msg : expr; flags : expr}
 [@@deriving
   equal,
     sexp_of,

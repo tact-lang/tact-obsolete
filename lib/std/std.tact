@@ -30,3 +30,23 @@ struct Int(bits: Integer) {
     }
   }
 }
+
+struct SendRawMsgFlags {
+  val value: Integer
+
+  fn default() -> Self {
+    Self { value: 0 }
+  }
+
+  fn carry_smart_contract_balance() -> Self {
+    Self { value: 128 }
+  }
+
+  fn carry_rest_from_transaction_input() -> Self {
+    Self { value: 64 }
+  }
+}
+
+fn send_raw_msg(msg: builtin_Cell, flags: SendRawMsgFlags) -> VoidType {
+  builtin_send_raw_msg(msg, flags.value);
+}
