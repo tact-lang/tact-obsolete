@@ -199,6 +199,8 @@ let rec expr_to_type = function
 let rec type_of = function
   | Value (Struct (sid, _)) ->
       StructType sid
+  | Value (UnionVariant (_, uid)) ->
+      UnionType uid
   | Value (Function {function_signature; _}) ->
       FunctionType function_signature
   | Value (Builtin builtin) ->
@@ -376,6 +378,9 @@ module Program = struct
     | StructType s ->
         List.find_map_exn p.structs ~f:(fun (id, s') ->
             if equal_int id s then Some s'.struct_methods else None )
+    | UnionType u ->
+        List.find_map_exn p.unions ~f:(fun (id, u') ->
+            if equal_int id u then Some u'.union_methods else None )
     | _ ->
         []
 
