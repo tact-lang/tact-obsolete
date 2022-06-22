@@ -52,6 +52,54 @@ struct SendRawMsgFlags {
   }
 }
 
+struct AddrNone {}
+
+// Interesting situation with this declaration: `bits` field should have count of bits
+// deriving from the `len` field which requires more powerful dependent types than we have for now.
+// Do we want to make such declarations possible?
+struct AddrExtern { 
+  val len: Int(9)
+  val bits: Integer
+}
+
+union MsgAddressExt {
+  case AddrNone
+  case AddrExtern
+}
+
+struct AddressStd {
+  val workchain_id: Int(8)
+  val address: Int(256)
+}
+
+struct AddressVar {
+  val len: Int(9)
+  val workchain_id: Int(8)
+  val address: Integer
+}
+
+union MsgAddressInt {
+  case AddressStd
+  case AddressVar
+}
+
+union MsgAddress {
+  case MsgAddressExt
+  case MsgAddressInt
+}
+
+struct ExtOutMsgInfo {
+  val src: MsgAddress
+  val dest: MsgAddressExt
+  val created_lt: Int(64) // TODO: uint
+  val created_at: Int(32) // TODO: uint
+}
+
+union CommonMsgInfoRelaxed {
+  case ExtOutMsgInfo
+  // TODO: int_msg_info
+}
+
 fn send_raw_msg(msg: Cell, flags: SendRawMsgFlags) -> VoidType {
   builtin_send_raw_msg(msg.c, flags.value);
 }

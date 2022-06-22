@@ -42,6 +42,11 @@ let build_program ?(errors = make_errors Show.show_error)
                List.filter program.structs ~f:(fun (id1, _) ->
                    not
                    @@ List.exists prev_program.structs ~f:(fun (id2, _) ->
+                          equal_int id1 id2 ) );
+             unions =
+               List.filter program.unions ~f:(fun (id1, _) ->
+                   not
+                   @@ List.exists prev_program.unions ~f:(fun (id2, _) ->
                           equal_int id1 id2 ) ) }
          else program )
   |> Result.map_error ~f:(fun errors ->
@@ -58,6 +63,11 @@ let build_program ?(errors = make_errors Show.show_error)
                      List.filter p'.structs ~f:(fun (id1, _) ->
                          not
                          @@ List.exists prev_program.structs ~f:(fun (id2, _) ->
+                                equal_int id1 id2 ) );
+                   unions =
+                     List.filter p'.unions ~f:(fun (id1, _) ->
+                         not
+                         @@ List.exists prev_program.unions ~f:(fun (id2, _) ->
                                 equal_int id1 id2 ) ) }
                else p' ) ) )
 
