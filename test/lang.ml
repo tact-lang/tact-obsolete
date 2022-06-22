@@ -989,7 +989,7 @@ let%expect_test "resolving a reference from inside a function" =
         (i (Value (Integer 1)))))
       (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
-let%expect_test "method access" =
+let%expect_test "struct method access" =
   let source =
     {|
       struct Foo {
@@ -1048,6 +1048,73 @@ let%expect_test "Self type resolution in methods" =
                (Fn ((Block ((Break (Expr (Reference (self (StructType 4))))))))))))))
           (struct_impls ()) (struct_id 4)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+
+let%expect_test "union method access" =
+  let source =
+    {|
+      union Foo {
+        case Bool
+        fn bar(self: Self, i: Integer) {
+           i
+        }
+      }
+      fn make_foo(foo: Foo) -> Foo {
+        foo
+      }
+      let foo = make_foo(true);
+      let res = foo.bar(1);
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+      (Ok
+       ((bindings
+         ((res (Value (Integer 1))) (foo (Value (UnionVariant ((Bool true) 4))))
+          (make_foo
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((foo (UnionType 4))))
+                (function_returns (UnionType 4))))
+              (function_impl
+               (Fn ((Block ((Break (Expr (Reference (foo (UnionType 4))))))))))))))
+          (Foo (Value (Type (UnionType 4))))))
+        (structs ())
+        (unions
+         ((4
+           ((cases ((BoolType (Discriminator 0))))
+            (union_methods
+             ((bar
+               ((function_signature
+                 ((function_params ((self (UnionType 4)) (i IntegerType)))
+                  (function_returns IntegerType)))
+                (function_impl
+                 (Fn ((Block ((Break (Expr (Reference (i IntegerType)))))))))))))
+            (union_impls
+             (((impl_interface
+                (Value
+                 (Type
+                  (InterfaceType
+                   ((interface_methods
+                     ((from
+                       ((function_params ((from BoolType)))
+                        (function_returns SelfType))))))))))
+               (impl_methods
+                ((from
+                  (Value
+                   (Function
+                    ((function_signature
+                      ((function_params ((v (ExprType (Value (Type BoolType))))))
+                       (function_returns (UnionType 4))))
+                     (function_impl
+                      (Fn
+                       ((Return
+                         (MakeUnionVariant
+                          ((Reference (v (ExprType (Value (Type BoolType))))) 4)))))))))))))))
+            (union_id 4)))))
+        (type_counter <opaque>) (memoized_fcalls <opaque>)))
+      |}]
 
 let%expect_test "struct instantiation" =
   let source =

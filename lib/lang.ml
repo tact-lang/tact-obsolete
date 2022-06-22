@@ -305,9 +305,9 @@ functor
               [] )
           in
           let make_call receiver ~mk_args =
-            let receiver' = Value (Type (StructType receiver)) in
+            let receiver' = Value (Type receiver) in
             match
-              (Program.get_struct program receiver).struct_methods
+              Program.methods_of program receiver
               |> fun ms -> List.Assoc.find ms fn ~equal:String.equal
             with
             | Some fn' ->
@@ -321,14 +321,22 @@ functor
           match receiver with
           | ResolvedReference (_, Value (Type (StructType st)))
           | Value (Type (StructType st)) ->
-              make_call st ~mk_args:(fun x -> x)
+              make_call (StructType st) ~mk_args:(fun x -> x)
           | ResolvedReference (_, Value (Struct (st, _)))
           | Value (Struct (st, _)) ->
-              make_call st ~mk_args:(fun args -> receiver :: args)
+              make_call (StructType st) ~mk_args:(fun args -> receiver :: args)
+          | ResolvedReference (_, Value (Type (UnionType ut)))
+          | Value (Type (UnionType ut)) ->
+              make_call (UnionType ut) ~mk_args:(fun x -> x)
+          | ResolvedReference (_, Value (UnionVariant (_, ut)))
+          | Value (UnionVariant (_, ut)) ->
+              make_call (UnionType ut) ~mk_args:(fun args -> receiver :: args)
           | receiver' -> (
             match type_of receiver' with
             | StructType s ->
-                make_call s ~mk_args:(fun args -> receiver :: args)
+                make_call (StructType s) ~mk_args:(fun args -> receiver :: args)
+            | UnionType u ->
+                make_call (StructType u) ~mk_args:(fun args -> receiver :: args)
             | _ ->
                 print_sexp (sexp_of_expr receiver') ;
                 errors#report `Error (`UnexpectedType (type_of receiver')) () ;
