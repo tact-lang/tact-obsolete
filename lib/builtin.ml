@@ -3,8 +3,8 @@ open Lang_types
 
 let builder = BuiltinType "Builder"
 
-(* Builder is first struct in the std, so its ID will be 0+1=1 *)
-let builder_struct = StructType 1
+(* Builder is second struct in the std, so its ID will be 3 *)
+let builder_struct = StructType 3
 
 let cell = Value (Type (BuiltinType "Cell"))
 

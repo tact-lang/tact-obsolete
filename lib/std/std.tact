@@ -1,11 +1,16 @@
+struct Cell {
+  val c: builtin_Cell
+}
+
 struct Builder {
   val b: builtin_Builder
 
   fn new() -> Self {
     Self { b: builtin_builder_new() }
   }
-  fn build(self: Self) -> builtin_Cell {
-    builtin_builder_build(self.b)
+  fn build(self: Self) -> Cell {
+    let c = builtin_builder_build(self.b);
+    Cell { c: c }
   }
   fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
     let b = builtin_builder_store_int(self.b, int, bits);
@@ -47,6 +52,6 @@ struct SendRawMsgFlags {
   }
 }
 
-fn send_raw_msg(msg: builtin_Cell, flags: SendRawMsgFlags) -> VoidType {
-  builtin_send_raw_msg(msg, flags.value);
+fn send_raw_msg(msg: Cell, flags: SendRawMsgFlags) -> VoidType {
+  builtin_send_raw_msg(msg.c, flags.value);
 }
