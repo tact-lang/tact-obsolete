@@ -15,6 +15,7 @@
    (ocaml (>= 4.14.0))
    (ppx_show (>= 0.2.1))
    (ppx_make (>= 0.3.0))
+   (ppx_blob (>= 0.7.2))
    (js_of_ocaml-ppx (>= 4.0.0))
    (zarith_stubs_js (>= 0.15.0))
    (dune (and :build (>= 3.1.1)))
