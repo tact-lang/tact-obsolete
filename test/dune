@@ -19,5 +19,5 @@
   (staged_pps ppx_matches ppx_sexp_conv ppx_inline_alcotest))
  (name tact_tests_)
  (inline_tests)
- (modules errors builtin_basics lang_types)
+ (modules errors builtin_basics lang_types std)
  (libraries tact core sexplib shared alcotest))

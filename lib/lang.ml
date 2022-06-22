@@ -232,10 +232,22 @@ functor
 
         method build_Switch _ s = Switch s
 
-        method build_switch_branch _env ty var stmt =
-          { branch_ty = expr_to_type (Syntax.value ty);
-            branch_var = Syntax.value var;
-            branch_stmt = stmt }
+        method build_switch_branch _env _ _ _ = raise InternalCompilerError
+
+        method! visit_switch_branch env b =
+          let ty =
+            expr_to_type @@ Syntax.value
+            @@ s#visit_located s#visit_expr env b.ty
+          in
+          let ref = Syntax.ident_to_string (Syntax.value b.var) in
+          let stmt =
+            s#with_bindings
+              [make_runtime (ref, ty)]
+              (fun _ ->
+                let stmt = s#visit_stmt env b.stmt in
+                stmt )
+          in
+          {branch_ty = ty; branch_var = ref; branch_stmt = stmt}
 
         method build_switch _env cond branches =
           {switch_condition = Syntax.value cond; branches}
