@@ -78,6 +78,13 @@ let from_intf =
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
+let make_builtin_fn params ret_ty primitive =
+  Value
+    (Function
+       { function_signature =
+           {function_params = params; function_returns = ret_ty};
+         function_impl = Fn (Some (Return (Primitive primitive))) } )
+
 let builtin_bindings =
   [ ("builtin_Builder", Value (Type (BuiltinType "Builder")));
     ("builtin_Cell", Value (Type (BuiltinType "Cell")));
@@ -88,54 +95,28 @@ let builtin_bindings =
                {function_params = []; function_returns = BuiltinType "Builder"};
              function_impl = Fn (Some (Return (Primitive EmptyBuilder))) } ) );
     ( "builtin_builder_build",
-      Value
-        (Function
-           { function_signature =
-               { function_params = [("b", BuiltinType "Builder")];
-                 function_returns = BuiltinType "Cell" };
-             function_impl =
-               Fn
-                 (Some
-                    (Return
-                       (Primitive
-                          (BuildCell
-                             {builder = Reference ("b", BuiltinType "Builder")}
-                          ) ) ) ) } ) );
+      make_builtin_fn
+        [("b", BuiltinType "Builder")]
+        (BuiltinType "Cell")
+        (BuildCell {builder = Reference ("b", BuiltinType "Builder")}) );
     ( "builtin_builder_store_int",
-      Value
-        (Function
-           { function_signature =
-               { function_params =
-                   [ ("b", BuiltinType "Builder");
-                     ("int", IntegerType);
-                     ("bits", IntegerType) ];
-                 function_returns = BuiltinType "Cell" };
-             function_impl =
-               Fn
-                 (Some
-                    (Return
-                       (Primitive
-                          (StoreInt
-                             { builder = Reference ("b", BuiltinType "Builder");
-                               length = Reference ("bits", IntegerType);
-                               integer = Reference ("int", IntegerType);
-                               signed = true } ) ) ) ) } ) );
+      make_builtin_fn
+        [ ("b", BuiltinType "Builder");
+          ("int", IntegerType);
+          ("bits", IntegerType) ]
+        (BuiltinType "Builder")
+        (StoreInt
+           { builder = Reference ("b", BuiltinType "Builder");
+             length = Reference ("bits", IntegerType);
+             integer = Reference ("int", IntegerType);
+             signed = true } ) );
     ( "builtin_send_raw_msg",
-      Value
-        (Function
-           { function_signature =
-               { function_params =
-                   [("msg", BuiltinType "Cell"); ("flags", IntegerType)];
-                 function_returns = VoidType };
-             function_impl =
-               Fn
-                 (Some
-                    (Return
-                       (Primitive
-                          (SendRawMsg
-                             { msg = Reference ("msg", BuiltinType "Cell");
-                               flags = Reference ("flags", IntegerType) } ) ) )
-                 ) } ) ) ]
+      make_builtin_fn
+        [("msg", BuiltinType "Cell"); ("flags", IntegerType)]
+        VoidType
+        (SendRawMsg
+           { msg = Reference ("msg", BuiltinType "Cell");
+             flags = Reference ("flags", IntegerType) } ) ) ]
 
 let default_bindings () =
   [ ("Integer", Value (Type IntegerType));
