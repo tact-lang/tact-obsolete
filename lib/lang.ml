@@ -336,7 +336,7 @@ functor
             | StructType s ->
                 make_call (StructType s) ~mk_args:(fun args -> receiver :: args)
             | UnionType u ->
-                make_call (StructType u) ~mk_args:(fun args -> receiver :: args)
+                make_call (UnionType u) ~mk_args:(fun args -> receiver :: args)
             | _ ->
                 print_sexp (sexp_of_expr receiver') ;
                 errors#report `Error (`UnexpectedType (type_of receiver')) () ;
