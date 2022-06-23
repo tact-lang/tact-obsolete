@@ -176,7 +176,9 @@ class constructor (program : T.program) =
       fun name -> function
         | Value (Function f) -> (
           try Some (F.Function (self#add_function f ~name:(Some name)))
-          with ex -> if equal_string name "test_try" then raise ex else None )
+          with ex ->
+            if equal_string name "builtin_send_raw_msg" then raise ex else None
+          )
         | _ ->
             None
 
@@ -238,6 +240,11 @@ class constructor (program : T.program) =
       | StoreInt {builder; length; integer; signed} ->
           self#cg_StoreInt (self#cg_expr builder) (self#cg_expr length)
             (self#cg_expr integer) signed
+      | SendRawMsg {msg; flags} ->
+          F.FunctionCall
+            ( "send_raw_message",
+              [self#cg_expr msg; self#cg_expr flags],
+              F.InferType )
 
     method cg_EmptyBuilder = F.FunctionCall ("new_builder", [], F.BuilderType)
 
@@ -259,7 +266,7 @@ class constructor (program : T.program) =
           F.BuilderType
       | BuiltinType "Cell" ->
           F.CellType
-      | HoleType ->
+      | HoleType | VoidType ->
           F.InferType
       (* FIXME: actually, ExprType should not be here, this is bug. It is flows from
          `Lang.constructor.(#make_from_impls)` fn but I do not know why it does not
