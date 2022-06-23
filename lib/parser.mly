@@ -25,7 +25,22 @@
     | stmt :: rest ->
       (make_located ~loc:(Syntax.loc stmt) ~value:(match Syntax.value stmt with | Break s -> s | s -> s) ())::rest
     |> List.rev
-  %}
+
+  let cast loc (expr : expr located) (typ : expr) =
+    make_located ~loc ~value:
+    (FunctionCall {
+      fn = make_located ~loc ~value:
+          (Function (make_function_definition 
+                              ~params: [make_located ~loc ~value: (make_located ~loc ~value: (Ident "v") (), 
+                                                                   make_located ~loc ~value: typ ()) ()]
+                              ~returns: (make_located ~loc ~value: typ ())
+                              ~function_body: (make_function_body ~function_stmt:(Return (value expr)) ()) 
+                              ()
+                    )) ();
+      arguments = [expr]
+    }) ()
+
+%}
 
 %%
 
@@ -57,14 +72,22 @@ let S(T: Type) = struct {val v: T}
 
 Same applies to enums, interfaces, unions and fns
 
+It's also possible to specify a valid type in let bindings:
+
+```
+let a: Int(32) = 1
+```
+
 *)
 let let_binding ==
 | located (
   LET;
   name = located(ident);
+  typ = option(COLON; i = type_expr; { i });
   EQUALS;
   expr = located(expr);
-  { make_binding ~binding_name: name ~binding_expr: expr () }
+  { let expr = Option.map (cast $loc expr) typ |> Option.value ~default: expr in
+    make_binding ~binding_name: name ~binding_expr: expr () }
 )
 | located (
   LET;

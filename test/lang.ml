@@ -2549,3 +2549,98 @@ let%expect_test "partial evaluation of a function" =
             (function_impl
              (Fn ((Block ((Break (Expr (Reference (x IntegerType)))))))))))))))
       (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+
+let%expect_test "let binding with type" =
+  let source = {|
+      let a: Int(257) = 1;
+      let a: Int(32) = 2;
+    |} in
+  pp source ;
+  [%expect
+    {|
+      (Ok
+       ((bindings
+         ((a (Value (Struct (25 ((value (Value (Integer 2))))))))
+          (a (Value (Struct (30 ((value (Value (Integer 1))))))))))
+        (structs
+         ((30
+           ((struct_fields ((value ((field_type IntegerType)))))
+            (struct_methods
+             ((new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 30))))
+                (function_impl
+                 (Fn
+                  ((Block
+                    ((Break
+                      (Expr
+                       (Value (Struct (30 ((value (Reference (i IntegerType))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 30)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  ((Block
+                    ((Break
+                      (Expr
+                       (FunctionCall
+                        ((ResolvedReference (serialize_int <opaque>))
+                         ((Reference (builder (StructType 3)))
+                          (StructField
+                           ((Reference (self (StructType 30))) value IntegerType))
+                          (Value (Integer 257))))))))))))))
+              (from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 30))))
+                (function_impl
+                 (Fn
+                  ((Block
+                    ((Break
+                      (Expr
+                       (Value (Struct (30 ((value (Reference (i IntegerType))))))))))))))))))
+            (struct_impls
+             (((impl_interface
+                (Value
+                 (Type
+                  (InterfaceType
+                   ((interface_methods
+                     ((from
+                       ((function_params ((from IntegerType)))
+                        (function_returns SelfType))))))))))
+               (impl_methods
+                ((from
+                  (Value
+                   (Function
+                    ((function_signature
+                      ((function_params ((i IntegerType)))
+                       (function_returns (StructType 30))))
+                     (function_impl
+                      (Fn
+                       ((Block
+                         ((Break
+                           (Expr
+                            (Value
+                             (Struct (30 ((value (Reference (i IntegerType)))))))))))))))))))))))
+            (struct_id 30)))))
+        (type_counter <opaque>) (memoized_fcalls <opaque>)))
+      |}]
+
+let%expect_test "let binding with a non-matching type" =
+  let source = {|
+      let a: Bool = 1;
+    |} in
+  pp source ;
+  [%expect
+    {|
+      (Error
+       (((TypeError (BoolType IntegerType))
+         ((bindings ((a (Value Void)))) (structs ()) (type_counter <opaque>)
+          (memoized_fcalls <opaque>)))
+        ((TypeError (BoolType IntegerType))
+         ((bindings ((a (Value Void)))) (structs ()) (type_counter <opaque>)
+          (memoized_fcalls <opaque>)))))
+      |}]
