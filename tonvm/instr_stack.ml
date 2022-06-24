@@ -1,41 +1,41 @@
 open Base
 
-type t =
-  [ `NOP
-  | `SWAP
-  | `XCHG0 of int
-  | `XCHG of int * int
-  | `PUSH of int
-  | `DUP
-  | `OVER
-  | `POP of int
-  | `DROP
-  | `NIP ]
+type core = [`NOP | `XCHG of int * int | `PUSH of int | `POP of int]
 [@@deriving sexp_of, sexp]
 
-let execute vm = function
-  | `NOP ->
-      vm
+type ext = [`SWAP | `XCHG0 of int | `DUP | `OVER | `DROP | `NIP]
+[@@deriving sexp_of, sexp]
+
+type t = [core | ext] [@@deriving sexp_of, sexp]
+
+let rec core_of_ext : ext -> core = function
   | `SWAP ->
-      let y, vm = Vm.pop vm in
-      let x, vm = Vm.pop vm in
-      Vm.push y vm |> Vm.push x
+      core_of_ext (`XCHG0 1)
   | `XCHG0 i ->
-      Vm.interchange 0 i vm
-  | `XCHG (i, j) ->
-      Vm.interchange i j vm
-  | `PUSH i ->
-      Vm.push (Vm.at vm i) vm
+      `XCHG (0, i)
   | `DUP ->
-      Vm.push (Vm.at vm 0) vm
+      `PUSH 0
   | `OVER ->
-      Vm.push (Vm.at vm 1) vm
-  | `POP i ->
-      let _, vm = Vm.interchange 0 i vm |> Vm.pop in
-      vm
+      `PUSH 1
   | `DROP ->
-      let _, vm = Vm.pop vm in
-      vm
+      `POP 0
   | `NIP ->
-      let _, vm = Vm.interchange 0 1 vm |> Vm.pop in
-      vm
+      `POP 1
+
+let execute vm =
+  let execute_core vm = function
+    | `NOP ->
+        vm
+    | `XCHG (i, j) ->
+        Vm.interchange i j vm
+    | `PUSH i ->
+        Vm.push (Vm.at vm i) vm
+    | `POP i ->
+        let _, vm = Vm.interchange 0 i vm |> Vm.pop in
+        vm
+  in
+  function
+  | #ext as instr ->
+      execute_core vm @@ core_of_ext instr
+  | #core as instr ->
+      execute_core vm instr
