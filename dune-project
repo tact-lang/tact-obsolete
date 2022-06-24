@@ -9,6 +9,20 @@
 (maintainers "cmxog@protonmail.com" "dmytro.polunin@gmail.com")
 
 (package
+ (name tonvm)
+ (synopsis "TON Virtual Machine implementation")
+ (depends
+   (ocaml (>= 4.14.0))
+   (base (>= 0.15.0))
+   (zarith (>= 1.12))
+   (stdint (>= 0.7.0))
+   (ppx_show (>= 0.2.1))
+   (sexplib (>= 0.15.0))
+   (ppx_sexp_conv (>= 0.15.1))
+   (dune (and :build (>= 3.1.1)))
+   (ppx_expect (and :with-test (>= 0.15.0)))))
+
+(package
  (name tact)
  (synopsis "TON Tact Language")
  (depends

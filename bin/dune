@@ -1,5 +1,6 @@
 (executable
  (public_name tact)
+ (package tact)
  (name main)
  (modules main)
  (libraries tact))
