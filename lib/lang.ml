@@ -72,7 +72,8 @@ functor
         structs = Builtin.default_structs;
         unions = [];
         type_counter = 0;
-        memoized_fcalls = [] }
+        memoized_fcalls = [];
+        interfaces = [] }
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
@@ -152,7 +153,7 @@ functor
 
         method build_String _env s = Value (String s)
 
-        method build_Interface _env iface = Value (Type (InterfaceType iface))
+        method build_Interface _env intf = MkInterfaceDef intf
 
         method build_Let _env let_ =
           let amend_bindings binding = function
@@ -417,7 +418,7 @@ functor
                     errors#report `Error `OnlyFunctionIsAllowed () ;
                     None )
           in
-          {interface_methods = signatures}
+          {mk_interface_methods = signatures}
 
         method! visit_interface_definition env def =
           let value =

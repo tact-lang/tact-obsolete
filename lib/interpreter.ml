@@ -277,6 +277,19 @@ class interpreter
               |> Result.ok_exn
             in
             Type (UnionType union.union_id)
+        | MkInterfaceDef {mk_interface_methods} ->
+            let intf =
+              { interface_methods =
+                  List.map mk_interface_methods ~f:(fun (name, sign) ->
+                      ( name,
+                        { function_params =
+                            List.map sign.function_params ~f:(fun (pname, ty) ->
+                                (pname, self#interpret_type ty) );
+                          function_returns =
+                            self#interpret_type sign.function_returns } ) ) }
+            in
+            let intf_ty = Program.insert_interface program intf in
+            Type intf_ty
         | MkFunction f ->
             Function (self#interpret_function f)
         | Primitive _ | InvalidExpr | Hole ->

@@ -47,6 +47,11 @@ let build_program ?(errors = make_errors Show.show_error)
                List.filter program.unions ~f:(fun (id1, _) ->
                    not
                    @@ List.exists prev_program.unions ~f:(fun (id2, _) ->
+                          equal_int id1 id2 ) );
+             interfaces =
+               List.filter program.interfaces ~f:(fun (id1, _) ->
+                   not
+                   @@ List.exists prev_program.interfaces ~f:(fun (id2, _) ->
                           equal_int id1 id2 ) ) }
          else program )
   |> Result.map_error ~f:(fun errors ->
@@ -68,7 +73,12 @@ let build_program ?(errors = make_errors Show.show_error)
                      List.filter p'.unions ~f:(fun (id1, _) ->
                          not
                          @@ List.exists prev_program.unions ~f:(fun (id2, _) ->
-                                equal_int id1 id2 ) ) }
+                                equal_int id1 id2 ) );
+                   interfaces =
+                     List.filter p'.interfaces ~f:(fun (id1, _) ->
+                         not
+                         @@ List.exists prev_program.interfaces
+                              ~f:(fun (id2, _) -> equal_int id1 id2) ) }
                else p' ) ) )
 
 let rec pp_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter

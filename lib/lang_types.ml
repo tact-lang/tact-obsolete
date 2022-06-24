@@ -37,6 +37,7 @@ and program =
   { bindings : (string * expr) list;
     mutable structs : (int * struct_) list;
     mutable unions : (int * union) list; [@sexp.list]
+    mutable interfaces : (int * interface) list; [@sexp.list]
     mutable type_counter : (int[@sexp.opaque]);
     mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
   }
@@ -45,6 +46,7 @@ and expr =
   | FunctionCall of function_call
   | MkStructDef of mk_struct
   | MkUnionDef of mk_union
+  | MkInterfaceDef of mk_interface
   | MkFunction of function_
   | MakeUnionVariant of (expr * int)
   | Reference of (string * type_)
@@ -54,6 +56,8 @@ and expr =
   | Hole
   | Primitive of primitive
   | InvalidExpr
+
+and mk_interface = {mk_interface_methods : (string * function_signature) list}
 
 and interface = {interface_methods : (string * function_signature) list}
 
@@ -91,8 +95,8 @@ and type_ =
   | BuiltinType of builtin
   | StructType of int
   | UnionType of int
+  | InterfaceType of int
   | FunctionType of function_signature
-  | InterfaceType of interface
   | HoleType
   | SelfType
   | InvalidType of expr
@@ -384,6 +388,17 @@ module Program = struct
             if equal_int id u then Some u'.union_methods else None )
     | _ ->
         []
+
+  let insert_interface p i =
+    let c = p.type_counter in
+    p.type_counter <- p.type_counter + 1 ;
+    p.interfaces <- (c, i) :: p.interfaces ;
+    InterfaceType c
+
+  (* Caller must guarantee that index is not used and will not be used by other types. *)
+  let insert_interface_with_id p idx intf =
+    p.interfaces <- (idx, intf) :: p.interfaces ;
+    InterfaceType idx
 
   let get_struct p s = List.Assoc.find_exn p.structs s ~equal:equal_int
 
