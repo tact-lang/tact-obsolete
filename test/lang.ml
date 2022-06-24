@@ -2469,8 +2469,9 @@ let%expect_test "interface constraints" =
     let must_be_one = concrete_beeper(BeeperImpl1{});
   |}
   in
-  pp source;
-  [%expect {|
+  pp source ;
+  [%expect
+    {|
     (Ok
      ((bindings
        ((must_be_one (Value (Integer 1)))
