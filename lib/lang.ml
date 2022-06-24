@@ -331,29 +331,17 @@ functor
                 dummy
           in
           (* TODO: check method signatures *)
-          match receiver with
-          | ResolvedReference (_, Value (Type (StructType st)))
-          | Value (Type (StructType st)) ->
-              make_call (StructType st) ~mk_args:(fun x -> x)
-          | ResolvedReference (_, Value (Struct (st, _)))
-          | Value (Struct (st, _)) ->
+          match type_of receiver with
+          | TypeN 0 ->
+              make_call (expr_to_type receiver) ~mk_args:(fun x -> x)
+          | StructType st ->
               make_call (StructType st) ~mk_args:(fun args -> receiver :: args)
-          | ResolvedReference (_, Value (Type (UnionType ut)))
-          | Value (Type (UnionType ut)) ->
-              make_call (UnionType ut) ~mk_args:(fun x -> x)
-          | ResolvedReference (_, Value (UnionVariant (_, ut)))
-          | Value (UnionVariant (_, ut)) ->
+          | UnionType ut ->
               make_call (UnionType ut) ~mk_args:(fun args -> receiver :: args)
-          | receiver' -> (
-            match type_of receiver' with
-            | StructType s ->
-                make_call (StructType s) ~mk_args:(fun args -> receiver :: args)
-            | UnionType u ->
-                make_call (UnionType u) ~mk_args:(fun args -> receiver :: args)
-            | _ ->
-                print_sexp (sexp_of_expr receiver') ;
-                errors#report `Error (`UnexpectedType (type_of receiver')) () ;
-                dummy )
+          | receiver_ty ->
+              print_sexp (sexp_of_expr receiver) ;
+              errors#report `Error (`UnexpectedType receiver_ty) () ;
+              dummy
 
         method! visit_function_definition env f =
           (* prepare parameter bindings *)
