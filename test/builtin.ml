@@ -96,11 +96,13 @@ let%expect_test "Int(bits) serializer" =
              (Fn
               ((Block
                 ((Let
-                  ((i (Value (Struct (32 ((value (Value (Integer 100))))))))))
+                  ((i
+                    (FunctionCall
+                     ((ResolvedReference (new <opaque>)) ((Value (Integer 100))))))))
                  (Expr
                   (FunctionCall
                    ((ResolvedReference (serialize <opaque>))
-                    ((ResolvedReference (i <opaque>))
+                    ((Reference (i (StructType 32)))
                      (Reference (b (StructType 3))))))))))))))))))
       (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
@@ -140,8 +142,14 @@ let%expect_test "demo struct serializer" =
                     ((Value
                       (Struct
                        (40
-                        ((a (Value (Struct (32 ((value (Value (Integer 0))))))))
-                         (b (Value (Struct (38 ((value (Value (Integer 1))))))))))))
+                        ((a
+                          (FunctionCall
+                           ((ResolvedReference (new <opaque>))
+                            ((Value (Integer 0))))))
+                         (b
+                          (FunctionCall
+                           ((ResolvedReference (new <opaque>))
+                            ((Value (Integer 1))))))))))
                      (Reference (b (StructType 3))))))))))))))))
         (T_serializer
          (Value

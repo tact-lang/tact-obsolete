@@ -44,6 +44,7 @@ and program =
 
 and expr =
   | FunctionCall of function_call
+  | IntfMethodCall of intf_method_cal
   | MkStructDef of mk_struct
   | MkUnionDef of mk_union
   | MkInterfaceDef of mk_interface
@@ -150,6 +151,12 @@ and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
 and function_call = expr * expr list
 
+and intf_method_cal =
+  { intf_instance : expr;
+    intf_def : int;
+    intf_method : string * function_signature;
+    intf_args : expr list }
+
 and switch = {switch_condition : expr; branches : branch list}
 
 and branch = {branch_ty : type_; branch_var : string; branch_stmt : stmt}
@@ -246,6 +253,11 @@ let rec type_of = function
       type0
   | StructField (_, _, ty) ->
       unwrap_type_ ty
+  | IntfMethodCall {intf_method = _, sign; intf_args; _} ->
+      unwrap_type_
+      @@ type_of_call intf_args sign.function_params sign.function_returns
+  | MkFunction mk_function ->
+      FunctionType mk_function.function_signature
   | expr ->
       InvalidType expr
 
@@ -400,7 +412,11 @@ module Program = struct
     p.interfaces <- (idx, intf) :: p.interfaces ;
     InterfaceType idx
 
+  let get_intf p id = List.Assoc.find_exn p.interfaces id ~equal:equal_int
+
   let get_struct p s = List.Assoc.find_exn p.structs s ~equal:equal_int
+
+  let get_union p u = List.Assoc.find_exn p.unions u ~equal:equal_int
 
   let rec update_list id new_s = function
     | [] ->
@@ -441,4 +457,14 @@ module Program = struct
     let new_union = f u in
     p.unions <- update_list id new_union p.unions ;
     new_union
+
+  let find_impl_intf p impl = function
+    | StructType s ->
+        List.find (get_struct p s).struct_impls ~f:(fun {impl_interface; _} ->
+            equal_expr impl_interface (Value (Type (InterfaceType impl))) )
+    | UnionType u ->
+        List.find (get_union p u).union_impls ~f:(fun {impl_interface; _} ->
+            equal_expr impl_interface (Value (Type (InterfaceType impl))) )
+    | _ ->
+        None
 end

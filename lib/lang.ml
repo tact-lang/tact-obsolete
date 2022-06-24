@@ -141,7 +141,7 @@ functor
               errors#report `Error (`ExpectedFunction ty) () ;
               Value Void
 
-        method build_MethodCall env mc = s#build_FunctionCall env mc
+        method build_MethodCall _env mc = mc
 
         method build_Ident _env string_ = string_
 
@@ -308,15 +308,17 @@ functor
         method build_method_call _env receiver fn args =
           let receiver = Syntax.value receiver in
           let fn = Syntax.value fn
-          and dummy : expr * expr list =
-            ( Value
-                (Function
-                   { function_signature =
-                       {function_params = []; function_returns = VoidType};
-                     function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void))
-                   } ),
-              [] )
+          and dummy : expr =
+            FunctionCall
+              ( Value
+                  (Function
+                     { function_signature =
+                         {function_params = []; function_returns = VoidType};
+                       function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void))
+                     } ),
+                [] )
           in
+          let args = s#of_located_list args in
           let make_call receiver ~mk_args =
             let receiver' = Value (Type receiver) in
             match
@@ -324,8 +326,8 @@ functor
               |> fun ms -> List.Assoc.find ms fn ~equal:String.equal
             with
             | Some fn' ->
-                ( ResolvedReference (fn, Value (Function fn')),
-                  mk_args (s#of_located_list args) )
+                FunctionCall
+                  (ResolvedReference (fn, Value (Function fn')), mk_args args)
             | None ->
                 errors#report `Error (`MethodNotFound (receiver', fn)) () ;
                 dummy
@@ -334,10 +336,58 @@ functor
           match type_of receiver with
           | TypeN 0 ->
               make_call (expr_to_type receiver) ~mk_args:(fun x -> x)
+          | InterfaceType intf_id -> (
+              let intf = Program.get_intf program intf_id in
+              match
+                List.Assoc.find intf.interface_methods fn ~equal:String.equal
+              with
+              | Some m ->
+                  IntfMethodCall
+                    { intf_instance = receiver;
+                      intf_def = intf_id;
+                      intf_method = (fn, m);
+                      intf_args = args }
+              | None ->
+                  print_sexp (sexp_of_expr receiver) ;
+                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  dummy )
           | StructType st ->
               make_call (StructType st) ~mk_args:(fun args -> receiver :: args)
           | UnionType ut ->
               make_call (UnionType ut) ~mk_args:(fun args -> receiver :: args)
+          | ExprType ex -> (
+            (* If receiver has expr type that have type Interface, that means that
+               value should implement interface, so we accept this case to allow
+               such constructions:
+               ```
+                 fn foo(X: Intf) {
+                  fn(arg: X) -> { arg.intf_method() }
+                 }
+               ```
+               where
+               type_of(arg) = ExprType(Reference("X"))
+               type_of(Reference("X")) = Intf
+            *)
+            match type_of ex with
+            | InterfaceType intf_id -> (
+                let intf = Program.get_intf program intf_id in
+                match
+                  List.Assoc.find intf.interface_methods fn ~equal:String.equal
+                with
+                | Some m ->
+                    IntfMethodCall
+                      { intf_instance = ex;
+                        intf_def = intf_id;
+                        intf_method = (fn, m);
+                        intf_args = receiver :: args }
+                | None ->
+                    print_sexp (sexp_of_expr receiver) ;
+                    errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                    dummy )
+            | _ ->
+                print_sexp (sexp_of_expr receiver) ;
+                errors#report `Error (`UnexpectedType (ExprType ex)) () ;
+                dummy )
           | receiver_ty ->
               print_sexp (sexp_of_expr receiver) ;
               errors#report `Error (`UnexpectedType receiver_ty) () ;

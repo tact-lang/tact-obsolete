@@ -1581,20 +1581,9 @@ let%expect_test "reference resolving in inner functions" =
            ((function_signature
              ((function_params ((X (TypeN 0))))
               (function_returns
-               (InvalidType
-                (MkFunction
-                 ((function_signature
-                   ((function_params ((x (Dependent X (TypeN 0)))))
-                    (function_returns (Dependent X (TypeN 0)))))
-                  (function_impl
-                   (Fn
-                    ((Block
-                      ((Break
-                        (Expr
-                         (Value
-                          (Type
-                           (ExprType
-                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
+               (FunctionType
+                ((function_params ((x (Dependent X (TypeN 0)))))
+                 (function_returns (Dependent X (TypeN 0))))))))
             (function_impl
              (Fn
               ((Block
@@ -1636,20 +1625,9 @@ let%expect_test "dependent types" =
            ((function_signature
              ((function_params ((Y (TypeN 0))))
               (function_returns
-               (InvalidType
-                (MkFunction
-                 ((function_signature
-                   ((function_params ((x (Dependent Y (TypeN 0)))))
-                    (function_returns (Dependent Y (TypeN 0)))))
-                  (function_impl
-                   (Fn
-                    ((Block
-                      ((Break
-                        (Expr
-                         (Value
-                          (Type
-                           (ExprType
-                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
+               (FunctionType
+                ((function_params ((x (Dependent Y (TypeN 0)))))
+                 (function_returns (Dependent Y (TypeN 0))))))))
             (function_impl
              (Fn
               ((Block
@@ -1664,20 +1642,9 @@ let%expect_test "dependent types" =
            ((function_signature
              ((function_params ((X (TypeN 0))))
               (function_returns
-               (InvalidType
-                (MkFunction
-                 ((function_signature
-                   ((function_params ((x (Dependent X (TypeN 0)))))
-                    (function_returns (Dependent X (TypeN 0)))))
-                  (function_impl
-                   (Fn
-                    ((Block
-                      ((Break
-                        (Expr
-                         (Value
-                          (Type
-                           (ExprType
-                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
+               (FunctionType
+                ((function_params ((x (Dependent X (TypeN 0)))))
+                 (function_returns (Dependent X (TypeN 0))))))))
             (function_impl
              (Fn
               ((Block
@@ -1698,19 +1665,10 @@ let%expect_test "dependent types" =
                   (Expr
                    (Reference
                     (f
-                     (InvalidType
-                      (MkFunction
-                       ((function_signature
-                         ((function_params
-                           ((x (ExprType (Reference (X (TypeN 0)))))))
-                          (function_returns (ExprType (Reference (X (TypeN 0)))))))
-                        (function_impl
-                         (Fn
-                          ((Block
-                            ((Break
-                              (Expr
-                               (Reference
-                                (x (ExprType (Reference (X (TypeN 0)))))))))))))))))))))))))))))))
+                     (FunctionType
+                      ((function_params
+                        ((x (ExprType (Reference (X (TypeN 0)))))))
+                       (function_returns (ExprType (Reference (X (TypeN 0))))))))))))))))))))))
       (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "TypeN" =
@@ -2376,20 +2334,9 @@ let%expect_test "partial evaluation of a function" =
            ((function_signature
              ((function_params ((x IntegerType)))
               (function_returns
-               (InvalidType
-                (MkFunction
-                 ((function_signature
-                   ((function_params ((y IntegerType)))
-                    (function_returns IntegerType)))
-                  (function_impl
-                   (Fn
-                    ((Block
-                      ((Break
-                        (Expr
-                         (FunctionCall
-                          ((ResolvedReference (left <opaque>))
-                           ((Value (Type (Dependent x IntegerType)))
-                            (Value (Type (ExprType (Reference (y IntegerType)))))))))))))))))))))
+               (FunctionType
+                ((function_params ((y IntegerType)))
+                 (function_returns IntegerType))))))
             (function_impl
              (Fn
               ((Block
@@ -2505,3 +2452,106 @@ let%expect_test "let binding with a non-matching type" =
          ((bindings ((a (Value Void)))) (structs ()) (type_counter <opaque>)
           (memoized_fcalls <opaque>)))))
       |}]
+
+let%expect_test "interface constraints" =
+  let source =
+    {|
+    interface Beep {
+      fn beep(self: Self) -> Integer
+    }
+    struct BeeperImpl1 { impl Beep { fn beep(self: Self) -> Integer { 1 } } }
+    fn test(T: Beep) {
+      fn(t: T) -> Integer {
+        return t.beep();
+      }
+    }
+    let concrete_beeper = test(BeeperImpl1);
+    let must_be_one = concrete_beeper(BeeperImpl1{});
+  |}
+  in
+  pp source;
+  [%expect {|
+    (Ok
+     ((bindings
+       ((must_be_one (Value (Integer 1)))
+        (concrete_beeper
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((t (StructType 40))))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              ((Block
+                ((Return
+                  (FunctionCall
+                   ((Value
+                     (Function
+                      ((function_signature
+                        ((function_params ((self (StructType 40))))
+                         (function_returns IntegerType)))
+                       (function_impl
+                        (Fn ((Block ((Break (Expr (Value (Integer 1))))))))))))
+                    ((Reference (t (StructType 40))))))))))))))))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((T (InterfaceType 38))))
+              (function_returns
+               (FunctionType
+                ((function_params ((t (Dependent T (InterfaceType 38)))))
+                 (function_returns IntegerType))))))
+            (function_impl
+             (Fn
+              ((Block
+                ((Break
+                  (Expr
+                   (MkFunction
+                    ((function_signature
+                      ((function_params
+                        ((t (ExprType (Reference (T (InterfaceType 38)))))))
+                       (function_returns IntegerType)))
+                     (function_impl
+                      (Fn
+                       ((Block
+                         ((Return
+                           (IntfMethodCall
+                            ((intf_instance (Reference (T (InterfaceType 38))))
+                             (intf_def 38)
+                             (intf_method
+                              (beep
+                               ((function_params ((self SelfType)))
+                                (function_returns IntegerType))))
+                             (intf_args
+                              ((Reference
+                                (t (ExprType (Reference (T (InterfaceType 38)))))))))))))))))))))))))))))
+        (BeeperImpl1 (Value (Type (StructType 40))))
+        (Beep (Value (Type (InterfaceType 38))))))
+      (structs
+       ((40
+         ((struct_fields ())
+          (struct_methods
+           ((beep
+             ((function_signature
+               ((function_params ((self (StructType 40))))
+                (function_returns IntegerType)))
+              (function_impl (Fn ((Block ((Break (Expr (Value (Integer 1)))))))))))))
+          (struct_impls
+           (((impl_interface (Value (Type (InterfaceType 38))))
+             (impl_methods
+              ((beep
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((self (StructType 40))))
+                     (function_returns IntegerType)))
+                   (function_impl
+                    (Fn ((Block ((Break (Expr (Value (Integer 1))))))))))))))))))
+          (struct_id 40)))))
+      (interfaces
+       ((38
+         ((interface_methods
+           ((beep
+             ((function_params ((self SelfType))) (function_returns IntegerType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
