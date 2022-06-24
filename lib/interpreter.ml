@@ -528,7 +528,7 @@ class interpreter
                       FunctionCall (method_, args)
                   | None ->
                       print_sexp (sexp_of_type_ intf_ty) ;
-                      print_sexp (sexp_of_intf_method_cal call) ;
+                      print_sexp (sexp_of_intf_method_call call) ;
                       raise InternalCompilerError )
               | false ->
                   IntfMethodCall {call with intf_instance; intf_args = args}

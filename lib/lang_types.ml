@@ -44,7 +44,7 @@ and program =
 
 and expr =
   | FunctionCall of function_call
-  | IntfMethodCall of intf_method_cal
+  | IntfMethodCall of intf_method_call
   | MkStructDef of mk_struct
   | MkUnionDef of mk_union
   | MkInterfaceDef of mk_interface
@@ -151,7 +151,7 @@ and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
 and function_call = expr * expr list
 
-and intf_method_cal =
+and intf_method_call =
   { intf_instance : expr;
     intf_def : int;
     intf_method : string * function_signature;
