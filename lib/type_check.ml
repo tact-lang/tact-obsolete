@@ -85,6 +85,14 @@ class type_checker (errors : _) (functions : _) =
               Error (NeedFromCall m)
           | _ ->
               Error (TypeError expected) )
+      | InterfaceType _ -> (
+        match actual with
+        (* TODO: we should check that argument implements such interface. Maybe we
+           should implement something like NeedFromCall variant but for interfaces. *)
+        | TypeN 0 ->
+            Ok expected
+        | _ ->
+            Error (TypeError expected) )
       | _otherwise ->
           Error (TypeError expected)
   end

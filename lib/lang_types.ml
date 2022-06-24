@@ -37,14 +37,17 @@ and program =
   { bindings : (string * expr) list;
     mutable structs : (int * struct_) list;
     mutable unions : (int * union) list; [@sexp.list]
+    mutable interfaces : (int * interface) list; [@sexp.list]
     mutable type_counter : (int[@sexp.opaque]);
     mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
   }
 
 and expr =
   | FunctionCall of function_call
+  | IntfMethodCall of intf_method_cal
   | MkStructDef of mk_struct
   | MkUnionDef of mk_union
+  | MkInterfaceDef of mk_interface
   | MkFunction of function_
   | MakeUnionVariant of (expr * int)
   | Reference of (string * type_)
@@ -54,6 +57,8 @@ and expr =
   | Hole
   | Primitive of primitive
   | InvalidExpr
+
+and mk_interface = {mk_interface_methods : (string * function_signature) list}
 
 and interface = {interface_methods : (string * function_signature) list}
 
@@ -91,8 +96,8 @@ and type_ =
   | BuiltinType of builtin
   | StructType of int
   | UnionType of int
+  | InterfaceType of int
   | FunctionType of function_signature
-  | InterfaceType of interface
   | HoleType
   | SelfType
   | InvalidType of expr
@@ -145,6 +150,12 @@ and function_signature =
 and function_impl = Fn of function_body | BuiltinFn of builtin_fn | InvalidFn
 
 and function_call = expr * expr list
+
+and intf_method_cal =
+  { intf_instance : expr;
+    intf_def : int;
+    intf_method : string * function_signature;
+    intf_args : expr list }
 
 and switch = {switch_condition : expr; branches : branch list}
 
@@ -242,6 +253,11 @@ let rec type_of = function
       type0
   | StructField (_, _, ty) ->
       unwrap_type_ ty
+  | IntfMethodCall {intf_method = _, sign; intf_args; _} ->
+      unwrap_type_
+      @@ type_of_call intf_args sign.function_params sign.function_returns
+  | MkFunction mk_function ->
+      FunctionType mk_function.function_signature
   | expr ->
       InvalidType expr
 
@@ -385,7 +401,22 @@ module Program = struct
     | _ ->
         []
 
+  let insert_interface p i =
+    let c = p.type_counter in
+    p.type_counter <- p.type_counter + 1 ;
+    p.interfaces <- (c, i) :: p.interfaces ;
+    InterfaceType c
+
+  (* Caller must guarantee that index is not used and will not be used by other types. *)
+  let insert_interface_with_id p idx intf =
+    p.interfaces <- (idx, intf) :: p.interfaces ;
+    InterfaceType idx
+
+  let get_intf p id = List.Assoc.find_exn p.interfaces id ~equal:equal_int
+
   let get_struct p s = List.Assoc.find_exn p.structs s ~equal:equal_int
+
+  let get_union p u = List.Assoc.find_exn p.unions u ~equal:equal_int
 
   let rec update_list id new_s = function
     | [] ->
@@ -426,4 +457,14 @@ module Program = struct
     let new_union = f u in
     p.unions <- update_list id new_union p.unions ;
     new_union
+
+  let find_impl_intf p impl = function
+    | StructType s ->
+        List.find (get_struct p s).struct_impls ~f:(fun {impl_interface; _} ->
+            equal_expr impl_interface (Value (Type (InterfaceType impl))) )
+    | UnionType u ->
+        List.find (get_union p u).union_impls ~f:(fun {impl_interface; _} ->
+            equal_expr impl_interface (Value (Type (InterfaceType impl))) )
+    | _ ->
+        None
 end

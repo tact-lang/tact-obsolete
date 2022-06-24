@@ -139,6 +139,25 @@ class interpreter
         match expr with
         | FunctionCall fc ->
             self#interpret_fc fc
+        | IntfMethodCall
+            {intf_instance; intf_def; intf_method = method_name, _ty; intf_args}
+          -> (
+            let ty =
+              match self#interpret_expr intf_instance with
+              | Type t ->
+                  t
+              | _ ->
+                  raise InternalCompilerError
+            in
+            match Program.find_impl_intf program intf_def ty with
+            | Some impl ->
+                let method_ =
+                  List.find_map_exn impl.impl_methods ~f:(fun (name, impl) ->
+                      if equal_string name method_name then Some impl else None )
+                in
+                self#interpret_fc (method_, intf_args)
+            | None ->
+                raise InternalCompilerError )
         | ResolvedReference (_, expr') ->
             self#interpret_expr expr'
         | Reference (name, _) -> (
@@ -277,6 +296,19 @@ class interpreter
               |> Result.ok_exn
             in
             Type (UnionType union.union_id)
+        | MkInterfaceDef {mk_interface_methods} ->
+            let intf =
+              { interface_methods =
+                  List.map mk_interface_methods ~f:(fun (name, sign) ->
+                      ( name,
+                        { function_params =
+                            List.map sign.function_params ~f:(fun (pname, ty) ->
+                                (pname, self#interpret_type ty) );
+                          function_returns =
+                            self#interpret_type sign.function_returns } ) ) }
+            in
+            let intf_ty = Program.insert_interface program intf in
+            Type intf_ty
         | MkFunction f ->
             Function (self#interpret_function f)
         | Primitive _ | InvalidExpr | Hole ->
@@ -458,6 +490,48 @@ class interpreter
                     self_eval#visit_function_impl env f.function_impl
                   in
                   {function_signature = sign; function_impl = body} )
+
+            method! visit_IntfMethodCall env call =
+              let intf_instance = self_eval#visit_expr env call.intf_instance in
+              let args =
+                self_eval#visit_list self_eval#visit_expr env call.intf_args
+              in
+              let is_dependent = function
+                | Value (Type (Dependent _)) ->
+                    true
+                | _ ->
+                    false
+              in
+              match
+                is_immediate_expr intf_instance
+                && not (is_dependent intf_instance)
+              with
+              | true -> (
+                  let intf_ty =
+                    match self#interpret_expr intf_instance with
+                    | Type t ->
+                        t
+                    | _ ->
+                        raise InternalCompilerError
+                  in
+                  match
+                    Program.find_impl_intf program call.intf_def intf_ty
+                  with
+                  | Some impl ->
+                      let method_ =
+                        List.find_map_exn impl.impl_methods
+                          ~f:(fun (name, impl) ->
+                            let method_name, _ = call.intf_method in
+                            if equal_string name method_name then Some impl
+                            else None )
+                      in
+                      FunctionCall (method_, args)
+                  | None ->
+                      print_sexp (sexp_of_type_ intf_ty) ;
+                      print_sexp (sexp_of_intf_method_cal call) ;
+                      raise InternalCompilerError )
+              | false ->
+                  IntfMethodCall {call with intf_instance; intf_args = args}
 
             method private with_vars : 'a. _ -> (unit -> 'a) -> 'a =
               fun vars f ->

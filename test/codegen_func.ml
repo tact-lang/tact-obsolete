@@ -160,16 +160,19 @@ let%expect_test "Int(bits) serializer codegen" =
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
     }
-    builder f1(builder self, int int, int bits) {
+    int f0(int i) {
+      i;
+    }
+    builder f2(builder self, int int, int bits) {
       builder b = builtin_builder_store_int(self, int, bits);
       b;
     }
-    builder f0(int self, builder builder) {
-      f1(builder, self, 32);
+    builder f1(int self, builder builder) {
+      f2(builder, self, 32);
     }
     _ test_int(builder b) {
-      int i = 100;
-      f0(100, b);
+      int i = f0(100);
+      f1(i, b);
     } |}]
 
 let%expect_test "demo struct serializer" =
@@ -223,9 +226,15 @@ let%expect_test "demo struct serializer" =
     builder f3() {
       builtin_builder_new();
     }
+    int f4(int i) {
+      i;
+    }
+    int f5(int i) {
+      i;
+    }
     _ test() {
       builder b = f3();
-      T_serializer([0, 1], b);
+      T_serializer([f4(0), f5(1)], b);
     } |}]
 
 let%expect_test "demo struct serializer 2" =
@@ -279,9 +288,15 @@ let%expect_test "demo struct serializer 2" =
     builder f3() {
       builtin_builder_new();
     }
+    int f4(int i) {
+      i;
+    }
+    int f5(int i) {
+      i;
+    }
     builder test() {
       builder b = f3();
-      return serialize_foo([0, 1], b);
+      return serialize_foo([f4(0), f5(1)], b);
     } |}]
 
 let%expect_test "true and false" =

@@ -64,15 +64,17 @@ let from_intf =
   let function_signature =
     {function_params = [("T", type0)]; function_returns = HoleType}
   in
-  let make_from t =
-    Type
-      (InterfaceType
-         { interface_methods =
-             [ ( "from",
-                 {function_params = [("from", t)]; function_returns = SelfType}
-               ) ] } )
+  let make_from p t =
+    let intf =
+      { interface_methods =
+          [ ( "from",
+              {function_params = [("from", t)]; function_returns = SelfType} )
+          ] }
+    in
+    let intf_ty = Program.insert_interface p intf in
+    Type intf_ty
   in
-  let function_impl _p = function [Type t] -> make_from t | _ -> Void in
+  let function_impl p = function [Type t] -> make_from p t | _ -> Void in
   Value
     (Function
        { function_signature;
@@ -132,5 +134,7 @@ let default_bindings () =
   @ builtin_bindings
 
 let default_structs = []
+
+let default_intfs = []
 
 let std = [%blob "std/std.tact"]
