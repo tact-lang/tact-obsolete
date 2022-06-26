@@ -35,12 +35,12 @@ and binding_scope = Comptime of expr | Runtime of type_
 
 and program =
   { bindings : (string * expr) list;
-    mutable structs : (int * struct_) list;
-    mutable unions : (int * union) list; [@sexp.list]
-    mutable interfaces : (int * interface) list; [@sexp.list]
-    mutable type_counter : (int[@sexp.opaque]);
+    mutable structs : (int * struct_) list; [@hash.ignore]
+    mutable unions : (int * union) list; [@sexp.list] [@hash.ignore]
+    mutable interfaces : (int * interface) list; [@sexp.list] [@hash.ignore]
+    mutable type_counter : (int[@sexp.opaque]); [@hash.ignore]
     mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
-  }
+        [@hash.ignore] }
 
 and expr =
   | FunctionCall of function_call
@@ -126,7 +126,9 @@ and struct_ =
   { struct_fields : (string * struct_field) list;
     struct_methods : (string * function_) list;
     struct_impls : impl list;
-    struct_id : int }
+    struct_id : int;
+    (* Used by codegen to determine if this is a tensor *)
+    tensor : bool [@sexp.bool] }
 
 and discriminator = Discriminator of int
 
@@ -137,7 +139,8 @@ and impl = {impl_interface : expr; impl_methods : binding list}
 and function_body = (stmt option[@sexp.option])
 
 and native_function =
-  (program -> value list -> value[@visitors.opaque] [@equal.ignore])
+  (program -> value list -> value
+  [@visitors.opaque] [@equal.ignore] [@compare.ignore] )
 
 and builtin_fn = native_function * (int[@sexp.opaque])
 
@@ -162,12 +165,15 @@ and switch = {switch_condition : expr; branches : branch list}
 and branch = {branch_ty : type_; branch_var : string; branch_stmt : stmt}
 
 and primitive =
+  | Divmod of {x : expr; y : expr}
   | EmptyBuilder
   | StoreInt of {builder : expr; length : expr; integer : expr; signed : bool}
   | BuildCell of {builder : expr}
   | SendRawMsg of {msg : expr; flags : expr}
 [@@deriving
   equal,
+    compare,
+    hash,
     sexp_of,
     visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},

@@ -8,7 +8,14 @@
   ppx_sexp_conv
   sexplib)
  (preprocess
-  (pps ppx_show ppx_make ppx_compare visitors.ppx ppx_sexp_conv ppx_blob))
+  (pps
+   ppx_show
+   ppx_make
+   ppx_compare
+   visitors.ppx
+   ppx_sexp_conv
+   ppx_blob
+   ppx_hash))
  (preprocessor_deps
   (file std/std.tact))
  (name tact))

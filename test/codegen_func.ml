@@ -49,8 +49,19 @@ let%expect_test "simple function generation" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -82,8 +93,19 @@ let%expect_test "passing struct to a function" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -111,8 +133,19 @@ let%expect_test "function calls" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -145,8 +178,19 @@ let%expect_test "Int(bits) serializer codegen" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -193,8 +237,19 @@ let%expect_test "demo struct serializer" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -255,8 +310,19 @@ let%expect_test "demo struct serializer 2" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -314,8 +380,19 @@ let%expect_test "true and false" =
   pp source ;
   [%expect
     {|
+      forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+        (Value1 value,  _) = tensor;
+        return value;
+      }
+      forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+        ( _, Value2 value) = tensor;
+        return value;
+      }
       _ builtin_send_raw_msg(cell msg, int flags) {
         return send_raw_message(msg, flags);
+      }
+      (int, int) builtin_divmod(int x, int y) {
+        return divmod(x, y);
       }
       builder builtin_builder_store_int(builder b, int int_, int bits) {
         return store_int(b, int_, bits);
@@ -352,8 +429,19 @@ let%expect_test "if/then/else" =
   pp source ;
   [%expect
     {|
+      forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+        (Value1 value,  _) = tensor;
+        return value;
+      }
+      forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+        ( _, Value2 value) = tensor;
+        return value;
+      }
       _ builtin_send_raw_msg(cell msg, int flags) {
         return send_raw_message(msg, flags);
+      }
+      (int, int) builtin_divmod(int x, int y) {
+        return divmod(x, y);
       }
       builder builtin_builder_store_int(builder b, int int_, int bits) {
         return store_int(b, int_, bits);
@@ -386,8 +474,19 @@ let%expect_test "serializer inner struct" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -431,8 +530,19 @@ let%expect_test "unions" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -478,8 +588,19 @@ let%expect_test "switch statement" =
   pp source ;
   [%expect
     {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -511,3 +632,47 @@ let%expect_test "switch statement" =
     }} else
     {
       }}} |}]
+
+let%expect_test "tensor2" =
+  let source =
+    {|
+    fn test() {
+      let x = builtin_divmod(10, 2);
+      return x.value1;
+    }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
+    _ builtin_send_raw_msg(cell msg, int flags) {
+      return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
+    }
+    builder builtin_builder_store_int(builder b, int int_, int bits) {
+      return store_int(b, int_, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return end_cell(b);
+    }
+    builder builtin_builder_new() {
+      return begin_cell();
+    }
+    _ send_raw_msg(cell msg, int flags) {
+      builtin_send_raw_msg(msg, flags);
+    }
+    int test() {
+      (int, int) x = builtin_divmod(10, 2);
+      return tensor2_value1(x);
+    }
+   |}]
