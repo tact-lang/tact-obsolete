@@ -21,7 +21,7 @@ class ['s] struct_updater (program : program) (old : int) (new_s : int) =
       if equal_int s old then StructType new_s
       else if not (List.exists visited_structs ~f:(fun s' -> equal_int s' s))
       then
-        let _ = self#update_struct_ids_if_need env s in
+        let _ = self#update_struct_ids_if_needed env s in
         StructType s
       else StructType s
 
@@ -40,7 +40,7 @@ class ['s] struct_updater (program : program) (old : int) (new_s : int) =
        is expected that after `Test` was constructed, `val x` field should have struct id `3`.
        So, to update such ids there is a function below.
     *)
-    method private update_struct_ids_if_need : 'env. 'env -> _ -> _ =
+    method private update_struct_ids_if_needed : 'env. 'env -> _ -> _ =
       fun env sid ->
         visited_structs <- sid :: visited_structs ;
         Program.update_struct program sid ~f:(fun st ->
