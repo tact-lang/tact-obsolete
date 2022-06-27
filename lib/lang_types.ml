@@ -170,6 +170,9 @@ and primitive =
   | StoreInt of {builder : expr; length : expr; integer : expr; signed : bool}
   | BuildCell of {builder : expr}
   | SendRawMsg of {msg : expr; flags : expr}
+  | ParseCell of {cell : expr}
+  | SliceEndParse of {slice : expr}
+  | SliceLoadInt of {slice : expr; bits : expr}
 [@@deriving
   equal,
     compare,

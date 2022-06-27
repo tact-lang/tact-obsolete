@@ -2,6 +2,8 @@ struct Cell {
   val c: builtin_Cell
 }
 
+// Do not change place of builder struct - for internal reasons
+// it should be second struct in the file.
 struct Builder {
   val b: builtin_Builder
 
@@ -15,6 +17,26 @@ struct Builder {
   fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
     let b = builtin_builder_store_int(self.b, int, bits);
     Self { b: b }
+  }
+}
+
+struct LoadResultBase(S: Type, X: Type) {
+  val slice: S
+  val value: X
+}
+
+struct Slice {
+  val s: builtin_Slice
+
+  fn parse(cell: Cell) -> Self {
+    Self { s: builtin_slice_begin_parse(cell.c) }
+  }
+
+  fn load_int(self: Self, bits: Integer) -> LoadResultBase(Self, Integer) {
+    let output = builtin_slice_load_int(self.s, bits);
+    let slice = Self { s: output.value1 };
+    let int = output.value2;
+    LoadResultBase(Self, Integer) { slice: slice, value: int }
   }
 }
 

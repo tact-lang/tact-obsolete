@@ -287,6 +287,15 @@ class constructor (program : T.program) =
             ( "send_raw_message",
               [self#cg_expr msg; self#cg_expr flags],
               F.InferType )
+      | ParseCell {cell} ->
+          F.FunctionCall ("begin_parse", [self#cg_expr cell], F.SliceType)
+      | SliceEndParse {slice} ->
+          F.FunctionCall ("end_parse", [self#cg_expr slice], F.InferType)
+      | SliceLoadInt {slice; bits} ->
+          F.FunctionCall
+            ( "load_int",
+              [self#cg_expr slice; self#cg_expr bits],
+              F.TensorType [F.SliceType; F.IntType] )
 
     method cg_EmptyBuilder = F.FunctionCall ("begin_cell", [], F.BuilderType)
 

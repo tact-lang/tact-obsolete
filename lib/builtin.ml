@@ -113,6 +113,7 @@ let tensor2 t1 t2 =
 let builtin_bindings =
   [ ("builtin_Builder", Value (Type (BuiltinType "Builder")));
     ("builtin_Cell", Value (Type (BuiltinType "Cell")));
+    ("builtin_Slice", Value (Type (BuiltinType "Slice")));
     ( "builtin_builder_new",
       Value
         (Function
@@ -135,6 +136,23 @@ let builtin_bindings =
              length = Reference ("bits", IntegerType);
              integer = Reference ("int", IntegerType);
              signed = true } ) );
+    ( "builtin_slice_begin_parse",
+      make_builtin_fn
+        [("c", BuiltinType "Cell")]
+        (BuiltinType "Slice")
+        (ParseCell {cell = Reference ("c", BuiltinType "Cell")}) );
+    ( "builtin_slice_end_parse",
+      make_builtin_fn
+        [("s", BuiltinType "Slice")]
+        VoidType
+        (SliceEndParse {slice = Reference ("s", BuiltinType "Slice")}) );
+    ( "builtin_slice_load_int",
+      make_builtin_fn
+        [("s", BuiltinType "Slice"); ("bits", IntegerType)]
+        (StructType (tensor2 (BuiltinType "Slice") IntegerType).struct_id)
+        (SliceLoadInt
+           { slice = Reference ("s", BuiltinType "Slice");
+             bits = Reference ("bits", IntegerType) } ) );
     ( "builtin_divmod",
       make_builtin_fn
         [("x", IntegerType); ("y", IntegerType)]
