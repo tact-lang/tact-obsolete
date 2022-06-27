@@ -171,7 +171,7 @@ and pp_expr f = function
   | Integer i ->
       pp_print_string f (Zint.to_string i)
   | Reference (ref, _) ->
-      pp_print_string f ref
+      pp_ident f ref
   | FunctionCall (name, args, _) ->
       pp_print_string f name ;
       pp_print_string f "(" ;
