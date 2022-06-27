@@ -246,10 +246,10 @@ class constructor (program : T.program) =
               [self#cg_expr msg; self#cg_expr flags],
               F.InferType )
 
-    method cg_EmptyBuilder = F.FunctionCall ("new_builder", [], F.BuilderType)
+    method cg_EmptyBuilder = F.FunctionCall ("begin_cell", [], F.BuilderType)
 
     method cg_BuildCell builder_arg =
-      F.FunctionCall ("build", [self#cg_expr builder_arg], F.CellType)
+      F.FunctionCall ("end_cell", [self#cg_expr builder_arg], F.CellType)
 
     method private lang_type_to_type : T.type_ -> F.type_ =
       function

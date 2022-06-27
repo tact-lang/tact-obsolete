@@ -56,10 +56,10 @@ let%expect_test "simple function generation" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -89,10 +89,10 @@ let%expect_test "passing struct to a function" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -118,10 +118,10 @@ let%expect_test "function calls" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -152,10 +152,10 @@ let%expect_test "Int(bits) serializer codegen" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -200,10 +200,10 @@ let%expect_test "demo struct serializer" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -262,10 +262,10 @@ let%expect_test "demo struct serializer 2" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -321,10 +321,10 @@ let%expect_test "true and false" =
         return store_int(b, int_, bits);
       }
       cell builtin_builder_build(builder b) {
-        return build(b);
+        return end_cell(b);
       }
       builder builtin_builder_new() {
-        return new_builder();
+        return begin_cell();
       }
       _ send_raw_msg(cell msg, int flags) {
         builtin_send_raw_msg(msg, flags);
@@ -359,10 +359,10 @@ let%expect_test "if/then/else" =
         return store_int(b, int_, bits);
       }
       cell builtin_builder_build(builder b) {
-        return build(b);
+        return end_cell(b);
       }
       builder builtin_builder_new() {
-        return new_builder();
+        return begin_cell();
       }
       _ send_raw_msg(cell msg, int flags) {
         builtin_send_raw_msg(msg, flags);
@@ -393,10 +393,10 @@ let%expect_test "serializer inner struct" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -438,10 +438,10 @@ let%expect_test "unions" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
@@ -485,10 +485,10 @@ let%expect_test "switch statement" =
       return store_int(b, int_, bits);
     }
     cell builtin_builder_build(builder b) {
-      return build(b);
+      return end_cell(b);
     }
     builder builtin_builder_new() {
-      return new_builder();
+      return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
       builtin_send_raw_msg(msg, flags);
