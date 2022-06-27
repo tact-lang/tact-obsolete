@@ -66,6 +66,15 @@ let%expect_test "simple function generation" =
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
     }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -113,6 +122,15 @@ let%expect_test "passing struct to a function" =
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
     }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -155,6 +173,15 @@ let%expect_test "function calls" =
     }
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -203,6 +230,15 @@ let%expect_test "Int(bits) serializer codegen" =
     }
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -265,6 +301,15 @@ let%expect_test "demo struct serializer" =
     }
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -342,6 +387,15 @@ let%expect_test "demo struct serializer 2" =
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
     }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -415,6 +469,15 @@ let%expect_test "true and false" =
       (int, int) builtin_divmod(int x, int y) {
         return divmod(x, y);
       }
+      (slice, int) builtin_slice_load_int(slice s, int bits) {
+        return load_int(s, bits);
+      }
+      _ builtin_slice_end_parse(slice s) {
+        return end_parse(s);
+      }
+      slice builtin_slice_begin_parse(cell c) {
+        return begin_parse(c);
+      }
       builder builtin_builder_store_int(builder b, int int_, int bits) {
         return store_int(b, int_, bits);
       }
@@ -467,6 +530,15 @@ let%expect_test "if/then/else" =
       (int, int) builtin_divmod(int x, int y) {
         return divmod(x, y);
       }
+      (slice, int) builtin_slice_load_int(slice s, int bits) {
+        return load_int(s, bits);
+      }
+      _ builtin_slice_end_parse(slice s) {
+        return end_parse(s);
+      }
+      slice builtin_slice_begin_parse(cell c) {
+        return begin_parse(c);
+      }
       builder builtin_builder_store_int(builder b, int int_, int bits) {
         return store_int(b, int_, bits);
       }
@@ -514,6 +586,15 @@ let%expect_test "serializer inner struct" =
     }
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -573,6 +654,15 @@ let%expect_test "unions" =
     }
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -635,6 +725,15 @@ let%expect_test "switch statement" =
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
     }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -695,6 +794,15 @@ let%expect_test "tensor2" =
     (int, int) builtin_divmod(int x, int y) {
       return divmod(x, y);
     }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -712,3 +820,191 @@ let%expect_test "tensor2" =
       return tensor2_value1(x);
     }
    |}]
+
+let%expect_test "deserialization api" =
+  let source =
+    {|
+     fn test(c: Cell) {
+       let s = Slice.parse(c);
+       let msg = CommonMsgInfo.deserialize(s);
+     }
+     |}
+  in
+  pp source ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value,  _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      ( _, Value2 value) = tensor;
+      return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
+    _ builtin_send_raw_msg(cell msg, int flags) {
+      return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
+    builder builtin_builder_store_int(builder b, int int_, int bits) {
+      return store_int(b, int_, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return end_cell(b);
+    }
+    builder builtin_builder_new() {
+      return begin_cell();
+    }
+    _ send_raw_msg(cell msg, int flags) {
+      builtin_send_raw_msg(msg, flags);
+    }
+    slice f0(cell cell_) {
+      builtin_slice_begin_parse(cell_);
+    }
+    [slice, int] f2(slice self, int bits) {
+      (slice, int) output = builtin_slice_load_int(self, bits);
+      slice slice_ = tensor2_value1(output);
+      int int_ = tensor2_value2(output);
+      [slice_, int_];
+    }
+    [slice, int] f7(slice s) {
+      [slice, int] res = f2(s, 9);
+      [first(res), second(res)];
+    }
+    [slice, int] f8(slice s) {
+      [slice, int] res = f2(s, 8);
+      [first(res), second(res)];
+    }
+    [slice, [int, int, int]] f9(slice s, [int, int, int] x) {
+      [s, x];
+    }
+    [slice, [int, int, int]] f6(slice s) {
+      [slice, int] res_anycast = f2(s, 1);
+      if (builtin_equal(second(res_anycast), 0)) {
+      [slice, int] res_len = f7(first(res_anycast));
+    [slice, int] res_workchain =
+    f8(first(res_len));
+    [slice, int] res_address =
+    f2(first(res_workchain), res_len);
+    return
+    f9(first(res_address), [second(res_len), second(res_workchain), second(res_address)]);
+    } else
+    {
+      }}
+    [slice, tuple] f10(slice s, tuple x) {
+      [s, x];
+    }
+    [slice, int] f12(slice s) {
+      [slice, int] res = f2(s, 256);
+      [first(res), second(res)];
+    }
+    [slice, [int, int]] f13(slice s, [int, int] x) {
+      [s, x];
+    }
+    [slice, [int, int]] f11(slice s) {
+      [slice, int] res_anycast = f2(s, 1);
+      if (builtin_equal(second(res_anycast), 0)) {
+      [slice, int] res_workchain = f8(first(res_anycast));
+    [slice, int] res_address =
+    f12(first(res_workchain));
+    return
+    f13(first(res_address), [second(res_workchain), second(res_address)]);
+    } else
+    {
+      }}
+    [slice, tuple] f5(slice s) {
+      [slice, int] res_discr = f2(s, 1);
+      if (builtin_equal(second(res_discr), 0)) {
+      [slice, [int, int]] res_addr = f11(second(res_discr));
+    return
+    f10(first(res_addr), second(res_addr));
+    } else
+    {
+      [slice, [int, int, int]] res_addr = f6(first(res_discr));
+    return
+    f10(first(res_addr), second(res_addr));
+    }}
+    [slice, tuple] f14(slice s, tuple x) {
+      [s, x];
+    }
+    [slice, [int, int]] f16(slice s) {
+      [slice, int] res_len = f7(s);
+      [slice, int] res_bits = f2(first(res_len), second(res_len));
+      [first(res_bits), [second(res_len), second(res_bits)]];
+    }
+    [slice, tuple] f17(slice s, tuple x) {
+      [s, x];
+    }
+    [slice, tuple] f15(slice s) {
+      [slice, int] res_discr = f2(s, 1);
+      if (builtin_equal(second(res_discr), 0)) {
+      return f17(first(res_discr), []);
+    } else if (builtin_equal(second(res_discr), 1))
+    {
+      [slice, [int, int]] res_addr = f16(first(res_discr));
+    return
+    f17(first(res_addr), second(res_addr));
+    } else
+    {
+      }}
+    [slice, tuple] f4(slice s) {
+      [slice, int] res_discr = f2(s, 1);
+      if (builtin_equal(second(res_discr), 0)) {
+      [slice, tuple] res_addr = f15(second(res_discr));
+    return
+    f14(first(res_addr), second(res_addr));
+    } else
+    {
+      [slice, tuple] res_addr = f5(first(res_discr));
+    return
+    f14(first(res_addr), second(res_addr));
+    }}
+    [slice, int] f18(slice s) {
+      [slice, int] res = f2(s, 64);
+      [first(res), second(res)];
+    }
+    [slice, [tuple, tuple, int, int]] f19(slice s, [tuple, tuple, int, int] x) {
+      [s, x];
+    }
+    [slice, [tuple, tuple, int, int]] f3(slice s) {
+      [slice, tuple] res_src = f4(s);
+      [slice, tuple] res_dest = f15(first(res_src));
+      [slice, int] res_created_lt = f18(first(res_dest));
+      [slice, int] res_created_at = f18(first(res_created_lt));
+      return
+        f19(first(res_created_at), [second(res_src), second(res_dest), second(res_created_lt), second(res_created_at)]);
+    }
+    [slice, tuple] f20(slice s, tuple x) {
+      [s, x];
+    }
+    [slice, tuple] f1(slice s) {
+      [slice, int] res_discr1 = f2(s, 1);
+      if (builtin_equal(second(res_discr1), 0)) {
+      } else
+    {
+      [slice, int] res_discr2 = f2(first(res_discr1), 1);
+    if (builtin_equal(second(res_discr2), 0))
+    {
+      } else
+    {
+      [slice, [tuple, tuple, int, int]] res_info = f3(first(res_discr2));
+    return
+    f20(first(res_info), second(res_info));
+    }}}
+    _ test(cell c) {
+      slice s = f0(c);
+      [slice, tuple] msg = f1(s);
+    } |}]

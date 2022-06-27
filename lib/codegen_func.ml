@@ -177,9 +177,7 @@ class constructor (program : T.program) =
       fun name -> function
         | Value (Function f) -> (
           try Some (F.Function (self#add_function f ~name:(Some name)))
-          with ex ->
-            if equal_string name "builtin_send_raw_msg" then raise ex else None
-          )
+          with ex -> if equal_string name "test" then raise ex else None )
         | _ ->
             None
 
@@ -319,12 +317,16 @@ class constructor (program : T.program) =
       | StructType s ->
           self#struct_to_ty (T.Program.get_struct program s)
       | UnionType u ->
+          T.print_sexp @@ sexp_of_int u ;
+          T.print_sexp @@ sexp_of_string "|" ;
           self#create_ty_from_union
             (List.Assoc.find_exn program.unions u ~equal:equal_int)
       | BuiltinType "Builder" ->
           F.BuilderType
       | BuiltinType "Cell" ->
           F.CellType
+      | BuiltinType "Slice" ->
+          F.SliceType
       | HoleType | VoidType ->
           F.InferType
       (* FIXME: actually, ExprType should not be here, this is bug. It is flows from

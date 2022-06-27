@@ -442,6 +442,12 @@ module Program = struct
     p.structs <- update_list sid (Ok new_s) p.structs ;
     new_s
 
+  let update_union p sid ~f =
+    let s = get_union p sid in
+    let new_u = f s in
+    p.unions <- update_list sid (Ok new_u) p.unions ;
+    new_u
+
   let with_struct p s f =
     p.structs <- (s.struct_id, s) :: p.structs ;
     let new_s = f () in

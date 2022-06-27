@@ -46,17 +46,49 @@ class ['s] struct_updater (program : program) (old : int) (new_s : int) =
         Program.update_struct program sid ~f:(fun st ->
             self#visit_struct_ env st )
 
+    method! visit_UnionType env u =
+      if not (List.exists visited_structs ~f:(fun s' -> equal_int s' u)) then (
+        visited_structs <- u :: visited_structs ;
+        let _ =
+          Program.update_union program u ~f:(fun st -> self#visit_union env st)
+        in
+        UnionType u )
+      else UnionType u
+
     method! visit_Struct env (s, fields) =
       let fields' = self#visit_list self#visit_binding env fields in
       if equal_int s old then Struct (new_s, fields') else Struct (s, fields')
   end
 
-class ['s] union_updater (old : int) (new_s : int) =
-  object
+class ['s] union_updater (program : program) (old : int) (new_s : int) =
+  object (self : 's)
     inherit ['s] map
 
-    method! visit_UnionType _ s =
-      if equal_int s old then UnionType new_s else UnionType s
+    val mutable visited_structs = []
+
+    method! visit_UnionType env s =
+      if equal_int s old then UnionType new_s else self#update_unions env s
+
+    method update_unions : 'env. 'env -> _ -> _ =
+      fun env u ->
+        if not (List.exists visited_structs ~f:(fun s' -> equal_int s' u)) then (
+          visited_structs <- u :: visited_structs ;
+          let _ =
+            Program.update_union program u ~f:(fun st ->
+                self#visit_union env st )
+          in
+          () ) ;
+        UnionType u
+
+    method! visit_StructType env s =
+      if not (List.exists visited_structs ~f:(fun s' -> equal_int s' s)) then (
+        visited_structs <- s :: visited_structs ;
+        let _ =
+          Program.update_struct program s ~f:(fun st ->
+              self#visit_struct_ env st )
+        in
+        () ) ;
+      StructType s
 
     method! visit_UnionVariant _ (expr, s) =
       if equal_int s old then UnionVariant (expr, new_s)
@@ -296,7 +328,8 @@ class interpreter
                     union_id = id } )
                 (fun u_base ->
                   let union_updater =
-                    new union_updater mk_union.mk_union_id u_base.union_id
+                    new union_updater
+                      program mk_union.mk_union_id u_base.union_id
                   in
                   let union_methods =
                     List.map mk_union.mk_union_methods ~f:(fun (name, fn) ->
