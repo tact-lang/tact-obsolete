@@ -177,9 +177,7 @@ class constructor (program : T.program) =
       fun name -> function
         | Value (Function f) -> (
           try Some (F.Function (self#add_function f ~name:(Some name)))
-          with ex ->
-            if equal_string name "builtin_send_raw_msg" then raise ex else None
-          )
+          with ex -> if equal_string name "test" then raise ex else None )
         | _ ->
             None
 
@@ -287,6 +285,17 @@ class constructor (program : T.program) =
             ( "send_raw_message",
               [self#cg_expr msg; self#cg_expr flags],
               F.InferType )
+      | ParseCell {cell} ->
+          F.FunctionCall ("begin_parse", [self#cg_expr cell], F.SliceType)
+      | SliceEndParse {slice} ->
+          F.FunctionCall ("end_parse", [self#cg_expr slice], F.InferType)
+      | SliceLoadInt {slice; bits} ->
+          F.FunctionCall
+            ( "load_int",
+              [self#cg_expr slice; self#cg_expr bits],
+              F.TensorType [F.SliceType; F.IntType] )
+      | Equality {x; y} ->
+          Operator (self#cg_expr x, F.EqualityOperator, self#cg_expr y)
 
     method cg_EmptyBuilder = F.FunctionCall ("begin_cell", [], F.BuilderType)
 
@@ -314,6 +323,8 @@ class constructor (program : T.program) =
           F.BuilderType
       | BuiltinType "Cell" ->
           F.CellType
+      | BuiltinType "Slice" ->
+          F.SliceType
       | HoleType | VoidType ->
           F.InferType
       (* FIXME: actually, ExprType should not be here, this is bug. It is flows from

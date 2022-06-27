@@ -166,10 +166,14 @@ and branch = {branch_ty : type_; branch_var : string; branch_stmt : stmt}
 
 and primitive =
   | Divmod of {x : expr; y : expr}
+  | Equality of {x : expr; y : expr}
   | EmptyBuilder
   | StoreInt of {builder : expr; length : expr; integer : expr; signed : bool}
   | BuildCell of {builder : expr}
   | SendRawMsg of {msg : expr; flags : expr}
+  | ParseCell of {cell : expr}
+  | SliceEndParse of {slice : expr}
+  | SliceLoadInt of {slice : expr; bits : expr}
 [@@deriving
   equal,
     compare,
@@ -431,6 +435,18 @@ module Program = struct
         if equal_int xid id then
           match new_s with Ok new_s -> (id, new_s) :: xs | Error _ -> xs
         else (xid, old_s) :: update_list id new_s xs
+
+  let update_struct p sid ~f =
+    let s = get_struct p sid in
+    let new_s = f s in
+    p.structs <- update_list sid (Ok new_s) p.structs ;
+    new_s
+
+  let update_union p sid ~f =
+    let s = get_union p sid in
+    let new_u = f s in
+    p.unions <- update_list sid (Ok new_u) p.unions ;
+    new_u
 
   let with_struct p s f =
     p.structs <- (s.struct_id, s) :: p.structs ;
