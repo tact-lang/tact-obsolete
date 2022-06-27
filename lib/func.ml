@@ -224,4 +224,9 @@ and pp_type f = function
   | FunctionType _ ->
       raise UnknownType
 
-and pp_ident f i = pp_print_string f i
+and pp_ident f i =
+  match i with
+  | "int" | "cell" | "slice" | "builder" | "cont" | "tuple " ->
+      pp_print_string f (i ^ "_")
+  | _ ->
+      pp_print_string f i
