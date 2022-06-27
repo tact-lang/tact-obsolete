@@ -87,8 +87,8 @@ and print_sexp e =
   pp_sexp
     (Result.sexp_of_t Lang.sexp_of_program (List.sexp_of_t sexp_of_error) e)
 
-let pp ?(prev_program = Lang.default_program ()) s =
-  parse_program s |> build_program ~prev_program |> print_sexp
+let pp ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) s =
+  parse_program s |> build_program ~prev_program ~strip_defaults |> print_sexp
 
 exception Exn of error list
 

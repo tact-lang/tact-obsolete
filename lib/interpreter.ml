@@ -11,12 +11,40 @@ type error =
   | `DuplicateVariant of type_ ]
 [@@deriving equal, sexp_of]
 
-class ['s] struct_updater (old : int) (new_s : int) =
+class ['s] struct_updater (program : program) (old : int) (new_s : int) =
   object (self : 's)
     inherit ['s] map
 
-    method! visit_StructType _ s =
-      if equal_int s old then StructType new_s else StructType s
+    val mutable visited_structs = []
+
+    method! visit_StructType env s =
+      if equal_int s old then StructType new_s
+      else if not (List.exists visited_structs ~f:(fun s' -> equal_int s' s))
+      then
+        let _ = self#update_struct_ids_if_need env s in
+        StructType s
+      else StructType s
+
+    (* This will update struct ids in the fields and functions of another struct.
+       Suppose, you have following declaration:
+       ```tact
+       struct Wrap(X: Type) {val x: X}
+       struct /* 3 */ Test {
+        fn wrap(self: Self) -> /* 2 */ Wrap( /* 1 */ Self) {
+          Wrap(Self) { x: self }
+        }
+       }
+       ```
+       If code will evaluated without function below, output code has IDs as in comments above.
+       As you can see, `Wrap(Struct(1))` will be created with field `val x: Struct(1)`, but it
+       is expected that after `Test` was constructed, `val x` field should have struct id `3`.
+       So, to update such ids there is a function below.
+    *)
+    method private update_struct_ids_if_need : 'env. 'env -> _ -> _ =
+      fun env sid ->
+        visited_structs <- sid :: visited_structs ;
+        Program.update_struct program sid ~f:(fun st ->
+            self#visit_struct_ env st )
 
     method! visit_Struct env (s, fields) =
       let fields' = self#visit_list self#visit_binding env fields in
@@ -204,7 +232,9 @@ class interpreter
                 struct_id;
                 tensor = false }
             in
-            let struct_updater = new struct_updater mk_struct_id struct_id in
+            let struct_updater =
+              new struct_updater program mk_struct_id struct_id
+            in
             let s =
               Program.with_struct program struct_ (fun _ ->
                   let struct_methods =

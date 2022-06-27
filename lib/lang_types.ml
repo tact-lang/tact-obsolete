@@ -435,6 +435,12 @@ module Program = struct
           match new_s with Ok new_s -> (id, new_s) :: xs | Error _ -> xs
         else (xid, old_s) :: update_list id new_s xs
 
+  let update_struct p sid ~f =
+    let s = get_struct p sid in
+    let new_s = f s in
+    p.structs <- update_list sid (Ok new_s) p.structs ;
+    new_s
+
   let with_struct p s f =
     p.structs <- (s.struct_id, s) :: p.structs ;
     let new_s = f () in

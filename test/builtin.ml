@@ -372,8 +372,8 @@ let%expect_test "slice api" =
       fn test(cell: Cell) {
         let slice = Slice.parse(cell);
         let result = slice.load_int(10);
-        let slice2 = result.slice;
-        let int = result.value;
+        let slice2: Slice = result.slice;
+        let int: Integer = result.value;
       }
     |}
   in
@@ -403,10 +403,33 @@ let%expect_test "slice api" =
                       ((Reference (slice (StructType 7))) (Value (Integer 10))))))))
                  (Let
                   ((slice2
-                    (StructField
-                     ((Reference (result (StructType 6))) slice (StructType 5))))))
+                    (FunctionCall
+                     ((MkFunction
+                       ((function_signature
+                         ((function_params ((v (StructType 7))))
+                          (function_returns (StructType 7))))
+                        (function_impl
+                         (Fn
+                          ((Return
+                            (StructField
+                             ((Reference (result (StructType 6))) slice
+                              (StructType 7)))))))))
+                      ((StructField
+                        ((Reference (result (StructType 6))) slice
+                         (StructType 7)))))))))
                  (Let
                   ((int
-                    (StructField
-                     ((Reference (result (StructType 6))) value IntegerType))))))))))))))))
+                    (FunctionCall
+                     ((MkFunction
+                       ((function_signature
+                         ((function_params ((v IntegerType)))
+                          (function_returns IntegerType)))
+                        (function_impl
+                         (Fn
+                          ((Return
+                            (StructField
+                             ((Reference (result (StructType 6))) value
+                              IntegerType))))))))
+                      ((StructField
+                        ((Reference (result (StructType 6))) value IntegerType)))))))))))))))))))
       (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
