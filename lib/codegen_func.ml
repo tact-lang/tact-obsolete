@@ -317,8 +317,6 @@ class constructor (program : T.program) =
       | StructType s ->
           self#struct_to_ty (T.Program.get_struct program s)
       | UnionType u ->
-          T.print_sexp @@ sexp_of_int u ;
-          T.print_sexp @@ sexp_of_string "|" ;
           self#create_ty_from_union
             (List.Assoc.find_exn program.unions u ~equal:equal_int)
       | BuiltinType "Builder" ->
