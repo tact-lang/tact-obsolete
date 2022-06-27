@@ -57,6 +57,9 @@ let%expect_test "simple function generation" =
       ( _, Value2 value) = tensor;
       return value;
     }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
     }
@@ -101,6 +104,9 @@ let%expect_test "passing struct to a function" =
       ( _, Value2 value) = tensor;
       return value;
     }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
     }
@@ -140,6 +146,9 @@ let%expect_test "function calls" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       ( _, Value2 value) = tensor;
       return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
     }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
@@ -185,6 +194,9 @@ let%expect_test "Int(bits) serializer codegen" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       ( _, Value2 value) = tensor;
       return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
     }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
@@ -244,6 +256,9 @@ let%expect_test "demo struct serializer" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       ( _, Value2 value) = tensor;
       return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
     }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
@@ -318,6 +333,9 @@ let%expect_test "demo struct serializer 2" =
       ( _, Value2 value) = tensor;
       return value;
     }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
     }
@@ -388,6 +406,9 @@ let%expect_test "true and false" =
         ( _, Value2 value) = tensor;
         return value;
       }
+      int builtin_equal(int x, int y) {
+        return x == y;
+      }
       _ builtin_send_raw_msg(cell msg, int flags) {
         return send_raw_message(msg, flags);
       }
@@ -437,6 +458,9 @@ let%expect_test "if/then/else" =
         ( _, Value2 value) = tensor;
         return value;
       }
+      int builtin_equal(int x, int y) {
+        return x == y;
+      }
       _ builtin_send_raw_msg(cell msg, int flags) {
         return send_raw_message(msg, flags);
       }
@@ -481,6 +505,9 @@ let%expect_test "serializer inner struct" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       ( _, Value2 value) = tensor;
       return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
     }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
@@ -537,6 +564,9 @@ let%expect_test "unions" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       ( _, Value2 value) = tensor;
       return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
     }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
@@ -596,6 +626,9 @@ let%expect_test "switch statement" =
       ( _, Value2 value) = tensor;
       return value;
     }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);
     }
@@ -652,6 +685,9 @@ let%expect_test "tensor2" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       ( _, Value2 value) = tensor;
       return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
     }
     _ builtin_send_raw_msg(cell msg, int flags) {
       return send_raw_message(msg, flags);

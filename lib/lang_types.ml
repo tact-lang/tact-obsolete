@@ -166,6 +166,7 @@ and branch = {branch_ty : type_; branch_var : string; branch_stmt : stmt}
 
 and primitive =
   | Divmod of {x : expr; y : expr}
+  | Equality of {x : expr; y : expr}
   | EmptyBuilder
   | StoreInt of {builder : expr; length : expr; integer : expr; signed : bool}
   | BuildCell of {builder : expr}

@@ -166,7 +166,14 @@ let builtin_bindings =
         VoidType
         (SendRawMsg
            { msg = Reference ("msg", BuiltinType "Cell");
-             flags = Reference ("flags", IntegerType) } ) ) ]
+             flags = Reference ("flags", IntegerType) } ) );
+    ( "builtin_equal",
+      make_builtin_fn
+        [("x", IntegerType); ("y", IntegerType)]
+        BoolType
+        (Equality
+           {x = Reference ("x", IntegerType); y = Reference ("y", IntegerType)}
+        ) ) ]
 
 let default_bindings () =
   [ ("Integer", Value (Type IntegerType));

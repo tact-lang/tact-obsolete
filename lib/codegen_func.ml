@@ -296,6 +296,8 @@ class constructor (program : T.program) =
             ( "load_int",
               [self#cg_expr slice; self#cg_expr bits],
               F.TensorType [F.SliceType; F.IntType] )
+      | Equality {x; y} ->
+          Operator (self#cg_expr x, F.EqualityOperator, self#cg_expr y)
 
     method cg_EmptyBuilder = F.FunctionCall ("begin_cell", [], F.BuilderType)
 
