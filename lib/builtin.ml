@@ -87,6 +87,29 @@ let make_builtin_fn params ret_ty primitive =
            {function_params = params; function_returns = ret_ty};
          function_impl = Fn (Some (Return (Primitive primitive))) } )
 
+let builtin_struct_next_id = ref 0
+
+let next_builtin_struct_id () =
+  let id = !builtin_struct_next_id - 1 in
+  builtin_struct_next_id := id ;
+  id
+
+let tensor2_hashtbl =
+  Hashtbl.create
+    ( module struct
+      type t = Lang_types.type_ * Lang_types.type_
+      [@@deriving hash, sexp_of, compare]
+    end )
+
+let tensor2 t1 t2 =
+  Hashtbl.find_or_add tensor2_hashtbl (t1, t2) ~default:(fun () ->
+      { struct_id = next_builtin_struct_id ();
+        struct_fields =
+          [("value1", {field_type = t1}); ("value2", {field_type = t2})];
+        struct_methods = [];
+        struct_impls = [];
+        tensor = true } )
+
 let builtin_bindings =
   [ ("builtin_Builder", Value (Type (BuiltinType "Builder")));
     ("builtin_Cell", Value (Type (BuiltinType "Cell")));
@@ -112,6 +135,13 @@ let builtin_bindings =
              length = Reference ("bits", IntegerType);
              integer = Reference ("int", IntegerType);
              signed = true } ) );
+    ( "builtin_divmod",
+      make_builtin_fn
+        [("x", IntegerType); ("y", IntegerType)]
+        (StructType (tensor2 IntegerType IntegerType).struct_id)
+        (Divmod
+           {x = Reference ("x", IntegerType); y = Reference ("y", IntegerType)}
+        ) );
     ( "builtin_send_raw_msg",
       make_builtin_fn
         [("msg", BuiltinType "Cell"); ("flags", IntegerType)]
@@ -133,7 +163,9 @@ let default_bindings () =
     ("From", from_intf) ]
   @ builtin_bindings
 
-let default_structs = []
+let default_structs =
+  Hashtbl.map tensor2_hashtbl ~f:(fun struct_ -> (struct_.struct_id, struct_))
+  |> Hashtbl.data
 
 let default_intfs = []
 

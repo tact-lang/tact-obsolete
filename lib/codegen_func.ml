@@ -164,7 +164,8 @@ class constructor (program : T.program) =
           | _ ->
               []
         in
-        { function_name = name;
+        { function_forall = [];
+          function_name = name;
           function_args =
             List.map fn.function_signature.function_params ~f:(fun (name, ty) ->
                 (name, self#lang_type_to_type ty) );
@@ -188,23 +189,59 @@ class constructor (program : T.program) =
           List.filter_map (List.rev program.bindings)
             ~f:(fun (name, top_level_stmt) ->
               self#cg_top_level_stmt name top_level_stmt )
+        and make_tensor_accessors (sz : int) =
+          let typeargs =
+            List.map ~f:(fun i -> "Value" ^ Int.to_string i)
+            @@ List.range ~start:`inclusive ~stop:`inclusive 1 sz
+          in
+          List.map ~f:(fun i ->
+              let ret = List.nth_exn typeargs (i - 1)
+              and tensor_type =
+                F.TensorType
+                  (List.map typeargs ~f:(fun ident -> F.NamedType ident))
+              in
+              F.Function
+                { function_forall = typeargs;
+                  function_name =
+                    "tensor" ^ Int.to_string sz ^ "_value" ^ Int.to_string i;
+                  function_args = [("tensor", tensor_type)];
+                  function_returns = NamedType ret;
+                  function_body =
+                    Fn
+                      [ DestructuringBinding
+                          ( List.mapi typeargs ~f:(fun i' typearg ->
+                                if Int.equal i (i' + 1) then
+                                  (Some (F.NamedType typearg), "value")
+                                else (None, "_") ),
+                            Reference ("tensor", tensor_type) );
+                        Return (Reference ("value", NamedType ret)) ] } )
+          @@ List.range ~start:`inclusive ~stop:`inclusive 1 sz
         in
-        List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
+        make_tensor_accessors 2
+        @ List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
 
     method cg_StructField (from_expr, field, _) =
-      let build_access struct_ty field field_ty =
-        let name =
-          match field with
-          | 0 ->
-              "first"
-          | 1 ->
-              "second"
-          | 2 ->
-              "third"
-          | _ ->
-              raise Unsupported
-        in
-        F.FunctionCall (name, [struct_ty], field_ty)
+      let build_access ~(tensor : int option) struct_ty field field_ty =
+        match tensor with
+        | None ->
+            let name =
+              match field with
+              | 0 ->
+                  "first"
+              | 1 ->
+                  "second"
+              | 2 ->
+                  "third"
+              | _ ->
+                  raise Unsupported
+            in
+            F.FunctionCall (name, [struct_ty], field_ty)
+        | Some arity ->
+            let name =
+              "tensor" ^ Int.to_string arity ^ "_value"
+              ^ Int.to_string (field + 1)
+            in
+            F.FunctionCall (name, [struct_ty], field_ty)
       in
       match T.type_of from_expr with
       | StructType s -> (
@@ -218,7 +255,10 @@ class constructor (program : T.program) =
                   (List.findi s.struct_fields ~f:(fun _ (name, _) ->
                        equal_string name field ) )
               in
-              build_access (self#cg_expr from_expr) field_id
+              build_access
+                ~tensor:
+                  (if s.tensor then Some (List.length s.struct_fields) else None)
+                (self#cg_expr from_expr) field_id
                 (self#lang_type_to_type field.field_type) )
       | _ ->
           raise Invalid
@@ -233,6 +273,8 @@ class constructor (program : T.program) =
 
     method cg_Primitive : T.primitive -> F.expr =
       function
+      | Divmod {x; y} ->
+          self#cg_Divmod x y
       | EmptyBuilder ->
           self#cg_EmptyBuilder
       | BuildCell {builder} ->
@@ -247,6 +289,12 @@ class constructor (program : T.program) =
               F.InferType )
 
     method cg_EmptyBuilder = F.FunctionCall ("begin_cell", [], F.BuilderType)
+
+    method cg_Divmod x y =
+      F.FunctionCall
+        ( "divmod",
+          [self#cg_expr x; self#cg_expr y],
+          F.TensorType [F.IntType; F.IntType] )
 
     method cg_BuildCell builder_arg =
       F.FunctionCall ("end_cell", [self#cg_expr builder_arg], F.CellType)
@@ -301,12 +349,12 @@ class constructor (program : T.program) =
       function
       | {struct_fields = [(_, {field_type})]; _} ->
           self#lang_type_to_type field_type
-      | {struct_fields; _} ->
+      | {struct_fields; tensor; _} ->
           let types =
             List.map struct_fields ~f:(fun (_, {field_type}) ->
                 self#lang_type_to_type field_type )
           in
-          TupleType types
+          if tensor then TensorType types else TupleType types
 
     method private create_ty_from_union : T.union -> F.type_ =
       function _ -> UnknownTuple

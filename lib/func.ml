@@ -8,7 +8,8 @@ type function_ =
   { function_name : ident;
     function_args : (ident * type_) list;
     function_returns : type_;
-    function_body : function_body }
+    function_body : function_body;
+    function_forall : ident list }
 
 and function_body =
   | AsmFn of Asm.instr list [@sexp.list]
@@ -16,6 +17,7 @@ and function_body =
 
 and stmt =
   | Vars of (type_ * ident * expr) list
+  | DestructuringBinding of (type_ option * ident) list * expr
   | Return of expr
   | Expr of expr
   | Block of stmt list
@@ -43,6 +45,7 @@ and type_ =
   | FunctionType of function_
   | ContType
   | InferType
+  | NamedType of ident
 
 and top_level_expr = Function of function_ | Global of type_ * ident
 
@@ -88,6 +91,18 @@ let rec pp_program f program =
 
 and pp_function f fn =
   pp_open_box f 4 ;
+  ( match fn.function_forall with
+  | [] ->
+      ()
+  | typeargs ->
+      pp_print_string f "forall" ;
+      pp_print_space f () ;
+      list_iter typeargs
+        ~f:(fun ident -> pp_ident f ident ; pp_print_string f ", ")
+        ~flast:(pp_ident f) ;
+      pp_print_space f () ;
+      pp_print_string f "->" ;
+      pp_print_space f () ) ;
   pp_type f fn.function_returns ;
   pp_print_space f () ;
   pp_ident f fn.function_name ;
@@ -129,6 +144,25 @@ and pp_stmt f = function
           pp_expr f expr ;
           pp_print_string f ";" ;
           pp_print_newline f () )
+  | DestructuringBinding (vars, expr) ->
+      pp_print_string f "(" ;
+      list_iter vars
+        ~f:(fun (t, n) ->
+          (match t with Some t -> pp_type f t | None -> ()) ;
+          pp_print_space f () ;
+          pp_ident f n ;
+          pp_print_string f "," ;
+          pp_print_space f () )
+        ~flast:(fun (t, n) ->
+          (match t with Some t -> pp_type f t | None -> ()) ;
+          pp_print_space f () ; pp_ident f n ) ;
+      pp_print_string f ")" ;
+      pp_print_space f () ;
+      pp_print_string f "=" ;
+      pp_print_space f () ;
+      pp_expr f expr ;
+      pp_print_string f ";" ;
+      pp_print_newline f ()
   | Return expr ->
       pp_print_string f "return" ;
       pp_print_space f () ;
@@ -223,6 +257,8 @@ and pp_type f = function
       pp_print_string f "_"
   | FunctionType _ ->
       raise UnknownType
+  | NamedType name ->
+      pp_print_string f name
 
 and pp_ident f i =
   match i with

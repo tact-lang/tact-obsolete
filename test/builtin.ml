@@ -336,3 +336,32 @@ let%expect_test "from interface" =
                           (Value (Struct (39 ((a (Reference (x IntegerType)))))))))))))))))))))))
           (struct_id 39)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+
+let%expect_test "tensor2" =
+  let source =
+    {|
+    fn test() {
+      let x = builtin_divmod(10, 2);
+    }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns HoleType)))
+            (function_impl
+             (Fn
+              ((Block
+                ((Let
+                  ((x
+                    (FunctionCall
+                     ((ResolvedReference (builtin_divmod <opaque>))
+                      ((Value (Integer 10)) (Value (Integer 2)))))))))))))))))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)))
+      |}]

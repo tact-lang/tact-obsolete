@@ -198,7 +198,11 @@ class interpreter
             program.type_counter <- program.type_counter + 1 ;
             let struct_ty = struct_id in
             let struct_ =
-              {struct_fields; struct_methods = []; struct_impls = []; struct_id}
+              { struct_fields;
+                struct_methods = [];
+                struct_impls = [];
+                struct_id;
+                tensor = false }
             in
             let struct_updater = new struct_updater mk_struct_id struct_id in
             let s =
@@ -232,7 +236,12 @@ class interpreter
                                     (self#interpret_expr
                                        (struct_updater#visit_expr () x) ) ) ) } )
                   in
-                  Ok {struct_fields; struct_methods; struct_impls; struct_id} )
+                  Ok
+                    { struct_fields;
+                      struct_methods;
+                      struct_impls;
+                      struct_id;
+                      tensor = false } )
             in
             let _ =
               match s with Ok t -> t | Error _ -> raise InternalCompilerError

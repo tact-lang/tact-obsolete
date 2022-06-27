@@ -533,7 +533,8 @@ functor
                     (name, {field_type = ExprType expr}) );
               struct_methods = [];
               struct_impls = [];
-              struct_id = program.type_counter }
+              struct_id = program.type_counter;
+              tensor = false }
           in
           program.type_counter <- program.type_counter + 1 ;
           let mk_struct =

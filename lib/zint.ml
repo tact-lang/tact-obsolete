@@ -10,3 +10,5 @@ class ['s] map =
   end
 
 let equal = Z.equal
+
+let hash_fold_t h v = Ppx_hash_lib.Std.Hash.fold_string h @@ Z.to_string v
