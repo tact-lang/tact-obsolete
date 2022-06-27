@@ -101,6 +101,48 @@ let let_binding ==
       ()
   }
 )
+
+(* 
+Let also allows to do destructuring assignment for structs:
+
+```
+let {x,y,z} = (struct { val x: Integer; val y: Integer; val z: Integer }){x: 1, y: 2, z: 3};
+```
+
+It is also possible to rename assignments:
+
+```
+let {x as x_,y as y_,z} = (struct { val x: Integer; val y: Integer; val z: Integer }){x: 1, y: 2, z: 3};
+```
+
+For brevity, unused fields can be omitted using `..` syntax:
+
+```
+let {x,..} = (struct { val x: Integer; val y: Integer; val z: Integer }){x: 1, y: 2, z: 3};
+```
+
+*)
+let destructuring_let_binding ==
+located (
+  LET;
+  (fields, rest) = delimited_separated_trailing_list_followed_by(LBRACE, destructuring_field, COMMA, rest, RBRACE);
+  EQUALS;
+  expr = located(expr);
+  { make_destructuring_binding ~destructuring_binding: (make_located ~loc: $loc ~value: fields ())
+      ~destructuring_binding_expr: expr
+      ~destructuring_binding_rest: rest
+      ()
+  }
+
+)
+
+let destructuring_field ==
+  | id = located(ident); { (id, id) }
+  | id = located(ident); AS; new_id = located(ident); { (id, new_id) }
+
+let rest ==
+  r = option(REST); { Option.is_some r }
+
 let shorthand_binding(funbody) ==
 | sugared_function_definition(funbody)
 | located( (name, expr) = struct_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~loc: $loc ~value: expr ())  () })
@@ -241,6 +283,7 @@ let stmt :=
 let semicolon_stmt :=
   | ~= stmt_expr; <Expr>
   | ~= let_binding; <Let>
+  | ~= destructuring_let_binding; <DestructuringLet>
   | RETURN; ~= expr; <Return>
 
 let non_semicolon_stmt :=

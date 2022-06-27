@@ -44,6 +44,7 @@ let whitespace = [' ' '\t']+
 rule token = parse
  | whitespace { token lexbuf }
  | newline  { next_line lexbuf; token lexbuf }
+ | ".." { REST }
  | ',' { COMMA }
  | ':' { COLON }
  | ';' { SEMICOLON }
@@ -61,6 +62,7 @@ rule token = parse
      string lexbuf ;
      STRING (get_str_buffer ())
    }
+ | "as" { AS }
  | "true" { BOOL true }
  | "false" { BOOL false }
  | "let" { LET }

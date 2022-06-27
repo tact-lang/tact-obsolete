@@ -100,4 +100,6 @@ functor
           Printf.sprintf "Uninterpretable statement."
       | `FieldNotFoundF field | `FieldNotFound (_, field) ->
           Printf.sprintf "Field `%s` not found." field
+      | `MissingField (_, field) ->
+          Printf.sprintf "Field '%s' is missing in destructuring." field
   end

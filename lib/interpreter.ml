@@ -7,6 +7,7 @@ type error =
   | `UninterpretableStatement of stmt
   | `UnexpectedType of type_
   | `FieldNotFound of int * string
+  | `MissingField of int * string
   | `ArgumentNumberMismatch
   | `DuplicateVariant of type_ ]
 [@@deriving equal, sexp_of]
@@ -151,6 +152,19 @@ class interpreter
           | _ ->
               errors#report `Error `ArgumentNumberMismatch () ;
               Void )
+      | DestructuringLet let_ ->
+          let args_scope =
+            List.map let_.destructuring_let ~f:(fun (name, new_name) ->
+                let expr =
+                  StructField (let_.destructuring_let_expr, name, HoleType)
+                in
+                (new_name, self#interpret_expr expr) )
+          in
+          let prev_scope = vars_scope in
+          vars_scope <- args_scope :: vars_scope ;
+          let output = self#interpret_stmt_list rest in
+          vars_scope <- prev_scope ;
+          output
       | Break stmt ->
           self#interpret_stmt stmt []
       | Return expr ->
@@ -549,6 +563,36 @@ class interpreter
               let vars_names = List.map vars ~f:(fun (name, _) -> name) in
               local_vars <- vars_names :: local_vars ;
               vars'
+
+            method! visit_DestructuringLet _env let_ =
+              match let_.destructuring_let_expr with
+              | Reference (_, StructType id) | Value (Struct (id, _)) ->
+                  let struct_ = Program.get_struct program id in
+                  (* Check if field names are correct *)
+                  List.iter let_.destructuring_let ~f:(fun (name, _) ->
+                      if
+                        List.Assoc.find struct_.struct_fields
+                          ~equal:String.equal name
+                        |> Option.is_some
+                      then ()
+                      else errors#report `Error (`FieldNotFound (id, name)) () ) ;
+                  (* If rest of fields are not ignored, check for completeness *)
+                  if let_.destructuring_let_rest then ()
+                  else
+                    List.iter struct_.struct_fields ~f:(fun (name, _) ->
+                        if
+                          List.Assoc.find let_.destructuring_let
+                            ~equal:String.equal name
+                          |> Option.is_some
+                        then ()
+                        else errors#report `Error (`MissingField (id, name)) () ) ;
+                  local_vars <-
+                    List.map let_.destructuring_let ~f:snd :: local_vars ;
+                  DestructuringLet let_
+              | expr ->
+                  errors#report `Error (`UninterpretableStatement (Expr expr))
+                    () ;
+                  Invalid
 
             method! visit_function_ env f =
               let sign =

@@ -174,6 +174,37 @@ functor
                 amend_bindings (make_runtime (name, ty)) current_bindings ;
               Let [(name, expr)]
 
+        method build_DestructuringLet _env let_ =
+          let amend_bindings binding = function
+            | [] ->
+                [[binding]]
+            | bindings :: rest ->
+                (binding :: bindings) :: rest
+          in
+          let let_ = Syntax.value let_ in
+          match is_immediate_expr let_.destructuring_let_expr with
+          | true ->
+              List.iter let_.destructuring_let ~f:(fun (name, new_name) ->
+                  let expr =
+                    StructField (let_.destructuring_let_expr, name, HoleType)
+                  in
+                  current_bindings <-
+                    amend_bindings
+                      (make_comptime (new_name, expr))
+                      current_bindings ) ;
+              DestructuringLet let_
+          | false ->
+              List.iter let_.destructuring_let ~f:(fun (name, new_name) ->
+                  let expr =
+                    StructField (let_.destructuring_let_expr, name, HoleType)
+                  in
+                  let ty = type_of expr in
+                  current_bindings <-
+                    amend_bindings
+                      (make_runtime (new_name, ty))
+                      current_bindings ) ;
+              DestructuringLet let_
+
         method build_MutRef _env _mutref = InvalidExpr
 
         method build_Reference env ref =
@@ -279,6 +310,15 @@ functor
 
         method build_binding _env name expr =
           (Syntax.value name, Syntax.value expr)
+
+        method build_destructuring_binding _env destructuring_binding
+            destructuring_binding_expr destructuring_binding_rest =
+          { destructuring_let =
+              List.map (Syntax.value destructuring_binding)
+                ~f:(fun (name, new_name) ->
+                  (Syntax.value name, Syntax.value new_name) );
+            destructuring_let_expr = Syntax.value destructuring_binding_expr;
+            destructuring_let_rest = destructuring_binding_rest }
 
         method build_enum_definition _env _members _bindings = ()
 

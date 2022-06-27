@@ -145,18 +145,26 @@ and pp_stmt f = function
           pp_print_string f ";" ;
           pp_print_newline f () )
   | DestructuringBinding (vars, expr) ->
-      pp_print_string f "(" ;
+      let tensor =
+        match expr with Reference (_, TensorType _) -> true | _ -> false
+      in
+      pp_print_string f (if tensor then "(" else "[") ;
       list_iter vars
         ~f:(fun (t, n) ->
-          (match t with Some t -> pp_type f t | None -> ()) ;
-          pp_print_space f () ;
-          pp_ident f n ;
-          pp_print_string f "," ;
-          pp_print_space f () )
+          ( match t with
+          | Some t ->
+              pp_type f t ; pp_print_space f ()
+          | None ->
+              () ) ;
+          pp_ident f n ; pp_print_string f "," ; pp_print_space f () )
         ~flast:(fun (t, n) ->
-          (match t with Some t -> pp_type f t | None -> ()) ;
-          pp_print_space f () ; pp_ident f n ) ;
-      pp_print_string f ")" ;
+          ( match t with
+          | Some t ->
+              pp_type f t ; pp_print_space f ()
+          | None ->
+              () ) ;
+          pp_ident f n ) ;
+      pp_print_string f (if tensor then ")" else "]") ;
       pp_print_space f () ;
       pp_print_string f "=" ;
       pp_print_space f () ;
