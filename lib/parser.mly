@@ -495,8 +495,16 @@ let enum_member ==
 let union_definition(name) ==
   UNION;
   n = name;
-  (members, bindings) = delimited(LBRACE, pair(list(preceded(CASE, located(union_member))), list(sugared_function_definition(option(code_block)))), RBRACE);  
-  { (n, Union (make_union_definition ~union_members: members ~union_bindings: bindings ())) }
+  LBRACE;
+  (members, bindings) =
+    pair(
+      list(preceded(CASE, located(union_member))), 
+      list(sugared_function_definition(option(code_block)))
+    );
+  impls = list(impl);
+  RBRACE;
+  { (n, Union (make_union_definition ~union_members: members ~union_bindings: bindings ()
+                    ~union_impls: impls)) }
 
 let union_member :=
  (* can be a struct definition *)

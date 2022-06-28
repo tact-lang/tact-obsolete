@@ -50,7 +50,8 @@ functor
     (* TODO: union impls *)
     and union_definition =
       { union_members : expr located list; [@sexpa.list]
-        union_bindings : binding located list [@sexp.list] }
+        union_bindings : binding located list; [@sexp.list]
+        union_impls : impl list [@sexp.list] }
 
     and expr =
       | Struct of struct_definition
