@@ -1,7 +1,7 @@
 (library
- (libraries zarith stdint base sexplib)
+ (libraries zarith stdint base sexplib bitstring)
  (package tonvm)
  (name tonvm)
  (inline_tests)
  (preprocess
-  (pps ppx_sexp_conv ppx_expect)))
+  (pps ppx_sexp_conv ppx_expect ppx_bitstring)))
