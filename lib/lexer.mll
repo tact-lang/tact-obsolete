@@ -44,7 +44,7 @@ let whitespace = [' ' '\t']+
 rule token = parse
  | whitespace { token lexbuf }
  | newline  { next_line lexbuf; token lexbuf }
- | ".." { REST }
+ | ".." { DOUBLEDOT }
  | ',' { COMMA }
  | ':' { COLON }
  | ';' { SEMICOLON }

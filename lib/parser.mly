@@ -141,7 +141,7 @@ let destructuring_field ==
   | id = located(ident); AS; new_id = located(ident); { (id, new_id) }
 
 let rest ==
-  r = option(REST); { Option.is_some r }
+  r = option(DOUBLEDOT); { Option.is_some r }
 
 let shorthand_binding(funbody) ==
 | sugared_function_definition(funbody)

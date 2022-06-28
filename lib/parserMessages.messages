@@ -1641,8 +1641,8 @@ program: LET VAL
 ## semicolon_stmt -> LET . IDENT option(__anonymous_0) EQUALS expr [ SEMICOLON RBRACE EOF ]
 ## semicolon_stmt -> LET . IDENT LPAREN nonempty_list(terminated(function_param,COMMA)) RPAREN EQUALS expr [ SEMICOLON RBRACE EOF ]
 ## semicolon_stmt -> LET . IDENT LPAREN loption(separated_nonempty_list(COMMA,function_param)) RPAREN EQUALS expr [ SEMICOLON RBRACE EOF ]
-## semicolon_stmt -> LET . LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
-## semicolon_stmt -> LET . LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET . LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET . LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET
@@ -1654,8 +1654,8 @@ program: LET LBRACE VAL
 ##
 ## Ends in an error in state: 192.
 ##
-## semicolon_stmt -> LET LBRACE . nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
-## semicolon_stmt -> LET LBRACE . loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE . nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE . loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
 ## LET LBRACE
@@ -1667,14 +1667,14 @@ program: LET LBRACE IDENT VAL
 ##
 ## Ends in an error in state: 193.
 ##
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . COMMA [ REST RBRACE ]
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . AS IDENT COMMA [ REST RBRACE ]
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ REST RBRACE ]
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . AS IDENT COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . AS IDENT [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . COMMA separated_nonempty_list(COMMA,destructuring_field) [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . AS IDENT COMMA separated_nonempty_list(COMMA,destructuring_field) [ REST RBRACE ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . COMMA [ RBRACE DOUBLEDOT ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . AS IDENT COMMA [ RBRACE DOUBLEDOT ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ RBRACE DOUBLEDOT ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT . AS IDENT COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . AS IDENT [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . COMMA separated_nonempty_list(COMMA,destructuring_field) [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT . AS IDENT COMMA separated_nonempty_list(COMMA,destructuring_field) [ RBRACE DOUBLEDOT ]
 ##
 ## The known suffix of the stack is as follows:
 ## IDENT
@@ -1686,9 +1686,9 @@ program: LET LBRACE IDENT COMMA VAL
 ##
 ## Ends in an error in state: 194.
 ##
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT COMMA . [ REST RBRACE ]
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT COMMA . nonempty_list(terminated(destructuring_field,COMMA)) [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT COMMA . separated_nonempty_list(COMMA,destructuring_field) [ REST RBRACE ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT COMMA . [ RBRACE DOUBLEDOT ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT COMMA . nonempty_list(terminated(destructuring_field,COMMA)) [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT COMMA . separated_nonempty_list(COMMA,destructuring_field) [ RBRACE DOUBLEDOT ]
 ##
 ## The known suffix of the stack is as follows:
 ## IDENT COMMA
@@ -1700,10 +1700,10 @@ program: LET LBRACE IDENT AS VAL
 ##
 ## Ends in an error in state: 197.
 ##
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS . IDENT COMMA [ REST RBRACE ]
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS . IDENT COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS . IDENT [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS . IDENT COMMA separated_nonempty_list(COMMA,destructuring_field) [ REST RBRACE ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS . IDENT COMMA [ RBRACE DOUBLEDOT ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS . IDENT COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS . IDENT [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS . IDENT COMMA separated_nonempty_list(COMMA,destructuring_field) [ RBRACE DOUBLEDOT ]
 ##
 ## The known suffix of the stack is as follows:
 ## IDENT AS
@@ -1715,10 +1715,10 @@ program: LET LBRACE IDENT AS IDENT VAL
 ##
 ## Ends in an error in state: 198.
 ##
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT . COMMA [ REST RBRACE ]
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT . COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS IDENT . [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS IDENT . COMMA separated_nonempty_list(COMMA,destructuring_field) [ REST RBRACE ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT . COMMA [ RBRACE DOUBLEDOT ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT . COMMA nonempty_list(terminated(destructuring_field,COMMA)) [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS IDENT . [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS IDENT . COMMA separated_nonempty_list(COMMA,destructuring_field) [ RBRACE DOUBLEDOT ]
 ##
 ## The known suffix of the stack is as follows:
 ## IDENT AS IDENT
@@ -1730,9 +1730,9 @@ program: LET LBRACE IDENT AS IDENT COMMA VAL
 ##
 ## Ends in an error in state: 199.
 ##
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT COMMA . [ REST RBRACE ]
-## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT COMMA . nonempty_list(terminated(destructuring_field,COMMA)) [ REST RBRACE ]
-## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS IDENT COMMA . separated_nonempty_list(COMMA,destructuring_field) [ REST RBRACE ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT COMMA . [ RBRACE DOUBLEDOT ]
+## nonempty_list(terminated(destructuring_field,COMMA)) -> IDENT AS IDENT COMMA . nonempty_list(terminated(destructuring_field,COMMA)) [ RBRACE DOUBLEDOT ]
+## separated_nonempty_list(COMMA,destructuring_field) -> IDENT AS IDENT COMMA . separated_nonempty_list(COMMA,destructuring_field) [ RBRACE DOUBLEDOT ]
 ##
 ## The known suffix of the stack is as follows:
 ## IDENT AS IDENT COMMA
@@ -1740,14 +1740,14 @@ program: LET LBRACE IDENT AS IDENT COMMA VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT COMMA REST VAL
+program: LET LBRACE IDENT COMMA DOUBLEDOT VAL
 ##
 ## Ends in an error in state: 205.
 ##
-## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) . RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) . RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST)
+## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT)
 ##
 
 Invalid syntax
@@ -1756,10 +1756,10 @@ program: LET LBRACE IDENT COMMA RBRACE VAL
 ##
 ## Ends in an error in state: 206.
 ##
-## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE . EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE . EQUALS expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE
+## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE
 ##
 
 Invalid syntax
@@ -1768,10 +1768,10 @@ program: LET LBRACE IDENT COMMA RBRACE EQUALS VAL
 ##
 ## Ends in an error in state: 207.
 ##
-## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE EQUALS . expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE EQUALS . expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE EQUALS
+## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE EQUALS
 ##
 
 Invalid syntax
@@ -1783,10 +1783,10 @@ program: LET LBRACE IDENT COMMA RBRACE EQUALS BOOL VAL
 ## expr -> expr . DOT IDENT [ SEMICOLON RBRACE EOF DOT ]
 ## expr -> expr . DOT IDENT LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ SEMICOLON RBRACE EOF DOT ]
 ## expr -> expr . DOT IDENT LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ SEMICOLON RBRACE EOF DOT ]
-## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE EQUALS expr . [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE EQUALS expr . [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(REST) RBRACE EQUALS expr
+## LET LBRACE nonempty_list(terminated(destructuring_field,COMMA)) option(DOUBLEDOT) RBRACE EQUALS expr
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an
@@ -1797,14 +1797,14 @@ program: LET LBRACE IDENT COMMA RBRACE EQUALS BOOL VAL
 
 Invalid syntax
 
-program: LET LBRACE REST VAL
+program: LET LBRACE DOUBLEDOT VAL
 ##
 ## Ends in an error in state: 210.
 ##
-## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) . RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) . RBRACE EQUALS expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST)
+## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT)
 ##
 
 Invalid syntax
@@ -1813,10 +1813,10 @@ program: LET LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 211.
 ##
-## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE . EQUALS expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE . EQUALS expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE
+## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE
 ##
 
 Invalid syntax
@@ -1825,10 +1825,10 @@ program: LET LBRACE RBRACE EQUALS VAL
 ##
 ## Ends in an error in state: 212.
 ##
-## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE EQUALS . expr [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE EQUALS . expr [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE EQUALS
+## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE EQUALS
 ##
 
 Invalid syntax
@@ -1840,10 +1840,10 @@ program: LET LBRACE RBRACE EQUALS BOOL VAL
 ## expr -> expr . DOT IDENT [ SEMICOLON RBRACE EOF DOT ]
 ## expr -> expr . DOT IDENT LPAREN nonempty_list(terminated(located(expr),COMMA)) RPAREN [ SEMICOLON RBRACE EOF DOT ]
 ## expr -> expr . DOT IDENT LPAREN loption(separated_nonempty_list(COMMA,located(expr))) RPAREN [ SEMICOLON RBRACE EOF DOT ]
-## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE EQUALS expr . [ SEMICOLON RBRACE EOF ]
+## semicolon_stmt -> LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE EQUALS expr . [ SEMICOLON RBRACE EOF ]
 ##
 ## The known suffix of the stack is as follows:
-## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(REST) RBRACE EQUALS expr
+## LET LBRACE loption(separated_nonempty_list(COMMA,destructuring_field)) option(DOUBLEDOT) RBRACE EQUALS expr
 ##
 ## WARNING: This example involves spurious reductions.
 ## This implies that, although the LR(1) items shown above provide an

@@ -3,7 +3,7 @@
 %token <string> IDENT
 %token <string> STRING
 %token EOF
-%token REST 
+%token DOUBLEDOT 
 %token LBRACE LPAREN
 %token RBRACE RPAREN
 %token COMMA
