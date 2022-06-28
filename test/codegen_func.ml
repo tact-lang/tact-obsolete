@@ -253,14 +253,14 @@ let%expect_test "Int(bits) serializer codegen" =
       builtin_send_raw_msg(msg, flags);
     }
     int f0(int i) {
-      i;
+      return i;
     }
     builder f2(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
-      b;
+      return b;
     }
     builder f1(int self, builder builder_) {
-      f2(builder_, self, 32);
+      return f2(builder_, self, 32);
     }
     _ test_int(builder b) {
       int i = f0(100);
@@ -325,13 +325,13 @@ let%expect_test "demo struct serializer" =
     }
     builder f1(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
-      b;
+      return b;
     }
     builder f0(int self, builder builder_) {
-      f1(builder_, self, 32);
+      return f1(builder_, self, 32);
     }
     builder f2(int self, builder builder_) {
-      f1(builder_, self, 16);
+      return f1(builder_, self, 16);
     }
     builder T_serializer([int, int] self, builder b) {
       builder b = f0(first(self), b);
@@ -339,13 +339,13 @@ let%expect_test "demo struct serializer" =
       return b;
     }
     builder f3() {
-      builtin_builder_new();
+      return builtin_builder_new();
     }
     int f4(int i) {
-      i;
+      return i;
     }
     int f5(int i) {
-      i;
+      return i;
     }
     _ test() {
       builder b = f3();
@@ -410,13 +410,13 @@ let%expect_test "demo struct serializer 2" =
     }
     builder f1(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
-      b;
+      return b;
     }
     builder f0(int self, builder builder_) {
-      f1(builder_, self, 32);
+      return f1(builder_, self, 32);
     }
     builder f2(int self, builder builder_) {
-      f1(builder_, self, 16);
+      return f1(builder_, self, 16);
     }
     builder serialize_foo([int, int] self, builder b) {
       builder b = f0(first(self), b);
@@ -424,13 +424,13 @@ let%expect_test "demo struct serializer 2" =
       return b;
     }
     builder f3() {
-      builtin_builder_new();
+      return builtin_builder_new();
     }
     int f4(int i) {
-      i;
+      return i;
     }
     int f5(int i) {
-      i;
+      return i;
     }
     builder test() {
       builder b = f3();
@@ -610,10 +610,10 @@ let%expect_test "serializer inner struct" =
     }
     builder f1(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
-      b;
+      return b;
     }
     builder f0(int self, builder builder_) {
-      f1(builder_, self, 32);
+      return f1(builder_, self, 32);
     }
     builder serialize_wallet([int, int] self, builder b) {
       builder b = f0(first(self), b);
@@ -677,7 +677,7 @@ let%expect_test "unions" =
       builtin_send_raw_msg(msg, flags);
     }
     tuple try(tuple x) {
-      x;
+      return x;
     }
     tuple f0(int v) {
       return [1, v];
@@ -872,24 +872,24 @@ let%expect_test "deserialization api" =
       builtin_send_raw_msg(msg, flags);
     }
     slice f0(cell cell_) {
-      builtin_slice_begin_parse(cell_);
+      return builtin_slice_begin_parse(cell_);
     }
     [slice, int] f2(slice self, int bits) {
       (slice, int) output = builtin_slice_load_int(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
-      [slice_, int_];
+      return [slice_, int_];
     }
     [slice, int] f7(slice s) {
       [slice, int] res = f2(s, 9);
-      [first(res), second(res)];
+      return [first(res), second(res)];
     }
     [slice, int] f8(slice s) {
       [slice, int] res = f2(s, 8);
-      [first(res), second(res)];
+      return [first(res), second(res)];
     }
     [slice, [int, int, int]] f9(slice s, [int, int, int] x) {
-      [s, x];
+      return [s, x];
     }
     [slice, [int, int, int]] f6(slice s) {
       [slice, int] res_anycast = f2(s, 1);
@@ -905,14 +905,14 @@ let%expect_test "deserialization api" =
     {
       }}
     [slice, tuple] f10(slice s, tuple x) {
-      [s, x];
+      return [s, x];
     }
     [slice, int] f12(slice s) {
       [slice, int] res = f2(s, 256);
-      [first(res), second(res)];
+      return [first(res), second(res)];
     }
     [slice, [int, int]] f13(slice s, [int, int] x) {
-      [s, x];
+      return [s, x];
     }
     [slice, [int, int]] f11(slice s) {
       [slice, int] res_anycast = f2(s, 1);
@@ -938,15 +938,15 @@ let%expect_test "deserialization api" =
     f10(first(res_addr), second(res_addr));
     }}
     [slice, tuple] f14(slice s, tuple x) {
-      [s, x];
+      return [s, x];
     }
     [slice, [int, int]] f16(slice s) {
       [slice, int] res_len = f7(s);
       [slice, int] res_bits = f2(first(res_len), second(res_len));
-      [first(res_bits), [second(res_len), second(res_bits)]];
+      return [first(res_bits), [second(res_len), second(res_bits)]];
     }
     [slice, tuple] f17(slice s, tuple x) {
-      [s, x];
+      return [s, x];
     }
     [slice, tuple] f15(slice s) {
       [slice, int] res_discr = f2(s, 1);
@@ -974,10 +974,10 @@ let%expect_test "deserialization api" =
     }}
     [slice, int] f18(slice s) {
       [slice, int] res = f2(s, 64);
-      [first(res), second(res)];
+      return [first(res), second(res)];
     }
     [slice, [tuple, tuple, int, int]] f19(slice s, [tuple, tuple, int, int] x) {
-      [s, x];
+      return [s, x];
     }
     [slice, [tuple, tuple, int, int]] f3(slice s) {
       [slice, tuple] res_src = f4(s);
@@ -988,7 +988,7 @@ let%expect_test "deserialization api" =
         f19(first(res_created_at), [second(res_src), second(res_dest), second(res_created_lt), second(res_created_at)]);
     }
     [slice, tuple] f20(slice s, tuple x) {
-      [s, x];
+      return [s, x];
     }
     [slice, tuple] f1(slice s) {
       [slice, int] res_discr1 = f2(s, 1);

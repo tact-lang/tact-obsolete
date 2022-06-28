@@ -433,6 +433,24 @@ functor
           functions <- functions + 1 ;
           (* process the body *)
           let result = super#visit_function_body env body in
+          (* Convert implicit returns accomplished with an implicit last break *)
+          let rec handle_returning_break = function
+            | Block block -> (
+              match List.rev block with
+              | [] ->
+                  Block []
+              | hd :: tl -> (
+                match List.rev @@ (handle_returning_break hd :: tl) with
+                | [stmt] ->
+                    stmt
+                | stmts ->
+                    Block stmts ) )
+            | Break (Expr expr) ->
+                Return expr
+            | other ->
+                other
+          in
+          let result = handle_returning_break result in
           (* restore function enclosure count *)
           functions <- functions' ;
           result
