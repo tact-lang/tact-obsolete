@@ -153,11 +153,10 @@ class interpreter
               errors#report `Error `ArgumentNumberMismatch () ;
               Void )
       | DestructuringLet let_ ->
+          let struct_expr = self#interpret_expr let_.destructuring_let_expr in
           let args_scope =
             List.map let_.destructuring_let ~f:(fun (name, new_name) ->
-                let expr =
-                  StructField (let_.destructuring_let_expr, name, HoleType)
-                in
+                let expr = StructField (Value struct_expr, name, HoleType) in
                 (new_name, self#interpret_expr expr) )
           in
           let prev_scope = vars_scope in
