@@ -369,6 +369,46 @@ union CommonMsgInfoRelaxed {
   }
 }
 
+struct MessageRelaxed(X: Serialize) {
+  val info: CommonMsgInfoRelaxed
+  val body: X
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      let b = self.info.serialize(b);
+      let b = b.serialize_int(0, 1); // init
+      let b = b.serialize_int(0, 1); // body discriminant
+      let b = self.body.serialize(b);
+      return b;
+    }
+  }
+}
+
+struct Message(X: Deserialize) {
+  val info: CommonMsgInfo
+  val body: X
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+      let res_info = CommonMsgInfo.deserialize(s);
+      let res_init = res_info.slice.load_int(1);
+
+      if (builtin_equal(res_init.value, 0)) {
+        let res_body_discr = res_init.slice.load_int(1);
+        if (builtin_equal(res_body_discr.value, 0)) {
+          let body = X.deserialize(res_body_discr.slice);
+          let mes = Self { info: res_info.value, body: body.value };
+          return LoadResultBase(Slice, Self).new(body.slice, mes);
+        } else {
+          /* TODO: cells */
+        }
+      } else {
+        /* TODO: can be init state != 0? */
+      }
+    }
+  }
+}
+
 fn send_raw_msg(msg: Cell, flags: SendRawMsgFlags) -> VoidType {
   builtin_send_raw_msg(msg.c, flags.value);
 }

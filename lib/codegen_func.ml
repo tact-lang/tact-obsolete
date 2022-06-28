@@ -366,6 +366,9 @@ class constructor (program : T.program) =
           in
           self#lang_type_to_type @@ T.expr_to_type
           @@ Value (inter#interpret_expr ex)
+      (* TODO: this is a bug that SelfType flows into codegen stage *)
+      | SelfType ->
+          F.InferType
       | _ ->
           raise Invalid
 
