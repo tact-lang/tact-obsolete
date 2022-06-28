@@ -42,6 +42,8 @@ class type_checker (errors : _) (functions : _) =
       match expected with
       | HoleType ->
           Ok actual
+      | _ when equal_type_ HoleType actual ->
+          Ok expected
       | _ when equal_type_ expected actual ->
           Ok actual
       | StructType s -> (

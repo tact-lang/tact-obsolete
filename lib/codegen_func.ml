@@ -26,6 +26,30 @@ class constructor (program : T.program) =
                let expr = self#cg_expr expr in
                (F.type_of expr, name, expr) ) )
 
+    method cg_DestructuringLet : T.destructuring_let -> F.stmt =
+      fun let_ ->
+        let expr = let_.destructuring_let_expr in
+        match expr with
+        | Reference (_, StructType id) | Value (Struct (id, _)) ->
+            let struct_ = T.Program.get_struct program id in
+            let expr' = self#cg_expr expr in
+            let fields =
+              List.map struct_.struct_fields
+                ~f:(fun (field_name, {field_type; _}) ->
+                  match
+                    List.Assoc.find let_.destructuring_let ~equal:String.equal
+                      field_name
+                  with
+                  | Some new_name ->
+                      (Some (self#lang_type_to_type field_type), new_name)
+                  | None ->
+                      (None, "_") )
+            in
+            F.DestructuringBinding (fields, expr')
+        | _x ->
+            T.print_sexp (T.sexp_of_expr _x) ;
+            raise Invalid
+
     method cg_Struct : T.struct_ * (string * T.expr) list -> F.expr =
       function
       | _, [(_, expr)] ->
@@ -93,6 +117,8 @@ class constructor (program : T.program) =
       function
       | Let bindings ->
           self#cg_Let bindings
+      | DestructuringLet let_ ->
+          self#cg_DestructuringLet let_
       | Return expr ->
           F.Return (self#cg_expr expr)
       | Expr e ->

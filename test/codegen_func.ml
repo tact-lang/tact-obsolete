@@ -50,11 +50,11 @@ let%expect_test "simple function generation" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -106,11 +106,11 @@ let%expect_test "passing struct to a function" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -158,11 +158,11 @@ let%expect_test "function calls" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -215,11 +215,11 @@ let%expect_test "Int(bits) serializer codegen" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -286,11 +286,11 @@ let%expect_test "demo struct serializer" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -371,11 +371,11 @@ let%expect_test "demo struct serializer 2" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -453,11 +453,11 @@ let%expect_test "true and false" =
   [%expect
     {|
       forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-        (Value1 value,  _) = tensor;
+        (Value1 value, _) = tensor;
         return value;
       }
       forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-        ( _, Value2 value) = tensor;
+        (_, Value2 value) = tensor;
         return value;
       }
       int builtin_equal(int x, int y) {
@@ -514,11 +514,11 @@ let%expect_test "if/then/else" =
   [%expect
     {|
       forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-        (Value1 value,  _) = tensor;
+        (Value1 value, _) = tensor;
         return value;
       }
       forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-        ( _, Value2 value) = tensor;
+        (_, Value2 value) = tensor;
         return value;
       }
       int builtin_equal(int x, int y) {
@@ -571,11 +571,11 @@ let%expect_test "serializer inner struct" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -639,11 +639,11 @@ let%expect_test "unions" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -709,11 +709,11 @@ let%expect_test "switch statement" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -778,11 +778,11 @@ let%expect_test "tensor2" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -834,11 +834,11 @@ let%expect_test "deserialization api" =
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value,  _) = tensor;
+      (Value1 value, _) = tensor;
       return value;
     }
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      ( _, Value2 value) = tensor;
+      (_, Value2 value) = tensor;
       return value;
     }
     int builtin_equal(int x, int y) {
@@ -1008,3 +1008,127 @@ let%expect_test "deserialization api" =
       slice s = f0(c);
       [slice, tuple] msg = f1(s);
     } |}]
+
+let%expect_test "destructuring let" =
+  let source =
+    {|
+      struct T {
+         val x: Integer
+         val y: Integer
+         val z: Integer
+      }
+      fn test(t: T) -> Integer {
+        let {x, y as y2, z} = t;
+        y2
+      }
+
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
+    _ builtin_send_raw_msg(cell msg, int flags) {
+      return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
+    builder builtin_builder_store_int(builder b, int int_, int bits) {
+      return store_int(b, int_, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return end_cell(b);
+    }
+    builder builtin_builder_new() {
+      return begin_cell();
+    }
+    _ send_raw_msg(cell msg, int flags) {
+      builtin_send_raw_msg(msg, flags);
+    }
+    int test([int, int, int] t) {
+      [int x, int y2, int z] = t;
+      return y2;
+    }
+ |}]
+
+let%expect_test "destructuring let with rest ignored" =
+  let source =
+    {|
+      struct T {
+         val x: Integer
+         val y: Integer
+         val z: Integer
+      }
+      fn test(t: T) -> Integer {
+        let {y as y2, ..} = t;
+        y2
+      }
+
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
+    _ builtin_send_raw_msg(cell msg, int flags) {
+      return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
+    builder builtin_builder_store_int(builder b, int int_, int bits) {
+      return store_int(b, int_, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return end_cell(b);
+    }
+    builder builtin_builder_new() {
+      return begin_cell();
+    }
+    _ send_raw_msg(cell msg, int flags) {
+      builtin_send_raw_msg(msg, flags);
+    }
+    int test([int, int, int] t) {
+      [_, int y2, _] = t;
+      return y2;
+    }
+ |}]

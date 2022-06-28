@@ -2762,3 +2762,160 @@ let%expect_test "interface constraints" =
            ((beep
              ((function_params ((self SelfType))) (function_returns IntegerType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
+
+let%expect_test "destructuring let" =
+  let source =
+    {|
+      struct T {
+         val x: Integer
+         val y: Integer
+         val z: Integer
+      }
+      fn test(t: T) -> Integer {
+        let {x, y as y2, z} = t;
+        y2
+      }
+
+      let x = test(T{x: 1, y: 2, z: 3});
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((x (Value (Integer 2)))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((t (StructType 54))))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              ((Block
+                ((DestructuringLet
+                  ((destructuring_let ((x x) (y y2) (z z)))
+                   (destructuring_let_expr (Reference (t (StructType 54))))
+                   (destructuring_let_rest false)))
+                 (Return (Reference (y2 HoleType))))))))))))
+        (T (Value (Type (StructType 54))))))
+      (structs
+       ((54
+         ((struct_fields
+           ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
+            (z ((field_type IntegerType)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)))
+ |}]
+
+let%expect_test "destructuring let with missing fields" =
+  let source =
+    {|
+      struct T {
+         val x: Integer
+         val y: Integer
+         val z: Integer
+      }
+      fn test(t: T) -> Integer {
+        let {y as y2} = t;
+        y2
+      }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Error
+     (((MissingField (54 x))
+       ((bindings
+         ((test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (StructType 54))))
+                (function_returns IntegerType)))
+              (function_impl
+               (Fn
+                ((Block
+                  ((DestructuringLet
+                    ((destructuring_let ((y y2)))
+                     (destructuring_let_expr (Reference (t (StructType 54))))
+                     (destructuring_let_rest false)))
+                   (Return (Reference (y2 HoleType))))))))))))
+          (T (Value (Type (StructType 54))))))
+        (structs
+         ((54
+           ((struct_fields
+             ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
+              (z ((field_type IntegerType)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+        (type_counter <opaque>) (memoized_fcalls <opaque>)))
+      ((MissingField (54 z))
+       ((bindings
+         ((test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((t (StructType 54))))
+                (function_returns IntegerType)))
+              (function_impl
+               (Fn
+                ((Block
+                  ((DestructuringLet
+                    ((destructuring_let ((y y2)))
+                     (destructuring_let_expr (Reference (t (StructType 54))))
+                     (destructuring_let_rest false)))
+                   (Return (Reference (y2 HoleType))))))))))))
+          (T (Value (Type (StructType 54))))))
+        (structs
+         ((54
+           ((struct_fields
+             ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
+              (z ((field_type IntegerType)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+        (type_counter <opaque>) (memoized_fcalls <opaque>)))))
+ |}]
+
+let%expect_test "destructuring let with missing fields ignored" =
+  let source =
+    {|
+      struct T {
+         val x: Integer
+         val y: Integer
+         val z: Integer
+      }
+      fn test(t: T) -> Integer {
+        let {y as y2, ..} = t;
+        y2
+      }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((t (StructType 54))))
+              (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              ((Block
+                ((DestructuringLet
+                  ((destructuring_let ((y y2)))
+                   (destructuring_let_expr (Reference (t (StructType 54))))
+                   (destructuring_let_rest true)))
+                 (Return (Reference (y2 HoleType))))))))))))
+        (T (Value (Type (StructType 54))))))
+      (structs
+       ((54
+         ((struct_fields
+           ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
+            (z ((field_type IntegerType)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)))
+ |}]

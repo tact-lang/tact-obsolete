@@ -899,3 +899,87 @@ let%expect_test "switch statement" =
                            ((binding_name (Ident a)) (binding_expr (Int 10))))
                           (Let
                            ((binding_name (Ident b)) (binding_expr (Int 20)))))))))))))))))))))))))) |}]
+
+let%expect_test "destructuring let" =
+  let source =
+    {|
+  let {x, y, z} = (struct {val x: Integer; val y: Integer; val z: Integer}){x: 1, y: 2, z: 3};
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+      ((stmts
+        ((DestructuringLet
+          ((destructuring_binding
+            (((Ident x) (Ident x)) ((Ident y) (Ident y)) ((Ident z) (Ident z))))
+           (destructuring_binding_expr
+            (StructConstructor
+             ((constructor_id
+               (Struct
+                ((fields
+                  (((field_name (Ident x))
+                    (field_type (Reference (Ident Integer))))
+                   ((field_name (Ident y))
+                    (field_type (Reference (Ident Integer))))
+                   ((field_name (Ident z))
+                    (field_type (Reference (Ident Integer)))))))))
+              (fields_construction
+               (((Ident x) (Int 1)) ((Ident y) (Int 2)) ((Ident z) (Int 3)))))))
+           (destructuring_binding_rest false))))))
+    |}]
+
+let%expect_test "destructuring let with renaming" =
+  let source =
+    {|
+  let {x as x1, y, z as z1} = (struct {val x: Integer; val y: Integer; val z: Integer}){x: 1, y: 2, z: 3};
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((DestructuringLet
+        ((destructuring_binding
+          (((Ident x) (Ident x1)) ((Ident y) (Ident y)) ((Ident z) (Ident z1))))
+         (destructuring_binding_expr
+          (StructConstructor
+           ((constructor_id
+             (Struct
+              ((fields
+                (((field_name (Ident x))
+                  (field_type (Reference (Ident Integer))))
+                 ((field_name (Ident y))
+                  (field_type (Reference (Ident Integer))))
+                 ((field_name (Ident z))
+                  (field_type (Reference (Ident Integer)))))))))
+            (fields_construction
+             (((Ident x) (Int 1)) ((Ident y) (Int 2)) ((Ident z) (Int 3)))))))
+         (destructuring_binding_rest false)))))) |}]
+
+let%expect_test "destructuring let with rest ignored" =
+  let source =
+    {|
+  let {x, ..}  = (struct {val x: Integer; val y: Integer; val z: Integer}){x: 1, y: 2, z: 3};
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((DestructuringLet
+        ((destructuring_binding (((Ident x) (Ident x))))
+         (destructuring_binding_expr
+          (StructConstructor
+           ((constructor_id
+             (Struct
+              ((fields
+                (((field_name (Ident x))
+                  (field_type (Reference (Ident Integer))))
+                 ((field_name (Ident y))
+                  (field_type (Reference (Ident Integer))))
+                 ((field_name (Ident z))
+                  (field_type (Reference (Ident Integer)))))))))
+            (fields_construction
+             (((Ident x) (Int 1)) ((Ident y) (Int 2)) ((Ident z) (Int 3)))))))
+         (destructuring_binding_rest true)))))) |}]

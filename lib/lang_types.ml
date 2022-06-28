@@ -78,12 +78,18 @@ and value =
 and stmt =
   | If of if_
   | Let of (string * expr) list
+  | DestructuringLet of destructuring_let
   | Return of expr
   | Break of stmt
   | Expr of expr
   | Block of stmt list
   | Switch of switch
   | Invalid
+
+and destructuring_let =
+  { destructuring_let : (string * string) list;
+    destructuring_let_expr : expr;
+    destructuring_let_rest : bool }
 
 and builtin = string
 

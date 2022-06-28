@@ -71,6 +71,7 @@ functor
     and stmt =
       | CodeBlock of (stmt located list[@sexp.list])
       | Let of binding located
+      | DestructuringLet of destructuring_binding located
       | If of if_
       | Return of expr
       | Break of stmt
@@ -99,6 +100,11 @@ functor
     and function_body = {function_stmt : stmt}
 
     and binding = {binding_name : ident located; binding_expr : expr located}
+
+    and destructuring_binding =
+      { destructuring_binding : (ident located * ident located) list located;
+        destructuring_binding_expr : expr located;
+        destructuring_binding_rest : bool }
 
     and if_ =
       { condition : expr located;
