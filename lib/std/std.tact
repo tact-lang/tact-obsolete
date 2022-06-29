@@ -183,9 +183,7 @@ struct AddressVar {
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
       let b = b.serialize_int(0, 0); // AnyCast
-      let b = self.len.serialize(b);
-      let b = self.workchain_id.serialize(b);
-      let b = b.serialize_int(self.address, self.len.value);
+      let b = serializer(Self)(self, b);
       return b;
     }
   }
@@ -216,16 +214,7 @@ union MsgAddressInt {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      switch(self) {
-        case AddressStd addr => {
-          let b = b.serialize_int(0, 1);
-          return addr.serialize(b);
-        }
-        case AddressVar addr => {
-          let b = b.serialize_int(1, 1);
-          return addr.serialize(b);
-        }
-      }
+      serializer(Self)(self, b)
     }
   }
 
@@ -249,16 +238,7 @@ union MsgAddress {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      switch(self) {
-        case MsgAddressExt addr_ext => {
-          let b = b.serialize_int(0, 1);
-          return addr_ext.serialize(b);
-        }
-        case MsgAddressInt addr_int => {
-          let b = b.serialize_int(1, 1);
-          return addr_int.serialize(b);
-        }
-      }
+      serializer(Self)(self, b)
     }
   }
 
@@ -283,6 +263,7 @@ struct ExtOutMsgInfo {
   val created_at: Int(32) // TODO: uint
 
   impl Serialize {
+    // TODO: There is bugs when tried to use `serializer` fn here.
     fn serialize(self: Self, b: Builder) -> Builder {
       let b = self.src.serialize(b);
       let b = self.dest.serialize(b);

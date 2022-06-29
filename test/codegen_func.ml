@@ -885,57 +885,62 @@ let%expect_test "serialization api" =
       builder b = builtin_builder_store_int(self, int_, bits);
       return b;
     }
-    builder f8(int self, builder builder_) {
-      return f3(builder_, self, 9);
+    builder f10([int, int, int] self, builder b) {
+      return b;
     }
-    builder f9(int self, builder builder_) {
-      return f3(builder_, self, 8);
-    }
-    builder f7([int, int, int] self, builder b) {
+    builder f9([int, int, int] self, builder b) {
       builder b = f3(b, 0, 0);
-      builder b = f8(first(self), b);
-      builder b = f9(second(self), b);
-      builder b = f3(b, third(self), first(self));
+      builder b = f10(self, b);
+      return b;
+    }
+    builder f12([int, int] self, builder b) {
       return b;
     }
     builder f11([int, int] self, builder b) {
-      return b;
-    }
-    builder f10([int, int] self, builder b) {
       builder b = f3(b, 0, 0);
-      return f11(self, b);
+      return f12(self, b);
     }
-    builder f6(tuple self, builder b) {
+    builder f8(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
     first(temp);
     if (discr == 0)
     {
-      [int, int] addr = second(temp);
+      [int, int] var = second(temp);
     {
-      builder b = f3(b, 0, 1);
+      int b = store_uint(b, 1, 1);
+    builder b =
+    f11(var, b);
     return
-    f10(addr, b);
+    b;
     }} else if (discr == 1)
     {
-      [int, int, int] addr = second(temp);
+      [int, int, int] var = second(temp);
     {
-      builder b = f3(b, 1, 1);
+      int b = store_uint(b, 0, 1);
+    builder b =
+    f9(var, b);
     return
-    f7(addr, b);
+    b;
     }} else
     {
       }}}
-    builder f14([int, int] self, builder b) {
-      builder b = f8(first(self), b);
+    builder f7(tuple self, builder b) {
+      return f8(self, b);
+    }
+    builder f16(int self, builder builder_) {
+      return f3(builder_, self, 9);
+    }
+    builder f15([int, int] self, builder b) {
+      builder b = f16(first(self), b);
       builder b = f3(b, second(self), first(self));
       return b;
     }
-    builder f15([] self, builder b) {
+    builder f17([] self, builder b) {
       return b;
     }
-    builder f13(tuple self, builder b) {
+    builder f14(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
@@ -946,7 +951,7 @@ let%expect_test "serialization api" =
     {
       int b = store_uint(b, 1, 1);
     builder b =
-    f15(var, b);
+    f17(var, b);
     return
     b;
     }} else if (discr == 1)
@@ -955,48 +960,55 @@ let%expect_test "serialization api" =
     {
       int b = store_uint(b, 0, 1);
     builder b =
-    f14(var, b);
+    f15(var, b);
     return
     b;
     }} else
     {
       }}}
-    builder f12(tuple self, builder b) {
-      return f13(self, b);
+    builder f13(tuple self, builder b) {
+      return f14(self, b);
     }
-    builder f5(tuple self, builder b) {
+    builder f6(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
     first(temp);
     if (discr == 0)
     {
-      tuple addr_ext = second(temp);
+      tuple var = second(temp);
     {
-      builder b = f3(b, 0, 1);
+      int b = store_uint(b, 1, 1);
+    builder b =
+    f13(var, b);
     return
-    f12(addr_ext, b);
+    b;
     }} else if (discr == 1)
     {
-      tuple addr_int = second(temp);
+      tuple var = second(temp);
     {
-      builder b = f3(b, 1, 1);
+      int b = store_uint(b, 0, 1);
+    builder b =
+    f7(var, b);
     return
-    f6(addr_int, b);
+    b;
     }} else
     {
       }}}
-    builder f16(int self, builder builder_) {
+    builder f5(tuple self, builder b) {
+      return f6(self, b);
+    }
+    builder f18(int self, builder builder_) {
       return f3(builder_, self, 64);
     }
-    builder f17(int self, builder builder_) {
+    builder f19(int self, builder builder_) {
       return f3(builder_, self, 32);
     }
     builder f4([tuple, tuple, int, int] self, builder b) {
       builder b = f5(first(self), b);
-      builder b = f12(second(self), b);
-      builder b = f16(third(self), b);
-      builder b = f17(fourth(self), b);
+      builder b = f13(second(self), b);
+      builder b = f18(third(self), b);
+      builder b = f19(fourth(self), b);
       return b;
     }
     builder f2(tuple self, builder b) {
@@ -1014,14 +1026,14 @@ let%expect_test "serialization api" =
     }} else
     {
       }}}
-    builder f18([] self, builder b) {
+    builder f20([] self, builder b) {
       return b;
     }
     builder f1([tuple, []] self, builder b) {
       builder b = f2(first(self), b);
       builder b = f3(b, 0, 1);
       builder b = f3(b, 0, 1);
-      builder b = f18(second(self), b);
+      builder b = f20(second(self), b);
       return b;
     }
     _ test([tuple, []] m) {
