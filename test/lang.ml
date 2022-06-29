@@ -3506,23 +3506,23 @@ let%expect_test "destructuring let" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 54))))
+             ((function_params ((t (StructType 60))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               ((Block
                 ((DestructuringLet
                   ((destructuring_let ((x x) (y y2) (z z)))
-                   (destructuring_let_expr (Reference (t (StructType 54))))
+                   (destructuring_let_expr (Reference (t (StructType 60))))
                    (destructuring_let_rest false)))
                  (Return (Reference (y2 HoleType))))))))))))
-        (T (Value (Type (StructType 54))))))
+        (T (Value (Type (StructType 60))))))
       (structs
-       ((54
+       ((60
          ((struct_fields
            ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
             (z ((field_type IntegerType)))))
-          (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 60)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)))
  |}]
 
@@ -3544,53 +3544,53 @@ let%expect_test "destructuring let with missing fields" =
   [%expect
     {|
     (Error
-     (((MissingField (54 x))
+     (((MissingField (60 x))
        ((bindings
          ((test
            (Value
             (Function
              ((function_signature
-               ((function_params ((t (StructType 54))))
+               ((function_params ((t (StructType 60))))
                 (function_returns IntegerType)))
               (function_impl
                (Fn
                 ((Block
                   ((DestructuringLet
                     ((destructuring_let ((y y2)))
-                     (destructuring_let_expr (Reference (t (StructType 54))))
+                     (destructuring_let_expr (Reference (t (StructType 60))))
                      (destructuring_let_rest false)))
                    (Return (Reference (y2 HoleType))))))))))))
-          (T (Value (Type (StructType 54))))))
+          (T (Value (Type (StructType 60))))))
         (structs
-         ((54
+         ((60
            ((struct_fields
              ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
               (z ((field_type IntegerType)))))
-            (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 60)))))
         (type_counter <opaque>) (memoized_fcalls <opaque>)))
-      ((MissingField (54 z))
+      ((MissingField (60 z))
        ((bindings
          ((test
            (Value
             (Function
              ((function_signature
-               ((function_params ((t (StructType 54))))
+               ((function_params ((t (StructType 60))))
                 (function_returns IntegerType)))
               (function_impl
                (Fn
                 ((Block
                   ((DestructuringLet
                     ((destructuring_let ((y y2)))
-                     (destructuring_let_expr (Reference (t (StructType 54))))
+                     (destructuring_let_expr (Reference (t (StructType 60))))
                      (destructuring_let_rest false)))
                    (Return (Reference (y2 HoleType))))))))))))
-          (T (Value (Type (StructType 54))))))
+          (T (Value (Type (StructType 60))))))
         (structs
-         ((54
+         ((60
            ((struct_fields
              ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
               (z ((field_type IntegerType)))))
-            (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 60)))))
         (type_counter <opaque>) (memoized_fcalls <opaque>)))))
  |}]
 
@@ -3617,22 +3617,22 @@ let%expect_test "destructuring let with missing fields ignored" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 54))))
+             ((function_params ((t (StructType 60))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               ((Block
                 ((DestructuringLet
                   ((destructuring_let ((y y2)))
-                   (destructuring_let_expr (Reference (t (StructType 54))))
+                   (destructuring_let_expr (Reference (t (StructType 60))))
                    (destructuring_let_rest true)))
                  (Return (Reference (y2 HoleType))))))))))))
-        (T (Value (Type (StructType 54))))))
+        (T (Value (Type (StructType 60))))))
       (structs
-       ((54
+       ((60
          ((struct_fields
            ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
             (z ((field_type IntegerType)))))
-          (struct_methods ()) (struct_impls ()) (struct_id 54)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 60)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)))
  |}]
