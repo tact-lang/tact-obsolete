@@ -826,8 +826,8 @@ let%expect_test "deserialization api" =
     {|
      struct Empty { 
       impl Deserialize {
-        fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
-          return LoadResultBase(Slice, Self).new(s, Self{});
+        fn deserialize(s: Slice) -> LoadResult(Self) {
+          return LoadResult(Self).new(s, Self{});
         }
       }
     }
@@ -895,8 +895,8 @@ let%expect_test "deserialization api" =
       [slice, int] res = f3(s, 8);
       return [first(res), second(res)];
     }
-    [slice, [int, int, int]] f10(slice s, [int, int, int] x) {
-      return [s, x];
+    [slice, [int, int, int]] f10(slice s, [int, int, int] v) {
+      return [s, v];
     }
     [slice, [int, int, int]] f7(slice s) {
       [slice, int] res_anycast = f3(s, 1);
@@ -911,15 +911,15 @@ let%expect_test "deserialization api" =
     } else
     {
       }}
-    [slice, tuple] f11(slice s, tuple x) {
-      return [s, x];
+    [slice, tuple] f11(slice s, tuple v) {
+      return [s, v];
     }
     [slice, int] f13(slice s) {
       [slice, int] res = f3(s, 256);
       return [first(res), second(res)];
     }
-    [slice, [int, int]] f14(slice s, [int, int] x) {
-      return [s, x];
+    [slice, [int, int]] f14(slice s, [int, int] v) {
+      return [s, v];
     }
     [slice, [int, int]] f12(slice s) {
       [slice, int] res_anycast = f3(s, 1);
@@ -944,16 +944,16 @@ let%expect_test "deserialization api" =
     return
     f11(first(res_addr), second(res_addr));
     }}
-    [slice, tuple] f15(slice s, tuple x) {
-      return [s, x];
+    [slice, tuple] f15(slice s, tuple v) {
+      return [s, v];
     }
     [slice, [int, int]] f17(slice s) {
       [slice, int] res_len = f8(s);
       [slice, int] res_bits = f3(first(res_len), second(res_len));
       return [first(res_bits), [second(res_len), second(res_bits)]];
     }
-    [slice, tuple] f18(slice s, tuple x) {
-      return [s, x];
+    [slice, tuple] f18(slice s, tuple v) {
+      return [s, v];
     }
     [slice, tuple] f16(slice s) {
       [slice, int] res_discr = f3(s, 1);
@@ -983,8 +983,8 @@ let%expect_test "deserialization api" =
       [slice, int] res = f3(s, 64);
       return [first(res), second(res)];
     }
-    [slice, [tuple, tuple, int, int]] f20(slice s, [tuple, tuple, int, int] x) {
-      return [s, x];
+    [slice, [tuple, tuple, int, int]] f20(slice s, [tuple, tuple, int, int] v) {
+      return [s, v];
     }
     [slice, [tuple, tuple, int, int]] f4(slice s) {
       [slice, tuple] res_src = f5(s);
@@ -994,8 +994,8 @@ let%expect_test "deserialization api" =
       return
         f20(first(res_created_at), [second(res_src), second(res_dest), second(res_created_lt), second(res_created_at)]);
     }
-    [slice, tuple] f21(slice s, tuple x) {
-      return [s, x];
+    [slice, tuple] f21(slice s, tuple v) {
+      return [s, v];
     }
     [slice, tuple] f2(slice s) {
       [slice, int] res_discr1 = f3(s, 1);
@@ -1011,14 +1011,14 @@ let%expect_test "deserialization api" =
     return
     f21(first(res_info), second(res_info));
     }}}
-    [slice, []] f23(slice s, [] x) {
-      return [s, x];
+    [slice, []] f23(slice s, [] v) {
+      return [s, v];
     }
     [slice, []] f22(slice s) {
       return f23(s, []);
     }
-    [slice, [tuple, []]] f24(slice s, [tuple, []] x) {
-      return [s, x];
+    [slice, [tuple, []]] f24(slice s, [tuple, []] v) {
+      return [s, v];
     }
     [slice, [tuple, []]] f1(slice s) {
       [slice, tuple] res_info = f2(s);

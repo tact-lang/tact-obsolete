@@ -20,18 +20,6 @@ struct Builder {
   }
 }
 
-struct LoadResultBase(S: Type, X: Type) {
-  val slice: S
-  val value: X
-
-  fn new(s: S, x: X) -> Self {
-    Self {
-      slice: s,
-      value: x,
-    }
-  }
-}
-
 struct Slice {
   val s: builtin_Slice
 
@@ -39,20 +27,12 @@ struct Slice {
     Self { s: builtin_slice_begin_parse(cell.c) }
   }
 
-  fn load_int(self: Self, bits: Integer) -> LoadResultBase(Self, Integer) {
+  fn load_int(self: Self, bits: Integer) -> LoadResult(Integer) {
     let output = builtin_slice_load_int(self.s, bits);
     let slice = Self { s: output.value1 };
     let int = output.value2;
-    LoadResultBase(Self, Integer) { slice: slice, value: int }
+    LoadResult(Integer) { slice: slice, value: int }
   }
-}
-
-interface Serialize {
-  fn serialize(self: Self, builder: Builder) -> Builder
-}
-
-interface Deserialize {
-  fn deserialize(slice: Slice) -> LoadResultBase(Slice, Self)
 }
 
 struct Int(bits: Integer) {
@@ -69,10 +49,10 @@ struct Int(bits: Integer) {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res = s.load_int(bits);
       
-      LoadResultBase(Slice, Self) { 
+      LoadResult(Self) { 
         slice: res.slice, 
         value: Self { value: res.value }
       }
@@ -120,11 +100,11 @@ struct AddrExtern {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_len = Int(9).deserialize(s);
       let res_bits = res_len.slice.load_int(res_len.value);
 
-      LoadResultBase(Slice, Self) { 
+      LoadResult(Self) { 
         slice: res_bits.slice, 
         value: Self { 
           len: res_len.value,
@@ -154,13 +134,13 @@ union MsgAddressExt {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
-        return LoadResultBase(Slice, Self).new(res_discr.slice, AddrNone{});
+        return LoadResult(Self).new(res_discr.slice, AddrNone{});
       } else if (builtin_equal(res_discr.value, 1)) {
         let res_addr = AddrExtern.deserialize(res_discr.slice);
-        return LoadResultBase(Slice, Self).new(res_addr.slice, res_addr.value);
+        return LoadResult(Self).new(res_addr.slice, res_addr.value);
       } else {
         /* TODO: throw an exception */
       }
@@ -180,12 +160,12 @@ struct AddressStd {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_anycast = s.load_int(1);
       if (builtin_equal(res_anycast.value, 0)) {
         let res_workchain = Int(8).deserialize(res_anycast.slice);
         let res_address = Int(256).deserialize(res_workchain.slice);
-        return LoadResultBase(Slice, Self)
+        return LoadResult(Self)
           .new(res_address.slice, Self {
             workchain_id: res_workchain.value,
             address: res_address.value,
@@ -213,13 +193,13 @@ struct AddressVar {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_anycast = s.load_int(1);
       if (builtin_equal(res_anycast.value, 0)) {
         let res_len = Int(9).deserialize(res_anycast.slice);
         let res_workchain = Int(8).deserialize(res_len.slice);
         let res_address = res_workchain.slice.load_int(res_len);
-        return LoadResultBase(Slice, Self)
+        return LoadResult(Self)
           .new(res_address.slice, Self {
             len: res_len.value,
             workchain_id: res_workchain.value,
@@ -252,14 +232,14 @@ union MsgAddressInt {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
         let res_addr = AddressStd.deserialize(res_discr.value);
-        return LoadResultBase(Slice, Self).new(res_addr.slice, res_addr.value);
+        return LoadResult(Self).new(res_addr.slice, res_addr.value);
       } else {
         let res_addr = AddressVar.deserialize(res_discr.slice);
-        return LoadResultBase(Slice, Self).new(res_addr.slice, res_addr.value);
+        return LoadResult(Self).new(res_addr.slice, res_addr.value);
       }
     }
   }
@@ -285,14 +265,14 @@ union MsgAddress {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
         let res_addr = MsgAddressExt.deserialize(res_discr.value);
-        return LoadResultBase(Slice, Self).new(res_addr.slice, res_addr.value);
+        return LoadResult(Self).new(res_addr.slice, res_addr.value);
       } else {
         let res_addr = MsgAddressInt.deserialize(res_discr.slice);
-        return LoadResultBase(Slice, Self).new(res_addr.slice, res_addr.value);
+        return LoadResult(Self).new(res_addr.slice, res_addr.value);
       }
     }
   }
@@ -315,12 +295,12 @@ struct ExtOutMsgInfo {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_src = MsgAddress.deserialize(s);
       let res_dest = MsgAddressExt.deserialize(res_src.slice);
       let res_created_lt = Int(64).deserialize(res_dest.slice);
       let res_created_at = Int(64).deserialize(res_created_lt.slice);
-      return LoadResultBase(Slice, Self)
+      return LoadResult(Self)
         .new(res_created_at.slice, Self {
           src: res_src.value,
           dest: res_dest.value,
@@ -336,7 +316,7 @@ union CommonMsgInfo {
   // TODO: int_msg_info, ext_in_msg_info
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_discr1 = s.load_int(1);
       if (builtin_equal(res_discr1.value, 0)) {
         /* TODO: int_msg_info */
@@ -346,7 +326,7 @@ union CommonMsgInfo {
           /* TODO: ext_in_msg_info */
         } else {
           let res_info = ExtOutMsgInfo.deserialize(res_discr2.slice);
-          return LoadResultBase(Slice, Self).new(res_info.slice, res_info.value);
+          return LoadResult(Self).new(res_info.slice, res_info.value);
         }
       }
     }
@@ -389,7 +369,7 @@ struct Message(X: Deserialize) {
   val body: X
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResultBase(Slice, Self) {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_info = CommonMsgInfo.deserialize(s);
       let res_init = res_info.slice.load_int(1);
 
@@ -398,7 +378,7 @@ struct Message(X: Deserialize) {
         if (builtin_equal(res_body_discr.value, 0)) {
           let body = X.deserialize(res_body_discr.slice);
           let mes = Self { info: res_info.value, body: body.value };
-          return LoadResultBase(Slice, Self).new(body.slice, mes);
+          return LoadResult(Self).new(body.slice, mes);
         } else {
           /* TODO: cells */
         }

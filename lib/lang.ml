@@ -73,7 +73,7 @@ functor
         unions = [];
         type_counter = 0;
         memoized_fcalls = [];
-        interfaces = [] }
+        interfaces = Builtin.default_intfs }
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)

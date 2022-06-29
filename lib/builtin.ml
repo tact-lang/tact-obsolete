@@ -6,7 +6,76 @@ let builder = BuiltinType "Builder"
 (* Builder is second struct in the std, so its ID will be 3 *)
 let builder_struct = StructType 3
 
+let slice_struct = StructType 6
+
 let cell = Value (Type (BuiltinType "Cell"))
+
+let make_load_result_with_id id t =
+  { struct_fields =
+      [("slice", {field_type = slice_struct}); ("value", {field_type = t})];
+    struct_methods =
+      [ ( "new",
+          { function_signature =
+              { function_params = [("s", slice_struct); ("v", t)];
+                function_returns = StructType id };
+            function_impl =
+              Fn
+                (Some
+                   (Return
+                      (Value
+                         (Struct
+                            ( id,
+                              [ ("slice", Reference ("s", slice_struct));
+                                ("value", Reference ("v", t)) ] ) ) ) ) ) } ) ];
+    struct_impls = [];
+    struct_id = id;
+    tensor = false }
+
+let load_result_func =
+  let function_signature =
+    {function_params = [("T", type0)]; function_returns = type0}
+  in
+  let make_load_result p t =
+    let id = p.type_counter in
+    p.type_counter <- p.type_counter + 1 ;
+    let struct_ = make_load_result_with_id id t in
+    let struct_ =
+      Result.ok_exn @@ Program.with_struct p struct_ (fun _ -> Ok struct_)
+    in
+    Type (StructType struct_.struct_id)
+  in
+  let function_impl p = function
+    | [Type t] ->
+        make_load_result p t
+    | _ ->
+        Void
+  in
+  Value
+    (Function
+       { function_signature;
+         function_impl = BuiltinFn (builtin_fun function_impl) } )
+
+let serialize_intf =
+  let intf =
+    { interface_methods =
+        [ ( "serialize",
+            { function_params = [("self", SelfType); ("b", builder_struct)];
+              function_returns = builder_struct } ) ] }
+  in
+  intf
+
+let serialize_intf_id = -10
+
+let deserialize_intf =
+  let intf =
+    { interface_methods =
+        [ ( "deserialize",
+            { function_params = [("b", builder_struct)];
+              function_returns = StructType (-12) } ) ] }
+  in
+  intf
+
+let deserialize_intf_id = -11
 
 let serializer =
   let function_signature =
@@ -16,7 +85,7 @@ let serializer =
           { function_params = [("t", HoleType); ("b", builder_struct)];
             function_returns = builder_struct } }
   in
-  let serializer_f s p =
+  let serializer_struct_ty s p =
     let s = List.Assoc.find_exn p.structs s ~equal:equal_int in
     let calls =
       List.filter_map s.struct_fields ~f:(function name, {field_type = f} ->
@@ -51,7 +120,7 @@ let serializer =
   in
   let function_impl p = function
     | [Type (StructType s)] ->
-        Function (serializer_f s p)
+        Function (serializer_struct_ty s p)
     | _ ->
         Void
   in
@@ -185,13 +254,18 @@ let default_bindings () =
      * purposes
      *)
     ("serializer", serializer);
+    ("Serialize", Value (Type (InterfaceType serialize_intf_id)));
+    ("Deserialize", Value (Type (InterfaceType deserialize_intf_id)));
+    ("LoadResult", load_result_func);
     ("From", from_intf) ]
   @ builtin_bindings
 
 let default_structs =
-  Hashtbl.map tensor2_hashtbl ~f:(fun struct_ -> (struct_.struct_id, struct_))
-  |> Hashtbl.data
+  ( Hashtbl.map tensor2_hashtbl ~f:(fun struct_ -> (struct_.struct_id, struct_))
+  |> Hashtbl.data )
+  @ [(-12, make_load_result_with_id (-12) SelfType)]
 
-let default_intfs = []
+let default_intfs =
+  [(serialize_intf_id, serialize_intf); (deserialize_intf_id, deserialize_intf)]
 
 let std = [%blob "std/std.tact"]
