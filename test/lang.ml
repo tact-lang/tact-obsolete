@@ -2640,7 +2640,7 @@ let%expect_test "union variants constructing" =
       (unions
        ((56
          ((cases
-           (((StructType 42) (Discriminator 0)) (IntegerType (Discriminator 1))))
+           (((StructType 42) (Discriminator 1)) (IntegerType (Discriminator 0))))
           (union_methods ())
           (union_impls
            (((impl_interface (Value (Type (InterfaceType 9))))
@@ -2856,8 +2856,8 @@ let%expect_test "unions duplicate variant" =
             (union_id 58)))
           (56
            ((cases
-             (((BuiltinType Builder) (Discriminator 0))
-              (IntegerType (Discriminator 1))))
+             (((BuiltinType Builder) (Discriminator 1))
+              (IntegerType (Discriminator 0))))
             (union_methods ())
             (union_impls
              (((impl_interface (Value (Type (InterfaceType 9))))
@@ -3043,8 +3043,8 @@ let%expect_test "unions" =
       (unions
        ((57
          ((cases
-           (((StructType 41) (Discriminator 0))
-            ((StructType 55) (Discriminator 1))))
+           (((StructType 41) (Discriminator 1))
+            ((StructType 55) (Discriminator 0))))
           (union_methods
            ((id
              ((function_signature
@@ -3213,8 +3213,8 @@ let%expect_test "switch statement" =
       (unions
        ((56
          ((cases
-           (((StructType 41) (Discriminator 0))
-            ((StructType 42) (Discriminator 1))))
+           (((StructType 41) (Discriminator 1))
+            ((StructType 42) (Discriminator 0))))
           (union_methods ())
           (union_impls
            (((impl_interface (Value (Type (InterfaceType 57))))

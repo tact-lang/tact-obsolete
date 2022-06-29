@@ -82,7 +82,13 @@ struct SendRawMsgFlags {
   }
 }
 
-struct AddrNone {}
+struct AddrNone {
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      return b;
+    }
+  }
+}
 
 // Interesting situation with this declaration: `bits` field should have count of bits
 // deriving from the `len` field which requires more powerful dependent types than we have for now.
@@ -121,15 +127,7 @@ union MsgAddressExt {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      switch(self) {
-        case AddrNone a => {
-          return b.serialize_int(0, 1);
-        }
-        case AddrExtern addr => {
-          let b = b.serialize_int(1, 1);
-          return addr.serialize(b);
-        }
-      }
+      serializer(Self)(self, b)
     }
   }
 

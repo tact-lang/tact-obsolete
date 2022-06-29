@@ -85,6 +85,66 @@ let serializer =
           { function_params = [("t", HoleType); ("b", builder_struct)];
             function_returns = builder_struct } }
   in
+  let rec int_required_bits = function
+    | 0 ->
+        0
+    | x ->
+        1 + (int_required_bits @@ Int.shift_right x 1)
+  in
+  let serialize_union_ty u p =
+    let union = List.Assoc.find_exn p.unions u ~equal:equal_int in
+    let discriminator_len =
+      Value
+        (Integer (Z.of_int (int_required_bits (List.length union.cases - 1))))
+    in
+    let branches =
+      List.filter_map union.cases ~f:(fun (ty, Discriminator discr) ->
+          let serialize_ty =
+            match
+              List.Assoc.find (Program.methods_of p ty) ~equal:String.equal
+                "serialize"
+            with
+            | Some m ->
+                Some m
+            | None ->
+                None
+          in
+          serialize_ty
+          |> Option.map ~f:(fun method_ ->
+                 { branch_ty = ty;
+                   branch_var = "var";
+                   branch_stmt =
+                     Block
+                       [ Let
+                           [ ( "b",
+                               Primitive
+                                 (StoreInt
+                                    { builder =
+                                        StructField
+                                          ( Reference ("b", builder_struct),
+                                            "b",
+                                            BuiltinType "Builder" );
+                                      length = discriminator_len;
+                                      integer = Value (Integer (Z.of_int discr));
+                                      signed = false } ) ) ];
+                         Let
+                           [ ( "b",
+                               FunctionCall
+                                 ( Value (Function method_),
+                                   [ Reference ("var", ty);
+                                     Reference ("b", builder_struct) ] ) ) ];
+                         Return (Reference ("b", builder_struct)) ] } ) )
+    in
+    let switch =
+      {switch_condition = Reference ("self", UnionType union.union_id); branches}
+    in
+    let body = Switch switch in
+    { function_signature =
+        { function_params =
+            [("self", UnionType union.union_id); ("b", builder_struct)];
+          function_returns = builder_struct };
+      function_impl = Fn (Some body) }
+  in
   let serializer_struct_ty s p =
     let s = List.Assoc.find_exn p.structs s ~equal:equal_int in
     let calls =
@@ -121,6 +181,8 @@ let serializer =
   let function_impl p = function
     | [Type (StructType s)] ->
         Function (serializer_struct_ty s p)
+    | [Type (UnionType u)] ->
+        Function (serialize_union_ty u p)
     | _ ->
         Void
   in

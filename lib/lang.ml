@@ -640,7 +640,8 @@ functor
           Program.with_union_id program
             (fun id ->
               { cases =
-                  List.map cases ~f:(fun x -> (expr_to_type x, Discriminator 0));
+                  Discriminator.LocalDiscriminators.choose_discriminators () id
+                    (List.map cases ~f:expr_to_type);
                 union_methods = [];
                 union_impls = [];
                 union_id = id } )
