@@ -76,7 +76,7 @@ let%expect_test "Int(bits) constructor" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -94,7 +94,7 @@ let%expect_test "Int(bits) constructor" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -343,7 +343,7 @@ let%expect_test "demo struct serializer" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -361,7 +361,7 @@ let%expect_test "demo struct serializer" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 16))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
