@@ -661,12 +661,28 @@ functor
                        | _ ->
                            raise InternalCompilerError )
               in
+              let impls =
+                s#with_bindings
+                  [ make_comptime
+                      ("Self", Value (Type (UnionType u_base.union_id))) ]
+                  (fun _ -> s#visit_list s#visit_impl env def.union_impls)
+              in
+              let impl_methods =
+                List.concat
+                  (List.map impls ~f:(fun impl ->
+                       List.filter_map impl.impl_methods ~f:(fun (name, ex) ->
+                           match ex with
+                           | Value (Function _) | MkFunction _ ->
+                               Some (name, ex)
+                           | _ ->
+                               None ) ) )
+              in
               let convert_impls = s#make_from_impls cases u_base.union_id in
               Error
                 { mk_cases = cases;
                   mk_union_id = u_base.union_id;
-                  mk_union_impls = convert_impls;
-                  mk_union_methods = methods } )
+                  mk_union_impls = impls @ convert_impls;
+                  mk_union_methods = methods @ impl_methods } )
           |> Result.error |> Option.value_exn
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
