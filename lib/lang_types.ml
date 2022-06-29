@@ -417,6 +417,16 @@ module Program = struct
     | _ ->
         []
 
+  let impls_of p = function
+    | StructType s ->
+        List.find_map_exn p.structs ~f:(fun (id, s') ->
+            if equal_int id s then Some s'.struct_impls else None )
+    | UnionType u ->
+        List.find_map_exn p.unions ~f:(fun (id, u') ->
+            if equal_int id u then Some u'.union_impls else None )
+    | _ ->
+        []
+
   let insert_interface p i =
     let c = p.type_counter in
     p.type_counter <- p.type_counter + 1 ;

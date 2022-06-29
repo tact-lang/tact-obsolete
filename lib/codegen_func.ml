@@ -256,6 +256,8 @@ class constructor (program : T.program) =
                   "second"
               | 2 ->
                   "third"
+              | 3 ->
+                  "fourth"
               | _ ->
                   raise Unsupported
             in
