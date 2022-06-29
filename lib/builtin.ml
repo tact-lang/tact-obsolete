@@ -10,6 +10,13 @@ let slice_struct = StructType 6
 
 let cell = Value (Type (BuiltinType "Cell"))
 
+let builtin_struct_next_id = ref 0
+
+let next_builtin_struct_id () =
+  let id = !builtin_struct_next_id - 1 in
+  builtin_struct_next_id := id ;
+  id
+
 let make_load_result_with_id id t =
   { struct_fields =
       [("slice", {field_type = slice_struct}); ("value", {field_type = t})];
@@ -64,18 +71,19 @@ let serialize_intf =
   in
   intf
 
-let serialize_intf_id = -10
+let serialize_intf_id = next_builtin_struct_id ()
 
 let deserialize_intf =
+  let id = next_builtin_struct_id () in
   let intf =
     { interface_methods =
         [ ( "deserialize",
             { function_params = [("b", builder_struct)];
-              function_returns = StructType (-12) } ) ] }
+              function_returns = StructType id } ) ] }
   in
-  intf
+  (intf, id)
 
-let deserialize_intf_id = -11
+let deserialize_intf_id = next_builtin_struct_id ()
 
 let serializer =
   let function_signature =
@@ -218,13 +226,6 @@ let make_builtin_fn params ret_ty primitive =
            {function_params = params; function_returns = ret_ty};
          function_impl = Fn (Some (Return (Primitive primitive))) } )
 
-let builtin_struct_next_id = ref 0
-
-let next_builtin_struct_id () =
-  let id = !builtin_struct_next_id - 1 in
-  builtin_struct_next_id := id ;
-  id
-
 let tensor2_hashtbl =
   Hashtbl.create
     ( module struct
@@ -325,9 +326,11 @@ let default_bindings () =
 let default_structs =
   ( Hashtbl.map tensor2_hashtbl ~f:(fun struct_ -> (struct_.struct_id, struct_))
   |> Hashtbl.data )
-  @ [(-12, make_load_result_with_id (-12) SelfType)]
+  @ [ (let id = snd deserialize_intf in
+       (id, make_load_result_with_id id SelfType) ) ]
 
 let default_intfs =
-  [(serialize_intf_id, serialize_intf); (deserialize_intf_id, deserialize_intf)]
+  [ (serialize_intf_id, serialize_intf);
+    (deserialize_intf_id, fst deserialize_intf) ]
 
 let std = [%blob "std/std.tact"]

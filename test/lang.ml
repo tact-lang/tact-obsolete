@@ -97,7 +97,7 @@ let%expect_test "scope resolution" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -115,7 +115,7 @@ let%expect_test "scope resolution" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -235,7 +235,7 @@ let%expect_test "binding resolution" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -253,7 +253,7 @@ let%expect_test "binding resolution" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -387,7 +387,7 @@ let%expect_test "scope resolution after let binding" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -405,7 +405,7 @@ let%expect_test "scope resolution after let binding" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -528,7 +528,7 @@ let%expect_test "basic struct definition" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -546,7 +546,7 @@ let%expect_test "basic struct definition" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -693,7 +693,7 @@ let%expect_test "Tact function evaluation" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -711,7 +711,7 @@ let%expect_test "Tact function evaluation" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -869,7 +869,7 @@ let%expect_test "struct definition" =
                   ((Return
                     (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
-             (((impl_interface (Value (Type (InterfaceType -10))))
+             (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
                 ((serialize
                   (Value
@@ -887,7 +887,7 @@ let%expect_test "struct definition" =
                             (StructField
                              ((Reference (self (StructType 55))) value IntegerType))
                             (Value (Integer 257))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType -11))))
+              ((impl_interface (Value (Type (InterfaceType -3))))
                (impl_methods
                 ((deserialize
                   (Value
@@ -1022,7 +1022,7 @@ let%expect_test "duplicate type field" =
                   ((Return
                     (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
-             (((impl_interface (Value (Type (InterfaceType -10))))
+             (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
                 ((serialize
                   (Value
@@ -1041,7 +1041,7 @@ let%expect_test "duplicate type field" =
                              ((Reference (self (StructType 55))) value
                               IntegerType))
                             (Value (Integer 257))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType -11))))
+              ((impl_interface (Value (Type (InterfaceType -3))))
                (impl_methods
                 ((deserialize
                   (Value
@@ -1179,7 +1179,7 @@ let%expect_test "parametric struct instantiation" =
                 ((Return
                   (Value (Struct (56 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -1197,7 +1197,7 @@ let%expect_test "parametric struct instantiation" =
                           (StructField
                            ((Reference (self (StructType 56))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -1354,7 +1354,7 @@ let%expect_test "scoping that `let` introduces in code" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -1372,7 +1372,7 @@ let%expect_test "scoping that `let` introduces in code" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -1529,7 +1529,7 @@ let%expect_test "reference in function bodies" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -1547,7 +1547,7 @@ let%expect_test "reference in function bodies" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -2037,7 +2037,7 @@ let%expect_test "type check error" =
                   ((Return
                     (Value (Struct (56 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
-             (((impl_interface (Value (Type (InterfaceType -10))))
+             (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
                 ((serialize
                   (Value
@@ -2056,7 +2056,7 @@ let%expect_test "type check error" =
                              ((Reference (self (StructType 56))) value
                               IntegerType))
                             (Value (Integer 10))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType -11))))
+              ((impl_interface (Value (Type (InterfaceType -3))))
                (impl_methods
                 ((deserialize
                   (Value
@@ -2165,7 +2165,7 @@ let%expect_test "type check error" =
                   ((Return
                     (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
-             (((impl_interface (Value (Type (InterfaceType -10))))
+             (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
                 ((serialize
                   (Value
@@ -2184,7 +2184,7 @@ let%expect_test "type check error" =
                              ((Reference (self (StructType 55))) value
                               IntegerType))
                             (Value (Integer 99))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType -11))))
+              ((impl_interface (Value (Type (InterfaceType -3))))
                (impl_methods
                 ((deserialize
                   (Value
@@ -2253,132 +2253,30 @@ let%expect_test "implement interface op" =
   pp source ~prev_program:(add_bin_op_intf (Lang.default_program ())) ;
   [%expect
     {|
-    (StructField
-     ((Reference (self (StructType 52))) body
-      (ExprType (Reference (X (InterfaceType -10))))))(Error
-                                                       (((MethodNotFound
-                                                          ((StructField
-                                                            ((Reference
-                                                              (self
-                                                               (StructType 52)))
-                                                             body
-                                                             (ExprType
-                                                              (Reference
-                                                               (X
-                                                                (InterfaceType
-                                                                 -10))))))
-                                                           serialize))
-                                                         ((bindings
-                                                           ((one
-                                                             (Value (Integer 1)))
-                                                            (Left
-                                                             (Value
-                                                              (Type
-                                                               (StructType 57))))))
-                                                          (structs
-                                                           ((57
-                                                             ((struct_fields ())
-                                                              (struct_methods
-                                                               ((op
-                                                                 ((function_signature
-                                                                   ((function_params
-                                                                     ((left
-                                                                       IntegerType)
-                                                                      (right
-                                                                       IntegerType)))
-                                                                    (function_returns
-                                                                     IntegerType)))
-                                                                  (function_impl
-                                                                   (Fn
-                                                                    ((Return
-                                                                      (Reference
-                                                                       (left
-                                                                        IntegerType))))))))))
-                                                              (struct_impls
-                                                               (((impl_interface
-                                                                  (Value
-                                                                   (Type
-                                                                    (InterfaceType
-                                                                     -10))))
-                                                                 (impl_methods
-                                                                  ((op
-                                                                    (Value
-                                                                     (Function
-                                                                      ((function_signature
-                                                                        ((function_params
-                                                                        ((left
-                                                                        IntegerType)
-                                                                        (right
-                                                                        IntegerType)))
-                                                                        (function_returns
-                                                                        IntegerType)))
-                                                                       (function_impl
-                                                                        (Fn
-                                                                        ((Return
-                                                                        (Reference
-                                                                        (left
-                                                                        IntegerType)))))))))))))))
-                                                              (struct_id 57)))))
-                                                          (type_counter <opaque>)
-                                                          (memoized_fcalls
-                                                           <opaque>)))
-                                                        ((TypeError
-                                                          ((StructType 3)
-                                                           VoidType))
-                                                         ((bindings
-                                                           ((one
-                                                             (Value (Integer 1)))
-                                                            (Left
-                                                             (Value
-                                                              (Type
-                                                               (StructType 57))))))
-                                                          (structs
-                                                           ((57
-                                                             ((struct_fields ())
-                                                              (struct_methods
-                                                               ((op
-                                                                 ((function_signature
-                                                                   ((function_params
-                                                                     ((left
-                                                                       IntegerType)
-                                                                      (right
-                                                                       IntegerType)))
-                                                                    (function_returns
-                                                                     IntegerType)))
-                                                                  (function_impl
-                                                                   (Fn
-                                                                    ((Return
-                                                                      (Reference
-                                                                       (left
-                                                                        IntegerType))))))))))
-                                                              (struct_impls
-                                                               (((impl_interface
-                                                                  (Value
-                                                                   (Type
-                                                                    (InterfaceType
-                                                                     -10))))
-                                                                 (impl_methods
-                                                                  ((op
-                                                                    (Value
-                                                                     (Function
-                                                                      ((function_signature
-                                                                        ((function_params
-                                                                        ((left
-                                                                        IntegerType)
-                                                                        (right
-                                                                        IntegerType)))
-                                                                        (function_returns
-                                                                        IntegerType)))
-                                                                       (function_impl
-                                                                        (Fn
-                                                                        ((Return
-                                                                        (Reference
-                                                                        (left
-                                                                        IntegerType)))))))))))))))
-                                                              (struct_id 57)))))
-                                                          (type_counter <opaque>)
-                                                          (memoized_fcalls
-                                                           <opaque>))))) |}]
+    (Ok
+     ((bindings
+       ((one (Value (Integer 1))) (Left (Value (Type (StructType 56))))))
+      (structs
+       ((56
+         ((struct_fields ())
+          (struct_methods
+           ((op
+             ((function_signature
+               ((function_params ((left IntegerType) (right IntegerType)))
+                (function_returns IntegerType)))
+              (function_impl (Fn ((Return (Reference (left IntegerType))))))))))
+          (struct_impls
+           (((impl_interface (Value (Type (InterfaceType -10))))
+             (impl_methods
+              ((op
+                (Value
+                 (Function
+                  ((function_signature
+                    ((function_params ((left IntegerType) (right IntegerType)))
+                     (function_returns IntegerType)))
+                   (function_impl (Fn ((Return (Reference (left IntegerType)))))))))))))))
+          (struct_id 56)))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "implement interface op" =
   let source =
@@ -2975,7 +2873,7 @@ let%expect_test "unions" =
                 ((Return
                   (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType -10))))
+           (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
               ((serialize
                 (Value
@@ -2993,7 +2891,7 @@ let%expect_test "unions" =
                           (StructField
                            ((Reference (self (StructType 55))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType -11))))
+            ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
               ((deserialize
                 (Value
@@ -3400,7 +3298,7 @@ let%expect_test "let binding with type" =
                   ((Return
                     (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
-             (((impl_interface (Value (Type (InterfaceType -10))))
+             (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
                 ((serialize
                   (Value
@@ -3418,7 +3316,7 @@ let%expect_test "let binding with type" =
                             (StructField
                              ((Reference (self (StructType 55))) value IntegerType))
                             (Value (Integer 257))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType -11))))
+              ((impl_interface (Value (Type (InterfaceType -3))))
                (impl_methods
                 ((deserialize
                   (Value
