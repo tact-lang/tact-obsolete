@@ -402,10 +402,12 @@ class interpreter
 
     method interpret_type : type_ -> type_ =
       function
-      | ExprType (Value (Type t)) ->
-          self#interpret_type t
-      | ExprType ex ->
-          expr_to_type (Value (self#interpret_expr ex))
+      | ExprType ex -> (
+        match self#interpret_expr ex with
+        | Type t ->
+            t
+        | _ ->
+            raise InternalCompilerError )
       | ty ->
           ty
 

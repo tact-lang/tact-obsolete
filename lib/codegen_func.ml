@@ -93,12 +93,7 @@ class constructor (program : T.program) =
           raise Unsupported
 
     method cg_union_variant expr union =
-      (* FIXME: actually, ExprType should not be here, this is bug. It is flows from
-         `Lang.constructor.(#make_from_impls)` fn but I do not know why it does not
-         handled in the interpreter. *)
-      let e_ty =
-        match T.type_of expr with ExprType (Value (Type t)) -> t | ty -> ty
-      in
+      let e_ty = T.type_of expr in
       let expr = self#cg_expr expr in
       let union = List.Assoc.find_exn program.unions union ~equal:equal_int in
       let (T.Discriminator discr) =
@@ -360,19 +355,6 @@ class constructor (program : T.program) =
           F.SliceType
       | HoleType | VoidType ->
           F.InferType
-      (* FIXME: actually, ExprType should not be here, this is bug. It is flows from
-         `Lang.constructor.(#make_from_impls)` fn but I do not know why it does not
-         handled in the interpreter. *)
-      | ExprType ex ->
-          let inter =
-            new Interpreter.interpreter
-              ( program,
-                [List.map program.bindings ~f:T.make_comptime],
-                new Errors.errors (fun _ -> ""),
-                0 )
-          in
-          self#lang_type_to_type @@ T.expr_to_type
-          @@ Value (inter#interpret_expr ex)
       (* TODO: this is a bug that SelfType flows into codegen stage *)
       | SelfType ->
           F.InferType
