@@ -18,6 +18,10 @@ struct Builder {
     let b = builtin_builder_store_int(self.b, int, bits);
     Self { b: b }
   }
+  fn serialize_coins(self: Self, c: Integer) -> Self {
+    let b = builtin_builder_store_coins(self.b, c);
+    Self { b: b }
+  }
 }
 
 struct Slice {
@@ -32,6 +36,20 @@ struct Slice {
     let slice = Self { s: output.value1 };
     let int = output.value2;
     LoadResult(Integer) { slice: slice, value: int }
+  }
+}
+
+struct Coins {
+  val value: Integer
+
+  fn new(c: Integer) -> Self {
+    Self { value: c }
+  }
+
+  impl Serialize {
+    fn serialize(self: Self, builder: Builder) -> Builder {
+      builder.serialize_coins(self.value)
+    } 
   }
 }
 
@@ -150,6 +168,13 @@ struct AddressStd {
   val workchain_id: Int(8)
   val address: Int(256)
 
+  fn new(workchain_id: Int(8), address: Int(256)) -> Self {
+    Self {
+      workchain_id: workchain_id,
+      address: address,
+    }
+  }
+
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
       let b = b.serialize_int(0, 0); // AnyCast
@@ -257,6 +282,29 @@ union MsgAddress {
 }
 
 struct ExtOutMsgInfo {
+  val src: MsgAddressInt
+  val dest: MsgAddressExt
+  val created_lt: Int(64) // TODO: uint
+  val created_at: Int(32) // TODO: uint
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult(Self) {
+      let res_src = MsgAddressInt.deserialize(s);
+      let res_dest = MsgAddressExt.deserialize(res_src.slice);
+      let res_created_lt = Int(64).deserialize(res_dest.slice);
+      let res_created_at = Int(64).deserialize(res_created_lt.slice);
+      return LoadResult(Self)
+        .new(res_created_at.slice, Self {
+          src: res_src.value,
+          dest: res_dest.value,
+          created_lt: res_created_lt.value,
+          created_at: res_created_at.value,
+        });
+    }
+  }
+}
+
+struct ExtOutMsgInfoRelaxed {
   val src: MsgAddress
   val dest: MsgAddressExt
   val created_lt: Int(64) // TODO: uint
@@ -270,22 +318,6 @@ struct ExtOutMsgInfo {
       let b = self.created_lt.serialize(b);
       let b = self.created_at.serialize(b);
       return b;
-    }
-  }
-
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
-      let res_src = MsgAddress.deserialize(s);
-      let res_dest = MsgAddressExt.deserialize(res_src.slice);
-      let res_created_lt = Int(64).deserialize(res_dest.slice);
-      let res_created_at = Int(64).deserialize(res_created_lt.slice);
-      return LoadResult(Self)
-        .new(res_created_at.slice, Self {
-          src: res_src.value,
-          dest: res_dest.value,
-          created_lt: res_created_lt.value,
-          created_at: res_created_at.value,
-        });
     }
   }
 }
@@ -312,14 +344,99 @@ union CommonMsgInfo {
   }
 }
 
+struct IntMsgInfoRelaxedFlags {
+  val ihr_disabled: Int(1)
+  val bounce: Int(1)
+  val bounced: Int(1)
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer(Self)(self, b)
+    }
+  }
+}
+
+struct IntMsgInfoRelaxedAddresses {
+  val src: MsgAddressInt
+  val dst: MsgAddressInt
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer(Self)(self, b)
+    }
+  }
+}
+
+struct IntMsgInfoRelaxedCoins {
+  val ihr_fee: Coins
+  val fwd_fee: Coins
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer(Self)(self, b)
+    }
+  }
+}
+
+struct Timestamps {
+  val created_lt: Int(64) // TODO: uint
+  val created_at: Int(32) // TODO: uint
+
+  fn zeros() -> Self {
+    Self {
+      created_lt: 0,
+      created_at: 0,
+    }
+  }
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer(Self)(self, b)
+    }
+  }
+}
+
+struct IntMsgInfoRelaxed {
+  val flags: IntMsgInfoRelaxedFlags
+  val addresses: IntMsgInfoRelaxedAddresses
+  val coins: IntMsgInfoRelaxedCoins
+  val timestamps: Timestamps
+
+  fn new(
+    flags: IntMsgInfoRelaxedFlags, 
+    dst: MsgAddressInt,
+    coins: IntMsgInfoRelaxedCoins,
+  ) -> Self {
+    Self {
+      flags: flags,
+      addresses: IntMsgInfoRelaxedAddresses {
+        src: AddressStd.new(0, 0), // it will be replaced by smartcontract address by TVM
+        dst: dst,
+      },
+      coins: coins,
+      timestamps: Timestamps.zeros(), // it will be replaced by current timestamps by TVM
+    }
+  }
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer(Self)(self, b)
+    }
+  }
+}
+
 union CommonMsgInfoRelaxed {
-  case ExtOutMsgInfo
-  // TODO: int_msg_info
+  case ExtOutMsgInfoRelaxed
+  case IntMsgInfoRelaxed
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
       switch(self) {
-        case ExtOutMsgInfo info => {
+        case IntMsgInfoRelaxed info => {
+          let b = b.serialize_int(0, 1);
+          return info.serialize(b);
+        }
+        case ExtOutMsgInfoRelaxed info => {
           let b = b.serialize_int(3, 2); // 0b11
           return info.serialize(b);
         }

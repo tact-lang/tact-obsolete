@@ -308,6 +308,11 @@ class constructor (program : T.program) =
       | StoreInt {builder; length; integer; signed} ->
           self#cg_StoreInt (self#cg_expr builder) (self#cg_expr length)
             (self#cg_expr integer) signed
+      | StoreCoins {builder; coins} ->
+          F.FunctionCall
+            ( "store_grams",
+              [self#cg_expr builder; self#cg_expr coins],
+              F.BuilderType )
       | SendRawMsg {msg; flags} ->
           F.FunctionCall
             ( "send_raw_message",

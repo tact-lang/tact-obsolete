@@ -268,6 +268,13 @@ let builtin_bindings =
              length = Reference ("bits", IntegerType);
              integer = Reference ("int", IntegerType);
              signed = true } ) );
+    ( "builtin_builder_store_coins",
+      make_builtin_fn
+        [("b", BuiltinType "Builder"); ("c", IntegerType)]
+        BoolType
+        (StoreCoins
+           { builder = Reference ("b", BuiltinType "Builder");
+             coins = Reference ("c", IntegerType) } ) );
     ( "builtin_slice_begin_parse",
       make_builtin_fn
         [("c", BuiltinType "Cell")]

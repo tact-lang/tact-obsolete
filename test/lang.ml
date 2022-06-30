@@ -34,23 +34,23 @@ let%expect_test "scope resolution" =
   [%expect
     {|
     (Ok
-     ((bindings ((T (Value (Type (StructType 55))))))
+     ((bindings ((T (Value (Type (StructType 72))))))
       (structs
-       ((55
+       ((72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -59,12 +59,12 @@ let%expect_test "scope resolution" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -76,14 +76,14 @@ let%expect_test "scope resolution" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -91,11 +91,11 @@ let%expect_test "scope resolution" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -104,7 +104,7 @@ let%expect_test "scope resolution" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -113,7 +113,7 @@ let%expect_test "scope resolution" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -122,7 +122,7 @@ let%expect_test "scope resolution" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -135,7 +135,7 @@ let%expect_test "scope resolution" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -143,25 +143,25 @@ let%expect_test "scope resolution" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "binding resolution" =
@@ -172,23 +172,23 @@ let%expect_test "binding resolution" =
   [%expect
     {|
     (Ok
-     ((bindings ((T (Value (Type (StructType 55))))))
+     ((bindings ((T (Value (Type (StructType 72))))))
       (structs
-       ((55
+       ((72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -197,12 +197,12 @@ let%expect_test "binding resolution" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -214,14 +214,14 @@ let%expect_test "binding resolution" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -229,11 +229,11 @@ let%expect_test "binding resolution" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -242,7 +242,7 @@ let%expect_test "binding resolution" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -251,7 +251,7 @@ let%expect_test "binding resolution" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -260,7 +260,7 @@ let%expect_test "binding resolution" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -273,7 +273,7 @@ let%expect_test "binding resolution" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -281,25 +281,25 @@ let%expect_test "binding resolution" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "failed scope resolution" =
@@ -324,23 +324,23 @@ let%expect_test "scope resolution after let binding" =
     {|
     (Ok
      ((bindings
-       ((B (Value (Type (StructType 55)))) (A (Value (Type (StructType 55))))))
+       ((B (Value (Type (StructType 72)))) (A (Value (Type (StructType 72))))))
       (structs
-       ((55
+       ((72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -349,12 +349,12 @@ let%expect_test "scope resolution after let binding" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -366,14 +366,14 @@ let%expect_test "scope resolution after let binding" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -381,11 +381,11 @@ let%expect_test "scope resolution after let binding" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -394,7 +394,7 @@ let%expect_test "scope resolution after let binding" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -403,7 +403,7 @@ let%expect_test "scope resolution after let binding" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -412,7 +412,7 @@ let%expect_test "scope resolution after let binding" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -425,7 +425,7 @@ let%expect_test "scope resolution after let binding" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -433,25 +433,25 @@ let%expect_test "scope resolution after let binding" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "basic struct definition" =
@@ -462,26 +462,26 @@ let%expect_test "basic struct definition" =
   [%expect
     {|
     (Ok
-     ((bindings ((T (Value (Type (StructType 57))))))
+     ((bindings ((T (Value (Type (StructType 74))))))
       (structs
-       ((57
-         ((struct_fields ((t ((field_type (StructType 55))))))
-          (struct_methods ()) (struct_impls ()) (struct_id 57)))
-        (55
+       ((74
+         ((struct_fields ((t ((field_type (StructType 72))))))
+          (struct_methods ()) (struct_impls ()) (struct_id 74)))
+        (72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -490,12 +490,12 @@ let%expect_test "basic struct definition" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -507,14 +507,14 @@ let%expect_test "basic struct definition" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -522,11 +522,11 @@ let%expect_test "basic struct definition" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -535,7 +535,7 @@ let%expect_test "basic struct definition" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -544,7 +544,7 @@ let%expect_test "basic struct definition" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -553,7 +553,7 @@ let%expect_test "basic struct definition" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -566,7 +566,7 @@ let%expect_test "basic struct definition" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -574,25 +574,25 @@ let%expect_test "basic struct definition" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "native function evaluation" =
@@ -623,30 +623,30 @@ let%expect_test "Tact function evaluation" =
     {|
     (Ok
      ((bindings
-       ((a (Value (Struct (55 ((value (Value (Integer 1))))))))
+       ((a (Value (Struct (72 ((value (Value (Integer 1))))))))
         (test
          (Value
           (Function
            ((function_signature
-             ((function_params ((i (StructType 55))))
-              (function_returns (StructType 55))))
-            (function_impl (Fn ((Return (Reference (i (StructType 55)))))))))))))
+             ((function_params ((i (StructType 72))))
+              (function_returns (StructType 72))))
+            (function_impl (Fn ((Return (Reference (i (StructType 72)))))))))))))
       (structs
-       ((55
+       ((72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -655,12 +655,12 @@ let%expect_test "Tact function evaluation" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -672,14 +672,14 @@ let%expect_test "Tact function evaluation" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -687,11 +687,11 @@ let%expect_test "Tact function evaluation" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -700,7 +700,7 @@ let%expect_test "Tact function evaluation" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -709,7 +709,7 @@ let%expect_test "Tact function evaluation" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -718,7 +718,7 @@ let%expect_test "Tact function evaluation" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -731,7 +731,7 @@ let%expect_test "Tact function evaluation" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -739,25 +739,25 @@ let%expect_test "Tact function evaluation" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "compile-time function evaluation within a function" =
@@ -802,27 +802,27 @@ let%expect_test "struct definition" =
   [%expect
     {|
       (Ok
-       ((bindings ((MyType (Value (Type (StructType 57))))))
+       ((bindings ((MyType (Value (Type (StructType 74))))))
         (structs
-         ((57
+         ((74
            ((struct_fields
-             ((a ((field_type (StructType 55)))) (b ((field_type BoolType)))))
-            (struct_methods ()) (struct_impls ()) (struct_id 57)))
-          (55
+             ((a ((field_type (StructType 72)))) (b ((field_type BoolType)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 74)))
+          (72
            ((struct_fields ((value ((field_type IntegerType)))))
             (struct_methods
              ((new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 55)) (builder (StructType 3))))
+                   ((self (StructType 72)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -831,12 +831,12 @@ let%expect_test "struct definition" =
                      ((ResolvedReference (serialize_int <opaque>))
                       ((Reference (builder (StructType 3)))
                        (StructField
-                        ((Reference (self (StructType 55))) value IntegerType))
+                        ((Reference (self (StructType 72))) value IntegerType))
                        (Value (Integer 257)))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 6))))
-                  (function_returns (StructType 8))))
+                  (function_returns (StructType 10))))
                 (function_impl
                  (Fn
                   ((Block
@@ -848,14 +848,14 @@ let%expect_test "struct definition" =
                      (Return
                       (Value
                        (Struct
-                        (8
+                        (10
                          ((slice
                            (StructField
                             ((Reference (res (StructType 5))) slice (StructType 6))))
                           (value
                            (Value
                             (Struct
-                             (55
+                             (72
                               ((value
                                 (StructField
                                  ((Reference (res (StructType 5))) value
@@ -863,11 +863,11 @@ let%expect_test "struct definition" =
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
              (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
@@ -876,7 +876,7 @@ let%expect_test "struct definition" =
                    (Function
                     ((function_signature
                       ((function_params
-                        ((self (StructType 55)) (builder (StructType 3))))
+                        ((self (StructType 72)) (builder (StructType 3))))
                        (function_returns (StructType 3))))
                      (function_impl
                       (Fn
@@ -885,7 +885,7 @@ let%expect_test "struct definition" =
                           ((ResolvedReference (serialize_int <opaque>))
                            ((Reference (builder (StructType 3)))
                             (StructField
-                             ((Reference (self (StructType 55))) value IntegerType))
+                             ((Reference (self (StructType 72))) value IntegerType))
                             (Value (Integer 257))))))))))))))))
               ((impl_interface (Value (Type (InterfaceType -3))))
                (impl_methods
@@ -894,7 +894,7 @@ let%expect_test "struct definition" =
                    (Function
                     ((function_signature
                       ((function_params ((s (StructType 6))))
-                       (function_returns (StructType 8))))
+                       (function_returns (StructType 10))))
                      (function_impl
                       (Fn
                        ((Block
@@ -907,7 +907,7 @@ let%expect_test "struct definition" =
                           (Return
                            (Value
                             (Struct
-                             (8
+                             (10
                               ((slice
                                 (StructField
                                  ((Reference (res (StructType 5))) slice
@@ -915,25 +915,25 @@ let%expect_test "struct definition" =
                                (value
                                 (Value
                                  (Struct
-                                  (55
+                                  (72
                                    ((value
                                      (StructField
                                       ((Reference (res (StructType 5))) value
                                        IntegerType)))))))))))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType 9))))
+              ((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((i IntegerType)))
-                       (function_returns (StructType 55))))
+                       (function_returns (StructType 72))))
                      (function_impl
                       (Fn
                        ((Return
                          (Value
-                          (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-            (struct_id 55)))))
+                          (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+            (struct_id 72)))))
         (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "duplicate type field" =
@@ -952,29 +952,29 @@ let%expect_test "duplicate type field" =
      (((DuplicateField
         (a
          ((mk_struct_fields
-           ((a (Value (Type (StructType 55)))) (a (Value (Type BoolType)))))
+           ((a (Value (Type (StructType 72)))) (a (Value (Type BoolType)))))
           (mk_methods ()) (mk_impls ()) (mk_struct_id -1))))
-       ((bindings ((MyType (Value (Type (StructType 57))))))
+       ((bindings ((MyType (Value (Type (StructType 74))))))
         (structs
-         ((57
+         ((74
            ((struct_fields
-             ((a ((field_type (StructType 55)))) (a ((field_type BoolType)))))
-            (struct_methods ()) (struct_impls ()) (struct_id 57)))
-          (55
+             ((a ((field_type (StructType 72)))) (a ((field_type BoolType)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 74)))
+          (72
            ((struct_fields ((value ((field_type IntegerType)))))
             (struct_methods
              ((new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 55)) (builder (StructType 3))))
+                   ((self (StructType 72)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -983,12 +983,12 @@ let%expect_test "duplicate type field" =
                      ((ResolvedReference (serialize_int <opaque>))
                       ((Reference (builder (StructType 3)))
                        (StructField
-                        ((Reference (self (StructType 55))) value IntegerType))
+                        ((Reference (self (StructType 72))) value IntegerType))
                        (Value (Integer 257)))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 6))))
-                  (function_returns (StructType 8))))
+                  (function_returns (StructType 10))))
                 (function_impl
                  (Fn
                   ((Block
@@ -1000,7 +1000,7 @@ let%expect_test "duplicate type field" =
                      (Return
                       (Value
                        (Struct
-                        (8
+                        (10
                          ((slice
                            (StructField
                             ((Reference (res (StructType 5))) slice
@@ -1008,7 +1008,7 @@ let%expect_test "duplicate type field" =
                           (value
                            (Value
                             (Struct
-                             (55
+                             (72
                               ((value
                                 (StructField
                                  ((Reference (res (StructType 5))) value
@@ -1016,11 +1016,11 @@ let%expect_test "duplicate type field" =
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
              (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
@@ -1029,7 +1029,7 @@ let%expect_test "duplicate type field" =
                    (Function
                     ((function_signature
                       ((function_params
-                        ((self (StructType 55)) (builder (StructType 3))))
+                        ((self (StructType 72)) (builder (StructType 3))))
                        (function_returns (StructType 3))))
                      (function_impl
                       (Fn
@@ -1038,7 +1038,7 @@ let%expect_test "duplicate type field" =
                           ((ResolvedReference (serialize_int <opaque>))
                            ((Reference (builder (StructType 3)))
                             (StructField
-                             ((Reference (self (StructType 55))) value
+                             ((Reference (self (StructType 72))) value
                               IntegerType))
                             (Value (Integer 257))))))))))))))))
               ((impl_interface (Value (Type (InterfaceType -3))))
@@ -1048,7 +1048,7 @@ let%expect_test "duplicate type field" =
                    (Function
                     ((function_signature
                       ((function_params ((s (StructType 6))))
-                       (function_returns (StructType 8))))
+                       (function_returns (StructType 10))))
                      (function_impl
                       (Fn
                        ((Block
@@ -1061,7 +1061,7 @@ let%expect_test "duplicate type field" =
                           (Return
                            (Value
                             (Struct
-                             (8
+                             (10
                               ((slice
                                 (StructField
                                  ((Reference (res (StructType 5))) slice
@@ -1069,25 +1069,25 @@ let%expect_test "duplicate type field" =
                                (value
                                 (Value
                                  (Struct
-                                  (55
+                                  (72
                                    ((value
                                      (StructField
                                       ((Reference (res (StructType 5))) value
                                        IntegerType)))))))))))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType 9))))
+              ((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((i IntegerType)))
-                       (function_returns (StructType 55))))
+                       (function_returns (StructType 72))))
                      (function_impl
                       (Fn
                        ((Return
                          (Value
-                          (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-            (struct_id 55)))))
+                          (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+            (struct_id 72)))))
         (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
 let%expect_test "parametric struct instantiation" =
@@ -1102,7 +1102,7 @@ let%expect_test "parametric struct instantiation" =
     {|
     (Ok
      ((bindings
-       ((TA (Value (Type (StructType 57))))
+       ((TA (Value (Type (StructType 74))))
         (T
          (Value
           (Function
@@ -1113,26 +1113,26 @@ let%expect_test "parametric struct instantiation" =
               ((Expr
                 (MkStructDef
                  ((mk_struct_fields ((a (Reference (A (TypeN 0))))))
-                  (mk_methods ()) (mk_impls ()) (mk_struct_id 55)))))))))))))
+                  (mk_methods ()) (mk_impls ()) (mk_struct_id 72)))))))))))))
       (structs
-       ((57
-         ((struct_fields ((a ((field_type (StructType 56))))))
-          (struct_methods ()) (struct_impls ()) (struct_id 57)))
-        (56
+       ((74
+         ((struct_fields ((a ((field_type (StructType 73))))))
+          (struct_methods ()) (struct_impls ()) (struct_id 74)))
+        (73
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 56))))
+                (function_returns (StructType 73))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (56 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (73 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 56)) (builder (StructType 3))))
+                 ((self (StructType 73)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -1141,12 +1141,12 @@ let%expect_test "parametric struct instantiation" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 56))) value IntegerType))
+                      ((Reference (self (StructType 73))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -1158,14 +1158,14 @@ let%expect_test "parametric struct instantiation" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (56
+                           (73
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -1173,11 +1173,11 @@ let%expect_test "parametric struct instantiation" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 56))))
+                (function_returns (StructType 73))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (56 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (73 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -1186,7 +1186,7 @@ let%expect_test "parametric struct instantiation" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 56)) (builder (StructType 3))))
+                      ((self (StructType 73)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -1195,7 +1195,7 @@ let%expect_test "parametric struct instantiation" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 56))) value IntegerType))
+                           ((Reference (self (StructType 73))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -1204,7 +1204,7 @@ let%expect_test "parametric struct instantiation" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -1217,7 +1217,7 @@ let%expect_test "parametric struct instantiation" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -1225,25 +1225,25 @@ let%expect_test "parametric struct instantiation" =
                              (value
                               (Value
                                (Struct
-                                (56
+                                (73
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 56))))
+                     (function_returns (StructType 73))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (56 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 56)))))
+                        (Struct (73 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "function without a return type" =
@@ -1280,34 +1280,34 @@ let%expect_test "scoping that `let` introduces in code" =
     {|
     (Ok
      ((bindings
-       ((b (Value (Struct (55 ((value (Value (Integer 1))))))))
+       ((b (Value (Struct (72 ((value (Value (Integer 1))))))))
         (f
          (Value
           (Function
            ((function_signature
-             ((function_params ((i (StructType 55))))
-              (function_returns (StructType 55))))
+             ((function_params ((i (StructType 72))))
+              (function_returns (StructType 72))))
             (function_impl
              (Fn
               ((Block
-                ((Let ((a (Reference (i (StructType 55))))))
-                 (Return (Reference (a (StructType 55)))))))))))))))
+                ((Let ((a (Reference (i (StructType 72))))))
+                 (Return (Reference (a (StructType 72)))))))))))))))
       (structs
-       ((55
+       ((72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -1316,12 +1316,12 @@ let%expect_test "scoping that `let` introduces in code" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -1333,14 +1333,14 @@ let%expect_test "scoping that `let` introduces in code" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -1348,11 +1348,11 @@ let%expect_test "scoping that `let` introduces in code" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -1361,7 +1361,7 @@ let%expect_test "scoping that `let` introduces in code" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -1370,7 +1370,7 @@ let%expect_test "scoping that `let` introduces in code" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -1379,7 +1379,7 @@ let%expect_test "scoping that `let` introduces in code" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -1392,7 +1392,7 @@ let%expect_test "scoping that `let` introduces in code" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -1400,25 +1400,25 @@ let%expect_test "scoping that `let` introduces in code" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "reference in function bodies" =
@@ -1443,7 +1443,7 @@ let%expect_test "reference in function bodies" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((x (StructType 55))))
+             ((function_params ((x (StructType 72))))
               (function_returns HoleType)))
             (function_impl
              (Fn
@@ -1452,37 +1452,37 @@ let%expect_test "reference in function bodies" =
                   ((a
                     (FunctionCall
                      ((ResolvedReference (op <opaque>))
-                      ((Reference (x (StructType 55)))
-                       (Reference (x (StructType 55)))))))))
+                      ((Reference (x (StructType 72)))
+                       (Reference (x (StructType 72)))))))))
                  (Let
                   ((b
                     (FunctionCall
                      ((ResolvedReference (op <opaque>))
-                      ((Reference (a (StructType 55)))
-                       (Reference (a (StructType 55))))))))))))))))))
+                      ((Reference (a (StructType 72)))
+                       (Reference (a (StructType 72))))))))))))))))))
         (op
          (Value
           (Function
            ((function_signature
-             ((function_params ((i (StructType 55)) (i_ (StructType 55))))
-              (function_returns (StructType 55))))
-            (function_impl (Fn ((Return (Reference (i (StructType 55)))))))))))))
+             ((function_params ((i (StructType 72)) (i_ (StructType 72))))
+              (function_returns (StructType 72))))
+            (function_impl (Fn ((Return (Reference (i (StructType 72)))))))))))))
       (structs
-       ((55
+       ((72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -1491,12 +1491,12 @@ let%expect_test "reference in function bodies" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -1508,14 +1508,14 @@ let%expect_test "reference in function bodies" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -1523,11 +1523,11 @@ let%expect_test "reference in function bodies" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -1536,7 +1536,7 @@ let%expect_test "reference in function bodies" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -1545,7 +1545,7 @@ let%expect_test "reference in function bodies" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -1554,7 +1554,7 @@ let%expect_test "reference in function bodies" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -1567,7 +1567,7 @@ let%expect_test "reference in function bodies" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -1575,25 +1575,25 @@ let%expect_test "reference in function bodies" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "resolving a reference from inside a function" =
@@ -1638,18 +1638,18 @@ let%expect_test "struct method access" =
     {|
     (Ok
      ((bindings
-       ((res (Value (Integer 1))) (foo (Value (Struct (56 ()))))
-        (Foo (Value (Type (StructType 56))))))
+       ((res (Value (Integer 1))) (foo (Value (Struct (73 ()))))
+        (Foo (Value (Type (StructType 73))))))
       (structs
-       ((56
+       ((73
          ((struct_fields ())
           (struct_methods
            ((bar
              ((function_signature
-               ((function_params ((self (StructType 56)) (i IntegerType)))
+               ((function_params ((self (StructType 73)) (i IntegerType)))
                 (function_returns IntegerType)))
               (function_impl (Fn ((Return (Reference (i IntegerType))))))))))
-          (struct_impls ()) (struct_id 56)))))
+          (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "struct type method access" =
@@ -1667,9 +1667,9 @@ let%expect_test "struct type method access" =
   [%expect
     {|
     (Ok
-     ((bindings ((res (Value (Integer 1))) (Foo (Value (Type (StructType 56))))))
+     ((bindings ((res (Value (Integer 1))) (Foo (Value (Type (StructType 73))))))
       (structs
-       ((56
+       ((73
          ((struct_fields ())
           (struct_methods
            ((bar
@@ -1677,7 +1677,7 @@ let%expect_test "struct type method access" =
                ((function_params ((i IntegerType)))
                 (function_returns IntegerType)))
               (function_impl (Fn ((Return (Reference (i IntegerType))))))))))
-          (struct_impls ()) (struct_id 56)))))
+          (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "Self type resolution in methods" =
@@ -1694,17 +1694,17 @@ let%expect_test "Self type resolution in methods" =
   [%expect
     {|
     (Ok
-     ((bindings ((Foo (Value (Type (StructType 56))))))
+     ((bindings ((Foo (Value (Type (StructType 73))))))
       (structs
-       ((56
+       ((73
          ((struct_fields ())
           (struct_methods
            ((bar
              ((function_signature
-               ((function_params ((self (StructType 56))))
-                (function_returns (StructType 56))))
-              (function_impl (Fn ((Return (Reference (self (StructType 56)))))))))))
-          (struct_impls ()) (struct_id 56)))))
+               ((function_params ((self (StructType 73))))
+                (function_returns (StructType 73))))
+              (function_impl (Fn ((Return (Reference (self (StructType 73)))))))))))
+          (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "union method access" =
@@ -1728,42 +1728,42 @@ let%expect_test "union method access" =
     {|
       (Ok
        ((bindings
-         ((res (Value (Integer 1))) (foo (Value (UnionVariant ((Bool true) 56))))
+         ((res (Value (Integer 1))) (foo (Value (UnionVariant ((Bool true) 73))))
           (make_foo
            (Value
             (Function
              ((function_signature
-               ((function_params ((foo (UnionType 56))))
-                (function_returns (UnionType 56))))
-              (function_impl (Fn ((Return (Reference (foo (UnionType 56)))))))))))
-          (Foo (Value (Type (UnionType 56))))))
+               ((function_params ((foo (UnionType 73))))
+                (function_returns (UnionType 73))))
+              (function_impl (Fn ((Return (Reference (foo (UnionType 73)))))))))))
+          (Foo (Value (Type (UnionType 73))))))
         (structs ())
         (unions
-         ((56
+         ((73
            ((cases ((BoolType (Discriminator 0))))
             (union_methods
              ((bar
                ((function_signature
-                 ((function_params ((self (UnionType 56)) (i IntegerType)))
+                 ((function_params ((self (UnionType 73)) (i IntegerType)))
                   (function_returns IntegerType)))
                 (function_impl (Fn ((Return (Reference (i IntegerType))))))))))
             (union_impls
-             (((impl_interface (Value (Type (InterfaceType 57))))
+             (((impl_interface (Value (Type (InterfaceType 74))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((v (ExprType (Value (Type BoolType))))))
-                       (function_returns (UnionType 56))))
+                       (function_returns (UnionType 73))))
                      (function_impl
                       (Fn
                        ((Return
                          (MakeUnionVariant
-                          ((Reference (v (ExprType (Value (Type BoolType))))) 56)))))))))))))))
-            (union_id 56)))))
+                          ((Reference (v (ExprType (Value (Type BoolType))))) 73)))))))))))))))
+            (union_id 73)))))
         (interfaces
-         ((57
+         ((74
            ((interface_methods
              ((from
                ((function_params ((from BoolType))) (function_returns SelfType)))))))))
@@ -1795,13 +1795,13 @@ let%expect_test "union type method access" =
            (Value
             (Function
              ((function_signature
-               ((function_params ((foo (UnionType 56))))
-                (function_returns (UnionType 56))))
-              (function_impl (Fn ((Return (Reference (foo (UnionType 56)))))))))))
-          (Foo (Value (Type (UnionType 56))))))
+               ((function_params ((foo (UnionType 73))))
+                (function_returns (UnionType 73))))
+              (function_impl (Fn ((Return (Reference (foo (UnionType 73)))))))))))
+          (Foo (Value (Type (UnionType 73))))))
         (structs ())
         (unions
-         ((56
+         ((73
            ((cases ((BoolType (Discriminator 0))))
             (union_methods
              ((bar
@@ -1810,22 +1810,22 @@ let%expect_test "union type method access" =
                   (function_returns IntegerType)))
                 (function_impl (Fn ((Return (Reference (i IntegerType))))))))))
             (union_impls
-             (((impl_interface (Value (Type (InterfaceType 57))))
+             (((impl_interface (Value (Type (InterfaceType 74))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((v (ExprType (Value (Type BoolType))))))
-                       (function_returns (UnionType 56))))
+                       (function_returns (UnionType 73))))
                      (function_impl
                       (Fn
                        ((Return
                          (MakeUnionVariant
-                          ((Reference (v (ExprType (Value (Type BoolType))))) 56)))))))))))))))
-            (union_id 56)))))
+                          ((Reference (v (ExprType (Value (Type BoolType))))) 73)))))))))))))))
+            (union_id 73)))))
         (interfaces
-         ((57
+         ((74
            ((interface_methods
              ((from
                ((function_params ((from BoolType))) (function_returns SelfType)))))))))
@@ -1849,13 +1849,13 @@ let%expect_test "struct instantiation" =
     (Ok
      ((bindings
        ((t
-         (Value (Struct (56 ((a (Value (Integer 1))) (b (Value (Integer 2))))))))
-        (T (Value (Type (StructType 56))))))
+         (Value (Struct (73 ((a (Value (Integer 1))) (b (Value (Integer 2))))))))
+        (T (Value (Type (StructType 73))))))
       (structs
-       ((56
+       ((73
          ((struct_fields
            ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
-          (struct_methods ()) (struct_impls ()) (struct_id 56)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "type check error" =
@@ -1866,21 +1866,21 @@ let%expect_test "type check error" =
   [%expect
     {|
     (Error
-     (((TypeError ((StructType 41) (StructType 42)))
+     (((TypeError ((StructType 43) (StructType 44)))
        ((bindings
          ((foo
            (Value
             (Function
              ((function_signature
-               ((function_params ((i (StructType 42))))
-                (function_returns (StructType 41))))
-              (function_impl (Fn ((Return (Reference (i (StructType 42)))))))))))))
+               ((function_params ((i (StructType 44))))
+                (function_returns (StructType 43))))
+              (function_impl (Fn ((Return (Reference (i (StructType 44)))))))))))))
         (structs ())
         (interfaces
-         ((55
+         ((72
            ((interface_methods
              ((from
-               ((function_params ((from (StructType 42))))
+               ((function_params ((from (StructType 44))))
                 (function_returns SelfType)))))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
@@ -1972,24 +1972,24 @@ let%expect_test "type check error" =
   [%expect
     {|
     (Error
-     (((TypeError ((StructType 55) (StructType 56)))
+     (((TypeError ((StructType 72) (StructType 73)))
        ((bindings ())
         (structs
-         ((56
+         ((73
            ((struct_fields ((value ((field_type IntegerType)))))
             (struct_methods
              ((new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 56))))
+                  (function_returns (StructType 73))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (56 ((value (Reference (i IntegerType)))))))))))))
+                    (Value (Struct (73 ((value (Reference (i IntegerType)))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 56)) (builder (StructType 3))))
+                   ((self (StructType 73)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -1998,12 +1998,12 @@ let%expect_test "type check error" =
                      ((ResolvedReference (serialize_int <opaque>))
                       ((Reference (builder (StructType 3)))
                        (StructField
-                        ((Reference (self (StructType 56))) value IntegerType))
+                        ((Reference (self (StructType 73))) value IntegerType))
                        (Value (Integer 10)))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 6))))
-                  (function_returns (StructType 8))))
+                  (function_returns (StructType 10))))
                 (function_impl
                  (Fn
                   ((Block
@@ -2015,7 +2015,7 @@ let%expect_test "type check error" =
                      (Return
                       (Value
                        (Struct
-                        (8
+                        (10
                          ((slice
                            (StructField
                             ((Reference (res (StructType 5))) slice
@@ -2023,7 +2023,7 @@ let%expect_test "type check error" =
                           (value
                            (Value
                             (Struct
-                             (56
+                             (73
                               ((value
                                 (StructField
                                  ((Reference (res (StructType 5))) value
@@ -2031,11 +2031,11 @@ let%expect_test "type check error" =
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 56))))
+                  (function_returns (StructType 73))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (56 ((value (Reference (i IntegerType)))))))))))))))
+                    (Value (Struct (73 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
              (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
@@ -2044,7 +2044,7 @@ let%expect_test "type check error" =
                    (Function
                     ((function_signature
                       ((function_params
-                        ((self (StructType 56)) (builder (StructType 3))))
+                        ((self (StructType 73)) (builder (StructType 3))))
                        (function_returns (StructType 3))))
                      (function_impl
                       (Fn
@@ -2053,7 +2053,7 @@ let%expect_test "type check error" =
                           ((ResolvedReference (serialize_int <opaque>))
                            ((Reference (builder (StructType 3)))
                             (StructField
-                             ((Reference (self (StructType 56))) value
+                             ((Reference (self (StructType 73))) value
                               IntegerType))
                             (Value (Integer 10))))))))))))))))
               ((impl_interface (Value (Type (InterfaceType -3))))
@@ -2063,7 +2063,7 @@ let%expect_test "type check error" =
                    (Function
                     ((function_signature
                       ((function_params ((s (StructType 6))))
-                       (function_returns (StructType 8))))
+                       (function_returns (StructType 10))))
                      (function_impl
                       (Fn
                        ((Block
@@ -2076,7 +2076,7 @@ let%expect_test "type check error" =
                           (Return
                            (Value
                             (Struct
-                             (8
+                             (10
                               ((slice
                                 (StructField
                                  ((Reference (res (StructType 5))) slice
@@ -2084,40 +2084,40 @@ let%expect_test "type check error" =
                                (value
                                 (Value
                                  (Struct
-                                  (56
+                                  (73
                                    ((value
                                      (StructField
                                       ((Reference (res (StructType 5))) value
                                        IntegerType)))))))))))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType 9))))
+              ((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((i IntegerType)))
-                       (function_returns (StructType 56))))
+                       (function_returns (StructType 73))))
                      (function_impl
                       (Fn
                        ((Return
                          (Value
-                          (Struct (56 ((value (Reference (i IntegerType))))))))))))))))))))
-            (struct_id 56)))
-          (55
+                          (Struct (73 ((value (Reference (i IntegerType))))))))))))))))))))
+            (struct_id 73)))
+          (72
            ((struct_fields ((value ((field_type IntegerType)))))
             (struct_methods
              ((new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 55)) (builder (StructType 3))))
+                   ((self (StructType 72)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -2126,12 +2126,12 @@ let%expect_test "type check error" =
                      ((ResolvedReference (serialize_int <opaque>))
                       ((Reference (builder (StructType 3)))
                        (StructField
-                        ((Reference (self (StructType 55))) value IntegerType))
+                        ((Reference (self (StructType 72))) value IntegerType))
                        (Value (Integer 99)))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 6))))
-                  (function_returns (StructType 8))))
+                  (function_returns (StructType 10))))
                 (function_impl
                  (Fn
                   ((Block
@@ -2143,7 +2143,7 @@ let%expect_test "type check error" =
                      (Return
                       (Value
                        (Struct
-                        (8
+                        (10
                          ((slice
                            (StructField
                             ((Reference (res (StructType 5))) slice
@@ -2151,7 +2151,7 @@ let%expect_test "type check error" =
                           (value
                            (Value
                             (Struct
-                             (55
+                             (72
                               ((value
                                 (StructField
                                  ((Reference (res (StructType 5))) value
@@ -2159,11 +2159,11 @@ let%expect_test "type check error" =
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
              (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
@@ -2172,7 +2172,7 @@ let%expect_test "type check error" =
                    (Function
                     ((function_signature
                       ((function_params
-                        ((self (StructType 55)) (builder (StructType 3))))
+                        ((self (StructType 72)) (builder (StructType 3))))
                        (function_returns (StructType 3))))
                      (function_impl
                       (Fn
@@ -2181,7 +2181,7 @@ let%expect_test "type check error" =
                           ((ResolvedReference (serialize_int <opaque>))
                            ((Reference (builder (StructType 3)))
                             (StructField
-                             ((Reference (self (StructType 55))) value
+                             ((Reference (self (StructType 72))) value
                               IntegerType))
                             (Value (Integer 99))))))))))))))))
               ((impl_interface (Value (Type (InterfaceType -3))))
@@ -2191,7 +2191,7 @@ let%expect_test "type check error" =
                    (Function
                     ((function_signature
                       ((function_params ((s (StructType 6))))
-                       (function_returns (StructType 8))))
+                       (function_returns (StructType 10))))
                      (function_impl
                       (Fn
                        ((Block
@@ -2204,7 +2204,7 @@ let%expect_test "type check error" =
                           (Return
                            (Value
                             (Struct
-                             (8
+                             (10
                               ((slice
                                 (StructField
                                  ((Reference (res (StructType 5))) slice
@@ -2212,30 +2212,30 @@ let%expect_test "type check error" =
                                (value
                                 (Value
                                  (Struct
-                                  (55
+                                  (72
                                    ((value
                                      (StructField
                                       ((Reference (res (StructType 5))) value
                                        IntegerType)))))))))))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType 9))))
+              ((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((i IntegerType)))
-                       (function_returns (StructType 55))))
+                       (function_returns (StructType 72))))
                      (function_impl
                       (Fn
                        ((Return
                          (Value
-                          (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-            (struct_id 55)))))
+                          (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+            (struct_id 72)))))
         (interfaces
-         ((57
+         ((74
            ((interface_methods
              ((from
-               ((function_params ((from (StructType 56))))
+               ((function_params ((from (StructType 73))))
                 (function_returns SelfType)))))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>))))) |}]
 
@@ -2255,9 +2255,9 @@ let%expect_test "implement interface op" =
     {|
     (Ok
      ((bindings
-       ((one (Value (Integer 1))) (Left (Value (Type (StructType 56))))))
+       ((one (Value (Integer 1))) (Left (Value (Type (StructType 73))))))
       (structs
-       ((56
+       ((73
          ((struct_fields ())
           (struct_methods
            ((op
@@ -2275,7 +2275,7 @@ let%expect_test "implement interface op" =
                     ((function_params ((left IntegerType) (right IntegerType)))
                      (function_returns IntegerType)))
                    (function_impl (Fn ((Return (Reference (left IntegerType)))))))))))))))
-          (struct_id 56)))))
+          (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "implement interface op" =
@@ -2297,28 +2297,28 @@ let%expect_test "implement interface op" =
     {|
     (Ok
      ((bindings
-       ((empty (Value (Struct (57 ())))) (Empty (Value (Type (StructType 57))))
-        (Make (Value (Type (InterfaceType 55))))))
+       ((empty (Value (Struct (74 ())))) (Empty (Value (Type (StructType 74))))
+        (Make (Value (Type (InterfaceType 72))))))
       (structs
-       ((57
+       ((74
          ((struct_fields ())
           (struct_methods
            ((new
              ((function_signature
-               ((function_params ()) (function_returns (StructType 57))))
-              (function_impl (Fn ((Return (Value (Struct (57 ())))))))))))
+               ((function_params ()) (function_returns (StructType 74))))
+              (function_impl (Fn ((Return (Value (Struct (74 ())))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType 55))))
+           (((impl_interface (Value (Type (InterfaceType 72))))
              (impl_methods
               ((new
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ()) (function_returns (StructType 57))))
-                   (function_impl (Fn ((Return (Value (Struct (57 ()))))))))))))))))
-          (struct_id 57)))))
+                    ((function_params ()) (function_returns (StructType 74))))
+                   (function_impl (Fn ((Return (Value (Struct (74 ()))))))))))))))))
+          (struct_id 74)))))
       (interfaces
-       ((55
+       ((72
          ((interface_methods
            ((new ((function_params ()) (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
@@ -2340,7 +2340,7 @@ let%expect_test "serializer inner struct" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((self (StructType 58)) (b (StructType 3))))
+             ((function_params ((self (StructType 75)) (b (StructType 3))))
               (function_returns (StructType 3))))
             (function_impl
              (Fn
@@ -2352,7 +2352,7 @@ let%expect_test "serializer inner struct" =
                        (Function
                         ((function_signature
                           ((function_params
-                            ((self (StructType 42)) (builder (StructType 3))))
+                            ((self (StructType 44)) (builder (StructType 3))))
                            (function_returns (StructType 3))))
                          (function_impl
                           (Fn
@@ -2361,24 +2361,24 @@ let%expect_test "serializer inner struct" =
                               ((ResolvedReference (serialize_int <opaque>))
                                ((Reference (builder (StructType 3)))
                                 (StructField
-                                 ((Reference (self (StructType 42))) value
+                                 ((Reference (self (StructType 44))) value
                                   IntegerType))
                                 (Value (Integer 32))))))))))))
                       ((StructField
-                        ((Reference (self (StructType 58))) y (StructType 42)))
+                        ((Reference (self (StructType 75))) y (StructType 44)))
                        (Reference (b (StructType 3)))))))))
                  (Return (Reference (b (StructType 3)))))))))))))
-        (Outer (Value (Type (StructType 58))))
-        (Inner (Value (Type (StructType 56))))))
+        (Outer (Value (Type (StructType 75))))
+        (Inner (Value (Type (StructType 73))))))
       (structs
-       ((58
+       ((75
          ((struct_fields
-           ((y ((field_type (StructType 42))))
-            (z ((field_type (StructType 56))))))
-          (struct_methods ()) (struct_impls ()) (struct_id 58)))
-        (56
-         ((struct_fields ((x ((field_type (StructType 42))))))
-          (struct_methods ()) (struct_impls ()) (struct_id 56)))))
+           ((y ((field_type (StructType 44))))
+            (z ((field_type (StructType 73))))))
+          (struct_methods ()) (struct_impls ()) (struct_id 75)))
+        (73
+         ((struct_fields ((x ((field_type (StructType 44))))))
+          (struct_methods ()) (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "reference resolving in inner functions" =
@@ -2524,24 +2524,24 @@ let%expect_test "union variants constructing" =
     (Ok
      ((bindings
        ((b
-         (Value (UnionVariant ((Struct (42 ((value (Value (Integer 1)))))) 56))))
-        (a (Value (UnionVariant ((Integer 10) 56))))
+         (Value (UnionVariant ((Struct (44 ((value (Value (Integer 1)))))) 73))))
+        (a (Value (UnionVariant ((Integer 10) 73))))
         (test
          (Value
           (Function
            ((function_signature
-             ((function_params ((value (UnionType 56))))
-              (function_returns (UnionType 56))))
-            (function_impl (Fn ((Return (Reference (value (UnionType 56)))))))))))
-        (Uni (Value (Type (UnionType 56))))))
+             ((function_params ((value (UnionType 73))))
+              (function_returns (UnionType 73))))
+            (function_impl (Fn ((Return (Reference (value (UnionType 73)))))))))))
+        (Uni (Value (Type (UnionType 73))))))
       (structs ())
       (unions
-       ((56
+       ((73
          ((cases
-           (((StructType 42) (Discriminator 1)) (IntegerType (Discriminator 0))))
+           (((StructType 44) (Discriminator 1)) (IntegerType (Discriminator 0))))
           (union_methods ())
           (union_impls
-           (((impl_interface (Value (Type (InterfaceType 9))))
+           (((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
@@ -2549,35 +2549,35 @@ let%expect_test "union variants constructing" =
                   ((function_signature
                     ((function_params
                       ((v (ExprType (Value (Type IntegerType))))))
-                     (function_returns (UnionType 56))))
+                     (function_returns (UnionType 73))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
                         ((Reference (v (ExprType (Value (Type IntegerType)))))
-                         56)))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 57))))
+                         73)))))))))))))
+            ((impl_interface (Value (Type (InterfaceType 74))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params
-                      ((v (ExprType (Value (Type (StructType 42)))))))
-                     (function_returns (UnionType 56))))
+                      ((v (ExprType (Value (Type (StructType 44)))))))
+                     (function_returns (UnionType 73))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
                         ((Reference
-                          (v (ExprType (Value (Type (StructType 42))))))
-                         56)))))))))))))))
-          (union_id 56)))))
+                          (v (ExprType (Value (Type (StructType 44))))))
+                         73)))))))))))))))
+          (union_id 73)))))
       (interfaces
-       ((57
+       ((74
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 42))))
+             ((function_params ((from (StructType 44))))
               (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
@@ -2600,7 +2600,7 @@ let%expect_test "unions duplicate variant" =
     (Error
      (((DuplicateVariant IntegerType)
        ((bindings
-         ((b (Value (Type (UnionType 58)))) (a (Value (Type (UnionType 56))))
+         ((b (Value (Type (UnionType 75)))) (a (Value (Type (UnionType 73))))
           (Test
            (Value
             (Function
@@ -2629,14 +2629,14 @@ let%expect_test "unions duplicate variant" =
                            (Function
                             ((function_signature
                               ((function_params ((v IntegerType)))
-                               (function_returns (UnionType 55))))
+                               (function_returns (UnionType 72))))
                              (function_impl
                               (Fn
                                ((Return
                                  (MakeUnionVariant
                                   ((Value
                                     (Type (ExprType (Reference (v IntegerType)))))
-                                   55)))))))))))))
+                                   72)))))))))))))
                       ((impl_interface
                         (FunctionCall
                          ((Value
@@ -2652,7 +2652,7 @@ let%expect_test "unions duplicate variant" =
                            (Function
                             ((function_signature
                               ((function_params ((v (Dependent T (TypeN 0)))))
-                               (function_returns (UnionType 55))))
+                               (function_returns (UnionType 72))))
                              (function_impl
                               (Fn
                                ((Return
@@ -2662,8 +2662,8 @@ let%expect_test "unions duplicate variant" =
                                      (ExprType
                                       (Reference
                                        (v (ExprType (Reference (T (TypeN 0)))))))))
-                                   55)))))))))))))))
-                    (mk_union_id 55)))))))
+                                   72)))))))))))))))
+                    (mk_union_id 72)))))))
               (function_impl
                (Fn
                 ((Return
@@ -2688,12 +2688,12 @@ let%expect_test "unions duplicate variant" =
                            (Function
                             ((function_signature
                               ((function_params ((v IntegerType)))
-                               (function_returns (UnionType 55))))
+                               (function_returns (UnionType 72))))
                              (function_impl
                               (Fn
                                ((Return
                                  (MakeUnionVariant
-                                  ((Reference (v IntegerType)) 55)))))))))))))
+                                  ((Reference (v IntegerType)) 72)))))))))))))
                       ((impl_interface
                         (FunctionCall
                          ((Value
@@ -2710,33 +2710,33 @@ let%expect_test "unions duplicate variant" =
                             ((function_signature
                               ((function_params
                                 ((v (ExprType (Reference (T (TypeN 0)))))))
-                               (function_returns (UnionType 55))))
+                               (function_returns (UnionType 72))))
                              (function_impl
                               (Fn
                                ((Return
                                  (MakeUnionVariant
                                   ((Reference
                                     (v (ExprType (Reference (T (TypeN 0))))))
-                                   55)))))))))))))))
-                    (mk_union_id 55)))))))))))))
+                                   72)))))))))))))))
+                    (mk_union_id 72)))))))))))))
         (structs ())
         (unions
-         ((58
+         ((75
            ((cases ((IntegerType (Discriminator 0)))) (union_methods ())
             (union_impls
-             (((impl_interface (Value (Type (InterfaceType 9))))
+             (((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((v IntegerType)))
-                       (function_returns (UnionType 58))))
+                       (function_returns (UnionType 75))))
                      (function_impl
                       (Fn
                        ((Return
-                         (MakeUnionVariant ((Reference (v IntegerType)) 58)))))))))))))
-              ((impl_interface (Value (Type (InterfaceType 9))))
+                         (MakeUnionVariant ((Reference (v IntegerType)) 75)))))))))))))
+              ((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
@@ -2744,33 +2744,33 @@ let%expect_test "unions duplicate variant" =
                     ((function_signature
                       ((function_params
                         ((v (ExprType (Reference (T (TypeN 0)))))))
-                       (function_returns (UnionType 58))))
+                       (function_returns (UnionType 75))))
                      (function_impl
                       (Fn
                        ((Return
                          (MakeUnionVariant
                           ((Reference (v (ExprType (Reference (T (TypeN 0))))))
-                           58)))))))))))))))
-            (union_id 58)))
-          (56
+                           75)))))))))))))))
+            (union_id 75)))
+          (73
            ((cases
              (((BuiltinType Builder) (Discriminator 1))
               (IntegerType (Discriminator 0))))
             (union_methods ())
             (union_impls
-             (((impl_interface (Value (Type (InterfaceType 9))))
+             (((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((v IntegerType)))
-                       (function_returns (UnionType 56))))
+                       (function_returns (UnionType 73))))
                      (function_impl
                       (Fn
                        ((Return
-                         (MakeUnionVariant ((Reference (v IntegerType)) 56)))))))))))))
-              ((impl_interface (Value (Type (InterfaceType 57))))
+                         (MakeUnionVariant ((Reference (v IntegerType)) 73)))))))))))))
+              ((impl_interface (Value (Type (InterfaceType 74))))
                (impl_methods
                 ((from
                   (Value
@@ -2778,16 +2778,16 @@ let%expect_test "unions duplicate variant" =
                     ((function_signature
                       ((function_params
                         ((v (ExprType (Reference (T (TypeN 0)))))))
-                       (function_returns (UnionType 56))))
+                       (function_returns (UnionType 73))))
                      (function_impl
                       (Fn
                        ((Return
                          (MakeUnionVariant
                           ((Reference (v (ExprType (Reference (T (TypeN 0))))))
-                           56)))))))))))))))
-            (union_id 56)))))
+                           73)))))))))))))))
+            (union_id 73)))))
         (interfaces
-         ((57
+         ((74
            ((interface_methods
              ((from
                ((function_params ((from (BuiltinType Builder))))
@@ -2810,23 +2810,23 @@ let%expect_test "unions" =
   [%expect
     {|
     (Ok
-     ((bindings ((Test (Value (Type (UnionType 57))))))
+     ((bindings ((Test (Value (Type (UnionType 74))))))
       (structs
-       ((55
+       ((72
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_methods
            ((new
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
             (serialize
              ((function_signature
                ((function_params
-                 ((self (StructType 55)) (builder (StructType 3))))
+                 ((self (StructType 72)) (builder (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -2835,12 +2835,12 @@ let%expect_test "unions" =
                    ((ResolvedReference (serialize_int <opaque>))
                     ((Reference (builder (StructType 3)))
                      (StructField
-                      ((Reference (self (StructType 55))) value IntegerType))
+                      ((Reference (self (StructType 72))) value IntegerType))
                      (Value (Integer 257)))))))))))
             (deserialize
              ((function_signature
                ((function_params ((s (StructType 6))))
-                (function_returns (StructType 8))))
+                (function_returns (StructType 10))))
               (function_impl
                (Fn
                 ((Block
@@ -2852,14 +2852,14 @@ let%expect_test "unions" =
                    (Return
                     (Value
                      (Struct
-                      (8
+                      (10
                        ((slice
                          (StructField
                           ((Reference (res (StructType 5))) slice (StructType 6))))
                         (value
                          (Value
                           (Struct
-                           (55
+                           (72
                             ((value
                               (StructField
                                ((Reference (res (StructType 5))) value
@@ -2867,11 +2867,11 @@ let%expect_test "unions" =
             (from
              ((function_signature
                ((function_params ((i IntegerType)))
-                (function_returns (StructType 55))))
+                (function_returns (StructType 72))))
               (function_impl
                (Fn
                 ((Return
-                  (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                  (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
           (struct_impls
            (((impl_interface (Value (Type (InterfaceType -1))))
              (impl_methods
@@ -2880,7 +2880,7 @@ let%expect_test "unions" =
                  (Function
                   ((function_signature
                     ((function_params
-                      ((self (StructType 55)) (builder (StructType 3))))
+                      ((self (StructType 72)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -2889,7 +2889,7 @@ let%expect_test "unions" =
                         ((ResolvedReference (serialize_int <opaque>))
                          ((Reference (builder (StructType 3)))
                           (StructField
-                           ((Reference (self (StructType 55))) value IntegerType))
+                           ((Reference (self (StructType 72))) value IntegerType))
                           (Value (Integer 257))))))))))))))))
             ((impl_interface (Value (Type (InterfaceType -3))))
              (impl_methods
@@ -2898,7 +2898,7 @@ let%expect_test "unions" =
                  (Function
                   ((function_signature
                     ((function_params ((s (StructType 6))))
-                     (function_returns (StructType 8))))
+                     (function_returns (StructType 10))))
                    (function_impl
                     (Fn
                      ((Block
@@ -2911,7 +2911,7 @@ let%expect_test "unions" =
                         (Return
                          (Value
                           (Struct
-                           (8
+                           (10
                             ((slice
                               (StructField
                                ((Reference (res (StructType 5))) slice
@@ -2919,80 +2919,80 @@ let%expect_test "unions" =
                              (value
                               (Value
                                (Struct
-                                (55
+                                (72
                                  ((value
                                    (StructField
                                     ((Reference (res (StructType 5))) value
                                      IntegerType)))))))))))))))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 9))))
+            ((impl_interface (Value (Type (InterfaceType 11))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 55))))
+                     (function_returns (StructType 72))))
                    (function_impl
                     (Fn
                      ((Return
                        (Value
-                        (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-          (struct_id 55)))))
+                        (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+          (struct_id 72)))))
       (unions
-       ((57
+       ((74
          ((cases
-           (((StructType 41) (Discriminator 1))
-            ((StructType 55) (Discriminator 0))))
+           (((StructType 43) (Discriminator 1))
+            ((StructType 72) (Discriminator 0))))
           (union_methods
            ((id
              ((function_signature
-               ((function_params ((self (UnionType 57))))
-                (function_returns (UnionType 57))))
-              (function_impl (Fn ((Return (Reference (self (UnionType 57)))))))))))
+               ((function_params ((self (UnionType 74))))
+                (function_returns (UnionType 74))))
+              (function_impl (Fn ((Return (Reference (self (UnionType 74)))))))))))
           (union_impls
-           (((impl_interface (Value (Type (InterfaceType 58))))
+           (((impl_interface (Value (Type (InterfaceType 75))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params
-                      ((v (ExprType (Value (Type (StructType 55)))))))
-                     (function_returns (UnionType 57))))
+                      ((v (ExprType (Value (Type (StructType 72)))))))
+                     (function_returns (UnionType 74))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
                         ((Reference
-                          (v (ExprType (Value (Type (StructType 55))))))
-                         57)))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 59))))
+                          (v (ExprType (Value (Type (StructType 72))))))
+                         74)))))))))))))
+            ((impl_interface (Value (Type (InterfaceType 76))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params
-                      ((v (ExprType (Value (Type (StructType 41)))))))
-                     (function_returns (UnionType 57))))
+                      ((v (ExprType (Value (Type (StructType 43)))))))
+                     (function_returns (UnionType 74))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
                         ((Reference
-                          (v (ExprType (Value (Type (StructType 41))))))
-                         57)))))))))))))))
-          (union_id 57)))))
+                          (v (ExprType (Value (Type (StructType 43))))))
+                         74)))))))))))))))
+          (union_id 74)))))
       (interfaces
-       ((59
+       ((76
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 41))))
+             ((function_params ((from (StructType 43))))
               (function_returns SelfType)))))))
-        (58
+        (75
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 55))))
+             ((function_params ((from (StructType 72))))
               (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
@@ -3017,9 +3017,9 @@ let%expect_test "methods monomorphization" =
     {|
     (Ok
      ((bindings
-       ((y (Value (Struct (58 ())))) (foo_empty (Value (Struct (59 ()))))
-        (Empty (Value (Type (StructType 58)))) (x (Value (Integer 10)))
-        (foo (Value (Struct (56 ()))))
+       ((y (Value (Struct (75 ())))) (foo_empty (Value (Struct (76 ()))))
+        (Empty (Value (Type (StructType 75)))) (x (Value (Integer 10)))
+        (foo (Value (Struct (73 ()))))
         (Foo
          (Value
           (Function
@@ -3035,36 +3035,36 @@ let%expect_test "methods monomorphization" =
                      (MkFunction
                       ((function_signature
                         ((function_params
-                          ((self (StructType 55))
+                          ((self (StructType 72))
                            (x (ExprType (Reference (X (TypeN 0)))))))
                          (function_returns (ExprType (Reference (X (TypeN 0)))))))
                        (function_impl
                         (Fn
                          ((Return
                            (Reference (x (ExprType (Reference (X (TypeN 0)))))))))))))))
-                  (mk_impls ()) (mk_struct_id 55)))))))))))))
+                  (mk_impls ()) (mk_struct_id 72)))))))))))))
       (structs
-       ((59
+       ((76
          ((struct_fields ())
           (struct_methods
            ((id
              ((function_signature
-               ((function_params ((self (StructType 59)) (x (StructType 58))))
-                (function_returns (StructType 58))))
-              (function_impl (Fn ((Return (Reference (x (StructType 58)))))))))))
-          (struct_impls ()) (struct_id 59)))
-        (58
+               ((function_params ((self (StructType 76)) (x (StructType 75))))
+                (function_returns (StructType 75))))
+              (function_impl (Fn ((Return (Reference (x (StructType 75)))))))))))
+          (struct_impls ()) (struct_id 76)))
+        (75
          ((struct_fields ()) (struct_methods ()) (struct_impls ())
-          (struct_id 58)))
-        (56
+          (struct_id 75)))
+        (73
          ((struct_fields ())
           (struct_methods
            ((id
              ((function_signature
-               ((function_params ((self (StructType 56)) (x IntegerType)))
+               ((function_params ((self (StructType 73)) (x IntegerType)))
                 (function_returns IntegerType)))
               (function_impl (Fn ((Return (Reference (x IntegerType))))))))))
-          (struct_impls ()) (struct_id 56)))))
+          (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
 let%expect_test "switch statement" =
@@ -3094,70 +3094,70 @@ let%expect_test "switch statement" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((i (UnionType 56))))
+             ((function_params ((i (UnionType 73))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               ((Break
                 (Switch
-                 ((switch_condition (Reference (i (UnionType 56))))
+                 ((switch_condition (Reference (i (UnionType 73))))
                   (branches
-                   (((branch_ty (StructType 42)) (branch_var vax)
+                   (((branch_ty (StructType 44)) (branch_var vax)
                      (branch_stmt (Block ((Return (Value (Integer 32)))))))
-                    ((branch_ty (StructType 41)) (branch_var vax)
+                    ((branch_ty (StructType 43)) (branch_var vax)
                      (branch_stmt (Block ((Return (Value (Integer 64)))))))))))))))))))
-        (Ints (Value (Type (UnionType 56))))))
+        (Ints (Value (Type (UnionType 73))))))
       (structs ())
       (unions
-       ((56
+       ((73
          ((cases
-           (((StructType 41) (Discriminator 1))
-            ((StructType 42) (Discriminator 0))))
+           (((StructType 43) (Discriminator 1))
+            ((StructType 44) (Discriminator 0))))
           (union_methods ())
           (union_impls
-           (((impl_interface (Value (Type (InterfaceType 57))))
+           (((impl_interface (Value (Type (InterfaceType 74))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params
-                      ((v (ExprType (Value (Type (StructType 42)))))))
-                     (function_returns (UnionType 56))))
+                      ((v (ExprType (Value (Type (StructType 44)))))))
+                     (function_returns (UnionType 73))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
                         ((Reference
-                          (v (ExprType (Value (Type (StructType 42))))))
-                         56)))))))))))))
-            ((impl_interface (Value (Type (InterfaceType 58))))
+                          (v (ExprType (Value (Type (StructType 44))))))
+                         73)))))))))))))
+            ((impl_interface (Value (Type (InterfaceType 75))))
              (impl_methods
               ((from
                 (Value
                  (Function
                   ((function_signature
                     ((function_params
-                      ((v (ExprType (Value (Type (StructType 41)))))))
-                     (function_returns (UnionType 56))))
+                      ((v (ExprType (Value (Type (StructType 43)))))))
+                     (function_returns (UnionType 73))))
                    (function_impl
                     (Fn
                      ((Return
                        (MakeUnionVariant
                         ((Reference
-                          (v (ExprType (Value (Type (StructType 41))))))
-                         56)))))))))))))))
-          (union_id 56)))))
+                          (v (ExprType (Value (Type (StructType 43))))))
+                         73)))))))))))))))
+          (union_id 73)))))
       (interfaces
-       ((58
+       ((75
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 41))))
+             ((function_params ((from (StructType 43))))
               (function_returns SelfType)))))))
-        (57
+        (74
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 42))))
+             ((function_params ((from (StructType 44))))
               (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]
 
@@ -3234,24 +3234,24 @@ let%expect_test "let binding with type" =
     {|
       (Ok
        ((bindings
-         ((a (Value (Struct (42 ((value (Value (Integer 2))))))))
-          (a (Value (Struct (55 ((value (Value (Integer 1))))))))))
+         ((a (Value (Struct (44 ((value (Value (Integer 2))))))))
+          (a (Value (Struct (72 ((value (Value (Integer 1))))))))))
         (structs
-         ((55
+         ((72
            ((struct_fields ((value ((field_type IntegerType)))))
             (struct_methods
              ((new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 55)) (builder (StructType 3))))
+                   ((self (StructType 72)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -3260,12 +3260,12 @@ let%expect_test "let binding with type" =
                      ((ResolvedReference (serialize_int <opaque>))
                       ((Reference (builder (StructType 3)))
                        (StructField
-                        ((Reference (self (StructType 55))) value IntegerType))
+                        ((Reference (self (StructType 72))) value IntegerType))
                        (Value (Integer 257)))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 6))))
-                  (function_returns (StructType 8))))
+                  (function_returns (StructType 10))))
                 (function_impl
                  (Fn
                   ((Block
@@ -3277,14 +3277,14 @@ let%expect_test "let binding with type" =
                      (Return
                       (Value
                        (Struct
-                        (8
+                        (10
                          ((slice
                            (StructField
                             ((Reference (res (StructType 5))) slice (StructType 6))))
                           (value
                            (Value
                             (Struct
-                             (55
+                             (72
                               ((value
                                 (StructField
                                  ((Reference (res (StructType 5))) value
@@ -3292,11 +3292,11 @@ let%expect_test "let binding with type" =
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 55))))
+                  (function_returns (StructType 72))))
                 (function_impl
                  (Fn
                   ((Return
-                    (Value (Struct (55 ((value (Reference (i IntegerType)))))))))))))))
+                    (Value (Struct (72 ((value (Reference (i IntegerType)))))))))))))))
             (struct_impls
              (((impl_interface (Value (Type (InterfaceType -1))))
                (impl_methods
@@ -3305,7 +3305,7 @@ let%expect_test "let binding with type" =
                    (Function
                     ((function_signature
                       ((function_params
-                        ((self (StructType 55)) (builder (StructType 3))))
+                        ((self (StructType 72)) (builder (StructType 3))))
                        (function_returns (StructType 3))))
                      (function_impl
                       (Fn
@@ -3314,7 +3314,7 @@ let%expect_test "let binding with type" =
                           ((ResolvedReference (serialize_int <opaque>))
                            ((Reference (builder (StructType 3)))
                             (StructField
-                             ((Reference (self (StructType 55))) value IntegerType))
+                             ((Reference (self (StructType 72))) value IntegerType))
                             (Value (Integer 257))))))))))))))))
               ((impl_interface (Value (Type (InterfaceType -3))))
                (impl_methods
@@ -3323,7 +3323,7 @@ let%expect_test "let binding with type" =
                    (Function
                     ((function_signature
                       ((function_params ((s (StructType 6))))
-                       (function_returns (StructType 8))))
+                       (function_returns (StructType 10))))
                      (function_impl
                       (Fn
                        ((Block
@@ -3336,7 +3336,7 @@ let%expect_test "let binding with type" =
                           (Return
                            (Value
                             (Struct
-                             (8
+                             (10
                               ((slice
                                 (StructField
                                  ((Reference (res (StructType 5))) slice
@@ -3344,25 +3344,25 @@ let%expect_test "let binding with type" =
                                (value
                                 (Value
                                  (Struct
-                                  (55
+                                  (72
                                    ((value
                                      (StructField
                                       ((Reference (res (StructType 5))) value
                                        IntegerType)))))))))))))))))))))))))
-              ((impl_interface (Value (Type (InterfaceType 9))))
+              ((impl_interface (Value (Type (InterfaceType 11))))
                (impl_methods
                 ((from
                   (Value
                    (Function
                     ((function_signature
                       ((function_params ((i IntegerType)))
-                       (function_returns (StructType 55))))
+                       (function_returns (StructType 72))))
                      (function_impl
                       (Fn
                        ((Return
                          (Value
-                          (Struct (55 ((value (Reference (i IntegerType))))))))))))))))))))
-            (struct_id 55)))))
+                          (Struct (72 ((value (Reference (i IntegerType))))))))))))))))))))
+            (struct_id 72)))))
         (type_counter <opaque>) (memoized_fcalls <opaque>)))
       |}]
 
@@ -3408,7 +3408,7 @@ let%expect_test "interface constraints" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 57))))
+             ((function_params ((t (StructType 74))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
@@ -3417,18 +3417,18 @@ let%expect_test "interface constraints" =
                  ((Value
                    (Function
                     ((function_signature
-                      ((function_params ((self (StructType 57))))
+                      ((function_params ((self (StructType 74))))
                        (function_returns IntegerType)))
                      (function_impl (Fn ((Return (Value (Integer 1)))))))))
-                  ((Reference (t (StructType 57))))))))))))))
+                  ((Reference (t (StructType 74))))))))))))))
         (test
          (Value
           (Function
            ((function_signature
-             ((function_params ((T (InterfaceType 55))))
+             ((function_params ((T (InterfaceType 72))))
               (function_returns
                (FunctionType
-                ((function_params ((t (Dependent T (InterfaceType 55)))))
+                ((function_params ((t (Dependent T (InterfaceType 72)))))
                  (function_returns IntegerType))))))
             (function_impl
              (Fn
@@ -3436,45 +3436,45 @@ let%expect_test "interface constraints" =
                 (MkFunction
                  ((function_signature
                    ((function_params
-                     ((t (ExprType (Reference (T (InterfaceType 55)))))))
+                     ((t (ExprType (Reference (T (InterfaceType 72)))))))
                     (function_returns IntegerType)))
                   (function_impl
                    (Fn
                     ((Return
                       (IntfMethodCall
-                       ((intf_instance (Reference (T (InterfaceType 55))))
-                        (intf_def 55)
+                       ((intf_instance (Reference (T (InterfaceType 72))))
+                        (intf_def 72)
                         (intf_method
                          (beep
                           ((function_params ((self SelfType)))
                            (function_returns IntegerType))))
                         (intf_args
                          ((Reference
-                           (t (ExprType (Reference (T (InterfaceType 55))))))))))))))))))))))))
-        (BeeperImpl1 (Value (Type (StructType 57))))
-        (Beep (Value (Type (InterfaceType 55))))))
+                           (t (ExprType (Reference (T (InterfaceType 72))))))))))))))))))))))))
+        (BeeperImpl1 (Value (Type (StructType 74))))
+        (Beep (Value (Type (InterfaceType 72))))))
       (structs
-       ((57
+       ((74
          ((struct_fields ())
           (struct_methods
            ((beep
              ((function_signature
-               ((function_params ((self (StructType 57))))
+               ((function_params ((self (StructType 74))))
                 (function_returns IntegerType)))
               (function_impl (Fn ((Return (Value (Integer 1))))))))))
           (struct_impls
-           (((impl_interface (Value (Type (InterfaceType 55))))
+           (((impl_interface (Value (Type (InterfaceType 72))))
              (impl_methods
               ((beep
                 (Value
                  (Function
                   ((function_signature
-                    ((function_params ((self (StructType 57))))
+                    ((function_params ((self (StructType 74))))
                      (function_returns IntegerType)))
                    (function_impl (Fn ((Return (Value (Integer 1)))))))))))))))
-          (struct_id 57)))))
+          (struct_id 74)))))
       (interfaces
-       ((55
+       ((72
          ((interface_methods
            ((beep
              ((function_params ((self SelfType))) (function_returns IntegerType)))))))))
@@ -3506,23 +3506,23 @@ let%expect_test "destructuring let" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 56))))
+             ((function_params ((t (StructType 73))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               ((Block
                 ((DestructuringLet
                   ((destructuring_let ((x x) (y y2) (z z)))
-                   (destructuring_let_expr (Reference (t (StructType 56))))
+                   (destructuring_let_expr (Reference (t (StructType 73))))
                    (destructuring_let_rest false)))
                  (Return (Reference (y2 HoleType))))))))))))
-        (T (Value (Type (StructType 56))))))
+        (T (Value (Type (StructType 73))))))
       (structs
-       ((56
+       ((73
          ((struct_fields
            ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
             (z ((field_type IntegerType)))))
-          (struct_methods ()) (struct_impls ()) (struct_id 56)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)))
  |}]
 
@@ -3544,53 +3544,53 @@ let%expect_test "destructuring let with missing fields" =
   [%expect
     {|
     (Error
-     (((MissingField (56 x))
+     (((MissingField (73 x))
        ((bindings
          ((test
            (Value
             (Function
              ((function_signature
-               ((function_params ((t (StructType 56))))
+               ((function_params ((t (StructType 73))))
                 (function_returns IntegerType)))
               (function_impl
                (Fn
                 ((Block
                   ((DestructuringLet
                     ((destructuring_let ((y y2)))
-                     (destructuring_let_expr (Reference (t (StructType 56))))
+                     (destructuring_let_expr (Reference (t (StructType 73))))
                      (destructuring_let_rest false)))
                    (Return (Reference (y2 HoleType))))))))))))
-          (T (Value (Type (StructType 56))))))
+          (T (Value (Type (StructType 73))))))
         (structs
-         ((56
+         ((73
            ((struct_fields
              ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
               (z ((field_type IntegerType)))))
-            (struct_methods ()) (struct_impls ()) (struct_id 56)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 73)))))
         (type_counter <opaque>) (memoized_fcalls <opaque>)))
-      ((MissingField (56 z))
+      ((MissingField (73 z))
        ((bindings
          ((test
            (Value
             (Function
              ((function_signature
-               ((function_params ((t (StructType 56))))
+               ((function_params ((t (StructType 73))))
                 (function_returns IntegerType)))
               (function_impl
                (Fn
                 ((Block
                   ((DestructuringLet
                     ((destructuring_let ((y y2)))
-                     (destructuring_let_expr (Reference (t (StructType 56))))
+                     (destructuring_let_expr (Reference (t (StructType 73))))
                      (destructuring_let_rest false)))
                    (Return (Reference (y2 HoleType))))))))))))
-          (T (Value (Type (StructType 56))))))
+          (T (Value (Type (StructType 73))))))
         (structs
-         ((56
+         ((73
            ((struct_fields
              ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
               (z ((field_type IntegerType)))))
-            (struct_methods ()) (struct_impls ()) (struct_id 56)))))
+            (struct_methods ()) (struct_impls ()) (struct_id 73)))))
         (type_counter <opaque>) (memoized_fcalls <opaque>)))))
  |}]
 
@@ -3617,22 +3617,22 @@ let%expect_test "destructuring let with missing fields ignored" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 56))))
+             ((function_params ((t (StructType 73))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               ((Block
                 ((DestructuringLet
                   ((destructuring_let ((y y2)))
-                   (destructuring_let_expr (Reference (t (StructType 56))))
+                   (destructuring_let_expr (Reference (t (StructType 73))))
                    (destructuring_let_rest true)))
                  (Return (Reference (y2 HoleType))))))))))))
-        (T (Value (Type (StructType 56))))))
+        (T (Value (Type (StructType 73))))))
       (structs
-       ((56
+       ((73
          ((struct_fields
            ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
             (z ((field_type IntegerType)))))
-          (struct_methods ()) (struct_impls ()) (struct_id 56)))))
+          (struct_methods ()) (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)))
  |}]

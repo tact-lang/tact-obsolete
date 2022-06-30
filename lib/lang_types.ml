@@ -175,6 +175,7 @@ and primitive =
   | Equality of {x : expr; y : expr}
   | EmptyBuilder
   | StoreInt of {builder : expr; length : expr; integer : expr; signed : bool}
+  | StoreCoins of {builder : expr; coins : expr}
   | BuildCell of {builder : expr}
   | SendRawMsg of {msg : expr; flags : expr}
   | ParseCell of {cell : expr}
@@ -408,10 +409,11 @@ let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
 module Program = struct
   let methods_of p = function
-    | StructType s ->
+    (* TODO: fix expr type *)
+    | StructType s | ExprType (Value (Type (StructType s))) ->
         List.find_map_exn p.structs ~f:(fun (id, s') ->
             if equal_int id s then Some s'.struct_methods else None )
-    | UnionType u ->
+    | UnionType u | ExprType (Value (Type (UnionType u))) ->
         List.find_map_exn p.unions ~f:(fun (id, u') ->
             if equal_int id u then Some u'.union_methods else None )
     | _ ->

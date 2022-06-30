@@ -75,6 +75,9 @@ let%expect_test "simple function generation" =
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
     }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -131,6 +134,9 @@ let%expect_test "passing struct to a function" =
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
     }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -182,6 +188,9 @@ let%expect_test "function calls" =
     }
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
+    }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -239,6 +248,9 @@ let%expect_test "Int(bits) serializer codegen" =
     }
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
+    }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -310,6 +322,9 @@ let%expect_test "demo struct serializer" =
     }
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
+    }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -396,6 +411,9 @@ let%expect_test "demo struct serializer 2" =
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
     }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -478,6 +496,9 @@ let%expect_test "true and false" =
       slice builtin_slice_begin_parse(cell c) {
         return begin_parse(c);
       }
+      int builtin_builder_store_coins(builder b, int c) {
+        return store_grams(b, c);
+      }
       builder builtin_builder_store_int(builder b, int int_, int bits) {
         return store_int(b, int_, bits);
       }
@@ -539,6 +560,9 @@ let%expect_test "if/then/else" =
       slice builtin_slice_begin_parse(cell c) {
         return begin_parse(c);
       }
+      int builtin_builder_store_coins(builder b, int c) {
+        return store_grams(b, c);
+      }
       builder builtin_builder_store_int(builder b, int int_, int bits) {
         return store_int(b, int_, bits);
       }
@@ -595,6 +619,9 @@ let%expect_test "serializer inner struct" =
     }
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
+    }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -663,6 +690,9 @@ let%expect_test "unions" =
     }
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
+    }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -734,6 +764,9 @@ let%expect_test "switch statement" =
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
     }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -803,6 +836,9 @@ let%expect_test "tensor2" =
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
     }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -866,6 +902,9 @@ let%expect_test "serialization api" =
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
     }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -885,7 +924,15 @@ let%expect_test "serialization api" =
       builder b = builtin_builder_store_int(self, int_, bits);
       return b;
     }
+    builder f11(int self, builder builder_) {
+      return f3(builder_, self, 9);
+    }
+    builder f12(int self, builder builder_) {
+      return f3(builder_, self, 8);
+    }
     builder f10([int, int, int] self, builder b) {
+      builder b = f11(first(self), b);
+      builder b = f12(second(self), b);
       return b;
     }
     builder f9([int, int, int] self, builder b) {
@@ -893,12 +940,17 @@ let%expect_test "serialization api" =
       builder b = f10(self, b);
       return b;
     }
-    builder f12([int, int] self, builder b) {
+    builder f15(int self, builder builder_) {
+      return f3(builder_, self, 256);
+    }
+    builder f14([int, int] self, builder b) {
+      builder b = f12(first(self), b);
+      builder b = f15(second(self), b);
       return b;
     }
-    builder f11([int, int] self, builder b) {
+    builder f13([int, int] self, builder b) {
       builder b = f3(b, 0, 0);
-      return f12(self, b);
+      return f14(self, b);
     }
     builder f8(tuple self, builder b) {
       {
@@ -911,7 +963,7 @@ let%expect_test "serialization api" =
     {
       int b = store_uint(b, 1, 1);
     builder b =
-    f11(var, b);
+    f13(var, b);
     return
     b;
     }} else if (discr == 1)
@@ -929,18 +981,15 @@ let%expect_test "serialization api" =
     builder f7(tuple self, builder b) {
       return f8(self, b);
     }
-    builder f16(int self, builder builder_) {
-      return f3(builder_, self, 9);
-    }
-    builder f15([int, int] self, builder b) {
-      builder b = f16(first(self), b);
+    builder f18([int, int] self, builder b) {
+      builder b = f11(first(self), b);
       builder b = f3(b, second(self), first(self));
       return b;
     }
-    builder f17([] self, builder b) {
+    builder f19([] self, builder b) {
       return b;
     }
-    builder f14(tuple self, builder b) {
+    builder f17(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
@@ -951,7 +1000,7 @@ let%expect_test "serialization api" =
     {
       int b = store_uint(b, 1, 1);
     builder b =
-    f17(var, b);
+    f19(var, b);
     return
     b;
     }} else if (discr == 1)
@@ -960,14 +1009,14 @@ let%expect_test "serialization api" =
     {
       int b = store_uint(b, 0, 1);
     builder b =
-    f15(var, b);
+    f18(var, b);
     return
     b;
     }} else
     {
       }}}
-    builder f13(tuple self, builder b) {
-      return f14(self, b);
+    builder f16(tuple self, builder b) {
+      return f17(self, b);
     }
     builder f6(tuple self, builder b) {
       {
@@ -980,7 +1029,7 @@ let%expect_test "serialization api" =
     {
       int b = store_uint(b, 1, 1);
     builder b =
-    f13(var, b);
+    f16(var, b);
     return
     b;
     }} else if (discr == 1)
@@ -998,25 +1047,88 @@ let%expect_test "serialization api" =
     builder f5(tuple self, builder b) {
       return f6(self, b);
     }
-    builder f18(int self, builder builder_) {
+    builder f20(int self, builder builder_) {
       return f3(builder_, self, 64);
     }
-    builder f19(int self, builder builder_) {
+    builder f21(int self, builder builder_) {
       return f3(builder_, self, 32);
     }
     builder f4([tuple, tuple, int, int] self, builder b) {
       builder b = f5(first(self), b);
-      builder b = f13(second(self), b);
-      builder b = f18(third(self), b);
-      builder b = f19(fourth(self), b);
+      builder b = f16(second(self), b);
+      builder b = f20(third(self), b);
+      builder b = f21(fourth(self), b);
       return b;
+    }
+    builder f26(int self, builder builder_) {
+      return f3(builder_, self, 1);
+    }
+    builder f25([int, int, int] self, builder b) {
+      builder b = f26(first(self), b);
+      builder b = f26(second(self), b);
+      builder b = f26(third(self), b);
+      return b;
+    }
+    builder f24([int, int, int] self, builder b) {
+      return f25(self, b);
+    }
+    builder f28([tuple, tuple] self, builder b) {
+      builder b = f7(first(self), b);
+      builder b = f7(second(self), b);
+      return b;
+    }
+    builder f27([tuple, tuple] self, builder b) {
+      return f28(self, b);
+    }
+    builder f32(builder self, int c) {
+      int b = builtin_builder_store_coins(self, c);
+      return b;
+    }
+    builder f31(int self, builder builder_) {
+      return f32(builder_, self);
+    }
+    builder f30([int, int] self, builder b) {
+      builder b = f31(first(self), b);
+      builder b = f31(second(self), b);
+      return b;
+    }
+    builder f29([int, int] self, builder b) {
+      return f30(self, b);
+    }
+    builder f34([int, int] self, builder b) {
+      builder b = f20(first(self), b);
+      builder b = f21(second(self), b);
+      return b;
+    }
+    builder f33([int, int] self, builder b) {
+      return f34(self, b);
+    }
+    builder f23([[int, int, int], [tuple, tuple], [int, int], [int, int]]
+        self, builder b) {
+      builder b = f24(first(self), b);
+      builder b = f27(second(self), b);
+      builder b = f29(third(self), b);
+      builder b = f33(fourth(self), b);
+      return b;
+    }
+    builder f22([[int, int, int], [tuple, tuple], [int, int], [int, int]]
+        self, builder b) {
+      return f23(self, b);
     }
     builder f2(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
     first(temp);
-    if (discr == 0)
+    if (discr == 1)
+    {
+      [[int, int, int], [tuple, tuple], [int, int], [int, int]] info =
+        second(temp);
+    {
+      builder b = f3(b, 0, 1);
+    return
+    f22(info, b);
+    }} else if (discr == 0)
     {
       [tuple, tuple, int, int] info = second(temp);
     {
@@ -1026,14 +1138,14 @@ let%expect_test "serialization api" =
     }} else
     {
       }}}
-    builder f20([] self, builder b) {
+    builder f35([] self, builder b) {
       return b;
     }
     builder f1([tuple, []] self, builder b) {
       builder b = f2(first(self), b);
       builder b = f3(b, 0, 1);
       builder b = f3(b, 0, 1);
-      builder b = f20(second(self), b);
+      builder b = f35(second(self), b);
       return b;
     }
     _ test([tuple, []] m) {
@@ -1086,6 +1198,9 @@ let%expect_test "deserialization api" =
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
     }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
+    }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
     }
@@ -1107,114 +1222,99 @@ let%expect_test "deserialization api" =
       int int_ = tensor2_value2(output);
       return [slice_, int_];
     }
-    [slice, int] f8(slice s) {
+    [slice, int] f7(slice s) {
       [slice, int] res = f3(s, 9);
       return [first(res), second(res)];
     }
-    [slice, int] f9(slice s) {
+    [slice, int] f8(slice s) {
       [slice, int] res = f3(s, 8);
       return [first(res), second(res)];
     }
-    [slice, [int, int, int]] f10(slice s, [int, int, int] v) {
+    [slice, [int, int, int]] f9(slice s, [int, int, int] v) {
       return [s, v];
     }
-    [slice, [int, int, int]] f7(slice s) {
+    [slice, [int, int, int]] f6(slice s) {
       [slice, int] res_anycast = f3(s, 1);
       if (builtin_equal(second(res_anycast), 0)) {
-      [slice, int] res_len = f8(first(res_anycast));
+      [slice, int] res_len = f7(first(res_anycast));
     [slice, int] res_workchain =
-    f9(first(res_len));
+    f8(first(res_len));
     [slice, int] res_address =
     f3(first(res_workchain), res_len);
     return
-    f10(first(res_address), [second(res_len), second(res_workchain), second(res_address)]);
+    f9(first(res_address), [second(res_len), second(res_workchain), second(res_address)]);
     } else
     {
       }}
-    [slice, tuple] f11(slice s, tuple v) {
+    [slice, tuple] f10(slice s, tuple v) {
       return [s, v];
     }
-    [slice, int] f13(slice s) {
+    [slice, int] f12(slice s) {
       [slice, int] res = f3(s, 256);
       return [first(res), second(res)];
     }
-    [slice, [int, int]] f14(slice s, [int, int] v) {
+    [slice, [int, int]] f13(slice s, [int, int] v) {
       return [s, v];
     }
-    [slice, [int, int]] f12(slice s) {
+    [slice, [int, int]] f11(slice s) {
       [slice, int] res_anycast = f3(s, 1);
       if (builtin_equal(second(res_anycast), 0)) {
-      [slice, int] res_workchain = f9(first(res_anycast));
+      [slice, int] res_workchain = f8(first(res_anycast));
     [slice, int] res_address =
-    f13(first(res_workchain));
+    f12(first(res_workchain));
     return
-    f14(first(res_address), [second(res_workchain), second(res_address)]);
-    } else
-    {
-      }}
-    [slice, tuple] f6(slice s) {
-      [slice, int] res_discr = f3(s, 1);
-      if (builtin_equal(second(res_discr), 0)) {
-      [slice, [int, int]] res_addr = f12(second(res_discr));
-    return
-    f11(first(res_addr), second(res_addr));
-    } else
-    {
-      [slice, [int, int, int]] res_addr = f7(first(res_discr));
-    return
-    f11(first(res_addr), second(res_addr));
-    }}
-    [slice, tuple] f15(slice s, tuple v) {
-      return [s, v];
-    }
-    [slice, [int, int]] f17(slice s) {
-      [slice, int] res_len = f8(s);
-      [slice, int] res_bits = f3(first(res_len), second(res_len));
-      return [first(res_bits), [second(res_len), second(res_bits)]];
-    }
-    [slice, tuple] f18(slice s, tuple v) {
-      return [s, v];
-    }
-    [slice, tuple] f16(slice s) {
-      [slice, int] res_discr = f3(s, 1);
-      if (builtin_equal(second(res_discr), 0)) {
-      return f18(first(res_discr), []);
-    } else if (builtin_equal(second(res_discr), 1))
-    {
-      [slice, [int, int]] res_addr = f17(first(res_discr));
-    return
-    f18(first(res_addr), second(res_addr));
+    f13(first(res_address), [second(res_workchain), second(res_address)]);
     } else
     {
       }}
     [slice, tuple] f5(slice s) {
       [slice, int] res_discr = f3(s, 1);
       if (builtin_equal(second(res_discr), 0)) {
-      [slice, tuple] res_addr = f16(second(res_discr));
+      [slice, [int, int]] res_addr = f11(second(res_discr));
     return
-    f15(first(res_addr), second(res_addr));
+    f10(first(res_addr), second(res_addr));
     } else
     {
-      [slice, tuple] res_addr = f6(first(res_discr));
+      [slice, [int, int, int]] res_addr = f6(first(res_discr));
     return
-    f15(first(res_addr), second(res_addr));
+    f10(first(res_addr), second(res_addr));
     }}
-    [slice, int] f19(slice s) {
+    [slice, [int, int]] f15(slice s) {
+      [slice, int] res_len = f7(s);
+      [slice, int] res_bits = f3(first(res_len), second(res_len));
+      return [first(res_bits), [second(res_len), second(res_bits)]];
+    }
+    [slice, tuple] f16(slice s, tuple v) {
+      return [s, v];
+    }
+    [slice, tuple] f14(slice s) {
+      [slice, int] res_discr = f3(s, 1);
+      if (builtin_equal(second(res_discr), 0)) {
+      return f16(first(res_discr), []);
+    } else if (builtin_equal(second(res_discr), 1))
+    {
+      [slice, [int, int]] res_addr = f15(first(res_discr));
+    return
+    f16(first(res_addr), second(res_addr));
+    } else
+    {
+      }}
+    [slice, int] f17(slice s) {
       [slice, int] res = f3(s, 64);
       return [first(res), second(res)];
     }
-    [slice, [tuple, tuple, int, int]] f20(slice s, [tuple, tuple, int, int] v) {
+    [slice, [tuple, tuple, int, int]] f18(slice s, [tuple, tuple, int, int] v) {
       return [s, v];
     }
     [slice, [tuple, tuple, int, int]] f4(slice s) {
       [slice, tuple] res_src = f5(s);
-      [slice, tuple] res_dest = f16(first(res_src));
-      [slice, int] res_created_lt = f19(first(res_dest));
-      [slice, int] res_created_at = f19(first(res_created_lt));
+      [slice, tuple] res_dest = f14(first(res_src));
+      [slice, int] res_created_lt = f17(first(res_dest));
+      [slice, int] res_created_at = f17(first(res_created_lt));
       return
-        f20(first(res_created_at), [second(res_src), second(res_dest), second(res_created_lt), second(res_created_at)]);
+        f18(first(res_created_at), [second(res_src), second(res_dest), second(res_created_lt), second(res_created_at)]);
     }
-    [slice, tuple] f21(slice s, tuple v) {
+    [slice, tuple] f19(slice s, tuple v) {
       return [s, v];
     }
     [slice, tuple] f2(slice s) {
@@ -1229,15 +1329,15 @@ let%expect_test "deserialization api" =
     {
       [slice, [tuple, tuple, int, int]] res_info = f4(first(res_discr2));
     return
-    f21(first(res_info), second(res_info));
+    f19(first(res_info), second(res_info));
     }}}
-    [slice, []] f23(slice s, [] v) {
+    [slice, []] f21(slice s, [] v) {
       return [s, v];
     }
-    [slice, []] f22(slice s) {
-      return f23(s, []);
+    [slice, []] f20(slice s) {
+      return f21(s, []);
     }
-    [slice, [tuple, []]] f24(slice s, [tuple, []] v) {
+    [slice, [tuple, []]] f22(slice s, [tuple, []] v) {
       return [s, v];
     }
     [slice, [tuple, []]] f1(slice s) {
@@ -1247,11 +1347,11 @@ let%expect_test "deserialization api" =
       [slice, int] res_body_discr = f3(first(res_init), 1);
     if (builtin_equal(second(res_body_discr), 0))
     {
-      [slice, []] body = f22(first(res_body_discr));
+      [slice, []] body = f20(first(res_body_discr));
     [tuple, _] mes =
     [second(res_info), second(body)];
     return
-    f24(first(body), mes);
+    f22(first(body), mes);
     } else
     {
       }} else
@@ -1305,6 +1405,9 @@ let%expect_test "destructuring let" =
     }
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
+    }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
@@ -1367,6 +1470,9 @@ let%expect_test "destructuring let with rest ignored" =
     }
     slice builtin_slice_begin_parse(cell c) {
       return begin_parse(c);
+    }
+    int builtin_builder_store_coins(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_builder_store_int(builder b, int int_, int bits) {
       return store_int(b, int_, bits);
