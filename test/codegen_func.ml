@@ -1385,3 +1385,115 @@ let%expect_test "destructuring let with rest ignored" =
       return y2;
     }
  |}]
+
+let%expect_test "demo serializer interface derivation" =
+  let source =
+    {|
+      let T = derive_serialize(struct {
+        val a: Int(32)
+        val b: Int(16)
+      });
+
+      let U = derive_serialize(union {
+         case T
+      });
+
+      fn test() {
+        let b = Builder.new();
+        let t = T{a: Int(32).new(0), b: Int(16).new(1)};
+        let u: U = t;
+        let b = t.serialize(b);
+        let b = u.serialize(b);
+      }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int builtin_equal(int x, int y) {
+      return x == y;
+    }
+    _ builtin_send_raw_msg(cell msg, int flags) {
+      return send_raw_message(msg, flags);
+    }
+    (int, int) builtin_divmod(int x, int y) {
+      return divmod(x, y);
+    }
+    (slice, int) builtin_slice_load_int(slice s, int bits) {
+      return load_int(s, bits);
+    }
+    _ builtin_slice_end_parse(slice s) {
+      return end_parse(s);
+    }
+    slice builtin_slice_begin_parse(cell c) {
+      return begin_parse(c);
+    }
+    builder builtin_builder_store_int(builder b, int int_, int bits) {
+      return store_int(b, int_, bits);
+    }
+    cell builtin_builder_build(builder b) {
+      return end_cell(b);
+    }
+    builder builtin_builder_new() {
+      return begin_cell();
+    }
+    _ send_raw_msg(cell msg, int flags) {
+      builtin_send_raw_msg(msg, flags);
+    }
+    builder f0() {
+      return builtin_builder_new();
+    }
+    int f1(int i) {
+      return i;
+    }
+    int f2(int i) {
+      return i;
+    }
+    builder f5(builder self, int int_, int bits) {
+      builder b = builtin_builder_store_int(self, int_, bits);
+      return b;
+    }
+    builder f4(int self, builder builder_) {
+      return f5(builder_, self, 32);
+    }
+    builder f6(int self, builder builder_) {
+      return f5(builder_, self, 16);
+    }
+    builder f3([int, int] self, builder b) {
+      builder b = f4(first(self), b);
+      builder b = f6(second(self), b);
+      return b;
+    }
+    builder f7(tuple self, builder b) {
+      {
+      tuple temp = self;
+    int discr =
+    first(temp);
+    if (discr == 0)
+    {
+      [int, int] var = second(temp);
+    {
+      int b = store_uint(b, 0, 0);
+    builder b =
+    f3(var, b);
+    return
+    b;
+    }} else
+    {
+      }}}
+    _ test() {
+      builder b = f0();
+      [int, int] t = [f1(0), f2(1)];
+      [int, [int, int]] u = [0, [0, 1]];
+      builder b = f3([f1(0), f2(1)], b);
+      builder b = f7([0, [0, 1]], b);
+    }
+|}]

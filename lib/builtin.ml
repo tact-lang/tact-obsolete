@@ -199,6 +199,149 @@ let serializer =
        { function_signature;
          function_impl = BuiltinFn (builtin_fun function_impl) } )
 
+let make_serialize self p =
+  let rec int_required_bits = function
+    | 0 ->
+        0
+    | x ->
+        1 + (int_required_bits @@ Int.shift_right x 1)
+  in
+  let serialize_union_ty u p =
+    let union = List.Assoc.find_exn p.unions u ~equal:equal_int in
+    let discriminator_len =
+      Value
+        (Integer (Z.of_int (int_required_bits (List.length union.cases - 1))))
+    in
+    let branches =
+      List.filter_map union.cases ~f:(fun (ty, Discriminator discr) ->
+          let serialize_ty =
+            match
+              List.Assoc.find (Program.methods_of p ty) ~equal:String.equal
+                "serialize"
+            with
+            | Some m ->
+                Some m
+            | None ->
+                None
+          in
+          serialize_ty
+          |> Option.map ~f:(fun method_ ->
+                 { branch_ty = ty;
+                   branch_var = "var";
+                   branch_stmt =
+                     Block
+                       [ Let
+                           [ ( "b",
+                               Primitive
+                                 (StoreInt
+                                    { builder =
+                                        StructField
+                                          ( Reference ("b", builder_struct),
+                                            "b",
+                                            BuiltinType "Builder" );
+                                      length = discriminator_len;
+                                      integer = Value (Integer (Z.of_int discr));
+                                      signed = false } ) ) ];
+                         Let
+                           [ ( "b",
+                               FunctionCall
+                                 ( Value (Function method_),
+                                   [ Reference ("var", ty);
+                                     Reference ("b", builder_struct) ] ) ) ];
+                         Return (Reference ("b", builder_struct)) ] } ) )
+    in
+    let switch =
+      {switch_condition = Reference ("self", UnionType union.union_id); branches}
+    in
+    let body = Switch switch in
+    { function_signature =
+        { function_params =
+            [("self", UnionType union.union_id); ("b", builder_struct)];
+          function_returns = builder_struct };
+      function_impl = Fn (Some body) }
+  in
+  let serializer_struct_ty s p =
+    let s = List.Assoc.find_exn p.structs s ~equal:equal_int in
+    let calls =
+      List.filter_map s.struct_fields ~f:(function name, {field_type = f} ->
+          let serialize_field =
+            match
+              List.Assoc.find (Program.methods_of p f) ~equal:String.equal
+                "serialize"
+            with
+            | Some m ->
+                Some m
+            | None ->
+                None
+          in
+          serialize_field
+          |> Option.map ~f:(fun method_ ->
+                 Let
+                   [ ( "b",
+                       FunctionCall
+                         ( Value (Function method_),
+                           StructField
+                             ( Reference ("self", StructType s.struct_id),
+                               name,
+                               f )
+                           :: [Reference ("b", builder_struct)] ) ) ] ) )
+    in
+    let body = Block (calls @ [Return (Reference ("b", builder_struct))]) in
+    { function_signature =
+        { function_params =
+            [("self", StructType s.struct_id); ("b", builder_struct)];
+          function_returns = builder_struct };
+      function_impl = Fn (Some body) }
+  in
+  match self with
+  | StructType s ->
+      serializer_struct_ty s p
+  | UnionType u ->
+      serialize_union_ty u p
+  | _ ->
+      failwith "unsupported"
+
+let derive_serialize =
+  let function_impl p = function
+    | [Type (StructType s)] ->
+        let _ =
+          Program.update_struct p s ~f:(fun s ->
+              let serialize = make_serialize (StructType s.struct_id) p in
+              { s with
+                struct_methods = ("serialize", serialize) :: s.struct_methods;
+                struct_impls =
+                  { impl_interface =
+                      Value (Type (InterfaceType serialize_intf_id));
+                    impl_methods = [("serialize", Value (Function serialize))]
+                  }
+                  :: s.struct_impls } )
+        in
+        Type (StructType s)
+    | [Type (UnionType u)] ->
+        let _ =
+          Program.update_union p u ~f:(fun u ->
+              let serialize = make_serialize (UnionType u.union_id) p in
+              { u with
+                union_methods = ("serialize", serialize) :: u.union_methods;
+                union_impls =
+                  { impl_interface =
+                      Value (Type (InterfaceType serialize_intf_id));
+                    impl_methods = [("serialize", Value (Function serialize))]
+                  }
+                  :: u.union_impls } )
+        in
+        Type (UnionType u)
+    | _ ->
+        Void
+  in
+  let function_signature =
+    {function_params = [("t", type0)]; function_returns = type0}
+  in
+  Value
+    (Function
+       { function_signature;
+         function_impl = BuiltinFn (builtin_fun function_impl) } )
+
 let from_intf =
   let function_signature =
     {function_params = [("T", type0)]; function_returns = HoleType}
@@ -319,6 +462,7 @@ let default_bindings () =
     ("serializer", serializer);
     ("Serialize", Value (Type (InterfaceType serialize_intf_id)));
     ("Deserialize", Value (Type (InterfaceType deserialize_intf_id)));
+    ("derive_serialize", derive_serialize);
     ("LoadResult", load_result_func);
     ("From", from_intf) ]
   @ builtin_bindings
