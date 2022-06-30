@@ -29,7 +29,7 @@ functor
        we need to change it to fn(X: Type) -> Dependent(X) *)
     class ['s] make_dependent_types (_errors : _) =
       object (self : 's)
-        inherit ['s] Lang_types.map as super
+        inherit ['s] Lang_types.map
 
         val mutable previous_arguments = []
 
@@ -43,11 +43,6 @@ functor
               Value (Type (Dependent (ref, ty')))
           | None ->
               Value (Type (ExprType (Reference (ref, ty))))
-
-        (* Unwrap ExprType(Value(Type(ty))) -> ty *)
-        method! visit_type_ env type_ =
-          let new_type = super#visit_type_ env type_ in
-          match new_type with ExprType (Value (Type t)) -> t | t -> t
 
         method! visit_function_signature env sign =
           let prev = previous_arguments in
@@ -588,7 +583,7 @@ functor
           let struct_ =
             { struct_fields =
                 List.map (s#of_located_list fields) ~f:(fun (name, expr) ->
-                    (name, {field_type = ExprType expr}) );
+                    (name, {field_type = expr_to_type expr}) );
               struct_methods = [];
               struct_impls = [];
               struct_id = program.type_counter;

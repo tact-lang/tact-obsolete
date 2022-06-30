@@ -542,7 +542,6 @@ class interpreter
               | ex ->
                   super#visit_expr env ex
 
-            (* TODO: I do not know why `ExprType` flows into output. *)
             method! visit_type_ env ty =
               self_eval#unwrap_expr_types (super#visit_type_ env ty)
 

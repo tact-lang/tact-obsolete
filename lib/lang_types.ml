@@ -241,7 +241,7 @@ let rec type_of = function
   | Value Void ->
       VoidType
   | Value (Type (Dependent (_, ty))) ->
-      unwrap_type_ @@ ty
+      ty
   | Value (Type t) ->
       type_of_type t
   | Hole ->
@@ -259,32 +259,23 @@ let rec type_of = function
           (Function
             {function_signature = {function_returns; function_params}; _} ),
         args ) ->
-      unwrap_type_ @@ type_of_call args function_params function_returns
+      type_of_call args function_params function_returns
   | Reference (_, t) ->
-      unwrap_type_ t
+      t
   | ResolvedReference (_, e) ->
-      unwrap_type_ @@ type_of e
+      type_of e
   | MakeUnionVariant (_, u) ->
       UnionType u
   | MkStructDef _ ->
       type0
   | StructField (_, _, ty) ->
-      unwrap_type_ ty
+      ty
   | IntfMethodCall {intf_method = _, sign; intf_args; _} ->
-      unwrap_type_
-      @@ type_of_call intf_args sign.function_params sign.function_returns
+      type_of_call intf_args sign.function_params sign.function_returns
   | MkFunction mk_function ->
       FunctionType mk_function.function_signature
   | expr ->
       InvalidType expr
-
-and unwrap_type_ = function
-  | ExprType (Value (Type ty)) ->
-      unwrap_type_ ty
-  | ExprType (ResolvedReference (_, Value (Type t))) ->
-      unwrap_type_ t
-  | type_ ->
-      type_
 
 and type_of_type = function TypeN x -> TypeN (x + 1) | _otherwise -> TypeN 0
 
@@ -410,10 +401,10 @@ let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 module Program = struct
   let methods_of p = function
     (* TODO: fix expr type *)
-    | StructType s | ExprType (Value (Type (StructType s))) ->
+    | StructType s ->
         List.find_map_exn p.structs ~f:(fun (id, s') ->
             if equal_int id s then Some s'.struct_methods else None )
-    | UnionType u | ExprType (Value (Type (UnionType u))) ->
+    | UnionType u ->
         List.find_map_exn p.unions ~f:(fun (id, u') ->
             if equal_int id u then Some u'.union_methods else None )
     | _ ->
