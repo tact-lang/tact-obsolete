@@ -38,7 +38,8 @@ class type_checker (errors : _) (functions : _) =
         fn_returns <- prev ;
         (result, new_fn_returns)
 
-    method check_type ~program ~current_bindings ~expected actual =
+    method check_type ~program ~current_bindings ~expected actual_value =
+      let actual = type_of actual_value in
       match expected with
       | HoleType ->
           Ok actual
@@ -91,12 +92,14 @@ class type_checker (errors : _) (functions : _) =
               Error (NeedFromCall (Value (Function m)))
           | _ ->
               Error (TypeError expected) )
-      | InterfaceType _ -> (
-        match actual with
-        (* TODO: we should check that argument implements such interface. Maybe we
-           should implement something like NeedFromCall variant but for interfaces. *)
-        | TypeN 0 ->
-            Ok expected
+      | InterfaceType v -> (
+        match actual_value with
+        | ResolvedReference (_, Value (Type t)) | Value (Type t) -> (
+          match Program.find_impl_intf program v t with
+          | Some _ ->
+              Ok t
+          | _ ->
+              Error (TypeError expected) )
         | _ ->
             Error (TypeError expected) )
       | _otherwise ->

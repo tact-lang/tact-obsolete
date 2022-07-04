@@ -3452,3 +3452,35 @@ let%expect_test "destructuring let with missing fields ignored" =
           (struct_methods ()) (struct_impls ()) (struct_id 73)))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)))
  |}]
+
+let%expect_test "type that does not implement interface passed to the \
+                 constrained argument" =
+  let source =
+    {|
+    interface Intf {}
+    fn ExpectedIntf(T: Intf) {}
+    struct Foo {}
+    let a = ExpectedIntf(Foo);
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Error
+     (((TypeError ((InterfaceType 72) (TypeN 0))))
+      ((bindings
+        ((a (Value Void)) (Foo (Value (Type (StructType 74))))
+         (ExpectedIntf
+          (Value
+           (Function
+            ((function_signature
+              ((function_params ((T (InterfaceType 72))))
+               (function_returns HoleType)))
+             (function_impl (Fn ((Block ()))))))))
+         (Intf (Value (Type (InterfaceType 72))))))
+       (structs
+        ((74
+          ((struct_fields ()) (struct_methods ()) (struct_impls ())
+           (struct_id 74)))))
+       (interfaces ((72 ((interface_methods ()))))) (type_counter <opaque>)
+       (memoized_fcalls <opaque>)))) |}]

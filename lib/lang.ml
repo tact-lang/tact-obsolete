@@ -106,7 +106,7 @@ functor
               let types_satisfying =
                 List.map2 sign.function_params args
                   ~f:(fun (_, expected) expr ->
-                    match s#check_type ~expected (type_of expr) with
+                    match s#check_type ~expected expr with
                     | Ok _ ->
                         expr
                     | Error (NeedFromCall func) ->
@@ -223,8 +223,7 @@ functor
               Return return
           | _ -> (
             match
-              type_checker#check_return_type (type_of return) ~program
-                ~current_bindings
+              type_checker#check_return_type return ~program ~current_bindings
             with
             | Ok _ ->
                 Return return
@@ -244,8 +243,7 @@ functor
                 raise InternalCompilerError
             | _ -> (
               match
-                type_checker#check_return_type (type_of ex) ~program
-                  ~current_bindings
+                type_checker#check_return_type ex ~program ~current_bindings
               with
               | Ok _ ->
                   Break stmt
