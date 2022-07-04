@@ -7,7 +7,7 @@ let%expect_test "Int(bits) constructor" =
       let overflow = Int(8).new(513);
     |}
   in
-  pp source ;
+  pp_compile source ;
   [%expect
     {|
     (Ok
@@ -144,7 +144,7 @@ let%expect_test "Int(bits) serializer" =
       }
     |}
   in
-  pp source ;
+  pp_compile source ;
   [%expect
     {|
     (Ok
@@ -183,7 +183,7 @@ let%expect_test "demo struct serializer" =
       }
     |}
   in
-  pp source ;
+  pp_compile source ;
   [%expect
     {|
     (Ok
@@ -410,7 +410,7 @@ let%expect_test "from interface" =
       let var = check(10);
     |}
   in
-  pp source ;
+  pp_compile source ;
   [%expect
     {|
     (Ok
@@ -457,7 +457,7 @@ let%expect_test "tensor2" =
     }
     |}
   in
-  pp source ;
+  pp_compile source ;
   [%expect
     {|
     (Ok
@@ -488,7 +488,7 @@ let%expect_test "slice api" =
       }
     |}
   in
-  pp source ;
+  pp_compile source ;
   [%expect
     {|
     (Ok

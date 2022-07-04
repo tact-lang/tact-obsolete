@@ -1,52 +1,10 @@
-module Syntax = Tact.Syntax.Make (Tact.Located.Disabled)
-module Parser = Tact.Parser.Make (Syntax)
-module Lang = Tact.Lang.Make (Syntax)
-module Show = Tact.Show.Make (Syntax)
-module Interpreter = Tact.Interpreter
-module Errors = Tact.Errors
-module Zint = Tact.Zint
-module Codegen = Tact.Codegen_func
-module Func = Tact.Func
-include Core
-
-type error = [Lang.error | Interpreter.error] * Lang.program
-[@@deriving sexp_of]
-
-let make_errors e = new Errors.errors e
-
-let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
-
-let build_program ?(errors = make_errors Show.show_error)
-    ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) p =
-  let std =
-    let c = new Lang.constructor ~program:prev_program errors in
-    let p' = c#visit_program () (parse_program Tact.Builtin.std) in
-    p'
-  in
-  let c = new Lang.constructor ~program:std errors in
-  let p' = c#visit_program () p in
-  errors#to_result ()
-  |> Result.map ~f:(fun _ -> p')
-  (* remove default bindings and methods *)
-  |> Result.map ~f:(fun (program : Lang.program) ->
-         if strip_defaults then program else program )
-  |> Result.map_error ~f:(fun errors ->
-         List.map errors ~f:(fun (_, err, _) -> (err, p')) )
-
-exception Exn of error list
-
-let pp ?(prev_program = Lang.default_program ()) s =
-  parse_program s
-  |> build_program ~prev_program
-  |> Result.map_error ~f:(fun err -> Exn err)
-  |> Result.ok_exn |> Codegen.codegen
-  |> Func.pp_program Caml.Format.std_formatter
+open Shared
 
 let%expect_test "simple function generation" =
   let source = {|
       fn test() -> Integer { return 0; }
     |} in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -56,39 +14,6 @@ let%expect_test "simple function generation" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       (_, Value2 value) = tensor;
       return value;
-    }
-    int builtin_equal(int x, int y) {
-      return x == y;
-    }
-    _ builtin_send_raw_msg(cell msg, int flags) {
-      return send_raw_message(msg, flags);
-    }
-    (int, int) builtin_divmod(int x, int y) {
-      return divmod(x, y);
-    }
-    (slice, int) builtin_slice_load_int(slice s, int bits) {
-      return load_int(s, bits);
-    }
-    _ builtin_slice_end_parse(slice s) {
-      return end_parse(s);
-    }
-    slice builtin_slice_begin_parse(cell c) {
-      return begin_parse(c);
-    }
-    int builtin_builder_store_coins(builder b, int c) {
-      return store_grams(b, c);
-    }
-    builder builtin_builder_store_int(builder b, int int_, int bits) {
-      return store_int(b, int_, bits);
-    }
-    cell builtin_builder_build(builder b) {
-      return end_cell(b);
-    }
-    builder builtin_builder_new() {
-      return begin_cell();
-    }
-    _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
     }
     int test() {
       return 0;
@@ -98,14 +23,13 @@ let%expect_test "passing struct to a function" =
   let source =
     {|
       struct T { 
-       val a: Int(32)
        val b: Integer
        val c: struct { val d : Integer }
       }
       fn test(t: T) -> Integer { return 1; }
     |}
   in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -116,40 +40,7 @@ let%expect_test "passing struct to a function" =
       (_, Value2 value) = tensor;
       return value;
     }
-    int builtin_equal(int x, int y) {
-      return x == y;
-    }
-    _ builtin_send_raw_msg(cell msg, int flags) {
-      return send_raw_message(msg, flags);
-    }
-    (int, int) builtin_divmod(int x, int y) {
-      return divmod(x, y);
-    }
-    (slice, int) builtin_slice_load_int(slice s, int bits) {
-      return load_int(s, bits);
-    }
-    _ builtin_slice_end_parse(slice s) {
-      return end_parse(s);
-    }
-    slice builtin_slice_begin_parse(cell c) {
-      return begin_parse(c);
-    }
-    int builtin_builder_store_coins(builder b, int c) {
-      return store_grams(b, c);
-    }
-    builder builtin_builder_store_int(builder b, int int_, int bits) {
-      return store_int(b, int_, bits);
-    }
-    cell builtin_builder_build(builder b) {
-      return end_cell(b);
-    }
-    builder builtin_builder_new() {
-      return begin_cell();
-    }
-    _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
-    }
-    int test([int, int, int] t) {
+    int test([int, int] t) {
       return 1;
     } |}]
 
@@ -160,7 +51,7 @@ let%expect_test "function calls" =
       fn test2(value: Integer) -> Integer { return test(value); }
     |}
   in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -170,39 +61,6 @@ let%expect_test "function calls" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       (_, Value2 value) = tensor;
       return value;
-    }
-    int builtin_equal(int x, int y) {
-      return x == y;
-    }
-    _ builtin_send_raw_msg(cell msg, int flags) {
-      return send_raw_message(msg, flags);
-    }
-    (int, int) builtin_divmod(int x, int y) {
-      return divmod(x, y);
-    }
-    (slice, int) builtin_slice_load_int(slice s, int bits) {
-      return load_int(s, bits);
-    }
-    _ builtin_slice_end_parse(slice s) {
-      return end_parse(s);
-    }
-    slice builtin_slice_begin_parse(cell c) {
-      return begin_parse(c);
-    }
-    int builtin_builder_store_coins(builder b, int c) {
-      return store_grams(b, c);
-    }
-    builder builtin_builder_store_int(builder b, int int_, int bits) {
-      return store_int(b, int_, bits);
-    }
-    cell builtin_builder_build(builder b) {
-      return end_cell(b);
-    }
-    builder builtin_builder_new() {
-      return begin_cell();
-    }
-    _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
     }
     int test(int value) {
       return value;
@@ -220,7 +78,7 @@ let%expect_test "Int(bits) serializer codegen" =
         }
       |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -294,7 +152,7 @@ let%expect_test "demo struct serializer" =
         }
       |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -382,7 +240,7 @@ let%expect_test "demo struct serializer 2" =
       }
     |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -467,7 +325,7 @@ let%expect_test "true and false" =
     }
     |}
   in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
       forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -477,39 +335,6 @@ let%expect_test "true and false" =
       forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
         (_, Value2 value) = tensor;
         return value;
-      }
-      int builtin_equal(int x, int y) {
-        return x == y;
-      }
-      _ builtin_send_raw_msg(cell msg, int flags) {
-        return send_raw_message(msg, flags);
-      }
-      (int, int) builtin_divmod(int x, int y) {
-        return divmod(x, y);
-      }
-      (slice, int) builtin_slice_load_int(slice s, int bits) {
-        return load_int(s, bits);
-      }
-      _ builtin_slice_end_parse(slice s) {
-        return end_parse(s);
-      }
-      slice builtin_slice_begin_parse(cell c) {
-        return begin_parse(c);
-      }
-      int builtin_builder_store_coins(builder b, int c) {
-        return store_grams(b, c);
-      }
-      builder builtin_builder_store_int(builder b, int int_, int bits) {
-        return store_int(b, int_, bits);
-      }
-      cell builtin_builder_build(builder b) {
-        return end_cell(b);
-      }
-      builder builtin_builder_new() {
-        return begin_cell();
-      }
-      _ send_raw_msg(cell msg, int flags) {
-        builtin_send_raw_msg(msg, flags);
       }
       int test(int flag) {
         if (flag) {
@@ -531,7 +356,7 @@ let%expect_test "if/then/else" =
     }
     |}
   in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
       forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -541,39 +366,6 @@ let%expect_test "if/then/else" =
       forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
         (_, Value2 value) = tensor;
         return value;
-      }
-      int builtin_equal(int x, int y) {
-        return x == y;
-      }
-      _ builtin_send_raw_msg(cell msg, int flags) {
-        return send_raw_message(msg, flags);
-      }
-      (int, int) builtin_divmod(int x, int y) {
-        return divmod(x, y);
-      }
-      (slice, int) builtin_slice_load_int(slice s, int bits) {
-        return load_int(s, bits);
-      }
-      _ builtin_slice_end_parse(slice s) {
-        return end_parse(s);
-      }
-      slice builtin_slice_begin_parse(cell c) {
-        return begin_parse(c);
-      }
-      int builtin_builder_store_coins(builder b, int c) {
-        return store_grams(b, c);
-      }
-      builder builtin_builder_store_int(builder b, int int_, int bits) {
-        return store_int(b, int_, bits);
-      }
-      cell builtin_builder_build(builder b) {
-        return end_cell(b);
-      }
-      builder builtin_builder_new() {
-        return begin_cell();
-      }
-      _ send_raw_msg(cell msg, int flags) {
-        builtin_send_raw_msg(msg, flags);
       }
       int test(int flag) {
         if (flag) {
@@ -591,7 +383,7 @@ let%expect_test "serializer inner struct" =
       let serialize_wallet = serializer(Wallet);
     |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -662,7 +454,7 @@ let%expect_test "unions" =
     }
   |}
   in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -672,39 +464,6 @@ let%expect_test "unions" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       (_, Value2 value) = tensor;
       return value;
-    }
-    int builtin_equal(int x, int y) {
-      return x == y;
-    }
-    _ builtin_send_raw_msg(cell msg, int flags) {
-      return send_raw_message(msg, flags);
-    }
-    (int, int) builtin_divmod(int x, int y) {
-      return divmod(x, y);
-    }
-    (slice, int) builtin_slice_load_int(slice s, int bits) {
-      return load_int(s, bits);
-    }
-    _ builtin_slice_end_parse(slice s) {
-      return end_parse(s);
-    }
-    slice builtin_slice_begin_parse(cell c) {
-      return begin_parse(c);
-    }
-    int builtin_builder_store_coins(builder b, int c) {
-      return store_grams(b, c);
-    }
-    builder builtin_builder_store_int(builder b, int int_, int bits) {
-      return store_int(b, int_, bits);
-    }
-    cell builtin_builder_build(builder b) {
-      return end_cell(b);
-    }
-    builder builtin_builder_new() {
-      return begin_cell();
-    }
-    _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
     }
     tuple try(tuple x) {
       return x;
@@ -735,7 +494,7 @@ let%expect_test "switch statement" =
       }
     |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -807,7 +566,7 @@ let%expect_test "tensor2" =
     }
     |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -873,7 +632,7 @@ let%expect_test "serialization api" =
      }
      |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -1169,7 +928,7 @@ let%expect_test "deserialization api" =
      }
      |}
   in
-  pp source ;
+  pp_codegen source ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -1377,7 +1136,7 @@ let%expect_test "destructuring let" =
 
   |}
   in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -1387,39 +1146,6 @@ let%expect_test "destructuring let" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       (_, Value2 value) = tensor;
       return value;
-    }
-    int builtin_equal(int x, int y) {
-      return x == y;
-    }
-    _ builtin_send_raw_msg(cell msg, int flags) {
-      return send_raw_message(msg, flags);
-    }
-    (int, int) builtin_divmod(int x, int y) {
-      return divmod(x, y);
-    }
-    (slice, int) builtin_slice_load_int(slice s, int bits) {
-      return load_int(s, bits);
-    }
-    _ builtin_slice_end_parse(slice s) {
-      return end_parse(s);
-    }
-    slice builtin_slice_begin_parse(cell c) {
-      return begin_parse(c);
-    }
-    int builtin_builder_store_coins(builder b, int c) {
-      return store_grams(b, c);
-    }
-    builder builtin_builder_store_int(builder b, int int_, int bits) {
-      return store_int(b, int_, bits);
-    }
-    cell builtin_builder_build(builder b) {
-      return end_cell(b);
-    }
-    builder builtin_builder_new() {
-      return begin_cell();
-    }
-    _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
     }
     int test([int, int, int] t) {
       [int x, int y2, int z] = t;
@@ -1439,10 +1165,9 @@ let%expect_test "destructuring let with rest ignored" =
         let {y as y2, ..} = t;
         y2
       }
-
   |}
   in
-  pp source ;
+  pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
     forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
@@ -1452,39 +1177,6 @@ let%expect_test "destructuring let with rest ignored" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       (_, Value2 value) = tensor;
       return value;
-    }
-    int builtin_equal(int x, int y) {
-      return x == y;
-    }
-    _ builtin_send_raw_msg(cell msg, int flags) {
-      return send_raw_message(msg, flags);
-    }
-    (int, int) builtin_divmod(int x, int y) {
-      return divmod(x, y);
-    }
-    (slice, int) builtin_slice_load_int(slice s, int bits) {
-      return load_int(s, bits);
-    }
-    _ builtin_slice_end_parse(slice s) {
-      return end_parse(s);
-    }
-    slice builtin_slice_begin_parse(cell c) {
-      return begin_parse(c);
-    }
-    int builtin_builder_store_coins(builder b, int c) {
-      return store_grams(b, c);
-    }
-    builder builtin_builder_store_int(builder b, int int_, int bits) {
-      return store_int(b, int_, bits);
-    }
-    cell builtin_builder_build(builder b) {
-      return end_cell(b);
-    }
-    builder builtin_builder_new() {
-      return begin_cell();
-    }
-    _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
     }
     int test([int, int, int] t) {
       [_, int y2, _] = t;

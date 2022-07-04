@@ -10,89 +10,87 @@ module Interpreter = Tact.Interpreter
 module Errors = Tact.Errors
 module Zint = Tact.Zint
 module C = Tact.Compiler
+module Codegen = Tact.Codegen_func
+module Func = Tact.Func
 include Core
 
-type error = [Lang.error | Interpreter.error] * Lang.program
-[@@deriving sexp_of]
+type error = [Lang.error | Interpreter.error] [@@deriving sexp_of]
 
 let make_errors e = new Errors.errors e
 
 let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
 
+let strip_if_exists_in_other o1 o2 ~equal =
+  List.filter o1 ~f:(fun o1_item -> not @@ List.exists o2 ~f:(equal o1_item))
+
+let strip : program:Lang.program -> previous:Lang.program -> Lang.program =
+ fun ~program ~previous ->
+  { program with
+    bindings =
+      strip_if_exists_in_other program.bindings previous.bindings
+        ~equal:Lang.equal_binding;
+    structs =
+      strip_if_exists_in_other program.structs previous.structs
+        ~equal:(fun (id1, _) (id2, _) -> equal_int id1 id2);
+    unions =
+      strip_if_exists_in_other program.unions previous.unions
+        ~equal:(fun (id1, _) (id2, _) -> equal_int id1 id2);
+    interfaces =
+      strip_if_exists_in_other program.interfaces previous.interfaces
+        ~equal:(fun (id1, _) (id2, _) -> equal_int id1 id2) }
+
+let compile_pass p prev_program errors =
+  let c = new Lang.constructor ~program:prev_program errors in
+  let p' = c#visit_program () p in
+  p'
+
 let build_program ?(errors = make_errors Show.show_error)
-    ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) p =
+    ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) ~codegen
+    p =
   let std =
     let c = new Lang.constructor ~program:prev_program errors in
     let p' = c#visit_program () (parse_program Tact.Builtin.std) in
     p'
   in
-  let c = new Lang.constructor ~program:std errors in
-  let p' = c#visit_program () p in
-  errors#to_result ()
-  |> Result.map ~f:(fun _ -> p')
-  (* remove default bindings and methods *)
-  |> Result.map ~f:(fun (program : Lang.program) ->
-         if strip_defaults then
-           { program with
-             bindings =
-               List.filter program.bindings ~f:(fun binding ->
-                   not
-                   @@ List.exists std.bindings ~f:(Lang.equal_binding binding) );
-             structs =
-               List.filter program.structs ~f:(fun (id1, _) ->
-                   not
-                   @@ List.exists prev_program.structs ~f:(fun (id2, _) ->
-                          equal_int id1 id2 ) );
-             unions =
-               List.filter program.unions ~f:(fun (id1, _) ->
-                   not
-                   @@ List.exists prev_program.unions ~f:(fun (id2, _) ->
-                          equal_int id1 id2 ) );
-             interfaces =
-               List.filter program.interfaces ~f:(fun (id1, _) ->
-                   not
-                   @@ List.exists prev_program.interfaces ~f:(fun (id2, _) ->
-                          equal_int id1 id2 ) ) }
-         else program )
+  (* This will make a deep copy of the std. Lang.constructor mutates input program,
+     so we need deep copy of an std if we want to strip std bindings later. *)
+  let std_copy = {std with bindings = std.bindings} in
+  let p' = compile_pass p std_copy errors in
+  let p'' = if strip_defaults then strip ~program:p' ~previous:std else p' in
+  errors#to_result p''
   |> Result.map_error ~f:(fun errors ->
-         List.map errors ~f:(fun (_, err, _) ->
-             ( err,
-               if strip_defaults then
-                 { p' with
-                   bindings =
-                     List.filter p'.bindings ~f:(fun binding ->
-                         not
-                         @@ List.exists std.bindings
-                              ~f:(Lang.equal_binding binding) );
-                   structs =
-                     List.filter p'.structs ~f:(fun (id1, _) ->
-                         not
-                         @@ List.exists prev_program.structs ~f:(fun (id2, _) ->
-                                equal_int id1 id2 ) );
-                   unions =
-                     List.filter p'.unions ~f:(fun (id1, _) ->
-                         not
-                         @@ List.exists prev_program.unions ~f:(fun (id2, _) ->
-                                equal_int id1 id2 ) );
-                   interfaces =
-                     List.filter p'.interfaces ~f:(fun (id1, _) ->
-                         not
-                         @@ List.exists prev_program.interfaces
-                              ~f:(fun (id2, _) -> equal_int id1 id2) ) }
-               else p' ) ) )
+         let errs = List.map errors ~f:(fun (_, err, _) -> err) in
+         (errs, p'') )
+  |> Result.map ~f:codegen
 
 let rec pp_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
+and sexp_of_errors =
+  sexp_of_pair (List.sexp_of_t sexp_of_error) Lang.sexp_of_program
+
 and print_sexp e =
-  pp_sexp
-    (Result.sexp_of_t Lang.sexp_of_program (List.sexp_of_t sexp_of_error) e)
+  pp_sexp (Result.sexp_of_t Lang.sexp_of_program sexp_of_errors e)
 
-let pp ?(prev_program = Lang.default_program ()) ?(strip_defaults = true) s =
-  parse_program s |> build_program ~prev_program ~strip_defaults |> print_sexp
+let pp_compile ?(prev_program = Lang.default_program ())
+    ?(strip_defaults = true) s =
+  parse_program s
+  |> build_program ~prev_program ~strip_defaults ~codegen:(fun x -> x)
+  |> print_sexp
 
-exception Exn of error list
+let pp_codegen ?(prev_program = Lang.default_program ())
+    ?(strip_defaults = false) s =
+  let _ =
+    parse_program s
+    |> build_program ~prev_program ~strip_defaults ~codegen:Codegen.codegen
+    |> Result.map ~f:(Func.pp_program Caml.Format.std_formatter)
+    |> Result.map_error ~f:(fun e -> pp_sexp (sexp_of_errors e))
+  in
+  ()
+
+exception Exn of error list * Lang.program
 
 let compile s =
-  parse_program s |> build_program
-  |> Result.map_error ~f:(fun err -> Exn err)
+  parse_program s
+  |> build_program ~codegen:(fun x -> x)
+  |> Result.map_error ~f:(fun (errs, p) -> Exn (errs, p))
   |> Result.ok_exn
