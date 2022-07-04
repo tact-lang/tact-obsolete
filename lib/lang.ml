@@ -288,8 +288,8 @@ functor
         method build_Expr _env expr = Expr expr
 
         method build_impl _env intf bindings =
-          { impl_interface = Syntax.value intf;
-            impl_methods = s#of_located_list bindings }
+          { mk_impl_interface = Syntax.value intf;
+            mk_impl_methods = s#of_located_list bindings }
 
         method! visit_expr env syntax_expr =
           let expr' = super#visit_expr env syntax_expr in
@@ -549,7 +549,7 @@ functor
           let impl_methods =
             List.concat
               (List.map impls ~f:(fun impl ->
-                   List.filter_map impl.impl_methods ~f:(fun (name, ex) ->
+                   List.filter_map impl.mk_impl_methods ~f:(fun (name, ex) ->
                        match ex with
                        | Value (Function _) | MkFunction _ ->
                            Some (name, ex)
@@ -666,7 +666,8 @@ functor
               let impl_methods =
                 List.concat
                   (List.map impls ~f:(fun impl ->
-                       List.filter_map impl.impl_methods ~f:(fun (name, ex) ->
+                       List.filter_map impl.mk_impl_methods
+                         ~f:(fun (name, ex) ->
                            match ex with
                            | Value (Function _) | MkFunction _ ->
                                Some (name, ex)
@@ -695,14 +696,15 @@ functor
             current_bindings <- current_bindings' ;
             result
 
-        method private make_from_impls : expr list -> int -> impl list =
+        method private make_from_impls : expr list -> int -> mk_impl list =
           fun cases union ->
             List.map cases ~f:(fun case ->
                 let from_intf_ =
                   FunctionCall (from_intf, [Value (Type (ExprType case))])
                 in
-                { impl_interface = from_intf_;
-                  impl_methods = [("from", s#make_from_impl_fn case union)] } )
+                { mk_impl_interface = from_intf_;
+                  mk_impl_methods = [("from", s#make_from_impl_fn case union)]
+                } )
 
         method private make_from_impl_fn case union =
           Value

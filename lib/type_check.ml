@@ -57,14 +57,16 @@ class type_checker (errors : _) (functions : _) =
             (List.Assoc.find_exn program.structs s ~equal:equal_int)
               .struct_impls
             |> List.find_map ~f:(fun i ->
-                   if equal_expr i.impl_interface from_intf_ then
-                     Some i.impl_methods
+                   if
+                     equal_expr (Value (Type (InterfaceType i.impl_interface)))
+                       from_intf_
+                   then Some i.impl_methods
                    else None )
             |> Option.bind ~f:List.hd
           in
           match impl with
           | Some (_, m) ->
-              Error (NeedFromCall m)
+              Error (NeedFromCall (Value (Function m)))
           | _ ->
               Error (TypeError expected) )
       | UnionType u -> (
@@ -77,14 +79,16 @@ class type_checker (errors : _) (functions : _) =
           let impl =
             (List.Assoc.find_exn program.unions u ~equal:equal_int).union_impls
             |> List.find_map ~f:(fun i ->
-                   if equal_expr i.impl_interface from_intf_ then
-                     Some i.impl_methods
+                   if
+                     equal_expr (Value (Type (InterfaceType i.impl_interface)))
+                       from_intf_
+                   then Some i.impl_methods
                    else None )
             |> Option.bind ~f:List.hd
           in
           match impl with
           | Some (_, m) ->
-              Error (NeedFromCall m)
+              Error (NeedFromCall (Value (Function m)))
           | _ ->
               Error (TypeError expected) )
       | InterfaceType _ -> (

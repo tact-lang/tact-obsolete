@@ -228,7 +228,7 @@ class interpreter
                   List.find_map_exn impl.impl_methods ~f:(fun (name, impl) ->
                       if equal_string name method_name then Some impl else None )
                 in
-                self#interpret_fc (method_, intf_args)
+                self#interpret_fc (Value (Function method_), intf_args)
             | None ->
                 raise InternalCompilerError )
         | ResolvedReference (_, expr') ->
@@ -280,7 +280,7 @@ class interpreter
             let struct_updater =
               new struct_updater program mk_struct_id struct_id
             in
-            let s =
+            let _ =
               Program.with_struct program struct_ (fun _ ->
                   let struct_methods =
                     List.map mk_methods ~f:(fun (name, fn) ->
@@ -303,11 +303,12 @@ class interpreter
                   let struct_impls =
                     List.map mk_impls ~f:(fun impl ->
                         { impl_interface =
-                            Value (self#interpret_expr impl.impl_interface);
+                            Value.unwrap_intf_id
+                              (self#interpret_expr impl.mk_impl_interface);
                           impl_methods =
-                            List.map impl.impl_methods ~f:(fun (n, x) ->
+                            List.map impl.mk_impl_methods ~f:(fun (n, x) ->
                                 ( n,
-                                  Value
+                                  Value.unwrap_function
                                     (self#interpret_expr
                                        (struct_updater#visit_expr () x) ) ) ) } )
                   in
@@ -317,9 +318,6 @@ class interpreter
                       struct_impls;
                       struct_id;
                       tensor = false } )
-            in
-            let _ =
-              match s with Ok t -> t | Error _ -> raise InternalCompilerError
             in
             Type (StructType struct_ty)
         | MkUnionDef mk_union ->
@@ -365,11 +363,12 @@ class interpreter
                   let union_impls =
                     List.map mk_union.mk_union_impls ~f:(fun impl ->
                         { impl_interface =
-                            Value (self#interpret_expr impl.impl_interface);
+                            Value.unwrap_intf_id
+                              (self#interpret_expr impl.mk_impl_interface);
                           impl_methods =
-                            List.map impl.impl_methods ~f:(fun (n, x) ->
+                            List.map impl.mk_impl_methods ~f:(fun (n, x) ->
                                 ( n,
-                                  Value
+                                  Value.unwrap_function
                                     (self#interpret_expr
                                        (union_updater#visit_expr () x) ) ) ) } )
                   in
@@ -641,7 +640,7 @@ class interpreter
                             if equal_string name method_name then Some impl
                             else None )
                       in
-                      FunctionCall (method_, args)
+                      FunctionCall (Value (Function method_), args)
                   | None ->
                       print_sexp (sexp_of_type_ intf_ty) ;
                       print_sexp (sexp_of_intf_method_call call) ;

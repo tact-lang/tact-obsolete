@@ -113,7 +113,7 @@ and type_ =
 and mk_union =
   { mk_cases : expr list;
     mk_union_methods : (string * expr) list;
-    mk_union_impls : impl list; [@sexp.list]
+    mk_union_impls : mk_impl list; [@sexp.list]
     mk_union_id : int }
 
 and union =
@@ -125,7 +125,7 @@ and union =
 and mk_struct =
   { mk_struct_fields : (string * expr) list;
     mk_methods : (string * expr) list;
-    mk_impls : impl list;
+    mk_impls : mk_impl list;
     mk_struct_id : int }
 
 and struct_ =
@@ -140,7 +140,9 @@ and discriminator = Discriminator of int
 
 and struct_field = {field_type : type_}
 
-and impl = {impl_interface : expr; impl_methods : binding list}
+and mk_impl = {mk_impl_interface : expr; mk_impl_methods : binding list}
+
+and impl = {impl_interface : int; impl_methods : (string * function_) list}
 
 and function_body = (stmt option[@sexp.option])
 
@@ -398,6 +400,20 @@ let find_in_runtime_scope : 'a. string -> (string * 'a) list list -> 'a option =
 
 let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
+module Value = struct
+  let unwrap_function = function
+    | Function f ->
+        f
+    | _ ->
+        raise Errors.InternalCompilerError
+
+  let unwrap_intf_id = function
+    | Type (InterfaceType intf_id) ->
+        intf_id
+    | _ ->
+        raise Errors.InternalCompilerError
+end
+
 module Program = struct
   let methods_of p = function
     (* TODO: fix expr type *)
@@ -492,10 +508,10 @@ module Program = struct
   let find_impl_intf p impl = function
     | StructType s ->
         List.find (get_struct p s).struct_impls ~f:(fun {impl_interface; _} ->
-            equal_expr impl_interface (Value (Type (InterfaceType impl))) )
+            equal_int impl_interface impl )
     | UnionType u ->
         List.find (get_union p u).union_impls ~f:(fun {impl_interface; _} ->
-            equal_expr impl_interface (Value (Type (InterfaceType impl))) )
+            equal_int impl_interface impl )
     | _ ->
         None
 end
