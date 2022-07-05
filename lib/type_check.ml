@@ -51,6 +51,7 @@ class type_checker (errors : _) (functions : _) =
           let from_intf_ =
             let inter =
               new interpreter (program, current_bindings, errors, functions)
+                (fun _ _ f -> f)
             in
             Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in
@@ -74,6 +75,7 @@ class type_checker (errors : _) (functions : _) =
           let from_intf_ =
             let inter =
               new interpreter (program, current_bindings, errors, functions)
+                (fun _ _ f -> f)
             in
             Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in

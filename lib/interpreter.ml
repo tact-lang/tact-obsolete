@@ -116,11 +116,10 @@ let get_memoized_or_execute p (f, args) ~execute =
 (*TODO: type checks for arguments*)
 class interpreter
   ((program, bindings, errors, _functions) :
-    program * tbinding list list * _ errors * int ) =
+    program * tbinding list list * _ errors * int )
+  (partial_evaluate : program -> tbinding list list -> function_ -> function_) =
   object (self)
-    val global_bindings = bindings
-
-    val mutable vars_scope = []
+    val mutable scope = bindings
 
     val mutable return = Void
 
@@ -144,10 +143,13 @@ class interpreter
           in
           match List.zip (List.map binds ~f:(fun (name, _) -> name)) values with
           | Ok args_scope ->
-              let prev_scope = vars_scope in
-              vars_scope <- args_scope :: vars_scope ;
+              let prev_scope = scope in
+              scope <-
+                List.map args_scope ~f:(fun (name, v) ->
+                    (name, Comptime (Value v)) )
+                :: scope ;
               let output = self#interpret_stmt_list rest in
-              vars_scope <- prev_scope ;
+              scope <- prev_scope ;
               output
           | _ ->
               errors#report `Error `ArgumentNumberMismatch () ;
@@ -157,12 +159,12 @@ class interpreter
           let args_scope =
             List.map let_.destructuring_let ~f:(fun (name, new_name) ->
                 let expr = StructField (Value struct_expr, name, HoleType) in
-                (new_name, self#interpret_expr expr) )
+                (new_name, Comptime (Value (self#interpret_expr expr))) )
           in
-          let prev_scope = vars_scope in
-          vars_scope <- args_scope :: vars_scope ;
+          let prev_scope = scope in
+          scope <- args_scope :: scope ;
           let output = self#interpret_stmt_list rest in
-          vars_scope <- prev_scope ;
+          scope <- prev_scope ;
           output
       | Break stmt ->
           self#interpret_stmt stmt []
@@ -195,10 +197,10 @@ class interpreter
               in
               match correct_branch with
               | Some branch ->
-                  let prev_scope = vars_scope in
-                  vars_scope <- [(branch.branch_var, v)] :: vars_scope ;
+                  let prev_scope = scope in
+                  scope <- [(branch.branch_var, Comptime (Value v))] :: scope ;
                   let res = self#interpret_stmt branch.branch_stmt [] in
-                  vars_scope <- prev_scope ;
+                  scope <- prev_scope ;
                   res
               | None ->
                   Void )
@@ -284,9 +286,12 @@ class interpreter
               Program.with_struct program struct_ (fun _ ->
                   let struct_methods =
                     List.map mk_methods ~f:(fun (name, fn) ->
-                        let prev_scope = vars_scope in
-                        vars_scope <-
-                          [("Self", Type (StructType struct_ty))] :: vars_scope ;
+                        let prev_scope = scope in
+                        scope <-
+                          [ ( "Self",
+                              Comptime (Value (Type (StructType struct_ty))) )
+                          ]
+                          :: scope ;
                         let output =
                           match
                             self#interpret_expr
@@ -297,7 +302,7 @@ class interpreter
                           | _ ->
                               raise InternalCompilerError
                         in
-                        vars_scope <- prev_scope ;
+                        scope <- prev_scope ;
                         (name, output) )
                   in
                   let struct_impls =
@@ -344,10 +349,12 @@ class interpreter
                   in
                   let union_methods =
                     List.map mk_union.mk_union_methods ~f:(fun (name, fn) ->
-                        let prev_scope = vars_scope in
-                        vars_scope <-
-                          [("Self", Type (UnionType u_base.union_id))]
-                          :: vars_scope ;
+                        let prev_scope = scope in
+                        scope <-
+                          [ ( "Self",
+                              Comptime (Value (Type (UnionType u_base.union_id)))
+                            ) ]
+                          :: scope ;
                         let output =
                           match
                             self#interpret_expr (union_updater#visit_expr () fn)
@@ -357,7 +364,7 @@ class interpreter
                           | _ ->
                               raise InternalCompilerError
                         in
-                        vars_scope <- prev_scope ;
+                        scope <- prev_scope ;
                         (name, output) )
                   in
                   let union_impls =
@@ -426,7 +433,7 @@ class interpreter
             value
 
     method interpret_function : function_ -> function_ =
-      fun f -> self#partial_evaluate_function f
+      fun f -> partial_evaluate program scope f
 
     method interpret_fc : function_call -> value =
       fun (func, args) ->
@@ -454,10 +461,13 @@ class interpreter
                   | Ok args_scope -> (
                     match function_impl with
                     | Some body ->
-                        let prev_scope = vars_scope in
-                        vars_scope <- args_scope :: vars_scope ;
+                        let prev_scope = scope in
+                        scope <-
+                          List.map args_scope ~f:(fun (name, ex) ->
+                              (name, Comptime (Value ex)) )
+                          :: scope ;
                         let output = self#interpret_stmt body [] in
-                        vars_scope <- prev_scope ;
+                        scope <- prev_scope ;
                         output
                     | None ->
                         Void )
@@ -473,33 +483,13 @@ class interpreter
 
     method private find_ref : string -> expr option =
       fun ref ->
-        match find_in_runtime_scope ref vars_scope with
-        | Some e ->
-            Some (Value e)
-        | None ->
-            self#find_in_global_scope ref
-
-    method private find_in_global_scope : string -> expr option =
-      fun ref ->
-        match find_comptime ref global_bindings with
-        | Some (Ok (Reference (ref', _))) ->
-            self#find_in_global_scope ref'
-        | Some (Ok (ResolvedReference (_, e))) ->
-            Some e
-        | Some (Error ()) ->
-            Sexplib.Sexp.pp_hum Caml.Format.std_formatter (sexp_of_string ref) ;
-            Sexplib.Sexp.pp_hum Caml.Format.std_formatter
-              (sexp_of_list
-                 (sexp_of_list
-                    (Stdppx.sexp_of_pair sexp_of_string sexp_of_value) )
-                 vars_scope ) ;
-            Sexplib.Sexp.pp_hum Caml.Format.std_formatter
-              (sexp_of_list (sexp_of_list sexp_of_tbinding) global_bindings) ;
+        match find_in_scope ref scope with
+        | Some (Comptime ex) ->
+            Some ex
+        | Some (Runtime _) ->
             raise Errors.InternalCompilerError
-        | Some (Ok v) ->
-            Some v
         | None ->
-            None
+            raise Errors.InternalCompilerError
 
     method private check_unions_for_doubled_types : type_ list -> type_ list =
       fun xs ->
@@ -510,153 +500,4 @@ class interpreter
                 acc
             | false ->
                 x :: acc )
-
-    (* This method resolves references that can be resolved at this point of execution. *)
-    method private partial_evaluate_function : function_ -> function_ =
-      fun fn ->
-        (* TODO: This should evaluate everything that can. *)
-        let evaluator =
-          object (self_eval)
-            inherit [_] Lang_types.map as super
-
-            val mutable local_vars = []
-
-            method! visit_expr env =
-              function
-              | Reference (ref, ty) -> (
-                match
-                  List.find_map local_vars ~f:(fun binds ->
-                      List.find binds ~f:(fun x -> equal_string x ref) )
-                with
-                | Some ref ->
-                    let new_ty = self_eval#visit_type_ env ty in
-                    Reference (ref, new_ty)
-                | None -> (
-                  match self#find_ref ref with
-                  | Some ex ->
-                      ex
-                  | None ->
-                      let new_ty = self_eval#visit_type_ env ty in
-                      Reference (ref, new_ty) ) )
-              | ex ->
-                  super#visit_expr env ex
-
-            method! visit_type_ env ty =
-              self_eval#unwrap_expr_types (super#visit_type_ env ty)
-
-            method private unwrap_expr_types =
-              function
-              | ExprType (Value (Type t)) ->
-                  self_eval#unwrap_expr_types t
-              | ExprType (ResolvedReference (_, Value (Type t))) ->
-                  self_eval#unwrap_expr_types t
-              | t ->
-                  t
-
-            method! visit_Block env b =
-              self_eval#with_vars [] (fun _ -> super#visit_Block env b)
-
-            method! visit_Let env vars =
-              (* TODO: this does not work if `vars` will be actually a list. *)
-              let vars' = super#visit_Let env vars in
-              let vars_names = List.map vars ~f:(fun (name, _) -> name) in
-              local_vars <- vars_names :: local_vars ;
-              vars'
-
-            method! visit_DestructuringLet _env let_ =
-              match let_.destructuring_let_expr with
-              | Reference (_, StructType id) | Value (Struct (id, _)) ->
-                  let struct_ = Program.get_struct program id in
-                  (* Check if field names are correct *)
-                  List.iter let_.destructuring_let ~f:(fun (name, _) ->
-                      if
-                        List.Assoc.find struct_.struct_fields
-                          ~equal:String.equal name
-                        |> Option.is_some
-                      then ()
-                      else errors#report `Error (`FieldNotFound (id, name)) () ) ;
-                  (* If rest of fields are not ignored, check for completeness *)
-                  if let_.destructuring_let_rest then ()
-                  else
-                    List.iter struct_.struct_fields ~f:(fun (name, _) ->
-                        if
-                          List.Assoc.find let_.destructuring_let
-                            ~equal:String.equal name
-                          |> Option.is_some
-                        then ()
-                        else errors#report `Error (`MissingField (id, name)) () ) ;
-                  local_vars <-
-                    List.map let_.destructuring_let ~f:snd :: local_vars ;
-                  DestructuringLet let_
-              | expr ->
-                  errors#report `Error (`UninterpretableStatement (Expr expr))
-                    () ;
-                  Invalid
-
-            method! visit_function_ env f =
-              let sign =
-                self_eval#visit_function_signature env f.function_signature
-              in
-              let args =
-                List.map sign.function_params ~f:(fun (name, _) -> name)
-              in
-              self_eval#with_vars args (fun _ ->
-                  let body =
-                    self_eval#visit_function_impl env f.function_impl
-                  in
-                  {function_signature = sign; function_impl = body} )
-
-            method! visit_IntfMethodCall env call =
-              let intf_instance = self_eval#visit_expr env call.intf_instance in
-              let args =
-                self_eval#visit_list self_eval#visit_expr env call.intf_args
-              in
-              let is_dependent = function
-                | Value (Type (Dependent _)) ->
-                    true
-                | _ ->
-                    false
-              in
-              match
-                is_immediate_expr intf_instance
-                && not (is_dependent intf_instance)
-              with
-              | true -> (
-                  let intf_ty =
-                    match self#interpret_expr intf_instance with
-                    | Type t ->
-                        t
-                    | _ ->
-                        raise InternalCompilerError
-                  in
-                  match
-                    Program.find_impl_intf program call.intf_def intf_ty
-                  with
-                  | Some impl ->
-                      let method_ =
-                        List.find_map_exn impl.impl_methods
-                          ~f:(fun (name, impl) ->
-                            let method_name, _ = call.intf_method in
-                            if equal_string name method_name then Some impl
-                            else None )
-                      in
-                      FunctionCall (Value (Function method_), args)
-                  | None ->
-                      print_sexp (sexp_of_type_ intf_ty) ;
-                      print_sexp (sexp_of_intf_method_call call) ;
-                      raise InternalCompilerError )
-              | false ->
-                  IntfMethodCall {call with intf_instance; intf_args = args}
-
-            method private with_vars : 'a. _ -> (unit -> 'a) -> 'a =
-              fun vars f ->
-                let prev_vars = local_vars in
-                local_vars <- vars :: local_vars ;
-                let out = f () in
-                local_vars <- prev_vars ;
-                out
-          end
-        in
-        let new_fn = evaluator#visit_function_ () fn in
-        new_fn
   end
