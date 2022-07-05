@@ -10,6 +10,7 @@ functor
     open Interpreter
     open Type_check
     module Syntax = Syntax.Make (Config)
+    open Partial_evaluator
 
     type error =
       [ `DuplicateField of string * mk_struct
@@ -123,11 +124,15 @@ functor
               | Ok args' when !no_errors ->
                   let fc = (f, args') in
                   if is_immediate_expr (FunctionCall (f, args')) then
-                    let inter =
-                      new interpreter
-                        (program, current_bindings, errors, functions)
+                    let fc =
+                      let inter =
+                        new interpreter
+                          (program, current_bindings, errors, functions)
+                          s#partial_evaluate_fn
+                      in
+                      let fc = inter#interpret_fc fc in
+                      fc
                     in
-                    let fc = inter#interpret_fc fc in
                     Value fc
                   else FunctionCall fc
               | _ ->
@@ -294,7 +299,9 @@ functor
           match is_immediate_expr expr' && equal functions 0 with
           | true ->
               let inter =
-                new interpreter (program, current_bindings, errors, functions)
+                new interpreter
+                  (program, current_bindings, errors, functions)
+                  s#partial_evaluate_fn
               in
               let value' = inter#interpret_expr expr' in
               Value value'
@@ -708,13 +715,18 @@ functor
           Value
             (Function
                { function_signature =
-                   { function_params = [("v", ExprType case)];
+                   { function_params = [("v", expr_to_type case)];
                      function_returns = UnionType union };
                  function_impl =
                    Fn
                      (Some
                         (Return
                            (MakeUnionVariant
-                              (Reference ("v", ExprType case), union) ) ) ) } )
+                              (Reference ("v", expr_to_type case), union) ) ) )
+               } )
+
+        method private partial_evaluate_fn p b f =
+          let partial_evaluator = new partial_evaluator p b errors in
+          partial_evaluator#visit_function_ () f
       end
   end

@@ -276,6 +276,8 @@ let rec type_of = function
       type_of_call intf_args sign.function_params sign.function_returns
   | MkFunction mk_function ->
       FunctionType mk_function.function_signature
+  | MkUnionDef _ ->
+      type0
   | expr ->
       InvalidType expr
 

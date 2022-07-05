@@ -198,7 +198,7 @@ class constructor (program : T.program) =
       fun name -> function
         | Value (Function f) -> (
           try Some (F.Function (self#add_function f ~name:(Some name)))
-          with ex -> if equal_string name "test" then raise ex else None )
+          with ex -> if equal_string name "test_try" then raise ex else None )
         | _ ->
             None
 
