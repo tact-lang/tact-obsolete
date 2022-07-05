@@ -2,17 +2,7 @@ open Base
 
 exception StackUnderflow of int
 
-type cont = int [@@deriving sexp_of, sexp]
-
-type value =
-  | Integer of Zint.t
-  | Cell
-  | Tuple
-  | Null
-  | Slice
-  | Builder
-  | Cont of cont
-[@@deriving sexp_of, sexp]
+type value = Value.t [@@deriving sexp_of, sexp]
 
 type codepage = Stdint.int16
 
@@ -32,24 +22,9 @@ type t =
   { (* Stack *)
     stack : value list;
     (* Control registers *)
-    c0 : value;
-    c1 : value;
-    c2 : value;
-    c3 : value;
-    c4 : value;
-    c5 : value;
-    c6 : value;
-    c7 : value;
-    c8 : value;
-    c9 : value;
-    c10 : value;
-    c11 : value;
-    c12 : value;
-    c13 : value;
-    c14 : value;
-    c15 : value;
+    control_registers : Value.control_registers;
     (* Current continuation *)
-    cc : cont;
+    cc : Value.cont option;
     (* Current codepage *)
     cp : codepage;
     (* Gas limits *)
@@ -81,29 +56,21 @@ let interchange x y vm =
   | _, None ->
       raise (StackUnderflow y)
 
-let const_true = Integer (Z.of_int (-1))
+let const_true : value = Integer (Z.of_int (-1))
 
-and const_false = Integer Z.zero
+and const_false : value = Integer Z.zero
 
 let make ?(gas = default_gas_limits) () =
   { stack = [];
-    c0 = Null;
-    c1 = Null;
-    c2 = Null;
-    c3 = Null;
-    c4 = Null;
-    c5 = Null;
-    c6 = Null;
-    c7 = Null;
-    c8 = Null;
-    c9 = Null;
-    c10 = Null;
-    c11 = Null;
-    c12 = Null;
-    c13 = Null;
-    c14 = Null;
-    c15 = Null;
-    cc = 0;
+    control_registers =
+      { c0 = None;
+        c1 = None;
+        c2 = None;
+        c3 = None;
+        c4 = None;
+        c5 = None;
+        c7 = None };
+    cc = None;
     cp = Stdint.Int16.zero;
     gas }
 
