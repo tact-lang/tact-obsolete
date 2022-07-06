@@ -31,16 +31,24 @@ let make_load_result_with_id id t =
                    (Return
                       (Value
                          (Struct
-                            ( id,
+                            ( Value (Type (StructType id)),
                               [ ("slice", Reference ("s", slice_struct));
                                 ("value", Reference ("v", t)) ] ) ) ) ) ) } ) ];
     struct_impls = [];
     struct_id = id;
     tensor = false }
 
-let load_result_func =
+let load_result_func a =
   let function_signature =
-    {function_params = [("T", type0)]; function_returns = type0}
+    { function_params = [("T", type0)];
+      function_returns =
+        (let id, _ =
+           Arena.with_id a ~f:(fun _ ->
+               { st_sig_fields =
+                   [ ("slice", Value (Type slice_struct));
+                     ("value", Value (Type (Dependent ("T", type0)))) ] } )
+         in
+         StructSig id ) }
   in
   let make_load_result p t =
     let id = p.type_counter in
@@ -314,7 +322,7 @@ let builtin_bindings =
            {x = Reference ("x", IntegerType); y = Reference ("y", IntegerType)}
         ) ) ]
 
-let default_bindings () =
+let default_bindings signs =
   [ ("Integer", Value (Type IntegerType));
     ("Bool", Value (Type BoolType));
     ("Type", Value (Type type0));
@@ -326,7 +334,7 @@ let default_bindings () =
     ("serializer", serializer);
     ("Serialize", Value (Type (InterfaceType serialize_intf_id)));
     ("Deserialize", Value (Type (InterfaceType deserialize_intf_id)));
-    ("LoadResult", load_result_func);
+    ("LoadResult", load_result_func signs);
     ("From", from_intf) ]
   @ builtin_bindings
 

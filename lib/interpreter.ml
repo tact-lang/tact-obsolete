@@ -6,7 +6,7 @@ type error =
   [ `UnresolvedIdentifier of string
   | `UninterpretableStatement of stmt
   | `UnexpectedType of type_
-  | `FieldNotFound of int * string
+  | `FieldNotFound of expr * string
   | `MissingField of int * string
   | `ArgumentNumberMismatch
   | `DuplicateVariant of type_ ]
@@ -57,8 +57,9 @@ class ['s] struct_updater (program : program) (old : int) (new_s : int) =
       else UnionType u
 
     method! visit_Struct env (s, fields) =
+      let after_s = self#visit_expr env s in
       let fields' = self#visit_list self#visit_binding env fields in
-      if equal_int s old then Struct (new_s, fields') else Struct (s, fields')
+      Struct (after_s, fields')
   end
 
 class ['s] union_updater (program : program) (old : int) (new_s : int) =
@@ -115,9 +116,16 @@ let get_memoized_or_execute p (f, args) ~execute =
 
 (*TODO: type checks for arguments*)
 class interpreter
-  ((program, bindings, errors, _functions) :
+  ((program, bindings, errors, functions) :
     program * tbinding list list * _ errors * int )
-  (partial_evaluate : program -> tbinding list list -> function_ -> function_) =
+  ?(updated_items : (int * int) list = [])
+  (partial_evaluate :
+    program ->
+    tbinding list list ->
+    (int * int) list ->
+    int ->
+    function_ ->
+    function_ ) =
   object (self)
     val mutable scope = bindings
 
@@ -126,6 +134,8 @@ class interpreter
     val mutable adding_structs = []
 
     val mutable errors = errors
+
+    val mutable updated_items : (int * int) list = updated_items
 
     method interpret_stmt_list : stmt list -> value =
       fun stmts ->
@@ -261,7 +271,8 @@ class interpreter
                so we do not need to check if union can be built from the expr. *)
             let data = self#interpret_expr expr in
             UnionVariant (data, union)
-        | MkStructDef {mk_struct_fields; mk_methods; mk_impls; mk_struct_id} ->
+        | MkStructDef {mk_struct_fields; mk_methods; mk_impls; mk_struct_id; _}
+          ->
             let struct_fields =
               List.map mk_struct_fields ~f:(fun (name, field_type) ->
                   ( name,
@@ -279,6 +290,8 @@ class interpreter
                 struct_id;
                 tensor = false }
             in
+            let prev_updated_items = updated_items in
+            updated_items <- (mk_struct_id, struct_id) :: updated_items ;
             let struct_updater =
               new struct_updater program mk_struct_id struct_id
             in
@@ -324,6 +337,7 @@ class interpreter
                       struct_id;
                       tensor = false } )
             in
+            updated_items <- prev_updated_items ;
             Type (StructType struct_ty)
         | MkUnionDef mk_union ->
             let compose f g x = g (f x) in
@@ -406,6 +420,20 @@ class interpreter
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
+    method interpret_partial_type =
+      function
+      | PartialStructType st ->
+          (* print_sexp (sexp_of_int st.mk_struct_id) ;
+             print_sexp (sexp_of_string "|") ;
+             if equal_int 16 st.mk_struct_id then print_sexp (sexp_of_mk_struct st) ;
+             if equal_int 16 st.mk_struct_id then
+               print_sexp
+                 (sexp_of_list
+                    (Sexplib.Conv.sexp_of_pair sexp_of_int sexp_of_int)
+                    updated_items ) ; *)
+          StructType
+            (List.Assoc.find_exn updated_items st.mk_struct_id ~equal:equal_int)
+
     method interpret_type : type_ -> type_ =
       function
       | ExprType ex -> (
@@ -414,6 +442,8 @@ class interpreter
             t
         | _ ->
             raise InternalCompilerError )
+      | PartialType pt ->
+          self#interpret_partial_type pt
       | ty ->
           ty
 
@@ -433,7 +463,7 @@ class interpreter
             value
 
     method interpret_function : function_ -> function_ =
-      fun f -> partial_evaluate program scope f
+      fun f -> partial_evaluate program scope updated_items functions f
 
     method interpret_fc : function_call -> value =
       fun (func, args) ->
@@ -487,6 +517,7 @@ class interpreter
         | Some (Comptime ex) ->
             Some ex
         | Some (Runtime _) ->
+            print_sexp (sexp_of_string ref) ;
             raise Errors.InternalCompilerError
         | None ->
             raise Errors.InternalCompilerError

@@ -20,7 +20,10 @@ class ['s] immediacy_checker =
     method! visit_function_call env (f, args) =
       match f with
       | Value (Function {function_impl = BuiltinFn _; _}) ->
-          true
+          in_function_call <- in_function_call + 1 ;
+          let result = self#visit_list self#visit_expr env args in
+          in_function_call <- in_function_call - 1 ;
+          result
       | _ ->
           in_function_call <- in_function_call + 1 ;
           let result = super#visit_function_call env (f, args) in
@@ -37,17 +40,29 @@ class ['s] immediacy_checker =
           true )
         (super#visit_function_signature env f.function_signature)
 
+    method! visit_MkFunction env f =
+      super#visit_function_signature env f.function_signature
+
+    method! visit_StructSig _ _ = true
+
     method! visit_mk_struct _ _ = true
+
+    method! visit_partial_type _ _ = false
   end
 
 class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
-  (errors : _) =
+  (updated_items : (int * int) list) (functions : int) (errors : _) =
   object (self : 's)
     inherit [_] Lang_types.map as super
 
     val mutable scope = bindings
 
-    method! visit_InvalidType _ _ = raise InternalCompilerError
+    val mutable functions = functions
+
+    method! visit_InvalidType _ ex =
+      print_sexp (sexp_of_string "invalid type") ;
+      print_sexp (sexp_of_expr ex) ;
+      raise InternalCompilerError
 
     method! visit_Reference env (ref, ty) =
       match find_in_scope ref scope with
@@ -62,7 +77,10 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
           raise InternalCompilerError
 
     method! visit_type_ env ty =
-      self#unwrap_expr_types (super#visit_type_ env ty)
+      let ty = super#visit_type_ env ty in
+      if equal_int functions 0 then
+        self#with_interpreter env (fun inter -> inter#interpret_type ty)
+      else self#unwrap_expr_types (super#visit_type_ env ty)
 
     method private unwrap_expr_types =
       function
@@ -88,6 +106,17 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
       scope <- vars_scope :: scope ;
       Let vars'
 
+    method! visit_PartialType env =
+      function
+      | PartialStructType st -> (
+        match
+          List.Assoc.find updated_items st.mk_struct_id ~equal:equal_int
+        with
+        | Some id ->
+            StructType id
+        | None ->
+            PartialType (PartialStructType (self#visit_mk_struct env st)) )
+
     method! visit_DestructuringLet _env let_ =
       match type_of let_.destructuring_let_expr with
       | StructType id ->
@@ -98,7 +127,10 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
                 List.Assoc.find struct_.struct_fields ~equal:String.equal name
                 |> Option.is_some
               then ()
-              else errors#report `Error (`FieldNotFound (id, name)) () ) ;
+              else
+                errors#report `Error
+                  (`FieldNotFound (Value (Type (StructType id)), name))
+                  () ) ;
           (* If rest of fields are not ignored, check for completeness *)
           if let_.destructuring_let_rest then ()
           else
@@ -135,12 +167,17 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
 
     method! visit_function_ env f =
       let sign = self#visit_function_signature env f.function_signature in
+      functions <- functions + 1 ;
       let args =
         List.map sign.function_params ~f:(fun (name, ty) -> (name, Runtime ty))
       in
-      self#with_vars args (fun _ ->
-          let body = self#visit_function_impl env f.function_impl in
-          {function_signature = sign; function_impl = body} )
+      let out =
+        self#with_vars args (fun _ ->
+            let body = self#visit_function_impl env f.function_impl in
+            {function_signature = sign; function_impl = body} )
+      in
+      functions <- functions - 1 ;
+      out
 
     method! visit_IntfMethodCall env call =
       let intf_instance = self#visit_expr env call.intf_instance in
@@ -189,10 +226,11 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
     (* FIXME: This function should create new instance of the partial_evaluator
        and call new_instance#visit_function_ but there is some problems with
        generics I can not solve yet. *)
-    method private with_interpreter : 'env. 'env -> _ -> _ =
+    method private with_interpreter : 'env 'a. 'env -> (_ -> 'a) -> 'a =
       fun _env f ->
         let inter =
-          new interpreter (program, scope, errors, 0) (fun _ _ f -> f)
+          new interpreter (program, scope, errors, 0) ~updated_items
+            (fun _ _ _ _ f -> f)
         in
         f inter
   end

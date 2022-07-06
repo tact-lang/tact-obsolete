@@ -24,12 +24,6 @@ let is_sig_part_of sign1 sign2 =
           (List.exists sign1.st_sig_fields ~f:(fun (name1, ty1) ->
                equal_string name1 name2 && equal_expr ty1 ty2 ) )
       then is_part := false ) ;
-  List.iter sign2.st_sig_methods ~f:(fun (name2, ty2) ->
-      if
-        not
-          (List.exists sign1.st_sig_methods ~f:(fun (name1, ty1) ->
-               equal_string name1 name2 && equal_function_signature ty1 ty2 ) )
-      then is_part := false ) ;
   !is_part
 
 class type_checker (errors : _) (functions : _) =
@@ -66,24 +60,29 @@ class type_checker (errors : _) (functions : _) =
 
     method check_type ~program ~current_bindings ~expected actual_value =
       let actual = type_of actual_value in
+      let remover = new remover_of_resolved_reference in
+      let actual' = remover#visit_type_ () actual in
+      let expected' = remover#visit_type_ () expected in
       match expected with
       | HoleType ->
           Ok actual
-      | _ when equal_type_ HoleType actual ->
+      | _ when equal_type_ HoleType actual' ->
           Ok expected
-      | _ when equal_type_ expected actual ->
+      | _ when equal_type_ expected' actual' ->
           Ok actual
       | StructSig sign_expected -> (
-        match actual with
-        | StructType sid ->
-            let s = Program.get_struct program sid in
-            let sign_actual = sig_of_struct s in
-            if is_sig_part_of sign_actual sign_expected then Ok (StructType sid)
-            else Error (TypeError expected)
-        | _ ->
-            Error (TypeError expected) )
+          let sign_expected = Arena.get program.struct_signs sign_expected in
+          match actual' with
+          | StructType sid ->
+              let s = Program.get_struct program sid in
+              let sign_actual = sig_of_struct s in
+              if is_sig_part_of sign_actual sign_expected then
+                Ok (StructType sid)
+              else Error (TypeError expected)
+          | _ ->
+              Error (TypeError expected) )
       | TypeN 0 -> (
-        match actual with
+        match actual' with
         | StructSig s ->
             Ok (StructSig s)
         | _ ->
@@ -92,8 +91,10 @@ class type_checker (errors : _) (functions : _) =
           let from_intf_ =
             let inter =
               new interpreter (program, current_bindings, errors, functions)
-                (fun _ _ f -> f)
+                (fun _ _ _ _ f -> f)
             in
+            print_sexp (sexp_of_type_ expected) ;
+            print_sexp (sexp_of_type_ actual) ;
             Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in
           let impl =
@@ -116,7 +117,7 @@ class type_checker (errors : _) (functions : _) =
           let from_intf_ =
             let inter =
               new interpreter (program, current_bindings, errors, functions)
-                (fun _ _ f -> f)
+                (fun _ _ _ _ f -> f)
             in
             Value (inter#interpret_fc (from_intf, [Value (Type actual)]))
           in

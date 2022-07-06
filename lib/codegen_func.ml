@@ -29,8 +29,8 @@ class constructor (program : T.program) =
     method cg_DestructuringLet : T.destructuring_let -> F.stmt =
       fun let_ ->
         let expr = let_.destructuring_let_expr in
-        match expr with
-        | Reference (_, StructType id) | Value (Struct (id, _)) ->
+        match T.type_of expr with
+        | StructType id ->
             let struct_ = T.Program.get_struct program id in
             let expr' = self#cg_expr expr in
             let fields =
@@ -47,7 +47,7 @@ class constructor (program : T.program) =
             in
             F.DestructuringBinding (fields, expr')
         | _x ->
-            T.print_sexp (T.sexp_of_expr _x) ;
+            T.print_sexp (T.sexp_of_type_ _x) ;
             raise Invalid
 
     method cg_Struct : T.struct_ * (string * T.expr) list -> F.expr =
@@ -67,7 +67,7 @@ class constructor (program : T.program) =
           F.Integer Zint.zero
       | StructField x ->
           self#cg_StructField x
-      | Value (Struct (id, inst)) ->
+      | Value (Struct (Value (Type (StructType id)), inst)) ->
           self#cg_Struct (T.Program.get_struct program id, inst)
       | ResolvedReference s ->
           self#cg_ResolvedReference s

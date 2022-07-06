@@ -64,12 +64,14 @@ functor
     (* Unit is important, because this function should return
        new program for each call, not one global mutable variable. *)
     let default_program () =
-      { bindings = Builtin.default_bindings ();
+      let signs = Arena.default () in
+      { bindings = Builtin.default_bindings signs;
         structs = Builtin.default_structs;
         unions = [];
         type_counter = 0;
         memoized_fcalls = [];
-        interfaces = Builtin.default_intfs }
+        interfaces = Builtin.default_intfs;
+        struct_signs = signs }
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
@@ -169,6 +171,7 @@ functor
                 amend_bindings (make_comptime (name, expr)) current_bindings ;
               Let [(name, expr)]
           | false ->
+              (* print_sexp (sexp_of_expr expr) ; *)
               let ty = type_of expr in
               current_bindings <-
                 amend_bindings (make_runtime (name, ty)) current_bindings ;
@@ -339,14 +342,25 @@ functor
                   errors#report `Error (`FieldNotFoundF field) () ;
                   (Value Void, field, VoidType) )
           | StructSig s -> (
-            match List.Assoc.find s.st_sig_fields field ~equal:equal_string with
-            | Some ty ->
-                (expr, field, expr_to_type ty)
+              let s = Arena.get program.struct_signs s in
+              match
+                List.Assoc.find s.st_sig_fields field ~equal:equal_string
+              with
+              | Some ty ->
+                  (expr, field, expr_to_type ty)
+              | None ->
+                  errors#report `Error (`FieldNotFoundF field) () ;
+                  (Value Void, field, VoidType) )
+          | PartialType (PartialStructType st) -> (
+            match
+              List.Assoc.find st.mk_struct_fields field ~equal:equal_string
+            with
+            | Some field_ty ->
+                (expr, field, expr_to_type field_ty)
             | None ->
                 errors#report `Error (`FieldNotFoundF field) () ;
                 (Value Void, field, VoidType) )
-          | s ->
-              print_sexp (sexp_of_type_ s) ;
+          | _ ->
               errors#report `Error (`FieldNotFoundF field) () ;
               (Value Void, field, VoidType)
 
@@ -396,7 +410,6 @@ functor
                       intf_method = (fn, m);
                       intf_args = args }
               | None ->
-                  print_sexp (sexp_of_expr receiver) ;
                   errors#report `Error (`MethodNotFound (receiver, fn)) () ;
                   dummy )
           | StructType st ->
@@ -429,15 +442,12 @@ functor
                         intf_method = (fn, m);
                         intf_args = receiver :: args }
                 | None ->
-                    print_sexp (sexp_of_expr receiver) ;
                     errors#report `Error (`MethodNotFound (receiver, fn)) () ;
                     dummy )
             | _ ->
-                print_sexp (sexp_of_expr receiver) ;
                 errors#report `Error (`UnexpectedType (ExprType ex)) () ;
                 dummy )
           | receiver_ty ->
-              print_sexp (sexp_of_expr receiver) ;
               errors#report `Error (`UnexpectedType receiver_ty) () ;
               dummy
 
@@ -548,17 +558,36 @@ functor
 
         method build_struct_constructor _env id fields =
           match Syntax.value id with
-          | ResolvedReference (_, Value (Type (StructType struct')))
-          | Value (Type (StructType struct')) ->
-              ( struct',
+          | ResolvedReference (_, (Value (Type (StructType _)) as ty))
+          | (Value (Type (StructType _)) as ty) ->
+              ( ty,
                 List.map fields ~f:(fun (name, expr) ->
                     (Syntax.value name, Syntax.value expr) ) )
-          | e ->
-              errors#report `Error (`UnexpectedType (type_of e)) () ;
-              (-1, [])
+          | ResolvedReference
+              (_, (Value (Type (PartialType (PartialStructType _))) as ty))
+          | (Value (Type (PartialType (PartialStructType _))) as ty) ->
+              ( ty,
+                List.map fields ~f:(fun (name, expr) ->
+                    (Syntax.value name, Syntax.value expr) ) )
+          | e -> (
+            match type_of e with
+            | StructSig _ ->
+                ( e,
+                  List.map fields ~f:(fun (name, expr) ->
+                      (Syntax.value name, Syntax.value expr) ) )
+            | _ ->
+                (* print_sexp (sexp_of_expr e) ;
+                   raise InternalCompilerError *)
+                errors#report `Error (`UnexpectedType (type_of e)) () ;
+                (Value (Type VoidType), []) )
+        (* print_sexp (sexp_of_expr e) ;
+           raise InternalCompilerError *)
 
-        method build_struct_definition _env struct_fields bindings impls =
-          let mk_struct_fields = s#of_located_list struct_fields in
+        method build_struct_definition _ _ _ _ = raise InternalCompilerError
+
+        method make_struct_definition struct_fields bindings impls mk_struct_id
+            sign_id =
+          let mk_struct_fields = struct_fields in
           let mk_methods =
             List.filter_map bindings ~f:(fun binding ->
                 let name, expr = Syntax.value binding in
@@ -578,11 +607,16 @@ functor
                        | _ ->
                            None ) ) )
           in
+          let _ =
+            Arena.update program.struct_signs sign_id ~f:(fun _ ->
+                {st_sig_fields = mk_struct_fields} )
+          in
           let s' =
             { mk_struct_fields;
               mk_methods = mk_methods @ impl_methods;
               mk_impls = impls;
-              mk_struct_id = -1 }
+              mk_struct_id;
+              mk_struct_sig = sign_id }
           in
           (* Check for duplicate fields *)
           ( match
@@ -601,45 +635,45 @@ functor
             s#visit_list
               (s#visit_located s#visit_struct_field)
               env syn_struct_def.fields
+            |> s#of_located_list
           in
-          let struct_ =
-            { struct_fields =
-                List.map (s#of_located_list fields) ~f:(fun (name, expr) ->
-                    (name, {field_type = expr_to_type expr}) );
-              struct_methods = [];
-              struct_impls = [];
-              struct_id = program.type_counter;
-              tensor = false }
+          let sign_id, _ =
+            Arena.with_id program.struct_signs ~f:(fun _ ->
+                {st_sig_fields = fields} )
+          in
+          let mk_struct_ =
+            { mk_struct_fields = fields;
+              mk_methods = [];
+              mk_impls = [];
+              mk_struct_id = program.type_counter;
+              mk_struct_sig = sign_id }
           in
           program.type_counter <- program.type_counter + 1 ;
           let mk_struct =
-            Program.with_struct program struct_ (fun _ ->
-                let methods =
-                  s#with_bindings
-                    [ make_comptime
-                        ("Self", Value (Type (StructType struct_.struct_id))) ]
-                    (fun _ ->
-                      s#visit_list
-                        (s#visit_located s#visit_binding)
-                        env syn_struct_def.struct_bindings )
-                in
-                let impls =
-                  s#with_bindings
-                    [ make_comptime
-                        ("Self", Value (Type (StructType struct_.struct_id))) ]
-                    (fun _ -> s#visit_list s#visit_impl env syn_struct_def.impls)
-                in
-                let mk_struct =
-                  s#build_struct_definition env fields methods impls
-                in
-                Error {mk_struct with mk_struct_id = struct_.struct_id} )
-          in
-          let mk_struct =
-            match mk_struct with
-            | Error mk ->
-                mk
-            | Ok _ ->
-                raise InternalCompilerError
+            let methods =
+              s#with_bindings
+                [ make_comptime
+                    ( "Self",
+                      Value (Type (PartialType (PartialStructType mk_struct_)))
+                    ) ]
+                (fun _ ->
+                  s#visit_list
+                    (s#visit_located s#visit_binding)
+                    env syn_struct_def.struct_bindings )
+            in
+            let impls =
+              s#with_bindings
+                [ make_comptime
+                    ( "Self",
+                      Value (Type (PartialType (PartialStructType mk_struct_)))
+                    ) ]
+                (fun _ -> s#visit_list s#visit_impl env syn_struct_def.impls)
+            in
+            let mk_struct =
+              s#make_struct_definition fields methods impls
+                mk_struct_.mk_struct_id mk_struct_.mk_struct_sig
+            in
+            {mk_struct with mk_struct_id = mk_struct_.mk_struct_id}
           in
           mk_struct
 
@@ -742,8 +776,8 @@ functor
                               (Reference ("v", expr_to_type case), union) ) ) )
                } )
 
-        method private partial_evaluate_fn p b f =
-          let partial_evaluator = new partial_evaluator p b errors in
+        method private partial_evaluate_fn p b u funcs f =
+          let partial_evaluator = new partial_evaluator p b u funcs errors in
           partial_evaluator#visit_function_ () f
       end
   end

@@ -1,5 +1,7 @@
 open Base
 
+let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
+
 class ['s] base_map =
   object (_ : 's)
     inherit ['s] Zint.map
@@ -12,6 +14,8 @@ class virtual ['s] base_reduce =
     method virtual visit_instr : _
 
     method virtual visit_z : _
+
+    method virtual visit_arena : _
   end
 
 class virtual ['s] base_visitor =
@@ -22,6 +26,52 @@ class virtual ['s] base_visitor =
 
     inherit ['s] Asm.map
   end
+
+module Arena = struct
+  type 'a t =
+    { mutable current_id : int; [@hash.ignore]
+      mutable items : (int * 'a) list [@hash.ignore] }
+  [@@deriving equal, compare, hash, sexp_of]
+
+  class ['s] visitor =
+    object (_self : 's)
+      method visit_arena : 'env. _ -> 'env -> _ -> _ = fun _ _ a -> a
+    end
+
+  let default () = {current_id = 0; items = []}
+
+  let get a id = List.Assoc.find a.items id ~equal:equal_int |> Option.value_exn
+
+  let with_id a ~f =
+    let current_id = a.current_id in
+    a.current_id <- current_id + 1 ;
+    let item = f current_id in
+    a.items <- (current_id, item) :: a.items ;
+    (current_id, item)
+
+  open struct
+    let rec update_list id new_item = function
+      | [] ->
+          raise Errors.InternalCompilerError
+      | (xid, old_s) :: xs ->
+          if equal_int xid id then (id, new_item) :: xs
+          else (xid, old_s) :: update_list id new_item xs
+  end
+
+  let update a id ~f =
+    let item = get a id in
+    let new_item = f item in
+    a.items <- update_list id new_item a.items ;
+    new_item
+
+  (* For tests purposes only *)
+  let strip_if_exists left right =
+    { left with
+      items =
+        List.filter left.items ~f:(fun (id, _) ->
+            Option.is_none (List.Assoc.find right.items id ~equal:equal_int) )
+    }
+end
 
 type comptime_counter = (int[@sexp.opaque])
 
@@ -39,8 +89,11 @@ and program =
     mutable unions : (int * union) list; [@sexp.list] [@hash.ignore]
     mutable interfaces : (int * interface) list; [@sexp.list] [@hash.ignore]
     mutable type_counter : (int[@sexp.opaque]); [@hash.ignore]
-    mutable memoized_fcalls : (((value * value list) * value) list[@sexp.opaque])
-        [@hash.ignore] }
+    mutable memoized_fcalls :
+      (((value * value list) * value) list[@sexp.opaque]);
+        [@hash.ignore]
+    mutable struct_signs : struct_sig Arena.t
+        [@hash.ignore] [@visitors.name "arena"] }
 
 and expr =
   | FunctionCall of function_call
@@ -66,7 +119,7 @@ and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 
 and value =
   | Void
-  | Struct of (int * (string * expr) list)
+  | Struct of (expr * (string * expr) list)
   | UnionVariant of (value * int)
   | Function of function_
   | Integer of (Zint.t[@visitors.name "z"])
@@ -93,6 +146,8 @@ and destructuring_let =
 
 and builtin = string
 
+and partial_type = PartialStructType of mk_struct
+
 and type_ =
   | TypeN of int
   | IntegerType
@@ -103,7 +158,8 @@ and type_ =
   | StructType of int
   | UnionType of int
   | InterfaceType of int
-  | StructSig of struct_sig
+  | StructSig of int
+  | PartialType of partial_type
   | FunctionType of function_signature
   | HoleType
   | SelfType
@@ -127,7 +183,8 @@ and mk_struct =
   { mk_struct_fields : (string * expr) list;
     mk_methods : (string * expr) list;
     mk_impls : mk_impl list;
-    mk_struct_id : int }
+    mk_struct_id : int;
+    mk_struct_sig : int }
 
 and struct_ =
   { struct_fields : (string * struct_field) list;
@@ -137,9 +194,7 @@ and struct_ =
     (* Used by codegen to determine if this is a tensor *)
     tensor : bool [@sexp.bool] }
 
-and struct_sig =
-  { st_sig_fields : (string * expr) list;
-    st_sig_methods : (string * function_signature) list }
+and struct_sig = {st_sig_fields : (string * expr) list}
 
 and discriminator = Discriminator of int
 
@@ -193,9 +248,15 @@ and primitive =
     compare,
     hash,
     sexp_of,
-    visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
+    visitors
+      { variety = "map";
+        polymorphic = true;
+        ancestors = ["base_map"; "Arena.visitor"] },
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
-    visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
+    visitors
+      { variety = "fold";
+        name = "visitor";
+        ancestors = ["base_visitor"; "Arena.visitor"] }]
 
 let type0 = TypeN 0
 
@@ -218,13 +279,6 @@ let extract_comptime_bindings bindings =
 let rec expr_to_type = function
   | Value (Type type_) ->
       type_
-  | FunctionCall
-      ( ResolvedReference
-          (_, Value (Function {function_signature = {function_returns; _}; _})),
-        _ )
-  | FunctionCall
-      (Value (Function {function_signature = {function_returns; _}; _}), _) ->
-      function_returns
   | Reference (ref, ty) ->
       ExprType (Reference (ref, ty))
   | ResolvedReference (_, e) ->
@@ -232,20 +286,18 @@ let rec expr_to_type = function
   | expr ->
       ExprType expr
 
-let sig_of_struct {struct_fields; struct_methods; _} =
+let sig_of_struct {struct_fields; _} =
   { st_sig_fields =
       List.Assoc.map struct_fields ~f:(fun {field_type} ->
           match field_type with
           | ExprType ex ->
               ex
           | field_type ->
-              Value (Type field_type) );
-    st_sig_methods =
-      List.Assoc.map struct_methods ~f:(fun f -> f.function_signature) }
+              Value (Type field_type) ) }
 
 let rec type_of = function
-  | Value (Struct (sid, _)) ->
-      StructType sid
+  | Value (Struct (s, _)) ->
+      expr_to_type s
   | Value (UnionVariant (_, uid)) ->
       UnionType uid
   | Value (Function {function_signature; _}) ->
@@ -264,20 +316,13 @@ let rec type_of = function
       type_of_type t
   | Hole ->
       HoleType
-  | FunctionCall
-      ( ResolvedReference
-          ( _,
-            Value
-              (Function
-                {function_signature = {function_returns; function_params}; _} )
-          ),
-        args )
-  | FunctionCall
-      ( Value
-          (Function
-            {function_signature = {function_returns; function_params}; _} ),
-        args ) ->
-      type_of_call args function_params function_returns
+  | FunctionCall (f, args) -> (
+      let f = type_of f in
+      match f with
+      | FunctionType sign ->
+          type_of_call args sign.function_params sign.function_returns
+      | _ ->
+          raise Errors.InternalCompilerError )
   | Reference (_, t) ->
       t
   | ResolvedReference (_, e) ->
@@ -285,7 +330,7 @@ let rec type_of = function
   | MakeUnionVariant (_, u) ->
       UnionType u
   | MkStructDef mk ->
-      StructSig (sig_of_mk_struct mk)
+      StructSig mk.mk_struct_sig
   | StructField (_, _, ty) ->
       ty
   | IntfMethodCall {intf_method = _, sign; intf_args; _} ->
@@ -297,16 +342,21 @@ let rec type_of = function
   | expr ->
       InvalidType expr
 
-and sig_of_mk_struct {mk_struct_fields; mk_methods; _} =
-  { st_sig_fields = mk_struct_fields;
-    st_sig_methods =
-      List.map mk_methods ~f:(fun (name, f) ->
-          ( name,
-            match type_of f with
-            | FunctionType sign ->
-                sign
-            | _ ->
-                raise Errors.InternalCompilerError ) ) }
+(*
+  Нужно чтобы заработало LoadResult(T).new();
+  Для этого нужно добавить методы в struct_sign
+  Для этого надо вынести сигнатуры в арены, потому что методы ссылаются на self-struct-sig
+*)
+and sig_of_mk_struct {mk_struct_fields; _} =
+  (* let partial_updater =
+       object (_self)
+         inherit [_] map
+
+         method! visit_PartialType env = function
+         | PartialStructType pst -> if partial_type
+       end
+     in *)
+  {st_sig_fields = mk_struct_fields}
 
 and type_of_type = function
   | TypeN x ->
@@ -357,6 +407,8 @@ class ['s] boolean_reduce (zero : bool) =
     method visit_instr _env _instr = zero
 
     method visit_z _env _z = zero
+
+    method visit_arena _ _ _ = zero
   end
 
 class ['s] primitive_presence =
@@ -387,7 +439,10 @@ class ['s] expr_immediacy_check =
     method! visit_function_call env (f, args) =
       match f with
       | Value (Function {function_impl = BuiltinFn _; _}) ->
-          true
+          in_function_call <- in_function_call + 1 ;
+          let result = self#visit_list self#visit_expr env args in
+          in_function_call <- in_function_call - 1 ;
+          result
       | _ ->
           in_function_call <- in_function_call + 1 ;
           let result = super#visit_function_call env (f, args) in
@@ -404,7 +459,14 @@ class ['s] expr_immediacy_check =
           true )
         (super#visit_function_signature env f.function_signature)
 
+    method! visit_MkFunction env f =
+      super#visit_function_signature env f.function_signature
+
+    method! visit_StructSig _ _ = true
+
     method! visit_mk_struct _ _ = true
+
+    method! visit_partial_type _ _ = false
   end
 
 let rec is_immediate_expr expr =
@@ -432,8 +494,6 @@ let find_in_runtime_scope : 'a. string -> (string * 'a) list list -> 'a option =
   List.find_map scope ~f:(fun bindings ->
       List.find_map bindings ~f:(fun (name, value) ->
           if String.equal ref name then Some value else None ) )
-
-let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
 module Value = struct
   let unwrap_function = function
