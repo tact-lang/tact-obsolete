@@ -338,7 +338,15 @@ functor
               | None ->
                   errors#report `Error (`FieldNotFoundF field) () ;
                   (Value Void, field, VoidType) )
-          | _ ->
+          | StructSig s -> (
+            match List.Assoc.find s.st_sig_fields field ~equal:equal_string with
+            | Some ty ->
+                (expr, field, expr_to_type ty)
+            | None ->
+                errors#report `Error (`FieldNotFoundF field) () ;
+                (Value Void, field, VoidType) )
+          | s ->
+              print_sexp (sexp_of_type_ s) ;
               errors#report `Error (`FieldNotFoundF field) () ;
               (Value Void, field, VoidType)
 
@@ -471,8 +479,15 @@ functor
           let functions' = functions in
           (* increment function counter *)
           functions <- functions + 1 ;
+          let body =
+            match body.function_stmt with
+            | Expr ex ->
+                Syntax.Return ex
+            | expr ->
+                expr
+          in
           (* process the body *)
-          let result = super#visit_function_body env body in
+          let result = super#visit_function_body env {function_stmt = body} in
           (* Convert implicit returns accomplished with an implicit last break *)
           let rec handle_returning_break = function
             | Block block -> (
@@ -487,6 +502,8 @@ functor
                     Block stmts ) )
             | Break (Expr expr) ->
                 Return expr
+            | Expr ex ->
+                Return ex
             | other ->
                 other
           in

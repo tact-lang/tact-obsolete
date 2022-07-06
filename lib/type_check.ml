@@ -6,6 +6,32 @@ open Errors
 
 type type_check_error = TypeError of type_ | NeedFromCall of expr
 
+class ['s] remover_of_resolved_reference =
+  object (self : 's)
+    inherit ['s] map
+
+    method! visit_ResolvedReference env (_, ex) = self#visit_expr env ex
+  end
+
+let is_sig_part_of sign1 sign2 =
+  let remover = new remover_of_resolved_reference in
+  let sign1 = remover#visit_struct_sig () sign1 in
+  let sign2 = remover#visit_struct_sig () sign2 in
+  let is_part = ref true in
+  List.iter sign2.st_sig_fields ~f:(fun (name2, ty2) ->
+      if
+        not
+          (List.exists sign1.st_sig_fields ~f:(fun (name1, ty1) ->
+               equal_string name1 name2 && equal_expr ty1 ty2 ) )
+      then is_part := false ) ;
+  List.iter sign2.st_sig_methods ~f:(fun (name2, ty2) ->
+      if
+        not
+          (List.exists sign1.st_sig_methods ~f:(fun (name1, ty1) ->
+               equal_string name1 name2 && equal_function_signature ty1 ty2 ) )
+      then is_part := false ) ;
+  !is_part
+
 class type_checker (errors : _) (functions : _) =
   object (self)
     val mutable fn_returns : type_ option = None
@@ -26,7 +52,7 @@ class type_checker (errors : _) (functions : _) =
           raise InternalCompilerError
 
     method get_fn_returns =
-      match fn_returns with Some x -> x | None -> HoleType
+      match fn_returns with Some x -> x | None -> raise InternalCompilerError
 
     method with_fn_returns
         : 'env 'a. 'env -> type_ -> ('env -> 'a) -> 'a * type_ =
@@ -47,6 +73,21 @@ class type_checker (errors : _) (functions : _) =
           Ok expected
       | _ when equal_type_ expected actual ->
           Ok actual
+      | StructSig sign_expected -> (
+        match actual with
+        | StructType sid ->
+            let s = Program.get_struct program sid in
+            let sign_actual = sig_of_struct s in
+            if is_sig_part_of sign_actual sign_expected then Ok (StructType sid)
+            else Error (TypeError expected)
+        | _ ->
+            Error (TypeError expected) )
+      | TypeN 0 -> (
+        match actual with
+        | StructSig s ->
+            Ok (StructSig s)
+        | _ ->
+            Error (TypeError expected) )
       | StructType s -> (
           let from_intf_ =
             let inter =

@@ -161,7 +161,7 @@ let%expect_test "Int(bits) serializer" =
                   ((i
                     (FunctionCall
                      ((ResolvedReference (new <opaque>)) ((Value (Integer 100))))))))
-                 (Expr
+                 (Return
                   (FunctionCall
                    ((ResolvedReference (serialize <opaque>))
                     ((Reference (i (StructType 44)))
@@ -198,7 +198,7 @@ let%expect_test "demo struct serializer" =
               ((Block
                 ((Let
                   ((b (FunctionCall ((ResolvedReference (new <opaque>)) ())))))
-                 (Expr
+                 (Return
                   (FunctionCall
                    ((ResolvedReference (T_serializer <opaque>))
                     ((Value

@@ -103,6 +103,7 @@ and type_ =
   | StructType of int
   | UnionType of int
   | InterfaceType of int
+  | StructSig of struct_sig
   | FunctionType of function_signature
   | HoleType
   | SelfType
@@ -135,6 +136,10 @@ and struct_ =
     struct_id : int;
     (* Used by codegen to determine if this is a tensor *)
     tensor : bool [@sexp.bool] }
+
+and struct_sig =
+  { st_sig_fields : (string * expr) list;
+    st_sig_methods : (string * function_signature) list }
 
 and discriminator = Discriminator of int
 
@@ -227,6 +232,17 @@ let rec expr_to_type = function
   | expr ->
       ExprType expr
 
+let sig_of_struct {struct_fields; struct_methods; _} =
+  { st_sig_fields =
+      List.Assoc.map struct_fields ~f:(fun {field_type} ->
+          match field_type with
+          | ExprType ex ->
+              ex
+          | field_type ->
+              Value (Type field_type) );
+    st_sig_methods =
+      List.Assoc.map struct_methods ~f:(fun f -> f.function_signature) }
+
 let rec type_of = function
   | Value (Struct (sid, _)) ->
       StructType sid
@@ -268,8 +284,8 @@ let rec type_of = function
       type_of e
   | MakeUnionVariant (_, u) ->
       UnionType u
-  | MkStructDef _ ->
-      type0
+  | MkStructDef mk ->
+      StructSig (sig_of_mk_struct mk)
   | StructField (_, _, ty) ->
       ty
   | IntfMethodCall {intf_method = _, sign; intf_args; _} ->
@@ -281,7 +297,24 @@ let rec type_of = function
   | expr ->
       InvalidType expr
 
-and type_of_type = function TypeN x -> TypeN (x + 1) | _otherwise -> TypeN 0
+and sig_of_mk_struct {mk_struct_fields; mk_methods; _} =
+  { st_sig_fields = mk_struct_fields;
+    st_sig_methods =
+      List.map mk_methods ~f:(fun (name, f) ->
+          ( name,
+            match type_of f with
+            | FunctionType sign ->
+                sign
+            | _ ->
+                raise Errors.InternalCompilerError ) ) }
+
+and type_of_type = function
+  | TypeN x ->
+      TypeN (x + 1)
+  | StructSig _ ->
+      TypeN 1
+  | _otherwise ->
+      TypeN 0
 
 and type_of_call args arg_types returns =
   let associated =

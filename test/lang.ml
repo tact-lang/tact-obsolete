@@ -1051,10 +1051,14 @@ let%expect_test "parametric struct instantiation" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((A (TypeN 0)))) (function_returns (TypeN 0))))
+             ((function_params ((A (TypeN 0))))
+              (function_returns
+               (StructSig
+                ((st_sig_fields ((a (Value (Type (Dependent A (TypeN 0)))))))
+                 (st_sig_methods ()))))))
             (function_impl
              (Fn
-              ((Expr
+              ((Return
                 (MkStructDef
                  ((mk_struct_fields ((a (Reference (A (TypeN 0))))))
                   (mk_methods ()) (mk_impls ()) (mk_struct_id 72)))))))))))))
@@ -2808,7 +2812,15 @@ let%expect_test "methods monomorphization" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((X (TypeN 0)))) (function_returns (TypeN 0))))
+             ((function_params ((X (TypeN 0))))
+              (function_returns
+               (StructSig
+                ((st_sig_fields ())
+                 (st_sig_methods
+                  ((id
+                    ((function_params
+                      ((self (StructType 72)) (x (Dependent X (TypeN 0)))))
+                     (function_returns (Dependent X (TypeN 0))))))))))))
             (function_impl
              (Fn
               ((Return
@@ -3398,3 +3410,316 @@ let%expect_test "type that does not implement interface passed to the \
            (struct_id 74)))))
        (interfaces ((72 ((interface_methods ()))))) (type_counter <opaque>)
        (memoized_fcalls <opaque>)))) |}]
+
+let%expect_test "struct signatures" =
+  let source =
+    {|
+      struct Int2(bits: Integer) {
+        val value: Integer
+      }
+      fn extract_value(n: Integer) {
+        fn(x: Int2(n)) -> Integer {  
+          x.value
+        }
+      }
+      let five = extract_value(10)(Int(10).new(5));
+      let zero = extract_value(20)(Int(20).new(0));
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((zero (Value (Integer 0))) (five (Value (Integer 5)))
+        (extract_value
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((n IntegerType)))
+              (function_returns
+               (FunctionType
+                ((function_params
+                  ((x
+                    (StructSig
+                     ((st_sig_fields
+                       ((value (ResolvedReference (Integer <opaque>)))))
+                      (st_sig_methods ()))))))
+                 (function_returns IntegerType))))))
+            (function_impl
+             (Fn
+              ((Return
+                (MkFunction
+                 ((function_signature
+                   ((function_params
+                     ((x
+                       (StructSig
+                        ((st_sig_fields
+                          ((value (ResolvedReference (Integer <opaque>)))))
+                         (st_sig_methods ()))))))
+                    (function_returns IntegerType)))
+                  (function_impl
+                   (Fn
+                    ((Return
+                      (StructField
+                       ((Reference
+                         (x
+                          (StructSig
+                           ((st_sig_fields
+                             ((value (ResolvedReference (Integer <opaque>)))))
+                            (st_sig_methods ())))))
+                        value IntegerType))))))))))))))))
+        (Int2
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((bits IntegerType)))
+              (function_returns
+               (StructSig
+                ((st_sig_fields ((value (ResolvedReference (Integer <opaque>)))))
+                 (st_sig_methods ()))))))
+            (function_impl
+             (Fn
+              ((Return
+                (MkStructDef
+                 ((mk_struct_fields
+                   ((value (ResolvedReference (Integer <opaque>)))))
+                  (mk_methods ()) (mk_impls ()) (mk_struct_id 72)))))))))))))
+      (structs
+       ((74
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((i IntegerType)))
+                (function_returns (StructType 74))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Value (Struct (74 ((value (Reference (i IntegerType)))))))))))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 74)) (builder (StructType 3))))
+                (function_returns (StructType 3))))
+              (function_impl
+               (Fn
+                ((Return
+                  (FunctionCall
+                   ((ResolvedReference (serialize_int <opaque>))
+                    ((Reference (builder (StructType 3)))
+                     (StructField
+                      ((Reference (self (StructType 74))) value IntegerType))
+                     (Value (Integer 20)))))))))))
+            (deserialize
+             ((function_signature
+               ((function_params ((s (StructType 6))))
+                (function_returns (StructType 10))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Let
+                    ((res
+                      (FunctionCall
+                       ((ResolvedReference (load_int <opaque>))
+                        ((Reference (s (StructType 6))) (Value (Integer 20))))))))
+                   (Return
+                    (Value
+                     (Struct
+                      (10
+                       ((slice
+                         (StructField
+                          ((Reference (res (StructType 5))) slice (StructType 6))))
+                        (value
+                         (Value
+                          (Struct
+                           (74
+                            ((value
+                              (StructField
+                               ((Reference (res (StructType 5))) value
+                                IntegerType))))))))))))))))))))
+            (from
+             ((function_signature
+               ((function_params ((i IntegerType)))
+                (function_returns (StructType 74))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Value (Struct (74 ((value (Reference (i IntegerType)))))))))))))))
+          (struct_impls
+           (((impl_interface -1)
+             (impl_methods
+              ((serialize
+                ((function_signature
+                  ((function_params
+                    ((self (StructType 74)) (builder (StructType 3))))
+                   (function_returns (StructType 3))))
+                 (function_impl
+                  (Fn
+                   ((Return
+                     (FunctionCall
+                      ((ResolvedReference (serialize_int <opaque>))
+                       ((Reference (builder (StructType 3)))
+                        (StructField
+                         ((Reference (self (StructType 74))) value IntegerType))
+                        (Value (Integer 20))))))))))))))
+            ((impl_interface -3)
+             (impl_methods
+              ((deserialize
+                ((function_signature
+                  ((function_params ((s (StructType 6))))
+                   (function_returns (StructType 10))))
+                 (function_impl
+                  (Fn
+                   ((Block
+                     ((Let
+                       ((res
+                         (FunctionCall
+                          ((ResolvedReference (load_int <opaque>))
+                           ((Reference (s (StructType 6))) (Value (Integer 20))))))))
+                      (Return
+                       (Value
+                        (Struct
+                         (10
+                          ((slice
+                            (StructField
+                             ((Reference (res (StructType 5))) slice
+                              (StructType 6))))
+                           (value
+                            (Value
+                             (Struct
+                              (74
+                               ((value
+                                 (StructField
+                                  ((Reference (res (StructType 5))) value
+                                   IntegerType)))))))))))))))))))))))
+            ((impl_interface 11)
+             (impl_methods
+              ((from
+                ((function_signature
+                  ((function_params ((i IntegerType)))
+                   (function_returns (StructType 74))))
+                 (function_impl
+                  (Fn
+                   ((Return
+                     (Value (Struct (74 ((value (Reference (i IntegerType))))))))))))))))))
+          (struct_id 74)))
+        (73
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_methods
+           ((new
+             ((function_signature
+               ((function_params ((i IntegerType)))
+                (function_returns (StructType 73))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Value (Struct (73 ((value (Reference (i IntegerType)))))))))))))
+            (serialize
+             ((function_signature
+               ((function_params
+                 ((self (StructType 73)) (builder (StructType 3))))
+                (function_returns (StructType 3))))
+              (function_impl
+               (Fn
+                ((Return
+                  (FunctionCall
+                   ((ResolvedReference (serialize_int <opaque>))
+                    ((Reference (builder (StructType 3)))
+                     (StructField
+                      ((Reference (self (StructType 73))) value IntegerType))
+                     (Value (Integer 10)))))))))))
+            (deserialize
+             ((function_signature
+               ((function_params ((s (StructType 6))))
+                (function_returns (StructType 10))))
+              (function_impl
+               (Fn
+                ((Block
+                  ((Let
+                    ((res
+                      (FunctionCall
+                       ((ResolvedReference (load_int <opaque>))
+                        ((Reference (s (StructType 6))) (Value (Integer 10))))))))
+                   (Return
+                    (Value
+                     (Struct
+                      (10
+                       ((slice
+                         (StructField
+                          ((Reference (res (StructType 5))) slice (StructType 6))))
+                        (value
+                         (Value
+                          (Struct
+                           (73
+                            ((value
+                              (StructField
+                               ((Reference (res (StructType 5))) value
+                                IntegerType))))))))))))))))))))
+            (from
+             ((function_signature
+               ((function_params ((i IntegerType)))
+                (function_returns (StructType 73))))
+              (function_impl
+               (Fn
+                ((Return
+                  (Value (Struct (73 ((value (Reference (i IntegerType)))))))))))))))
+          (struct_impls
+           (((impl_interface -1)
+             (impl_methods
+              ((serialize
+                ((function_signature
+                  ((function_params
+                    ((self (StructType 73)) (builder (StructType 3))))
+                   (function_returns (StructType 3))))
+                 (function_impl
+                  (Fn
+                   ((Return
+                     (FunctionCall
+                      ((ResolvedReference (serialize_int <opaque>))
+                       ((Reference (builder (StructType 3)))
+                        (StructField
+                         ((Reference (self (StructType 73))) value IntegerType))
+                        (Value (Integer 10))))))))))))))
+            ((impl_interface -3)
+             (impl_methods
+              ((deserialize
+                ((function_signature
+                  ((function_params ((s (StructType 6))))
+                   (function_returns (StructType 10))))
+                 (function_impl
+                  (Fn
+                   ((Block
+                     ((Let
+                       ((res
+                         (FunctionCall
+                          ((ResolvedReference (load_int <opaque>))
+                           ((Reference (s (StructType 6))) (Value (Integer 10))))))))
+                      (Return
+                       (Value
+                        (Struct
+                         (10
+                          ((slice
+                            (StructField
+                             ((Reference (res (StructType 5))) slice
+                              (StructType 6))))
+                           (value
+                            (Value
+                             (Struct
+                              (73
+                               ((value
+                                 (StructField
+                                  ((Reference (res (StructType 5))) value
+                                   IntegerType)))))))))))))))))))))))
+            ((impl_interface 11)
+             (impl_methods
+              ((from
+                ((function_signature
+                  ((function_params ((i IntegerType)))
+                   (function_returns (StructType 73))))
+                 (function_impl
+                  (Fn
+                   ((Return
+                     (Value (Struct (73 ((value (Reference (i IntegerType))))))))))))))))))
+          (struct_id 73)))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>))) |}]

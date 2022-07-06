@@ -120,7 +120,7 @@ let%expect_test "Int(bits) serializer codegen" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     int f0(int i) {
       return i;
@@ -134,7 +134,7 @@ let%expect_test "Int(bits) serializer codegen" =
     }
     _ test_int(builder b) {
       int i = f0(100);
-      f1(i, b);
+      return f1(i, b);
     } |}]
 
 let%expect_test "demo struct serializer" =
@@ -194,7 +194,7 @@ let%expect_test "demo struct serializer" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     builder f1(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
@@ -222,7 +222,7 @@ let%expect_test "demo struct serializer" =
     }
     _ test() {
       builder b = f3();
-      T_serializer([f4(0), f5(1)], b);
+      return T_serializer([f4(0), f5(1)], b);
     } |}]
 
 let%expect_test "demo struct serializer 2" =
@@ -282,7 +282,7 @@ let%expect_test "demo struct serializer 2" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     builder f1(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
@@ -425,7 +425,7 @@ let%expect_test "serializer inner struct" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     builder f1(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
@@ -536,7 +536,7 @@ let%expect_test "switch statement" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     int test(tuple i) {
       {
@@ -608,7 +608,7 @@ let%expect_test "tensor2" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     int test() {
       (int, int) x = builtin_divmod(10, 2);
@@ -674,7 +674,7 @@ let%expect_test "serialization api" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     builder f0() {
       return builtin_builder_new();
@@ -970,7 +970,7 @@ let%expect_test "deserialization api" =
       return begin_cell();
     }
     _ send_raw_msg(cell msg, int flags) {
-      builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_msg(msg, flags);
     }
     slice f0(cell cell_) {
       return builtin_slice_begin_parse(cell_);
