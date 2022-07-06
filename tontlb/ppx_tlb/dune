@@ -1,0 +1,7 @@
+(library
+ (libraries base bitstring ppxlib tlb camelsnakekebab)
+ (package ppx_tontlb)
+ (name ppx_tlb)
+ (kind ppx_rewriter)
+ (preprocess
+  (pps ppxlib.metaquot)))

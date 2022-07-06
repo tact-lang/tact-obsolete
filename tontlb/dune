@@ -1,0 +1,33 @@
+(library
+ (libraries
+  base
+  sexplib
+  bitstring
+  menhirLib
+  zarith
+  ppx_make
+  ppx_sexp_conv
+  ppx_expect
+  ppx_blob
+  ppx_compare
+  ppx_bitstring)
+ (package tontlb)
+ (name tlb)
+ (inline_tests)
+ (preprocess
+  (pps
+   ppx_make
+   ppx_bitstring
+   ppx_sexp_conv
+   ppx_expect
+   ppx_blob
+   ppx_compare
+   ppx_bitstring))
+ (preprocessor_deps
+  (file block.tlb)))
+
+(menhir
+ (modules parser)
+ (flags -v))
+
+(ocamllex lexer)

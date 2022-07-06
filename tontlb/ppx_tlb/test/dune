@@ -1,0 +1,8 @@
+(library
+ (libraries base bitstring ppx_tlb)
+ (package ppx_tontlb)
+ (name ppx_tlb_test)
+ (preprocessor_deps
+  (file block.tlb))
+ (preprocess
+  (pps ppx_tlb)))

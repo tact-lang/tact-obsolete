@@ -8,6 +8,38 @@
 (authors "cmxog@protonmail.com" "dmytro.polunin@gmail.com")
 (maintainers "cmxog@protonmail.com" "dmytro.polunin@gmail.com")
 
+(version 0.1)
+
+(package
+ (name tontlb)
+ (synopsis "TON's Typed Language - Binary")
+ (depends
+   (ocaml (>= 4.14.0))
+   (ppx_show (>= 0.2.1))
+   (ppx_make (>= 0.3.0))
+   (ppx_blob (>= 0.7.2))
+   (base (>= 0.15.0))
+   (bitstring (>= 4.1.0))
+   (ppx_bitstring (>= 4.1.0))
+   (dune (and :build (>= 3.1.1)))
+   (menhirLib (= 20220210))
+   (menhir (= 20220210))
+   (menhirSdk (= 20220210))
+   (base (>= 0.15.0))
+   (ppx_compare (>= 0.15.0))
+   (ppx_expect (and :with-test (>= 0.15.0)))
+   (ppx_blob (and :with-test (>= 0.7.2))))
+)
+
+(package
+ (name ppx_tontlb)
+ (synopsis "TON's Typed Language - Binary")
+ (depends
+   (tontlb (= 0.1))
+   (camelsnakekebab (>= 0.4))
+   (ppxlib (>= 0.27.0)))
+)
+
 (package
  (name tonvm)
  (synopsis "TON Virtual Machine implementation")
