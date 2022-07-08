@@ -61,17 +61,28 @@ functor
           {function_params; function_returns}
       end
 
+    (* class ['s] comptime_checker =
+       object (_self : 's)
+         inherit ['s] boolean_reduce true as super
+
+         method! visit_function_ = super#visit_function_
+
+         method! visit_Primitive = false
+       end *)
+
     (* Unit is important, because this function should return
        new program for each call, not one global mutable variable. *)
     let default_program () =
-      let signs = Arena.default () in
-      { bindings = Builtin.default_bindings signs;
+      let struct_signs = Arena.default () in
+      let union_signs = Arena.default () in
+      { bindings = Builtin.default_bindings struct_signs;
         structs = Builtin.default_structs;
         unions = [];
         type_counter = 0;
         memoized_fcalls = [];
         interfaces = Builtin.default_intfs;
-        struct_signs = signs }
+        struct_signs;
+        union_signs }
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
@@ -103,7 +114,7 @@ functor
         method build_Function _env fn = MkFunction fn
 
         method build_FunctionCall _env (f, args) =
-          match type_of f with
+          match type_of program f with
           | FunctionType sign -> (
               let no_errors = ref true in
               let types_satisfying =
@@ -117,7 +128,7 @@ functor
                         s
                     | _ ->
                         errors#report `Error
-                          (`TypeError (expected, type_of expr))
+                          (`TypeError (expected, type_of program expr))
                           () ;
                         no_errors := false ;
                         Value Void )
@@ -125,7 +136,10 @@ functor
               match types_satisfying with
               | Ok args' when !no_errors ->
                   let fc = (f, args') in
-                  if is_immediate_expr (FunctionCall (f, args')) then
+                  if
+                    is_immediate_expr current_bindings program
+                      (FunctionCall (f, args'))
+                  then
                     let fc =
                       let inter =
                         new interpreter
@@ -165,14 +179,13 @@ functor
                 (binding :: bindings) :: rest
           in
           let name, expr = Syntax.value let_ in
-          match is_immediate_expr expr with
+          match is_immediate_expr current_bindings program expr with
           | true ->
               current_bindings <-
                 amend_bindings (make_comptime (name, expr)) current_bindings ;
               Let [(name, expr)]
           | false ->
-              (* print_sexp (sexp_of_expr expr) ; *)
-              let ty = type_of expr in
+              let ty = type_of program expr in
               current_bindings <-
                 amend_bindings (make_runtime (name, ty)) current_bindings ;
               Let [(name, expr)]
@@ -185,7 +198,10 @@ functor
                 (binding :: bindings) :: rest
           in
           let let_ = Syntax.value let_ in
-          match is_immediate_expr let_.destructuring_let_expr with
+          match
+            is_immediate_expr current_bindings program
+              let_.destructuring_let_expr
+          with
           | true ->
               List.iter let_.destructuring_let ~f:(fun (name, new_name) ->
                   let expr =
@@ -201,7 +217,7 @@ functor
                   let expr =
                     StructField (let_.destructuring_let_expr, name, HoleType)
                   in
-                  let ty = type_of expr in
+                  let ty = type_of program expr in
                   current_bindings <-
                     amend_bindings
                       (make_runtime (new_name, ty))
@@ -219,7 +235,7 @@ functor
           | Some (Comptime (Value value)) ->
               ResolvedReference (ref, Value value)
           | Some (Comptime ex) ->
-              Reference (ref, type_of ex)
+              Reference (ref, type_of program ex)
           | None ->
               errors#report `Error (`UnresolvedIdentifier ref) () ;
               Reference (ref, HoleType)
@@ -239,7 +255,7 @@ functor
                 Break (Expr (FunctionCall (func, [return])))
             | Error (TypeError fn_returns) ->
                 errors#report `Error
-                  (`TypeError (fn_returns, type_of return))
+                  (`TypeError (fn_returns, type_of program return))
                   () ;
                 Return return )
 
@@ -258,7 +274,9 @@ functor
               | Error (NeedFromCall func) ->
                   Break (Expr (FunctionCall (func, [ex])))
               | Error (TypeError fn_returns) ->
-                  errors#report `Error (`TypeError (fn_returns, type_of ex)) () ;
+                  errors#report `Error
+                    (`TypeError (fn_returns, type_of program ex))
+                    () ;
                   Break stmt ) )
           | stmt ->
               Break stmt
@@ -269,7 +287,7 @@ functor
 
         method! visit_switch_branch env b =
           let ty =
-            expr_to_type @@ Syntax.value
+            expr_to_type program @@ Syntax.value
             @@ s#visit_located s#visit_expr env b.ty
           in
           let ref = Syntax.ident_to_string (Syntax.value b.var) in
@@ -299,7 +317,10 @@ functor
 
         method! visit_expr env syntax_expr =
           let expr' = super#visit_expr env syntax_expr in
-          match is_immediate_expr expr' && equal functions 0 with
+          match
+            is_immediate_expr current_bindings program expr'
+            && equal functions 0
+          with
           | true ->
               let inter =
                 new interpreter
@@ -330,7 +351,7 @@ functor
         method build_field_access _env expr field =
           let expr = Syntax.value expr in
           let field = Syntax.value field in
-          match type_of expr with
+          match type_of program expr with
           | StructType s -> (
               let struct_ = Program.get_struct program s in
               match
@@ -340,29 +361,36 @@ functor
                   (expr, field, field_type)
               | None ->
                   errors#report `Error (`FieldNotFoundF field) () ;
-                  (Value Void, field, VoidType) )
-          | StructSig s -> (
-              let s = Arena.get program.struct_signs s in
+                  (Value (Type VoidType), field, VoidType) )
+          | ExprType ex -> (
+            match type_of program ex with
+            | StructSig s -> (
+                let s = Arena.get program.struct_signs s in
+                match
+                  List.Assoc.find s.st_sig_fields field ~equal:equal_string
+                with
+                | Some ty ->
+                    (expr, field, expr_to_type program ty)
+                | None ->
+                    errors#report `Error (`FieldNotFoundF field) () ;
+                    (Value (Type VoidType), field, VoidType) )
+            | _ ->
+                errors#report `Error (`FieldNotFoundF field) () ;
+                (Value (Type VoidType), field, VoidType) )
+          | StructSig sign_id -> (
+              let s = Arena.get program.struct_signs sign_id in
               match
                 List.Assoc.find s.st_sig_fields field ~equal:equal_string
               with
               | Some ty ->
-                  (expr, field, expr_to_type ty)
+                  (expr, field, expr_to_type program ty)
               | None ->
                   errors#report `Error (`FieldNotFoundF field) () ;
-                  (Value Void, field, VoidType) )
-          | PartialType (PartialStructType st) -> (
-            match
-              List.Assoc.find st.mk_struct_fields field ~equal:equal_string
-            with
-            | Some field_ty ->
-                (expr, field, expr_to_type field_ty)
-            | None ->
-                errors#report `Error (`FieldNotFoundF field) () ;
-                (Value Void, field, VoidType) )
+                  (Value (Type VoidType), field, VoidType) )
           | _ ->
+              print_sexp (sexp_of_expr expr) ;
               errors#report `Error (`FieldNotFoundF field) () ;
-              (Value Void, field, VoidType)
+              (Value (Type VoidType), field, VoidType)
 
         method build_function_call _env fn args =
           (Syntax.value fn, s#of_located_list args)
@@ -395,9 +423,39 @@ functor
                 dummy
           in
           (* TODO: check method signatures *)
-          match type_of receiver with
+          match type_of program receiver with
           | TypeN 0 ->
-              make_call (expr_to_type receiver) ~mk_args:(fun x -> x)
+              make_call (expr_to_type program receiver) ~mk_args:(fun x -> x)
+          | StructSig sign_id -> (
+              let sign = Arena.get program.struct_signs sign_id in
+              match
+                List.Assoc.find sign.st_sig_methods fn ~equal:String.equal
+              with
+              | Some m ->
+                  StructSigMethodCall
+                    { st_sig_call_instance = receiver;
+                      st_sig_call_def = sign_id;
+                      st_sig_call_method = (fn, m);
+                      st_sig_call_args = args;
+                      st_sig_call_kind = StructSigKind }
+              | None ->
+                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  dummy )
+          | UnionSig sign_id -> (
+              let sign = Arena.get program.union_signs sign_id in
+              match
+                List.Assoc.find sign.un_sig_methods fn ~equal:String.equal
+              with
+              | Some m ->
+                  StructSigMethodCall
+                    { st_sig_call_instance = receiver;
+                      st_sig_call_def = sign_id;
+                      st_sig_call_method = (fn, m);
+                      st_sig_call_args = args;
+                      st_sig_call_kind = UnionSigKind }
+              | None ->
+                  errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                  dummy )
           | InterfaceType intf_id -> (
               let intf = Program.get_intf program intf_id in
               match
@@ -429,7 +487,7 @@ functor
                type_of(arg) = ExprType(Reference("X"))
                type_of(Reference("X")) = Intf
             *)
-            match type_of ex with
+            match type_of program ex with
             | InterfaceType intf_id -> (
                 let intf = Program.get_intf program intf_id in
                 match
@@ -441,6 +499,36 @@ functor
                         intf_def = intf_id;
                         intf_method = (fn, m);
                         intf_args = receiver :: args }
+                | None ->
+                    errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                    dummy )
+            | StructSig sign_id -> (
+                let sign = Arena.get program.struct_signs sign_id in
+                match
+                  List.Assoc.find sign.st_sig_methods fn ~equal:String.equal
+                with
+                | Some m ->
+                    StructSigMethodCall
+                      { st_sig_call_instance = ex;
+                        st_sig_call_def = sign_id;
+                        st_sig_call_method = (fn, m);
+                        st_sig_call_args = receiver :: args;
+                        st_sig_call_kind = StructSigKind }
+                | None ->
+                    errors#report `Error (`MethodNotFound (receiver, fn)) () ;
+                    dummy )
+            | UnionSig sign_id -> (
+                let sign = Arena.get program.union_signs sign_id in
+                match
+                  List.Assoc.find sign.un_sig_methods fn ~equal:String.equal
+                with
+                | Some m ->
+                    StructSigMethodCall
+                      { st_sig_call_instance = ex;
+                        st_sig_call_def = sign_id;
+                        st_sig_call_method = (fn, m);
+                        st_sig_call_args = receiver :: args;
+                        st_sig_call_kind = UnionSigKind }
                 | None ->
                     errors#report `Error (`MethodNotFound (receiver, fn)) () ;
                     dummy )
@@ -458,7 +546,7 @@ functor
             |> List.map ~f:(fun (ident, expr) ->
                    ( s#visit_ident env @@ Syntax.value ident,
                      s#visit_expr env @@ Syntax.value expr ) )
-            |> List.map ~f:(fun (id, expr) -> (id, expr_to_type expr))
+            |> List.map ~f:(fun (id, expr) -> (id, expr_to_type program expr))
           in
           let function_returns =
             s#with_bindings
@@ -467,7 +555,7 @@ functor
               (fun _ ->
                 f.returns
                 |> Option.map ~f:(fun x ->
-                       expr_to_type (s#visit_expr env (Syntax.value x)) )
+                       expr_to_type program (s#visit_expr env (Syntax.value x)) )
                 |> Option.value ~default:HoleType )
           in
           let body, fn_returns =
@@ -563,25 +651,27 @@ functor
               ( ty,
                 List.map fields ~f:(fun (name, expr) ->
                     (Syntax.value name, Syntax.value expr) ) )
-          | ResolvedReference
-              (_, (Value (Type (PartialType (PartialStructType _))) as ty))
-          | (Value (Type (PartialType (PartialStructType _))) as ty) ->
+          | ResolvedReference (_, (Value (Type (StructSig _)) as ty))
+          | (Value (Type (StructSig _)) as ty) ->
               ( ty,
                 List.map fields ~f:(fun (name, expr) ->
                     (Syntax.value name, Syntax.value expr) ) )
-          | e -> (
-            match type_of e with
+          (* | Reference (_, StructSig sid) ->
+              ( Value (Type (StructSig sid)),
+                List.map fields ~f:(fun (name, expr) ->
+                    (Syntax.value name, Syntax.value expr) ) ) *)
+          | ty -> (
+            match type_of program ty with
             | StructSig _ ->
-                ( e,
+                ( ty,
                   List.map fields ~f:(fun (name, expr) ->
                       (Syntax.value name, Syntax.value expr) ) )
             | _ ->
-                (* print_sexp (sexp_of_expr e) ;
-                   raise InternalCompilerError *)
-                errors#report `Error (`UnexpectedType (type_of e)) () ;
-                (Value (Type VoidType), []) )
-        (* print_sexp (sexp_of_expr e) ;
-           raise InternalCompilerError *)
+                raise InternalCompilerError )
+        (* print_sexp (sexp_of_expr e) ; *)
+
+        (* errors#report `Error (`UnexpectedType (type_of program ty)) () ;
+           (Value (Type VoidType), []) *)
 
         method build_struct_definition _ _ _ _ = raise InternalCompilerError
 
@@ -609,7 +699,15 @@ functor
           in
           let _ =
             Arena.update program.struct_signs sign_id ~f:(fun _ ->
-                {st_sig_fields = mk_struct_fields} )
+                { st_sig_fields = mk_struct_fields;
+                  st_sig_methods =
+                    List.Assoc.map (mk_methods @ impl_methods) ~f:(fun f ->
+                        match f with
+                        | Value (Function f) | MkFunction f ->
+                            f.function_signature
+                        | _ ->
+                            raise InternalCompilerError );
+                  st_sig_base_id = mk_struct_id } )
           in
           let s' =
             { mk_struct_fields;
@@ -639,7 +737,9 @@ functor
           in
           let sign_id, _ =
             Arena.with_id program.struct_signs ~f:(fun _ ->
-                {st_sig_fields = fields} )
+                { st_sig_fields = fields;
+                  st_sig_methods = [];
+                  st_sig_base_id = program.type_counter } )
           in
           let mk_struct_ =
             { mk_struct_fields = fields;
@@ -652,10 +752,7 @@ functor
           let mk_struct =
             let methods =
               s#with_bindings
-                [ make_comptime
-                    ( "Self",
-                      Value (Type (PartialType (PartialStructType mk_struct_)))
-                    ) ]
+                [make_runtime ("Self", StructSig sign_id)]
                 (fun _ ->
                   s#visit_list
                     (s#visit_located s#visit_binding)
@@ -663,10 +760,7 @@ functor
             in
             let impls =
               s#with_bindings
-                [ make_comptime
-                    ( "Self",
-                      Value (Type (PartialType (PartialStructType mk_struct_)))
-                    ) ]
+                [make_runtime ("Self", StructSig sign_id)]
                 (fun _ -> s#visit_list s#visit_impl env syn_struct_def.impls)
             in
             let mk_struct =
@@ -688,55 +782,53 @@ functor
             s#visit_list (s#visit_located s#visit_expr) env def.union_members
           in
           let cases = s#of_located_list members in
-          Program.with_union_id program
-            (fun id ->
-              { cases =
-                  Discriminator.LocalDiscriminators.choose_discriminators () id
-                    (List.map cases ~f:expr_to_type);
-                union_methods = [];
-                union_impls = [];
-                union_id = id } )
-            (fun u_base ->
-              let methods =
-                s#with_bindings
-                  [ make_comptime
-                      ("Self", Value (Type (UnionType u_base.union_id))) ]
-                  (fun _ ->
-                    s#visit_list
-                      (s#visit_located s#visit_binding)
-                      env def.union_bindings )
-                |> s#of_located_list
-                |> List.map ~f:(fun (name, e) ->
-                       match e with
+          let union_base_id = program.type_counter in
+          program.type_counter <- program.type_counter + 1 ;
+          let sign_id, _ =
+            Arena.with_id program.union_signs ~f:(fun _ ->
+                { un_sig_cases = List.map cases ~f:(expr_to_type program);
+                  un_sig_methods = [];
+                  un_sig_base_id = union_base_id } )
+          in
+          let methods =
+            s#with_bindings
+              [make_runtime ("Self", UnionSig sign_id)]
+              (fun _ ->
+                s#visit_list
+                  (s#visit_located s#visit_binding)
+                  env def.union_bindings )
+            |> s#of_located_list
+            |> List.map ~f:(fun (name, e) ->
+                   match e with
+                   | Value (Function _) | MkFunction _ ->
+                       (name, e)
+                   | _ ->
+                       raise InternalCompilerError )
+          in
+          let impls =
+            s#with_bindings
+              [make_runtime ("Self", UnionSig sign_id)]
+              (fun _ -> s#visit_list s#visit_impl env def.union_impls)
+          in
+          let impl_methods =
+            List.concat
+              (List.map impls ~f:(fun impl ->
+                   List.filter_map impl.mk_impl_methods ~f:(fun (name, ex) ->
+                       match ex with
                        | Value (Function _) | MkFunction _ ->
-                           (name, e)
+                           Some (name, ex)
                        | _ ->
-                           raise InternalCompilerError )
-              in
-              let impls =
-                s#with_bindings
-                  [ make_comptime
-                      ("Self", Value (Type (UnionType u_base.union_id))) ]
-                  (fun _ -> s#visit_list s#visit_impl env def.union_impls)
-              in
-              let impl_methods =
-                List.concat
-                  (List.map impls ~f:(fun impl ->
-                       List.filter_map impl.mk_impl_methods
-                         ~f:(fun (name, ex) ->
-                           match ex with
-                           | Value (Function _) | MkFunction _ ->
-                               Some (name, ex)
-                           | _ ->
-                               None ) ) )
-              in
-              let convert_impls = s#make_from_impls cases u_base.union_id in
-              Error
-                { mk_cases = cases;
-                  mk_union_id = u_base.union_id;
-                  mk_union_impls = impls @ convert_impls;
-                  mk_union_methods = methods @ impl_methods } )
-          |> Result.error |> Option.value_exn
+                           None ) ) )
+          in
+          let convert_impls = s#make_from_impls cases union_base_id in
+          let mk_union =
+            { mk_cases = cases;
+              mk_union_id = union_base_id;
+              mk_union_impls = impls @ convert_impls;
+              mk_union_methods = methods @ impl_methods;
+              mk_union_sig = sign_id }
+          in
+          mk_union
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
@@ -766,18 +858,20 @@ functor
           Value
             (Function
                { function_signature =
-                   { function_params = [("v", expr_to_type case)];
+                   { function_params = [("v", expr_to_type program case)];
                      function_returns = UnionType union };
                  function_impl =
                    Fn
                      (Some
                         (Return
                            (MakeUnionVariant
-                              (Reference ("v", expr_to_type case), union) ) ) )
-               } )
+                              (Reference ("v", expr_to_type program case), union)
+                           ) ) ) } )
 
-        method private partial_evaluate_fn p b u funcs f =
-          let partial_evaluator = new partial_evaluator p b u funcs errors in
+        method private partial_evaluate_fn p b u upu funcs f =
+          let partial_evaluator =
+            new partial_evaluator p b u upu funcs errors
+          in
           partial_evaluator#visit_function_ () f
       end
   end

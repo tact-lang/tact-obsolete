@@ -122,19 +122,16 @@ let%expect_test "Int(bits) serializer codegen" =
     _ send_raw_msg(cell msg, int flags) {
       return builtin_send_raw_msg(msg, flags);
     }
-    int f0(int i) {
-      return i;
-    }
-    builder f2(builder self, int int_, int bits) {
+    builder f1(builder self, int int_, int bits) {
       builder b = builtin_builder_store_int(self, int_, bits);
       return b;
     }
-    builder f1(int self, builder builder_) {
-      return f2(builder_, self, 32);
+    builder f0(int self, builder builder_) {
+      return f1(builder_, self, 32);
     }
     _ test_int(builder b) {
-      int i = f0(100);
-      return f1(i, b);
+      int i = 100;
+      return f0(i, b);
     } |}]
 
 let%expect_test "demo struct serializer" =
@@ -214,15 +211,9 @@ let%expect_test "demo struct serializer" =
     builder f3() {
       return builtin_builder_new();
     }
-    int f4(int i) {
-      return i;
-    }
-    int f5(int i) {
-      return i;
-    }
     _ test() {
       builder b = f3();
-      return T_serializer([f4(0), f5(1)], b);
+      return T_serializer([0, 1], b);
     } |}]
 
 let%expect_test "demo struct serializer 2" =
@@ -302,15 +293,9 @@ let%expect_test "demo struct serializer 2" =
     builder f3() {
       return builtin_builder_new();
     }
-    int f4(int i) {
-      return i;
-    }
-    int f5(int i) {
-      return i;
-    }
     builder test() {
       builder b = f3();
-      return serialize_foo([f4(0), f5(1)], b);
+      return serialize_foo([0, 1], b);
     } |}]
 
 let%expect_test "true and false" =
@@ -467,16 +452,6 @@ let%expect_test "unions" =
     }
     tuple try(tuple x) {
       return x;
-    }
-    tuple f0(int v) {
-      return [0, v];
-    }
-    tuple f1([] v) {
-      return [1, v];
-    }
-    _ test_try(int x, [] y) {
-      tuple test1 = try(f0(x));
-      tuple test2 = try(f1(y));
     } |}]
 
 let%expect_test "switch statement" =
@@ -683,51 +658,34 @@ let%expect_test "serialization api" =
       builder b = builtin_builder_store_int(self, int_, bits);
       return b;
     }
+    builder f9([] self, builder b) {
+      return b;
+    }
     builder f11(int self, builder builder_) {
       return f3(builder_, self, 9);
     }
-    builder f12(int self, builder builder_) {
-      return f3(builder_, self, 8);
-    }
-    builder f10([int, int, int] self, builder b) {
+    builder f10([int, int] self, builder b) {
       builder b = f11(first(self), b);
-      builder b = f12(second(self), b);
+      builder b = f3(b, second(self), first(self));
       return b;
-    }
-    builder f9([int, int, int] self, builder b) {
-      builder b = f3(b, 0, 0);
-      builder b = f10(self, b);
-      return b;
-    }
-    builder f15(int self, builder builder_) {
-      return f3(builder_, self, 256);
-    }
-    builder f14([int, int] self, builder b) {
-      builder b = f12(first(self), b);
-      builder b = f15(second(self), b);
-      return b;
-    }
-    builder f13([int, int] self, builder b) {
-      builder b = f3(b, 0, 0);
-      return f14(self, b);
     }
     builder f8(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
     first(temp);
-    if (discr == 0)
+    if (discr == 1)
     {
       [int, int] var = second(temp);
     {
       int b = store_uint(b, 1, 1);
     builder b =
-    f13(var, b);
+    f10(var, b);
     return
     b;
-    }} else if (discr == 1)
+    }} else if (discr == 0)
     {
-      [int, int, int] var = second(temp);
+      [] var = second(temp);
     {
       int b = store_uint(b, 0, 1);
     builder b =
@@ -740,58 +698,75 @@ let%expect_test "serialization api" =
     builder f7(tuple self, builder b) {
       return f8(self, b);
     }
-    builder f18([int, int] self, builder b) {
+    builder f16(int self, builder builder_) {
+      return f3(builder_, self, 8);
+    }
+    builder f17(int self, builder builder_) {
+      return f3(builder_, self, 256);
+    }
+    builder f15([int, int] self, builder b) {
+      builder b = f16(first(self), b);
+      builder b = f17(second(self), b);
+      return b;
+    }
+    builder f14([int, int] self, builder b) {
+      builder b = f3(b, 0, 0);
+      return f15(self, b);
+    }
+    builder f19([int, int, int] self, builder b) {
       builder b = f11(first(self), b);
-      builder b = f3(b, second(self), first(self));
+      builder b = f16(second(self), b);
       return b;
     }
-    builder f19([] self, builder b) {
+    builder f18([int, int, int] self, builder b) {
+      builder b = f3(b, 0, 0);
+      builder b = f19(self, b);
       return b;
     }
-    builder f17(tuple self, builder b) {
+    builder f13(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
     first(temp);
-    if (discr == 0)
+    if (discr == 1)
     {
-      [] var = second(temp);
+      [int, int, int] var = second(temp);
     {
       int b = store_uint(b, 1, 1);
     builder b =
-    f19(var, b);
+    f18(var, b);
     return
     b;
-    }} else if (discr == 1)
+    }} else if (discr == 0)
     {
       [int, int] var = second(temp);
     {
       int b = store_uint(b, 0, 1);
     builder b =
-    f18(var, b);
+    f14(var, b);
     return
     b;
     }} else
     {
       }}}
-    builder f16(tuple self, builder b) {
-      return f17(self, b);
+    builder f12(tuple self, builder b) {
+      return f13(self, b);
     }
     builder f6(tuple self, builder b) {
       {
       tuple temp = self;
     int discr =
     first(temp);
-    if (discr == 0)
+    if (discr == 1)
     {
       tuple var = second(temp);
     {
       int b = store_uint(b, 1, 1);
     builder b =
-    f16(var, b);
+    f12(var, b);
     return
     b;
-    }} else if (discr == 1)
+    }} else if (discr == 0)
     {
       tuple var = second(temp);
     {
@@ -814,7 +789,7 @@ let%expect_test "serialization api" =
     }
     builder f4([tuple, tuple, int, int] self, builder b) {
       builder b = f5(first(self), b);
-      builder b = f16(second(self), b);
+      builder b = f7(second(self), b);
       builder b = f20(third(self), b);
       builder b = f21(fourth(self), b);
       return b;
@@ -832,8 +807,8 @@ let%expect_test "serialization api" =
       return f25(self, b);
     }
     builder f28([tuple, tuple] self, builder b) {
-      builder b = f7(first(self), b);
-      builder b = f7(second(self), b);
+      builder b = f12(first(self), b);
+      builder b = f12(second(self), b);
       return b;
     }
     builder f27([tuple, tuple] self, builder b) {
@@ -971,154 +946,6 @@ let%expect_test "deserialization api" =
     }
     _ send_raw_msg(cell msg, int flags) {
       return builtin_send_raw_msg(msg, flags);
-    }
-    slice f0(cell cell_) {
-      return builtin_slice_begin_parse(cell_);
-    }
-    [slice, int] f3(slice self, int bits) {
-      (slice, int) output = builtin_slice_load_int(self, bits);
-      slice slice_ = tensor2_value1(output);
-      int int_ = tensor2_value2(output);
-      return [slice_, int_];
-    }
-    [slice, int] f7(slice s) {
-      [slice, int] res = f3(s, 9);
-      return [first(res), second(res)];
-    }
-    [slice, int] f8(slice s) {
-      [slice, int] res = f3(s, 8);
-      return [first(res), second(res)];
-    }
-    [slice, [int, int, int]] f9(slice s, [int, int, int] v) {
-      return [s, v];
-    }
-    [slice, [int, int, int]] f6(slice s) {
-      [slice, int] res_anycast = f3(s, 1);
-      if (builtin_equal(second(res_anycast), 0)) {
-      [slice, int] res_len = f7(first(res_anycast));
-    [slice, int] res_workchain =
-    f8(first(res_len));
-    [slice, int] res_address =
-    f3(first(res_workchain), res_len);
-    return
-    f9(first(res_address), [second(res_len), second(res_workchain), second(res_address)]);
-    } else
-    {
-      }}
-    [slice, tuple] f10(slice s, tuple v) {
-      return [s, v];
-    }
-    [slice, int] f12(slice s) {
-      [slice, int] res = f3(s, 256);
-      return [first(res), second(res)];
-    }
-    [slice, [int, int]] f13(slice s, [int, int] v) {
-      return [s, v];
-    }
-    [slice, [int, int]] f11(slice s) {
-      [slice, int] res_anycast = f3(s, 1);
-      if (builtin_equal(second(res_anycast), 0)) {
-      [slice, int] res_workchain = f8(first(res_anycast));
-    [slice, int] res_address =
-    f12(first(res_workchain));
-    return
-    f13(first(res_address), [second(res_workchain), second(res_address)]);
-    } else
-    {
-      }}
-    [slice, tuple] f5(slice s) {
-      [slice, int] res_discr = f3(s, 1);
-      if (builtin_equal(second(res_discr), 0)) {
-      [slice, [int, int]] res_addr = f11(second(res_discr));
-    return
-    f10(first(res_addr), second(res_addr));
-    } else
-    {
-      [slice, [int, int, int]] res_addr = f6(first(res_discr));
-    return
-    f10(first(res_addr), second(res_addr));
-    }}
-    [slice, [int, int]] f15(slice s) {
-      [slice, int] res_len = f7(s);
-      [slice, int] res_bits = f3(first(res_len), second(res_len));
-      return [first(res_bits), [second(res_len), second(res_bits)]];
-    }
-    [slice, tuple] f16(slice s, tuple v) {
-      return [s, v];
-    }
-    [slice, tuple] f14(slice s) {
-      [slice, int] res_discr = f3(s, 1);
-      if (builtin_equal(second(res_discr), 0)) {
-      return f16(first(res_discr), []);
-    } else if (builtin_equal(second(res_discr), 1))
-    {
-      [slice, [int, int]] res_addr = f15(first(res_discr));
-    return
-    f16(first(res_addr), second(res_addr));
-    } else
-    {
-      }}
-    [slice, int] f17(slice s) {
-      [slice, int] res = f3(s, 64);
-      return [first(res), second(res)];
-    }
-    [slice, [tuple, tuple, int, int]] f18(slice s, [tuple, tuple, int, int] v) {
-      return [s, v];
-    }
-    [slice, [tuple, tuple, int, int]] f4(slice s) {
-      [slice, tuple] res_src = f5(s);
-      [slice, tuple] res_dest = f14(first(res_src));
-      [slice, int] res_created_lt = f17(first(res_dest));
-      [slice, int] res_created_at = f17(first(res_created_lt));
-      return
-        f18(first(res_created_at), [second(res_src), second(res_dest), second(res_created_lt), second(res_created_at)]);
-    }
-    [slice, tuple] f19(slice s, tuple v) {
-      return [s, v];
-    }
-    [slice, tuple] f2(slice s) {
-      [slice, int] res_discr1 = f3(s, 1);
-      if (builtin_equal(second(res_discr1), 0)) {
-      } else
-    {
-      [slice, int] res_discr2 = f3(first(res_discr1), 1);
-    if (builtin_equal(second(res_discr2), 0))
-    {
-      } else
-    {
-      [slice, [tuple, tuple, int, int]] res_info = f4(first(res_discr2));
-    return
-    f19(first(res_info), second(res_info));
-    }}}
-    [slice, []] f21(slice s, [] v) {
-      return [s, v];
-    }
-    [slice, []] f20(slice s) {
-      return f21(s, []);
-    }
-    [slice, [tuple, []]] f22(slice s, [tuple, []] v) {
-      return [s, v];
-    }
-    [slice, [tuple, []]] f1(slice s) {
-      [slice, tuple] res_info = f2(s);
-      [slice, int] res_init = f3(first(res_info), 1);
-      if (builtin_equal(second(res_init), 0)) {
-      [slice, int] res_body_discr = f3(first(res_init), 1);
-    if (builtin_equal(second(res_body_discr), 0))
-    {
-      [slice, []] body = f20(first(res_body_discr));
-    [tuple, _] mes =
-    [second(res_info), second(body)];
-    return
-    f22(first(body), mes);
-    } else
-    {
-      }} else
-    {
-      }}
-    _ test(cell c) {
-      slice s = f0(c);
-      [slice, [tuple, []]] msg = f1(s);
     } |}]
 
 let%expect_test "destructuring let" =
@@ -1147,10 +974,6 @@ let%expect_test "destructuring let" =
       (_, Value2 value) = tensor;
       return value;
     }
-    int test([int, int, int] t) {
-      [int x, int y2, int z] = t;
-      return y2;
-    }
  |}]
 
 let%expect_test "destructuring let with rest ignored" =
@@ -1177,9 +1000,5 @@ let%expect_test "destructuring let with rest ignored" =
     forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
       (_, Value2 value) = tensor;
       return value;
-    }
-    int test([int, int, int] t) {
-      [_, int y2, _] = t;
-      return y2;
     }
  |}]

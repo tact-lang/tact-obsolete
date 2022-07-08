@@ -17,7 +17,7 @@ let next_builtin_struct_id () =
   builtin_struct_next_id := id ;
   id
 
-let make_load_result_with_id id t =
+let make_load_result_with_id base_id id t =
   { struct_fields =
       [("slice", {field_type = slice_struct}); ("value", {field_type = t})];
     struct_methods =
@@ -36,24 +36,32 @@ let make_load_result_with_id id t =
                                 ("value", Reference ("v", t)) ] ) ) ) ) ) } ) ];
     struct_impls = [];
     struct_id = id;
+    struct_base_id = base_id;
     tensor = false }
 
 let load_result_func a =
+  let base_id = -500 in
   let function_signature =
     { function_params = [("T", type0)];
       function_returns =
         (let id, _ =
-           Arena.with_id a ~f:(fun _ ->
+           Arena.with_id a ~f:(fun id ->
                { st_sig_fields =
                    [ ("slice", Value (Type slice_struct));
-                     ("value", Value (Type (Dependent ("T", type0)))) ] } )
+                     ("value", Value (Type (Dependent ("T", type0)))) ];
+                 st_sig_methods =
+                   [ ( "new",
+                       { function_params =
+                           [("s", slice_struct); ("v", Dependent ("T", type0))];
+                         function_returns = StructSig id } ) ];
+                 st_sig_base_id = base_id } )
          in
          StructSig id ) }
   in
   let make_load_result p t =
     let id = p.type_counter in
     p.type_counter <- p.type_counter + 1 ;
-    let struct_ = make_load_result_with_id id t in
+    let struct_ = make_load_result_with_id base_id id t in
     let struct_ =
       Result.ok_exn @@ Program.with_struct p struct_ (fun _ -> Ok struct_)
     in
@@ -248,6 +256,7 @@ let tensor2 t1 t2 =
           [("value1", {field_type = t1}); ("value2", {field_type = t2})];
         struct_methods = [];
         struct_impls = [];
+        struct_base_id = -501;
         tensor = true } )
 
 let builtin_bindings =
@@ -342,7 +351,7 @@ let default_structs =
   ( Hashtbl.map tensor2_hashtbl ~f:(fun struct_ -> (struct_.struct_id, struct_))
   |> Hashtbl.data )
   @ [ (let id = snd deserialize_intf in
-       (id, make_load_result_with_id id SelfType) ) ]
+       (id, make_load_result_with_id (-500) id SelfType) ) ]
 
 let default_intfs =
   [ (serialize_intf_id, serialize_intf);

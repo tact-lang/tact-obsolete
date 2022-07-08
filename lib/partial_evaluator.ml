@@ -3,55 +3,9 @@ open Lang_types
 open Base
 open Errors
 
-class ['s] immediacy_checker =
-  object (self : 's)
-    inherit [_] boolean_reduce true as super
-
-    val mutable in_function_call = 0
-
-    method! visit_Reference _env _ref = false
-
-    method! visit_Hole _env = false
-
-    method! visit_InvalidExpr _env = false
-
-    method! visit_Primitive _env _primitive = false
-
-    method! visit_function_call env (f, args) =
-      match f with
-      | Value (Function {function_impl = BuiltinFn _; _}) ->
-          in_function_call <- in_function_call + 1 ;
-          let result = self#visit_list self#visit_expr env args in
-          in_function_call <- in_function_call - 1 ;
-          result
-      | _ ->
-          in_function_call <- in_function_call + 1 ;
-          let result = super#visit_function_call env (f, args) in
-          in_function_call <- in_function_call - 1 ;
-          result
-
-    method! visit_function_ env f =
-      self#plus
-        ( if in_function_call > 0 then
-          (* If we're calling this function, check if there are no primitives *)
-          not @@ has_primitives f
-        else
-          (* Any function is assumed to be immediate as it can be evaluated otherwise *)
-          true )
-        (super#visit_function_signature env f.function_signature)
-
-    method! visit_MkFunction env f =
-      super#visit_function_signature env f.function_signature
-
-    method! visit_StructSig _ _ = true
-
-    method! visit_mk_struct _ _ = true
-
-    method! visit_partial_type _ _ = false
-  end
-
 class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
-  (updated_items : (int * int) list) (functions : int) (errors : _) =
+  (updated_items : (int * int) list) (updated_unions : (int * int) list)
+  (functions : int) (errors : _) =
   object (self : 's)
     inherit [_] Lang_types.map as super
 
@@ -78,9 +32,9 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
 
     method! visit_type_ env ty =
       let ty = super#visit_type_ env ty in
-      if equal_int functions 0 then
+      if is_immediate_expr scope program (Value (Type ty)) then
         self#with_interpreter env (fun inter -> inter#interpret_type ty)
-      else self#unwrap_expr_types (super#visit_type_ env ty)
+      else self#unwrap_expr_types ty
 
     method private unwrap_expr_types =
       function
@@ -101,24 +55,14 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
           env vars
       in
       let vars_scope =
-        List.map vars' ~f:(fun (name, ex) -> (name, Runtime (type_of ex)))
+        List.map vars' ~f:(fun (name, ex) ->
+            (name, Runtime (type_of program ex)) )
       in
       scope <- vars_scope :: scope ;
       Let vars'
 
-    method! visit_PartialType env =
-      function
-      | PartialStructType st -> (
-        match
-          List.Assoc.find updated_items st.mk_struct_id ~equal:equal_int
-        with
-        | Some id ->
-            StructType id
-        | None ->
-            PartialType (PartialStructType (self#visit_mk_struct env st)) )
-
     method! visit_DestructuringLet _env let_ =
-      match type_of let_.destructuring_let_expr with
+      match type_of program let_.destructuring_let_expr with
       | StructType id ->
           let struct_ = Program.get_struct program id in
           (* Check if field names are correct *)
@@ -189,7 +133,8 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
             false
       in
       match
-        is_immediate_expr intf_instance && not (is_dependent intf_instance)
+        is_immediate_expr scope program intf_instance
+        && not (is_dependent intf_instance)
       with
       | true -> (
           let intf_ty =
@@ -215,6 +160,103 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
       | false ->
           IntfMethodCall {call with intf_instance; intf_args = args}
 
+    val mutable visited_signs : (int * int) list = []
+
+    method! visit_StructSig _ sign_id =
+      match List.Assoc.find updated_items sign_id ~equal:equal_int with
+      | Some new_id ->
+          StructType new_id
+      | None ->
+          StructSig sign_id
+
+    method! visit_mk_struct env mk =
+      let _self_scope =
+        match
+          List.Assoc.find updated_items mk.mk_struct_id ~equal:equal_int
+        with
+        | Some new_id ->
+            [make_comptime ("Self", Value (Type (StructType new_id)))]
+        | None ->
+            [make_runtime ("Self", StructSig mk.mk_struct_sig)]
+      in
+      let mk =
+        self#with_vars
+          [make_runtime ("Self", StructSig mk.mk_struct_sig)]
+          (fun _ -> super#visit_mk_struct env mk)
+      in
+      mk
+
+    method! visit_UnionSig _ sign_id =
+      match List.Assoc.find updated_unions sign_id ~equal:equal_int with
+      | Some new_id ->
+          UnionType new_id
+      | None ->
+          UnionSig sign_id
+
+    method! visit_mk_union env mk =
+      let _self_scope =
+        match
+          List.Assoc.find updated_unions mk.mk_union_id ~equal:equal_int
+        with
+        | Some new_id ->
+            [make_comptime ("Self", Value (Type (UnionType new_id)))]
+        | None ->
+            [make_runtime ("Self", UnionSig mk.mk_union_sig)]
+      in
+      let mk =
+        self#with_vars
+          [make_runtime ("Self", UnionSig mk.mk_union_sig)]
+          (fun _ -> super#visit_mk_union env mk)
+      in
+      mk
+
+    method! visit_FunctionCall env (f, args) =
+      let f = self#visit_expr env f in
+      let args = self#visit_list self#visit_expr env args in
+      if is_immediate_expr scope program (FunctionCall (f, args)) then
+        Value
+          (self#with_interpreter env (fun inter -> inter#interpret_fc (f, args)))
+      else FunctionCall (f, args)
+
+    method! visit_StructSigMethodCall env call =
+      let st_sig_instance = self#visit_expr env call.st_sig_call_instance in
+      let args = self#visit_list self#visit_expr env call.st_sig_call_args in
+      let method_name, m_temp = call.st_sig_call_method in
+      let visited_method_ = self#visit_function_signature env m_temp in
+      let is_dependent = function
+        | Value (Type (Dependent _)) ->
+            true
+        | _ ->
+            false
+      in
+      match
+        is_immediate_expr scope program st_sig_instance
+        && not (is_dependent st_sig_instance)
+      with
+      | true ->
+          let st_sig_ty =
+            match
+              self#with_interpreter env (fun inter ->
+                  inter#interpret_expr st_sig_instance )
+            with
+            | Type t ->
+                t
+            | _ ->
+                raise InternalCompilerError
+          in
+          let methods = Program.methods_of program st_sig_ty in
+          let method_ =
+            List.find_map_exn methods ~f:(fun (name, fn) ->
+                if equal_string name method_name then Some fn else None )
+          in
+          FunctionCall (Value (Function method_), args)
+      | false ->
+          StructSigMethodCall
+            { call with
+              st_sig_call_instance = st_sig_instance;
+              st_sig_call_args = args;
+              st_sig_call_method = (method_name, visited_method_) }
+
     method private with_vars : 'a. _ -> (unit -> 'a) -> 'a =
       fun vars f ->
         let prev_vars = scope in
@@ -226,11 +268,12 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
     (* FIXME: This function should create new instance of the partial_evaluator
        and call new_instance#visit_function_ but there is some problems with
        generics I can not solve yet. *)
-    method private with_interpreter : 'env 'a. 'env -> (_ -> 'a) -> 'a =
+    method private with_interpreter : 'env 'a. 'env -> (interpreter -> 'a) -> 'a
+        =
       fun _env f ->
         let inter =
           new interpreter (program, scope, errors, 0) ~updated_items
-            (fun _ _ _ _ f -> f)
+            (fun _ _ _ _ _ f -> f)
         in
         f inter
   end

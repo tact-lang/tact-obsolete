@@ -39,7 +39,9 @@ let strip : program:Lang.program -> previous:Lang.program -> Lang.program =
       strip_if_exists_in_other program.interfaces previous.interfaces
         ~equal:(fun (id1, _) (id2, _) -> equal_int id1 id2);
     struct_signs =
-      Lang.Arena.strip_if_exists program.struct_signs previous.struct_signs }
+      Lang.Arena.strip_if_exists program.struct_signs previous.struct_signs;
+    union_signs =
+      Lang.Arena.strip_if_exists program.union_signs previous.struct_signs }
 
 let compile_pass p prev_program errors =
   let c = new Lang.constructor ~program:prev_program errors in

@@ -2,31 +2,6 @@ open Base
 
 let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
-class ['s] base_map =
-  object (_ : 's)
-    inherit ['s] Zint.map
-
-    inherit ['s] Asm.map
-  end
-
-class virtual ['s] base_reduce =
-  object (_ : 's)
-    method virtual visit_instr : _
-
-    method virtual visit_z : _
-
-    method virtual visit_arena : _
-  end
-
-class virtual ['s] base_visitor =
-  object (_ : 's)
-    inherit ['s] VisitorsRuntime.map
-
-    inherit ['s] Zint.map
-
-    inherit ['s] Asm.map
-  end
-
 module Arena = struct
   type 'a t =
     { mutable current_id : int; [@hash.ignore]
@@ -35,12 +10,16 @@ module Arena = struct
 
   class ['s] visitor =
     object (_self : 's)
-      method visit_arena : 'env. _ -> 'env -> _ -> _ = fun _ _ a -> a
+      method visit_arena : 'env 'a. ('env -> 'a -> 'a) -> 'env -> 'a t -> 'a t =
+        fun _ _ a -> a
     end
 
   let default () = {current_id = 0; items = []}
 
-  let get a id = List.Assoc.find a.items id ~equal:equal_int |> Option.value_exn
+  let get a id =
+    List.Assoc.find a.items id ~equal:equal_int
+    |> Option.value_exn
+         ~message:(Printf.sprintf "Try to get non existent id %i" id)
 
   let with_id a ~f =
     let current_id = a.current_id in
@@ -71,7 +50,41 @@ module Arena = struct
         List.filter left.items ~f:(fun (id, _) ->
             Option.is_none (List.Assoc.find right.items id ~equal:equal_int) )
     }
+
+  let unsafe_drop_first a =
+    a.current_id <- a.current_id - 1 ;
+    a.items <- List.tl_exn a.items
 end
+
+class ['s] base_map =
+  object (_ : 's)
+    inherit ['s] Zint.map
+
+    inherit ['s] Asm.map
+
+    inherit ['s] Arena.visitor
+  end
+
+class virtual ['s] base_reduce =
+  object (_ : 's)
+    method virtual visit_instr : _
+
+    method virtual visit_z : _
+
+    method virtual visit_arena
+        : 'env 'a. ('env -> 'a -> _) -> 'env -> 'a Arena.t -> _
+  end
+
+class virtual ['s] base_visitor =
+  object (_ : 's)
+    inherit ['s] VisitorsRuntime.map
+
+    inherit ['s] Zint.map
+
+    inherit ['s] Asm.map
+
+    inherit ['s] Arena.visitor
+  end
 
 type comptime_counter = (int[@sexp.opaque])
 
@@ -92,12 +105,15 @@ and program =
     mutable memoized_fcalls :
       (((value * value list) * value) list[@sexp.opaque]);
         [@hash.ignore]
-    mutable struct_signs : struct_sig Arena.t
+    mutable struct_signs : struct_sig Arena.t;
+        [@hash.ignore] [@visitors.name "arena"]
+    mutable union_signs : union_sig Arena.t
         [@hash.ignore] [@visitors.name "arena"] }
 
 and expr =
   | FunctionCall of function_call
   | IntfMethodCall of intf_method_call
+  | StructSigMethodCall of st_sig_method_call
   | MkStructDef of mk_struct
   | MkUnionDef of mk_union
   | MkInterfaceDef of mk_interface
@@ -146,8 +162,6 @@ and destructuring_let =
 
 and builtin = string
 
-and partial_type = PartialStructType of mk_struct
-
 and type_ =
   | TypeN of int
   | IntegerType
@@ -159,25 +173,28 @@ and type_ =
   | UnionType of int
   | InterfaceType of int
   | StructSig of int
-  | PartialType of partial_type
+  | UnionSig of int
   | FunctionType of function_signature
   | HoleType
   | SelfType
   | InvalidType of expr
   | ExprType of expr
   | Dependent of string * type_
+  | ValueOf of type_
 
 and mk_union =
   { mk_cases : expr list;
     mk_union_methods : (string * expr) list;
     mk_union_impls : mk_impl list; [@sexp.list]
-    mk_union_id : int }
+    mk_union_id : int;
+    mk_union_sig : int }
 
 and union =
   { cases : (type_ * discriminator) list;
     union_methods : (string * function_) list;
     union_impls : impl list; [@sexp.list]
-    union_id : int }
+    union_id : int;
+    union_base_id : int }
 
 and mk_struct =
   { mk_struct_fields : (string * expr) list;
@@ -191,10 +208,21 @@ and struct_ =
     struct_methods : (string * function_) list;
     struct_impls : impl list;
     struct_id : int;
+    struct_base_id : int;
     (* Used by codegen to determine if this is a tensor *)
     tensor : bool [@sexp.bool] }
 
-and struct_sig = {st_sig_fields : (string * expr) list}
+and struct_sig =
+  { st_sig_fields : (string * expr) list;
+    st_sig_methods : (string * function_signature) list;
+    (* ID of the base of the struct. *)
+    st_sig_base_id : int }
+
+and union_sig =
+  { un_sig_cases : type_ list;
+    un_sig_methods : (string * function_signature) list;
+    (* ID of the base of the struct. *)
+    un_sig_base_id : int }
 
 and discriminator = Discriminator of int
 
@@ -228,6 +256,15 @@ and intf_method_call =
     intf_method : string * function_signature;
     intf_args : expr list }
 
+and st_sig_method_call =
+  { st_sig_call_instance : expr;
+    st_sig_call_def : int;
+    st_sig_call_method : string * function_signature;
+    st_sig_call_args : expr list;
+    st_sig_call_kind : sig_kind }
+
+and sig_kind = UnionSigKind | StructSigKind
+
 and switch = {switch_condition : expr; branches : branch list}
 
 and branch = {branch_ty : type_; branch_var : string; branch_stmt : stmt}
@@ -248,15 +285,9 @@ and primitive =
     compare,
     hash,
     sexp_of,
-    visitors
-      { variety = "map";
-        polymorphic = true;
-        ancestors = ["base_map"; "Arena.visitor"] },
+    visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
     visitors {variety = "reduce"; ancestors = ["base_reduce"]},
-    visitors
-      { variety = "fold";
-        name = "visitor";
-        ancestors = ["base_visitor"; "Arena.visitor"] }]
+    visitors {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
 
 let type0 = TypeN 0
 
@@ -276,28 +307,44 @@ let extract_comptime_bindings bindings =
   List.filter_map bindings ~f:(fun (name, scope) ->
       match scope with Comptime value -> Some (name, value) | _ -> None )
 
-let rec expr_to_type = function
-  | Value (Type type_) ->
-      type_
-  | Reference (ref, ty) ->
-      ExprType (Reference (ref, ty))
-  | ResolvedReference (_, e) ->
-      expr_to_type e
-  | expr ->
-      ExprType expr
-
-let sig_of_struct {struct_fields; _} =
+let sig_of_struct {struct_fields; struct_methods; struct_base_id; _} =
   { st_sig_fields =
       List.Assoc.map struct_fields ~f:(fun {field_type} ->
           match field_type with
           | ExprType ex ->
               ex
           | field_type ->
-              Value (Type field_type) ) }
+              Value (Type field_type) );
+    st_sig_methods =
+      List.Assoc.map struct_methods ~f:(fun x -> x.function_signature);
+    st_sig_base_id = struct_base_id }
 
-let rec type_of = function
+let sig_of_union {cases; union_methods; union_base_id; _} =
+  { un_sig_cases = List.map cases ~f:fst;
+    un_sig_methods =
+      List.Assoc.map union_methods ~f:(fun x -> x.function_signature);
+    un_sig_base_id = union_base_id }
+
+let rec expr_to_type program = function
+  | Value (Type type_) ->
+      type_
+  | Reference (ref, ty) ->
+      ExprType (Reference (ref, ty))
+  (* | FunctionCall (f, args) -> (
+      let f = type_of program f in
+      match f with
+      | FunctionType sign ->
+          type_of_call program args sign.function_params sign.function_returns
+      | _ ->
+          raise Errors.InternalCompilerError ) *)
+  | ResolvedReference (_, e) ->
+      expr_to_type program e
+  | expr ->
+      ExprType expr
+
+and type_of program = function
   | Value (Struct (s, _)) ->
-      expr_to_type s
+      expr_to_type program s
   | Value (UnionVariant (_, uid)) ->
       UnionType uid
   | Value (Function {function_signature; _}) ->
@@ -313,20 +360,20 @@ let rec type_of = function
   | Value (Type (Dependent (_, ty))) ->
       ty
   | Value (Type t) ->
-      type_of_type t
+      type_of_type program t
   | Hole ->
       HoleType
   | FunctionCall (f, args) -> (
-      let f = type_of f in
-      match f with
+      let f' = type_of program f in
+      match f' with
       | FunctionType sign ->
-          type_of_call args sign.function_params sign.function_returns
+          type_of_call program args sign.function_params sign.function_returns
       | _ ->
           raise Errors.InternalCompilerError )
   | Reference (_, t) ->
       t
   | ResolvedReference (_, e) ->
-      type_of e
+      type_of program e
   | MakeUnionVariant (_, u) ->
       UnionType u
   | MkStructDef mk ->
@@ -334,39 +381,30 @@ let rec type_of = function
   | StructField (_, _, ty) ->
       ty
   | IntfMethodCall {intf_method = _, sign; intf_args; _} ->
-      type_of_call intf_args sign.function_params sign.function_returns
+      type_of_call program intf_args sign.function_params sign.function_returns
+  | StructSigMethodCall {st_sig_call_method = _, sign; st_sig_call_args; _} ->
+      type_of_call program st_sig_call_args sign.function_params
+        sign.function_returns
   | MkFunction mk_function ->
       FunctionType mk_function.function_signature
-  | MkUnionDef _ ->
-      type0
+  | MkUnionDef uni ->
+      UnionSig uni.mk_union_sig
   | expr ->
       InvalidType expr
 
-(*
-  Нужно чтобы заработало LoadResult(T).new();
-  Для этого нужно добавить методы в struct_sign
-  Для этого надо вынести сигнатуры в арены, потому что методы ссылаются на self-struct-sig
-*)
-and sig_of_mk_struct {mk_struct_fields; _} =
-  (* let partial_updater =
-       object (_self)
-         inherit [_] map
-
-         method! visit_PartialType env = function
-         | PartialStructType pst -> if partial_type
-       end
-     in *)
-  {st_sig_fields = mk_struct_fields}
-
-and type_of_type = function
+and type_of_type program = function
   | TypeN x ->
       TypeN (x + 1)
-  | StructSig _ ->
+  | StructSig _ | UnionSig _ ->
       TypeN 1
+  | ValueOf ty ->
+      ty
+  | ExprType ex ->
+      type_of program ex
   | _otherwise ->
       TypeN 0
 
-and type_of_call args arg_types returns =
+and type_of_call program args arg_types returns =
   let associated =
     match List.map2 args arg_types ~f:(fun expr (name, _) -> (name, expr)) with
     | Ok t ->
@@ -374,11 +412,58 @@ and type_of_call args arg_types returns =
     | _ ->
         raise Errors.InternalCompilerError
   in
-  let dependent_types_monomophizer (associated : (string * expr) list) =
-    object (_self : _)
+  let dependent_types_monomophizer (program : program)
+      (associated : (string * expr) list) =
+    object (self : _)
       inherit [_] map
 
-      method! visit_Dependent _ ref _ =
+      val mutable visited_signs : (int * int) list = []
+
+      val mutable visited_union_signs : (int * int) list = []
+
+      method! visit_StructSig env sign_id =
+        match List.Assoc.find visited_signs sign_id ~equal:equal_int with
+        | Some new_id ->
+            StructSig new_id
+        | None ->
+            let sign = Arena.get program.struct_signs sign_id in
+            let id, new_sign =
+              Arena.with_id program.struct_signs ~f:(fun new_id ->
+                  let prev_vis_signs = visited_signs in
+                  visited_signs <- (sign_id, new_id) :: visited_signs ;
+                  let new_sign = self#visit_struct_sig env sign in
+                  visited_signs <- prev_vis_signs ;
+                  new_sign )
+            in
+            if equal_struct_sig sign new_sign then (
+              Arena.unsafe_drop_first program.struct_signs ;
+              StructSig sign_id )
+            else StructSig id
+
+      method! visit_UnionSig env sign_id =
+        match List.Assoc.find visited_union_signs sign_id ~equal:equal_int with
+        | Some new_id ->
+            UnionSig new_id
+        | None ->
+            let sign = Arena.get program.union_signs sign_id in
+            let id, new_sign =
+              Arena.with_id program.union_signs ~f:(fun new_id ->
+                  let prev_vis_signs = visited_union_signs in
+                  visited_union_signs <-
+                    (sign_id, new_id) :: visited_union_signs ;
+                  let new_sign = self#visit_union_sig env sign in
+                  visited_union_signs <- prev_vis_signs ;
+                  new_sign )
+            in
+            if equal_union_sig sign new_sign then (
+              Arena.unsafe_drop_first program.union_signs ;
+              UnionSig sign_id )
+            else UnionSig id
+
+      method! visit_Dependent _ ref ty =
+        (* if equal_string ref "T" then (
+           print_sexp @@ sexp_of_list sexp_of_binding associated ;
+           print_sexp @@ sexp_of_type_ returns ) ; *)
         List.find_map associated ~f:(fun (name, x) ->
             if equal_string name ref then
               Some
@@ -386,14 +471,15 @@ and type_of_call args arg_types returns =
                 (* If we depend on reference, it means we depend on function argument,
                    so type must be dependent. *)
                 | Reference (r, t) ->
-                    Dependent (r, t)
+                    if equal_string r "Self" then ExprType (Reference (r, t))
+                    else Dependent (r, t)
                 | x ->
-                    type_of x )
+                    type_of program x )
             else None )
-        |> Option.value_exn
+        |> Option.value_or_thunk ~default:(fun _ -> Dependent (ref, ty))
     end
   in
-  let monomorphizer = dependent_types_monomophizer associated in
+  let monomorphizer = dependent_types_monomophizer program associated in
   monomorphizer#visit_type_ () returns
 
 class ['s] boolean_reduce (zero : bool) =
@@ -411,70 +497,126 @@ class ['s] boolean_reduce (zero : bool) =
     method visit_arena _ _ _ = zero
   end
 
-class ['s] primitive_presence =
-  object (_self : 's)
-    inherit [_] boolean_reduce false
-
-    method! visit_Primitive _env _primitive = true
-
-    method! visit_mk_struct _ _ = false
-  end
-
-let has_primitives = (new primitive_presence)#visit_function_ ()
-
-class ['s] expr_immediacy_check =
+class ['s] expr_immediacy_check ?(inside_function_call = false)
+  ?(arguments = []) ?(is_primitive_immediate = false)
+  (scope : tbinding list list) (program : program) =
   object (self : 's)
     inherit [_] boolean_reduce true as super
 
-    val mutable in_function_call = 0
+    val mutable arguments : string list list = arguments
 
-    method! visit_Reference _env _ref = false
+    method! visit_Reference _ (ref, _) =
+      match find_comptime ref scope with
+      | Some (Ok _) ->
+          true
+      | Some (Error _) ->
+          false
+      | None ->
+          List.find arguments ~f:(List.exists ~f:(equal_string ref))
+          |> Option.is_some
 
-    method! visit_Hole _env = false
+    method! visit_Primitive _env _primitive = is_primitive_immediate
 
-    method! visit_InvalidExpr _env = false
+    method! visit_Let env vars =
+      self#visit_list
+        (fun env (name, expr) ->
+          let is_expr_immediate = self#visit_expr env expr in
+          arguments <- [name] :: arguments ;
+          is_expr_immediate )
+        env vars
 
-    method! visit_Primitive _env _primitive = false
-
-    method! visit_function_call env (f, args) =
-      match f with
-      | Value (Function {function_impl = BuiltinFn _; _}) ->
-          in_function_call <- in_function_call + 1 ;
-          let result = self#visit_list self#visit_expr env args in
-          in_function_call <- in_function_call - 1 ;
-          result
-      | _ ->
-          in_function_call <- in_function_call + 1 ;
-          let result = super#visit_function_call env (f, args) in
-          in_function_call <- in_function_call - 1 ;
-          result
+    method! visit_Block env block =
+      self#with_arguments [] (fun _ -> super#visit_Block env block)
 
     method! visit_function_ env f =
-      self#plus
-        ( if in_function_call > 0 then
-          (* If we're calling this function, check if there are no primitives *)
-          not @@ has_primitives f
-        else
-          (* Any function is assumed to be immediate as it can be evaluated otherwise *)
-          true )
-        (super#visit_function_signature env f.function_signature)
+      if not inside_function_call then
+        let is_sig_immediate =
+          self#visit_function_signature env f.function_signature
+        in
+        let args = List.map f.function_signature.function_params ~f:fst in
+        let out =
+          self#with_arguments args (fun ars ->
+              (new expr_immediacy_check
+                 ~is_primitive_immediate:true ~arguments:ars scope program )
+                #visit_function_impl
+                env f.function_impl )
+        in
+        self#plus is_sig_immediate out
+      else
+        let is_sig_immediate =
+          self#visit_function_signature env f.function_signature
+        in
+        let args = List.map f.function_signature.function_params ~f:fst in
+        let out =
+          self#with_arguments args (fun ars ->
+              (new expr_immediacy_check
+                 ~is_primitive_immediate ~inside_function_call:false
+                 ~arguments:ars scope program )
+                #visit_function_impl
+                env f.function_impl )
+        in
+        self#plus is_sig_immediate out
 
-    method! visit_MkFunction env f =
-      super#visit_function_signature env f.function_signature
+    method! visit_branch env {branch_var; branch_stmt; _} =
+      self#with_arguments [branch_var] (fun _ ->
+          self#visit_stmt env branch_stmt )
 
-    method! visit_StructSig _ _ = true
+    method! visit_function_call env (f, args) =
+      let args = self#visit_list self#visit_expr env args in
+      let f =
+        (new expr_immediacy_check
+           ~is_primitive_immediate ~inside_function_call:true ~arguments scope
+           program )
+          #visit_expr
+          env f
+      in
+      self#plus f args
 
-    method! visit_mk_struct _ _ = true
+    method! visit_function_signature env sign =
+      let is_args_immediate =
+        List.fold ~init:true
+          ~f:(fun prev (_, ty2) -> prev && self#visit_type_ env ty2)
+          sign.function_params
+      in
+      let args = List.map ~f:(fun (name, _) -> name) sign.function_params in
+      let is_ret_immediate =
+        self#with_arguments args (fun _ ->
+            self#visit_type_ env sign.function_returns )
+      in
+      self#plus is_args_immediate is_ret_immediate
 
-    method! visit_partial_type _ _ = false
+    method! visit_StructSig env sid =
+      let sign = Arena.get program.struct_signs sid in
+      let _1 = self#visit_list self#visit_binding env sign.st_sig_fields in
+      _1
+
+    method! visit_mk_struct env mk =
+      self#with_arguments ["Self"] (fun _ -> super#visit_mk_struct env mk)
+
+    method! visit_mk_union env mk =
+      self#with_arguments ["Self"] (fun _ -> super#visit_mk_union env mk)
+
+    (* FIXME: I'm not sure why `Int` function is not immediate,
+       this should be investigated. *)
+    method! visit_ResolvedReference env (ref, ex) =
+      if equal_string ref "Int" then true
+      else super#visit_ResolvedReference env (ref, ex)
+
+    method private with_arguments args f =
+      let prev_args = arguments in
+      arguments <- args :: arguments ;
+      let out = f arguments in
+      arguments <- prev_args ;
+      out
   end
 
-let rec is_immediate_expr expr =
-  let checker = new expr_immediacy_check in
+let rec is_immediate_expr scope program expr =
+  let checker = new expr_immediacy_check scope program in
   checker#visit_expr () expr
 
-and are_immediate_arguments args =
-  Option.is_none (List.find args ~f:(fun a -> not (is_immediate_expr a)))
+and are_immediate_arguments scope program args =
+  Option.is_none
+    (List.find args ~f:(fun a -> not (is_immediate_expr scope program a)))
 
 let rec builtin_fun_counter = ref 0
 
@@ -511,7 +653,6 @@ end
 
 module Program = struct
   let methods_of p = function
-    (* TODO: fix expr type *)
     | StructType s ->
         List.find_map_exn p.structs ~f:(fun (id, s') ->
             if equal_int id s then Some s'.struct_methods else None )
