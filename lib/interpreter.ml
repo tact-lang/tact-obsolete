@@ -461,8 +461,9 @@ class interpreter
         match find_in_scope ref scope with
         | Some (Comptime ex) ->
             Some ex
-        | Some (Runtime _) ->
+        | Some (Runtime ty) ->
             print_sexp (sexp_of_string ref) ;
+            print_sexp (sexp_of_type_ ty) ;
             raise Errors.InternalCompilerError
         | None ->
             raise Errors.InternalCompilerError

@@ -238,7 +238,7 @@ functor
               Reference (ref, type_of program ex)
           | None ->
               errors#report `Error (`UnresolvedIdentifier ref) () ;
-              Reference (ref, HoleType)
+              Value Void
 
         method build_Return _env return =
           match functions with
@@ -351,6 +351,12 @@ functor
         method build_field_access _env expr field =
           let expr = Syntax.value expr in
           let field = Syntax.value field in
+          let mk_err () =
+            print_sexp (sexp_of_expr expr) ;
+            errors#report `Error (`FieldNotFoundF field) () ;
+            print_sexp (sexp_of_string field) ;
+            raise InternalCompilerError
+          in
           match type_of program expr with
           | StructType s -> (
               let struct_ = Program.get_struct program s in
@@ -360,8 +366,7 @@ functor
               | Some {field_type} ->
                   (expr, field, field_type)
               | None ->
-                  errors#report `Error (`FieldNotFoundF field) () ;
-                  (Value (Type VoidType), field, VoidType) )
+                  mk_err () )
           | ExprType ex -> (
             match type_of program ex with
             | StructSig s -> (
@@ -372,11 +377,9 @@ functor
                 | Some ty ->
                     (expr, field, expr_to_type program ty)
                 | None ->
-                    errors#report `Error (`FieldNotFoundF field) () ;
-                    (Value (Type VoidType), field, VoidType) )
+                    mk_err () )
             | _ ->
-                errors#report `Error (`FieldNotFoundF field) () ;
-                (Value (Type VoidType), field, VoidType) )
+                mk_err () )
           | StructSig sign_id -> (
               let s = Arena.get program.struct_signs sign_id in
               match
@@ -385,12 +388,9 @@ functor
               | Some ty ->
                   (expr, field, expr_to_type program ty)
               | None ->
-                  errors#report `Error (`FieldNotFoundF field) () ;
-                  (Value (Type VoidType), field, VoidType) )
+                  mk_err () )
           | _ ->
-              print_sexp (sexp_of_expr expr) ;
-              errors#report `Error (`FieldNotFoundF field) () ;
-              (Value (Type VoidType), field, VoidType)
+              mk_err ()
 
         method build_function_call _env fn args =
           (Syntax.value fn, s#of_located_list args)
@@ -698,7 +698,7 @@ functor
                            None ) ) )
           in
           let _ =
-            Arena.update program.struct_signs sign_id ~f:(fun _ ->
+            Arena.update program.struct_signs sign_id ~f:(fun sign ->
                 { st_sig_fields = mk_struct_fields;
                   st_sig_methods =
                     List.Assoc.map (mk_methods @ impl_methods) ~f:(fun f ->
@@ -707,7 +707,8 @@ functor
                             f.function_signature
                         | _ ->
                             raise InternalCompilerError );
-                  st_sig_base_id = mk_struct_id } )
+                  st_sig_base_id = mk_struct_id;
+                  st_sig_id = sign.st_sig_id } )
           in
           let s' =
             { mk_struct_fields;
@@ -729,6 +730,8 @@ functor
           s'
 
         method! visit_struct_definition env syn_struct_def =
+          let prev_functions = functions in
+          functions <- functions + 1 ;
           let fields =
             s#visit_list
               (s#visit_located s#visit_struct_field)
@@ -736,10 +739,11 @@ functor
             |> s#of_located_list
           in
           let sign_id, _ =
-            Arena.with_id program.struct_signs ~f:(fun _ ->
+            Arena.with_id program.struct_signs ~f:(fun id ->
                 { st_sig_fields = fields;
                   st_sig_methods = [];
-                  st_sig_base_id = program.type_counter } )
+                  st_sig_base_id = program.type_counter;
+                  st_sig_id = id } )
           in
           let mk_struct_ =
             { mk_struct_fields = fields;
@@ -769,6 +773,7 @@ functor
             in
             {mk_struct with mk_struct_id = mk_struct_.mk_struct_id}
           in
+          functions <- prev_functions ;
           mk_struct
 
         method build_struct_field : _ -> _ -> _ -> string * expr =
@@ -778,6 +783,8 @@ functor
         method build_union_definition _ _ _ = raise InternalCompilerError
 
         method! visit_union_definition env def =
+          let prev_functions = functions in
+          functions <- functions + 1 ;
           let members =
             s#visit_list (s#visit_located s#visit_expr) env def.union_members
           in
@@ -828,6 +835,7 @@ functor
               mk_union_methods = methods @ impl_methods;
               mk_union_sig = sign_id }
           in
+          functions <- prev_functions ;
           mk_union
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =

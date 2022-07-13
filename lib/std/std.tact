@@ -247,7 +247,7 @@ union MsgAddressInt {
     fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
-        let res_addr = AddressStd.deserialize(res_discr.value);
+        let res_addr = AddressStd.deserialize(res_discr.slice);
         return LoadResult(Self).new(res_addr.slice, res_addr.value);
       } else {
         let res_addr = AddressVar.deserialize(res_discr.slice);
@@ -256,7 +256,6 @@ union MsgAddressInt {
     }
   }
 }
-
 union MsgAddress {
   case MsgAddressExt
   case MsgAddressInt
@@ -271,7 +270,7 @@ union MsgAddress {
     fn deserialize(s: Slice) -> LoadResult(Self) {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
-        let res_addr = MsgAddressExt.deserialize(res_discr.value);
+        let res_addr = MsgAddressExt.deserialize(res_discr.slice);
         return LoadResult(Self).new(res_addr.slice, res_addr.value);
       } else {
         let res_addr = MsgAddressInt.deserialize(res_discr.slice);

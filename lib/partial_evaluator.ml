@@ -170,15 +170,6 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
           StructSig sign_id
 
     method! visit_mk_struct env mk =
-      let _self_scope =
-        match
-          List.Assoc.find updated_items mk.mk_struct_id ~equal:equal_int
-        with
-        | Some new_id ->
-            [make_comptime ("Self", Value (Type (StructType new_id)))]
-        | None ->
-            [make_runtime ("Self", StructSig mk.mk_struct_sig)]
-      in
       let mk =
         self#with_vars
           [make_runtime ("Self", StructSig mk.mk_struct_sig)]
@@ -194,15 +185,6 @@ class ['s] partial_evaluator (program : program) (bindings : tbinding list list)
           UnionSig sign_id
 
     method! visit_mk_union env mk =
-      let _self_scope =
-        match
-          List.Assoc.find updated_unions mk.mk_union_id ~equal:equal_int
-        with
-        | Some new_id ->
-            [make_comptime ("Self", Value (Type (UnionType new_id)))]
-        | None ->
-            [make_runtime ("Self", UnionSig mk.mk_union_sig)]
-      in
       let mk =
         self#with_vars
           [make_runtime ("Self", UnionSig mk.mk_union_sig)]

@@ -3,10 +3,19 @@ open Base
 let print_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 
 module Arena = struct
-  type 'a t =
-    { mutable current_id : int; [@hash.ignore]
-      mutable items : (int * 'a) list [@hash.ignore] }
-  [@@deriving equal, compare, hash, sexp_of]
+  module Vec = Containers.Vector
+
+  type 'a t = {mutable items : 'a Vec.vector [@hash.ignore]} [@@deriving hash]
+
+  let equal _ _ _ = raise Errors.InternalCompilerError
+
+  let compare _ _ _ = raise Errors.InternalCompilerError
+
+  let sexp_of_t : ('a -> Sexplib.Type.t) -> 'a t -> _ =
+   fun f a ->
+    Sexplib.Type.List
+      ( sexp_of_int (Vec.length a.items)
+      :: [Sexplib.Type.List (Vec.fold (fun l i -> f i :: l) [] a.items)] )
 
   class ['s] visitor =
     object (_self : 's)
@@ -14,46 +23,38 @@ module Arena = struct
         fun _ _ a -> a
     end
 
-  let default () = {current_id = 0; items = []}
+  let default () = {items = Vec.create ()}
 
-  let get a id =
-    List.Assoc.find a.items id ~equal:equal_int
-    |> Option.value_exn
-         ~message:(Printf.sprintf "Try to get non existent id %i" id)
+  let get a id = Vec.get a.items id
 
   let with_id a ~f =
-    let current_id = a.current_id in
-    a.current_id <- current_id + 1 ;
-    let item = f current_id in
-    a.items <- (current_id, item) :: a.items ;
-    (current_id, item)
-
-  open struct
-    let rec update_list id new_item = function
-      | [] ->
-          raise Errors.InternalCompilerError
-      | (xid, old_s) :: xs ->
-          if equal_int xid id then (id, new_item) :: xs
-          else (xid, old_s) :: update_list id new_item xs
-  end
+    let id = Vec.length a.items in
+    let item = f id in
+    Vec.push a.items item ; (id, item)
 
   let update a id ~f =
+    (* print_sexp (sexp_of_int id) ;
+       print_sexp (sexp_of_string "|") ; *)
     let item = get a id in
     let new_item = f item in
-    a.items <- update_list id new_item a.items ;
+    Vec.set a.items id new_item ;
     new_item
 
   (* For tests purposes only *)
   let strip_if_exists left right =
-    { left with
-      items =
-        List.filter left.items ~f:(fun (id, _) ->
-            Option.is_none (List.Assoc.find right.items id ~equal:equal_int) )
-    }
+    let rl = Vec.length right.items in
+    let ll = Vec.length left.items in
+    if rl > ll then left
+    else
+      { items =
+          ( Vec.rev left.items
+          |> fun items ->
+          Vec.truncate items (ll - rl) ;
+          Vec.rev items ) }
 
-  let unsafe_drop_first a =
-    a.current_id <- a.current_id - 1 ;
-    a.items <- List.tl_exn a.items
+  let unsafe_drop_last a =
+    let _ = Vec.pop_exn a.items in
+    ()
 end
 
 class ['s] base_map =
@@ -216,7 +217,8 @@ and struct_sig =
   { st_sig_fields : (string * expr) list;
     st_sig_methods : (string * function_signature) list;
     (* ID of the base of the struct. *)
-    st_sig_base_id : int }
+    st_sig_base_id : int;
+    st_sig_id : int [@compare.ignore] [@equal.ignore] }
 
 and union_sig =
   { un_sig_cases : type_ list;
@@ -307,7 +309,7 @@ let extract_comptime_bindings bindings =
   List.filter_map bindings ~f:(fun (name, scope) ->
       match scope with Comptime value -> Some (name, value) | _ -> None )
 
-let sig_of_struct {struct_fields; struct_methods; struct_base_id; _} =
+let sig_of_struct {struct_fields; struct_methods; struct_base_id; _} sid =
   { st_sig_fields =
       List.Assoc.map struct_fields ~f:(fun {field_type} ->
           match field_type with
@@ -317,7 +319,8 @@ let sig_of_struct {struct_fields; struct_methods; struct_base_id; _} =
               Value (Type field_type) );
     st_sig_methods =
       List.Assoc.map struct_methods ~f:(fun x -> x.function_signature);
-    st_sig_base_id = struct_base_id }
+    st_sig_base_id = struct_base_id;
+    st_sig_id = sid }
 
 let sig_of_union {cases; union_methods; union_base_id; _} =
   { un_sig_cases = List.map cases ~f:fst;
@@ -367,7 +370,9 @@ and type_of program = function
       let f' = type_of program f in
       match f' with
       | FunctionType sign ->
-          type_of_call program args sign.function_params sign.function_returns
+          type_of_call
+            ~self_ty:(Some (ExprType (FunctionCall (f, args))))
+            program args sign.function_params sign.function_returns
       | _ ->
           raise Errors.InternalCompilerError )
   | Reference (_, t) ->
@@ -404,7 +409,7 @@ and type_of_type program = function
   | _otherwise ->
       TypeN 0
 
-and type_of_call program args arg_types returns =
+and type_of_call ?(self_ty = None) program args arg_types returns =
   let associated =
     match List.map2 args arg_types ~f:(fun expr (name, _) -> (name, expr)) with
     | Ok t ->
@@ -413,9 +418,11 @@ and type_of_call program args arg_types returns =
         raise Errors.InternalCompilerError
   in
   let dependent_types_monomophizer (program : program)
-      (associated : (string * expr) list) =
+      ?(self_sig : int option = None) (associated : (string * expr) list) =
     object (self : _)
       inherit [_] map
+
+      val mutable inside_self_sig = false
 
       val mutable visited_signs : (int * int) list = []
 
@@ -424,8 +431,14 @@ and type_of_call program args arg_types returns =
       method! visit_StructSig env sign_id =
         match List.Assoc.find visited_signs sign_id ~equal:equal_int with
         | Some new_id ->
-            StructSig new_id
+            if inside_self_sig then
+              Option.value self_ty ~default:(StructSig new_id)
+            else StructSig new_id
         | None ->
+            if
+              equal_option equal_int self_sig (Some sign_id)
+              && not inside_self_sig
+            then inside_self_sig <- true ;
             let sign = Arena.get program.struct_signs sign_id in
             let id, new_sign =
               Arena.with_id program.struct_signs ~f:(fun new_id ->
@@ -433,10 +446,10 @@ and type_of_call program args arg_types returns =
                   visited_signs <- (sign_id, new_id) :: visited_signs ;
                   let new_sign = self#visit_struct_sig env sign in
                   visited_signs <- prev_vis_signs ;
-                  new_sign )
+                  {new_sign with st_sig_id = new_id} )
             in
             if equal_struct_sig sign new_sign then (
-              Arena.unsafe_drop_first program.struct_signs ;
+              Arena.unsafe_drop_last program.struct_signs ;
               StructSig sign_id )
             else StructSig id
 
@@ -456,7 +469,7 @@ and type_of_call program args arg_types returns =
                   new_sign )
             in
             if equal_union_sig sign new_sign then (
-              Arena.unsafe_drop_first program.union_signs ;
+              Arena.unsafe_drop_last program.union_signs ;
               UnionSig sign_id )
             else UnionSig id
 
@@ -479,7 +492,13 @@ and type_of_call program args arg_types returns =
         |> Option.value_or_thunk ~default:(fun _ -> Dependent (ref, ty))
     end
   in
-  let monomorphizer = dependent_types_monomophizer program associated in
+  let monomorphizer =
+    match returns with
+    | StructSig sid ->
+        dependent_types_monomophizer ~self_sig:(Some sid) program associated
+    | _ ->
+        dependent_types_monomophizer program associated
+  in
   monomorphizer#visit_type_ () returns
 
 class ['s] boolean_reduce (zero : bool) =
@@ -497,25 +516,60 @@ class ['s] boolean_reduce (zero : bool) =
     method visit_arena _ _ _ = zero
   end
 
-class ['s] expr_immediacy_check ?(inside_function_call = false)
-  ?(arguments = []) ?(is_primitive_immediate = false)
-  (scope : tbinding list list) (program : program) =
-  object (self : 's)
-    inherit [_] boolean_reduce true as super
+type reason_non_immediate =
+  | NonImmediateRef
+  | NonImmediatePrimitive
+  | NonImmediatetSig
+[@@deriving sexp_of]
 
-    val mutable arguments : string list list = arguments
+type is_immediate =
+  | Immediate
+  | ImmediateIfNotCalled
+  | NonImmediate of reason_non_immediate
+[@@deriving sexp_of]
+
+class ['s] expr_immediacy_check (scope : tbinding list list) =
+  object (self : 's)
+    inherit [_] reduce as super
+
+    method zero = Immediate
+
+    method plus x1 x2 =
+      match (x1, x2) with
+      | NonImmediate NonImmediateRef, _ | _, NonImmediate NonImmediateRef ->
+          NonImmediate NonImmediateRef
+      | NonImmediate NonImmediatePrimitive, _
+      | _, NonImmediate NonImmediatePrimitive ->
+          NonImmediate NonImmediatePrimitive
+      | NonImmediate NonImmediatetSig, _ | _, NonImmediate NonImmediatetSig ->
+          Immediate
+      | ImmediateIfNotCalled, _ | _, ImmediateIfNotCalled ->
+          ImmediateIfNotCalled
+      | _ ->
+          Immediate
+
+    method visit_z _ _ = Immediate
+
+    method visit_instr _ _ = raise Errors.InternalCompilerError
+
+    method visit_arena _ _ = raise Errors.InternalCompilerError
+
+    val mutable arguments : string list list = []
 
     method! visit_Reference _ (ref, _) =
-      match find_comptime ref scope with
-      | Some (Ok _) ->
-          true
-      | Some (Error _) ->
-          false
-      | None ->
-          List.find arguments ~f:(List.exists ~f:(equal_string ref))
-          |> Option.is_some
+      match List.find arguments ~f:(List.exists ~f:(equal_string ref)) with
+      | Some _ ->
+          Immediate
+      | _ -> (
+        match find_comptime ref scope with
+        | Some (Ok _) ->
+            Immediate
+        | Some (Error _) ->
+            NonImmediate NonImmediateRef
+        | None ->
+            raise Errors.InternalCompilerError )
 
-    method! visit_Primitive _env _primitive = is_primitive_immediate
+    method! visit_Primitive _ _ = NonImmediate NonImmediatePrimitive
 
     method! visit_Let env vars =
       self#visit_list
@@ -525,82 +579,72 @@ class ['s] expr_immediacy_check ?(inside_function_call = false)
           is_expr_immediate )
         env vars
 
+    method! visit_DestructuringLet env let_ =
+      let is_expr = self#visit_expr env let_.destructuring_let_expr in
+      let args = List.map let_.destructuring_let ~f:snd in
+      arguments <- args :: arguments ;
+      is_expr
+
     method! visit_Block env block =
       self#with_arguments [] (fun _ -> super#visit_Block env block)
 
     method! visit_function_ env f =
-      if not inside_function_call then
-        let is_sig_immediate =
-          self#visit_function_signature env f.function_signature
-        in
-        let args = List.map f.function_signature.function_params ~f:fst in
-        let out =
-          self#with_arguments args (fun ars ->
-              (new expr_immediacy_check
-                 ~is_primitive_immediate:true ~arguments:ars scope program )
-                #visit_function_impl
-                env f.function_impl )
-        in
-        self#plus is_sig_immediate out
-      else
-        let is_sig_immediate =
-          self#visit_function_signature env f.function_signature
-        in
-        let args = List.map f.function_signature.function_params ~f:fst in
-        let out =
-          self#with_arguments args (fun ars ->
-              (new expr_immediacy_check
-                 ~is_primitive_immediate ~inside_function_call:false
-                 ~arguments:ars scope program )
-                #visit_function_impl
-                env f.function_impl )
-        in
-        self#plus is_sig_immediate out
+      let is_sig = self#visit_function_signature env f.function_signature in
+      let args = List.map f.function_signature.function_params ~f:fst in
+      let is_body =
+        self#with_arguments args (fun _ ->
+            self#visit_function_impl env f.function_impl )
+      in
+      self#plus is_sig is_body
+
+    method! visit_function_body env body =
+      match super#visit_function_body env body with
+      | NonImmediate NonImmediatePrimitive ->
+          ImmediateIfNotCalled
+      | ImmediateIfNotCalled ->
+          (* Expression that throws ImmediateIfNotCalled is not called so function
+             itself is immediate *)
+          Immediate
+      | x ->
+          x
 
     method! visit_branch env {branch_var; branch_stmt; _} =
       self#with_arguments [branch_var] (fun _ ->
           self#visit_stmt env branch_stmt )
 
-    method! visit_function_call env (f, args) =
-      let args = self#visit_list self#visit_expr env args in
-      let f =
-        (new expr_immediacy_check
-           ~is_primitive_immediate ~inside_function_call:true ~arguments scope
-           program )
-          #visit_expr
-          env f
+    method! visit_function_call ctx (f, args) =
+      let is_args_immediate = self#visit_list self#visit_expr ctx args in
+      let is_f_immediate =
+        match self#visit_expr ctx f with
+        | ImmediateIfNotCalled ->
+            NonImmediate NonImmediatePrimitive
+        | x ->
+            x
       in
-      self#plus f args
+      self#plus is_args_immediate is_f_immediate
 
-    method! visit_function_signature env sign =
+    method! visit_function_signature ctx sign =
       let is_args_immediate =
-        List.fold ~init:true
-          ~f:(fun prev (_, ty2) -> prev && self#visit_type_ env ty2)
+        List.fold ~init:Immediate
+          ~f:(fun prev (_, ty2) -> self#plus prev (self#visit_type_ ctx ty2))
           sign.function_params
       in
       let args = List.map ~f:(fun (name, _) -> name) sign.function_params in
       let is_ret_immediate =
         self#with_arguments args (fun _ ->
-            self#visit_type_ env sign.function_returns )
+            self#visit_type_ ctx sign.function_returns )
       in
       self#plus is_args_immediate is_ret_immediate
 
-    method! visit_StructSig env sid =
-      let sign = Arena.get program.struct_signs sid in
-      let _1 = self#visit_list self#visit_binding env sign.st_sig_fields in
-      _1
+    method! visit_StructSig _ _ = NonImmediate NonImmediatetSig
+
+    method! visit_UnionSig _ _ = NonImmediate NonImmediatetSig
 
     method! visit_mk_struct env mk =
       self#with_arguments ["Self"] (fun _ -> super#visit_mk_struct env mk)
 
     method! visit_mk_union env mk =
       self#with_arguments ["Self"] (fun _ -> super#visit_mk_union env mk)
-
-    (* FIXME: I'm not sure why `Int` function is not immediate,
-       this should be investigated. *)
-    method! visit_ResolvedReference env (ref, ex) =
-      if equal_string ref "Int" then true
-      else super#visit_ResolvedReference env (ref, ex)
 
     method private with_arguments args f =
       let prev_args = arguments in
@@ -610,9 +654,13 @@ class ['s] expr_immediacy_check ?(inside_function_call = false)
       out
   end
 
-let rec is_immediate_expr scope program expr =
-  let checker = new expr_immediacy_check scope program in
-  checker#visit_expr () expr
+let rec is_immediate_expr scope _p expr =
+  let checker = new expr_immediacy_check scope in
+  match checker#visit_expr () expr with
+  | Immediate | ImmediateIfNotCalled ->
+      true
+  | _ ->
+      false
 
 and are_immediate_arguments scope program args =
   Option.is_none

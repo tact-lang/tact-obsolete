@@ -18,21 +18,9 @@ class ['s] remover_of_resolved_reference =
           self#visit_type_ env t
       | ty ->
           super#visit_type_ env ty
-
-    (* method! visit_ExprType env =
-       function
-       | FunctionCall (f, args) -> (
-           let f = type_of program f in
-           match f with
-           | FunctionType sign ->
-               type_of_call program args f.function_signature
-           | _ ->
-               raise InternalCompilerError )
-       | ex ->
-           ExprType ex *)
   end
 
-let is_sig_part_of sign1 sign2 =
+let is_sig_part_of sign1 sign2 ~equal_ty =
   let remover = new remover_of_resolved_reference in
   let sign1 = remover#visit_struct_sig () sign1 in
   let sign2 = remover#visit_struct_sig () sign2 in
@@ -41,7 +29,7 @@ let is_sig_part_of sign1 sign2 =
       if
         not
           (List.exists sign1.st_sig_fields ~f:(fun (name1, ty1) ->
-               equal_string name1 name2 && equal_expr ty1 ty2 ) )
+               equal_string name1 name2 && equal_ty ty1 ty2 ) )
       then is_part := false ) ;
   !is_part
 
@@ -87,11 +75,19 @@ class type_checker (errors : _) (functions : _) =
         fn_returns <- prev ;
         (result, new_fn_returns)
 
-    method check_type ~program ~current_bindings ~expected actual_value =
-      let actual = type_of program actual_value in
+    method check_type ~program ~current_bindings ~expected ?(actual_ty = None)
+        actual_value =
+      let actual =
+        Option.value_or_thunk actual_ty ~default:(fun _ ->
+            type_of program actual_value )
+      in
       let remover = new remover_of_resolved_reference in
       let actual' = remover#visit_type_ () actual in
       let expected' = remover#visit_type_ () expected in
+      let is_sig_part_of_call sign_actual sign_expected =
+        is_sig_part_of sign_actual sign_expected ~equal_ty:(fun ty1 ty2 ->
+            equal_expr ty1 ty2 )
+      in
       match expected with
       | HoleType ->
           Ok actual
@@ -104,15 +100,30 @@ class type_checker (errors : _) (functions : _) =
           match actual' with
           | StructType sid ->
               let s = Program.get_struct program sid in
-              let sign_actual = sig_of_struct s in
-              if is_sig_part_of sign_actual sign_expected then
+              let sign_actual = sig_of_struct s 0 in
+              if is_sig_part_of_call sign_actual sign_expected then
                 Ok (StructType sid)
               else Error (TypeError expected)
-          | ExprType (Reference (_, StructSig sid2)) | StructSig sid2 ->
+          | ExprType (Reference (ref, StructSig sid2)) ->
               let sign_actual = Arena.get program.struct_signs sid2 in
-              if is_sig_part_of sign_actual sign_expected then
+              if is_sig_part_of_call sign_actual sign_expected then
+                Ok (ExprType (Reference (ref, StructSig sid2)))
+              else Error (TypeError expected)
+          | StructSig sid2 ->
+              let sign_actual = Arena.get program.struct_signs sid2 in
+              if is_sig_part_of_call sign_actual sign_expected then
                 Ok (StructSig sid2)
               else Error (TypeError expected)
+          | ExprType (FunctionCall fc) -> (
+              let ex_ty = type_of program (FunctionCall fc) in
+              match ex_ty with
+              | StructSig sid2 ->
+                  let sign_actual = Arena.get program.struct_signs sid2 in
+                  if is_sig_part_of_call sign_actual sign_expected then
+                    Ok (ExprType (FunctionCall fc))
+                  else Error (TypeError expected)
+              | _ ->
+                  Error (TypeError expected) )
           | _ ->
               Error (TypeError expected) )
       | UnionSig sign_expected -> (

@@ -43,6 +43,7 @@
    (base (>= 0.15.0))
    (ppx_jane (>= 0.15.0))
    (visitors (= 20210608))
+   (containers (>= 3.9.0))
    (core (and :with-test (>= 0.15.0)))
    (ppx_expect (and :with-test (>= 0.15.0)))
    (ppx_matches (and :with-test (>= 0.1)))

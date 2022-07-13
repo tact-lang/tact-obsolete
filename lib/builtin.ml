@@ -54,7 +54,8 @@ let load_result_func a =
                        { function_params =
                            [("s", slice_struct); ("v", Dependent ("T", type0))];
                          function_returns = StructSig id } ) ];
-                 st_sig_base_id = base_id } )
+                 st_sig_base_id = base_id;
+                 st_sig_id = id } )
          in
          StructSig id ) }
   in
