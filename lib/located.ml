@@ -30,7 +30,7 @@ type pos = Lexing'.pos [@@deriving show {with_path = false}, equal]
 
 let sexp_of_pos = Lexing'.sexp_of_pos
 
-type loc = pos * pos [@@deriving show, equal, sexp_of]
+type span = pos * pos [@@deriving show, equal, sexp_of]
 
 module type T = sig
   type 'a located
@@ -38,30 +38,30 @@ module type T = sig
   val pp_located :
     (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a located -> unit
 
-  val make_located : loc:loc -> value:'a -> unit -> 'a located
+  val make_located : span:span -> value:'a -> unit -> 'a located
 
   val sexp_of_located : ('a -> Sexplib0.Sexp.t) -> 'a located -> Sexplib0.Sexp.t
 
   val value : 'a located -> 'a
 
-  val loc : 'a located -> loc
+  val span : 'a located -> span
 end
 
 module Enabled : T = struct
-  type 'a located = {loc : loc; value : 'a}
+  type 'a located = {span : span; value : 'a}
   [@@deriving show {with_path = false}, make, sexp_of]
 
   let value l = l.value
 
-  let loc l = l.loc
+  let span l = l.span
 end
 
 module Disabled : T = struct
   type 'a located = 'a [@@deriving show, sexp_of]
 
-  let make_located ~loc:_loc ~value () = value
+  let make_located ~span:_span ~value () = value
 
   let value v = v
 
-  let loc _ = (Lexing.dummy_pos, Lexing.dummy_pos)
+  let span _ = (Lexing.dummy_pos, Lexing.dummy_pos)
 end

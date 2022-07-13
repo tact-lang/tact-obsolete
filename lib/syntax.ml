@@ -16,7 +16,7 @@ functor
         method visit_located
             : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
             =
-          fun f env l -> make_located ~value:(f env (value l)) ~loc:(loc l) ()
+          fun f env l -> make_located ~value:(f env (value l)) ~span:(span l) ()
       end
 
     type ident = Ident of string
