@@ -6,99 +6,11 @@ type error =
   [ `UnresolvedIdentifier of string
   | `UninterpretableStatement of stmt
   | `UnexpectedType of type_
-  | `FieldNotFound of int * string
+  | `FieldNotFound of expr * string
   | `MissingField of int * string
   | `ArgumentNumberMismatch
   | `DuplicateVariant of type_ ]
 [@@deriving equal, sexp_of]
-
-class ['s] struct_updater (program : program) (old : int) (new_s : int) =
-  object (self : 's)
-    inherit ['s] map
-
-    val mutable visited_structs = []
-
-    method! visit_StructType env s =
-      if equal_int s old then StructType new_s
-      else if not (List.exists visited_structs ~f:(fun s' -> equal_int s' s))
-      then
-        let _ = self#update_struct_ids_if_needed env s in
-        StructType s
-      else StructType s
-
-    (* This will update struct ids in the fields and functions of another struct.
-       Suppose, you have following declaration:
-       ```tact
-       struct Wrap(X: Type) {val x: X}
-       struct /* 3 */ Test {
-        fn wrap(self: Self) -> /* 2 */ Wrap( /* 1 */ Self) {
-          Wrap(Self) { x: self }
-        }
-       }
-       ```
-       If code will evaluated without function below, output code has IDs as in comments above.
-       As you can see, `Wrap(Struct(1))` will be created with field `val x: Struct(1)`, but it
-       is expected that after `Test` was constructed, `val x` field should have struct id `3`.
-       So, to update such ids there is a function below.
-    *)
-    method private update_struct_ids_if_needed : 'env. 'env -> _ -> _ =
-      fun env sid ->
-        visited_structs <- sid :: visited_structs ;
-        Program.update_struct program sid ~f:(fun st ->
-            self#visit_struct_ env st )
-
-    method! visit_UnionType env u =
-      if not (List.exists visited_structs ~f:(fun s' -> equal_int s' u)) then (
-        visited_structs <- u :: visited_structs ;
-        let _ =
-          Program.update_union program u ~f:(fun st -> self#visit_union env st)
-        in
-        UnionType u )
-      else UnionType u
-
-    method! visit_Struct env (s, fields) =
-      let fields' = self#visit_list self#visit_binding env fields in
-      if equal_int s old then Struct (new_s, fields') else Struct (s, fields')
-  end
-
-class ['s] union_updater (program : program) (old : int) (new_s : int) =
-  object (self : 's)
-    inherit ['s] map
-
-    val mutable visited_structs = []
-
-    method! visit_UnionType env s =
-      if equal_int s old then UnionType new_s else self#update_unions env s
-
-    method update_unions : 'env. 'env -> _ -> _ =
-      fun env u ->
-        if not (List.exists visited_structs ~f:(fun s' -> equal_int s' u)) then (
-          visited_structs <- u :: visited_structs ;
-          let _ =
-            Program.update_union program u ~f:(fun st ->
-                self#visit_union env st )
-          in
-          () ) ;
-        UnionType u
-
-    method! visit_StructType env s =
-      if not (List.exists visited_structs ~f:(fun s' -> equal_int s' s)) then (
-        visited_structs <- s :: visited_structs ;
-        let _ =
-          Program.update_struct program s ~f:(fun st ->
-              self#visit_struct_ env st )
-        in
-        () ) ;
-      StructType s
-
-    method! visit_UnionVariant _ (expr, s) =
-      if equal_int s old then UnionVariant (expr, new_s)
-      else UnionVariant (expr, s)
-
-    method! visit_MakeUnionVariant _ (expr, s) =
-      if equal_int s old then MakeUnionVariant (expr, new_s)
-      else MakeUnionVariant (expr, s)
-  end
 
 let get_memoized_or_execute p (f, args) ~execute =
   match
@@ -115,9 +27,18 @@ let get_memoized_or_execute p (f, args) ~execute =
 
 (*TODO: type checks for arguments*)
 class interpreter
-  ((program, bindings, errors, _functions) :
+  ((program, bindings, errors, functions) :
     program * tbinding list list * _ errors * int )
-  (partial_evaluate : program -> tbinding list list -> function_ -> function_) =
+  ?(updated_items : (int * int) list = [])
+  ?(updated_unions : (int * int) list = [])
+  (partial_evaluate :
+    program ->
+    tbinding list list ->
+    (int * int) list ->
+    (int * int) list ->
+    int ->
+    function_ ->
+    function_ ) =
   object (self)
     val mutable scope = bindings
 
@@ -126,6 +47,10 @@ class interpreter
     val mutable adding_structs = []
 
     val mutable errors = errors
+
+    val mutable updated_items : (int * int) list = updated_items
+
+    val mutable updated_unions : (int * int) list = updated_unions
 
     method interpret_stmt_list : stmt list -> value =
       fun stmts ->
@@ -185,13 +110,15 @@ class interpreter
               Option.map if_else ~f:(fun stmt -> self#interpret_stmt stmt [])
               |> Option.value ~default:Void
           | value ->
-              errors#report `Error (`UnexpectedType (type_of (Value value))) () ;
+              errors#report `Error
+                (`UnexpectedType (type_of program (Value value)))
+                () ;
               Void )
       | Switch {switch_condition; branches} -> (
           let cond = self#interpret_expr switch_condition in
           match cond with
           | UnionVariant (v, _) -> (
-              let v_ty = type_of (Value v) in
+              let v_ty = type_of program (Value v) in
               let correct_branch =
                 List.find branches ~f:(fun b -> equal_type_ b.branch_ty v_ty)
               in
@@ -233,6 +160,28 @@ class interpreter
                 self#interpret_fc (Value (Function method_), intf_args)
             | None ->
                 raise InternalCompilerError )
+        | StructSigMethodCall
+            { st_sig_call_instance;
+              st_sig_call_def;
+              st_sig_call_method = method_name, _ty;
+              st_sig_call_args;
+              st_sig_call_kind = _ } -> (
+            let ty =
+              match self#interpret_expr st_sig_call_instance with
+              | Type t ->
+                  t
+              | _ ->
+                  raise InternalCompilerError
+            in
+            match Program.find_impl_intf program st_sig_call_def ty with
+            | Some impl ->
+                let method_ =
+                  List.find_map_exn impl.impl_methods ~f:(fun (name, impl) ->
+                      if equal_string name method_name then Some impl else None )
+                in
+                self#interpret_fc (Value (Function method_), st_sig_call_args)
+            | None ->
+                raise InternalCompilerError )
         | ResolvedReference (_, expr') ->
             self#interpret_expr expr'
         | Reference (name, _) -> (
@@ -252,7 +201,9 @@ class interpreter
                 errors#report `Error (`FieldNotFound (struct_, field)) () ;
                 Void )
           | other ->
-              errors#report `Error (`UnexpectedType (type_of (Value other))) () ;
+              errors#report `Error
+                (`UnexpectedType (type_of program (Value other)))
+                () ;
               Void )
         | Value value ->
             self#interpret_value value
@@ -261,13 +212,14 @@ class interpreter
                so we do not need to check if union can be built from the expr. *)
             let data = self#interpret_expr expr in
             UnionVariant (data, union)
-        | MkStructDef {mk_struct_fields; mk_methods; mk_impls; mk_struct_id} ->
+        | MkStructDef {mk_struct_fields; mk_methods; mk_impls; mk_struct_id; _}
+          ->
             let struct_fields =
               List.map mk_struct_fields ~f:(fun (name, field_type) ->
                   ( name,
                     { field_type =
-                        expr_to_type (Value (self#interpret_expr field_type)) }
-                  ) )
+                        expr_to_type program
+                          (Value (self#interpret_expr field_type)) } ) )
             in
             let struct_id = program.type_counter in
             program.type_counter <- program.type_counter + 1 ;
@@ -277,60 +229,62 @@ class interpreter
                 struct_methods = [];
                 struct_impls = [];
                 struct_id;
+                struct_base_id = mk_struct_id;
                 tensor = false }
             in
-            let struct_updater =
-              new struct_updater program mk_struct_id struct_id
-            in
+            let prev_updated_items = updated_items in
+            updated_items <- (mk_struct_id, struct_id) :: updated_items ;
             let _ =
               Program.with_struct program struct_ (fun _ ->
                   let struct_methods =
                     List.map mk_methods ~f:(fun (name, fn) ->
-                        let prev_scope = scope in
-                        scope <-
-                          [ ( "Self",
-                              Comptime (Value (Type (StructType struct_ty))) )
-                          ]
-                          :: scope ;
                         let output =
-                          match
-                            self#interpret_expr
-                              (struct_updater#visit_expr () fn)
-                          with
-                          | Function f ->
-                              f
-                          | _ ->
-                              raise InternalCompilerError
+                          self#with_vars
+                            [ ( "Self",
+                                Comptime (Value (Type (StructType struct_ty)))
+                              ) ]
+                            (fun _ ->
+                              match self#interpret_expr fn with
+                              | Function f ->
+                                  f
+                              | _ ->
+                                  raise InternalCompilerError )
                         in
-                        scope <- prev_scope ;
                         (name, output) )
                   in
                   let struct_impls =
                     List.map mk_impls ~f:(fun impl ->
-                        { impl_interface =
-                            Value.unwrap_intf_id
-                              (self#interpret_expr impl.mk_impl_interface);
-                          impl_methods =
-                            List.map impl.mk_impl_methods ~f:(fun (n, x) ->
-                                ( n,
-                                  Value.unwrap_function
-                                    (self#interpret_expr
-                                       (struct_updater#visit_expr () x) ) ) ) } )
+                        self#with_vars
+                          [ ( "Self",
+                              Comptime (Value (Type (StructType struct_ty))) )
+                          ]
+                          (fun _ ->
+                            { impl_interface =
+                                Value.unwrap_intf_id
+                                  (self#interpret_expr impl.mk_impl_interface);
+                              impl_methods =
+                                List.map impl.mk_impl_methods ~f:(fun (n, x) ->
+                                    ( n,
+                                      Value.unwrap_function
+                                        (self#interpret_expr x) ) ) } ) )
                   in
                   Ok
                     { struct_fields;
                       struct_methods;
                       struct_impls;
                       struct_id;
+                      struct_base_id = mk_struct_id;
                       tensor = false } )
             in
+            updated_items <- prev_updated_items ;
             Type (StructType struct_ty)
         | MkUnionDef mk_union ->
             let compose f g x = g (f x) in
             let cases =
               List.map mk_union.mk_cases
                 ~f:
-                  (compose self#interpret_expr (fun x -> expr_to_type (Value x)))
+                  (compose self#interpret_expr (fun x ->
+                       expr_to_type program (Value x) ) )
               |> self#check_unions_for_doubled_types
             in
             let union =
@@ -341,49 +295,48 @@ class interpreter
                         id cases;
                     union_methods = [];
                     union_impls = [];
-                    union_id = id } )
+                    union_id = id;
+                    union_base_id = mk_union.mk_union_id } )
                 (fun u_base ->
-                  let union_updater =
-                    new union_updater
-                      program mk_union.mk_union_id u_base.union_id
-                  in
                   let union_methods =
                     List.map mk_union.mk_union_methods ~f:(fun (name, fn) ->
-                        let prev_scope = scope in
-                        scope <-
-                          [ ( "Self",
-                              Comptime (Value (Type (UnionType u_base.union_id)))
-                            ) ]
-                          :: scope ;
                         let output =
-                          match
-                            self#interpret_expr (union_updater#visit_expr () fn)
-                          with
-                          | Function f ->
-                              f
-                          | _ ->
-                              raise InternalCompilerError
+                          self#with_vars
+                            [ ( "Self",
+                                Comptime
+                                  (Value (Type (UnionType u_base.union_id))) )
+                            ]
+                            (fun _ ->
+                              match self#interpret_expr fn with
+                              | Function f ->
+                                  f
+                              | _ ->
+                                  raise InternalCompilerError )
                         in
-                        scope <- prev_scope ;
                         (name, output) )
                   in
                   let union_impls =
-                    List.map mk_union.mk_union_impls ~f:(fun impl ->
-                        { impl_interface =
-                            Value.unwrap_intf_id
-                              (self#interpret_expr impl.mk_impl_interface);
-                          impl_methods =
-                            List.map impl.mk_impl_methods ~f:(fun (n, x) ->
-                                ( n,
-                                  Value.unwrap_function
-                                    (self#interpret_expr
-                                       (union_updater#visit_expr () x) ) ) ) } )
+                    self#with_vars
+                      [ ( "Self",
+                          Comptime (Value (Type (UnionType u_base.union_id))) )
+                      ]
+                      (fun _ ->
+                        List.map mk_union.mk_union_impls ~f:(fun impl ->
+                            { impl_interface =
+                                Value.unwrap_intf_id
+                                  (self#interpret_expr impl.mk_impl_interface);
+                              impl_methods =
+                                List.map impl.mk_impl_methods ~f:(fun (n, x) ->
+                                    ( n,
+                                      Value.unwrap_function
+                                        (self#interpret_expr x) ) ) } ) )
                   in
                   Ok
                     { cases = u_base.cases;
                       union_methods;
                       union_impls;
-                      union_id = u_base.union_id } )
+                      union_id = u_base.union_id;
+                      union_base_id = u_base.union_base_id } )
               |> Result.ok_exn
             in
             Type (UnionType union.union_id)
@@ -406,14 +359,35 @@ class interpreter
             errors#report `Error (`UninterpretableStatement (Expr expr)) () ;
             Void
 
+    method interpret_struct_sig sign =
+      match List.Assoc.find updated_items sign ~equal:equal_int with
+      | Some new_id ->
+          StructType new_id
+      | None ->
+          StructSig sign
+
+    method interpret_union_sig sign =
+      match List.Assoc.find updated_unions sign ~equal:equal_int with
+      | Some new_id ->
+          UnionType new_id
+      | None ->
+          UnionSig sign
+
     method interpret_type : type_ -> type_ =
       function
       | ExprType ex -> (
         match self#interpret_expr ex with
         | Type t ->
             t
-        | _ ->
+        | Void ->
+            VoidType
+        | ex2 ->
+            print_sexp (sexp_of_value ex2) ;
             raise InternalCompilerError )
+      | StructSig sign ->
+          self#interpret_struct_sig sign
+      | UnionSig sign ->
+          self#interpret_union_sig sign
       | ty ->
           ty
 
@@ -433,7 +407,8 @@ class interpreter
             value
 
     method interpret_function : function_ -> function_ =
-      fun f -> partial_evaluate program scope f
+      fun f ->
+        partial_evaluate program scope updated_items updated_unions functions f
 
     method interpret_fc : function_call -> value =
       fun (func, args) ->
@@ -486,7 +461,9 @@ class interpreter
         match find_in_scope ref scope with
         | Some (Comptime ex) ->
             Some ex
-        | Some (Runtime _) ->
+        | Some (Runtime ty) ->
+            print_sexp (sexp_of_string ref) ;
+            print_sexp (sexp_of_type_ ty) ;
             raise Errors.InternalCompilerError
         | None ->
             raise Errors.InternalCompilerError
@@ -500,4 +477,12 @@ class interpreter
                 acc
             | false ->
                 x :: acc )
+
+    method private with_vars : 'a. _ -> (unit -> 'a) -> 'a =
+      fun vars f ->
+        let prev_scope = scope in
+        scope <- vars :: scope ;
+        let output = f () in
+        scope <- prev_scope ;
+        output
   end

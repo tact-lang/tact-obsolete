@@ -29,8 +29,8 @@ class constructor (program : T.program) =
     method cg_DestructuringLet : T.destructuring_let -> F.stmt =
       fun let_ ->
         let expr = let_.destructuring_let_expr in
-        match expr with
-        | Reference (_, StructType id) | Value (Struct (id, _)) ->
+        match T.type_of program expr with
+        | StructType id ->
             let struct_ = T.Program.get_struct program id in
             let expr' = self#cg_expr expr in
             let fields =
@@ -47,7 +47,7 @@ class constructor (program : T.program) =
             in
             F.DestructuringBinding (fields, expr')
         | _x ->
-            T.print_sexp (T.sexp_of_expr _x) ;
+            T.print_sexp (T.sexp_of_type_ _x) ;
             raise Invalid
 
     method cg_Struct : T.struct_ * (string * T.expr) list -> F.expr =
@@ -67,7 +67,7 @@ class constructor (program : T.program) =
           F.Integer Zint.zero
       | StructField x ->
           self#cg_StructField x
-      | Value (Struct (id, inst)) ->
+      | Value (Struct (Value (Type (StructType id)), inst)) ->
           self#cg_Struct (T.Program.get_struct program id, inst)
       | ResolvedReference s ->
           self#cg_ResolvedReference s
@@ -93,7 +93,7 @@ class constructor (program : T.program) =
           raise Unsupported
 
     method cg_union_variant expr union =
-      let e_ty = T.type_of expr in
+      let e_ty = T.type_of program expr in
       let expr = self#cg_expr expr in
       let union = List.Assoc.find_exn program.unions union ~equal:equal_int in
       let (T.Discriminator discr) =
@@ -144,7 +144,7 @@ class constructor (program : T.program) =
                 ("first", [Reference ("temp", F.UnknownTuple)], F.IntType) ) ]
       in
       let union =
-        match T.type_of switch.switch_condition with
+        match T.type_of program switch.switch_condition with
         | UnionType u ->
             List.Assoc.find_exn program.unions u ~equal:equal_int
         | _ ->
@@ -198,7 +198,7 @@ class constructor (program : T.program) =
       fun name -> function
         | Value (Function f) -> (
           try Some (F.Function (self#add_function f ~name:(Some name)))
-          with ex -> if equal_string name "test_try" then raise ex else None )
+          with ex -> if equal_string name "test" then raise ex else None )
         | _ ->
             None
 
@@ -264,7 +264,7 @@ class constructor (program : T.program) =
             in
             F.FunctionCall (name, [struct_ty], field_ty)
       in
-      match T.type_of from_expr with
+      match T.type_of program from_expr with
       | StructType s -> (
           let s = T.Program.get_struct program s in
           match s.struct_fields with
