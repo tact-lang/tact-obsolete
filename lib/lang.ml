@@ -300,7 +300,8 @@ functor
           in
           {branch_ty = ty; branch_var = ref; branch_stmt = stmt}
 
-        method build_switch _env cond branches =
+        (* TODO: handle default *)
+        method build_switch _env cond branches _default =
           {switch_condition = Syntax.value cond; branches}
 
         method build_Struct _env s = MkStructDef s
