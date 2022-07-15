@@ -900,6 +900,59 @@ let%expect_test "switch statement" =
                           (Let
                            ((binding_name (Ident b)) (binding_expr (Int 20)))))))))))))))))))))))))) |}]
 
+let%expect_test "switch statement with a default case" =
+  let source =
+    {|
+    fn test() {
+      switch (expr) {
+        case Type(T) vax => { let a = 10; }
+        case Baz vax => {
+          let a = 10;
+          let b = 20;
+        }
+        else => {
+           let c = 30;
+        }
+      }
+    }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+      ((stmts
+        ((Let
+          ((binding_name (Ident test))
+           (binding_expr
+            (Function
+             ((function_body
+               ((function_stmt
+                 (CodeBlock
+                  ((Break
+                    (Switch
+                     ((switch_condition (Reference (Ident expr)))
+                      (branches
+                       (((ty
+                          (FunctionCall
+                           ((fn (Reference (Ident Type)))
+                            (arguments ((Reference (Ident T)))))))
+                         (var (Ident vax))
+                         (stmt
+                          (CodeBlock
+                           ((Let
+                             ((binding_name (Ident a)) (binding_expr (Int 10))))))))
+                        ((ty (Reference (Ident Baz))) (var (Ident vax))
+                         (stmt
+                          (CodeBlock
+                           ((Let
+                             ((binding_name (Ident a)) (binding_expr (Int 10))))
+                            (Let
+                             ((binding_name (Ident b)) (binding_expr (Int 20))))))))))
+                      (default
+                       (CodeBlock
+                        ((Let ((binding_name (Ident c)) (binding_expr (Int 30)))))))))))))))))))))))
+      |}]
+
 let%expect_test "destructuring let" =
   let source =
     {|

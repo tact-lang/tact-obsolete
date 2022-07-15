@@ -254,14 +254,16 @@ let code_block :=
     case Type1 var => { <stmts> }
     case Type2 var => { <stmts> }
     ...
+    [else => { <stmts> }]
   }
 *)
 
 let switch :=
   | SWITCH; LPAREN; switch_condition = located(expr); RPAREN; LBRACE;
     branches = list(switch_branch);
+    default = option(default_branch);
     RBRACE;
-    { Switch (make_switch ~switch_condition ~branches ()) }
+    { Switch (make_switch ~switch_condition ~branches ?default ()) }
 
 let switch_branch := 
   | CASE; 
@@ -272,6 +274,12 @@ let switch_branch :=
     stmt = code_block;
     { make_switch_branch ~ty ~var ~stmt () }
 
+let default_branch := 
+  | ELSE; 
+    REARROW;
+    (* TODO: what kind of stmts should be allowed here? *)
+    stmt = code_block;
+    { stmt } 
 
 
 let block_stmt :=

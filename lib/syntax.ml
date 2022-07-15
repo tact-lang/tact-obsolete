@@ -79,7 +79,10 @@ functor
       | Expr of expr
       | Switch of switch
 
-    and switch = {switch_condition : expr located; branches : switch_branch list}
+    and switch =
+      { switch_condition : expr located;
+        branches : switch_branch list;
+        default : stmt option [@sexp.option] }
 
     and switch_branch = {ty : expr located; var : ident located; stmt : stmt}
 
