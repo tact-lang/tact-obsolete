@@ -5,10 +5,12 @@ open struct
   module I = UnitActionsParser.MenhirInterpreter
   module E = MenhirLib.ErrorReports
   module L = MenhirLib.LexerUtil
-  module Syntax = Syntax.Make (Located.Enabled)
-  module Parser = Parser.Make (Syntax)
-  module Lang = Lang.Make (Syntax)
-  module Show = Show.Make (Syntax)
+  module Config = Located.Enabled
+  module Syntax = Syntax.Make (Config)
+  module Parser = Parser.Make (Config)
+  module Lang = Lang.Make (Config)
+  module Show = Show.Make (Config)
+  module Codegen_func = Codegen_func.Make (Config)
 
   (* [env checkpoint] extracts a parser environment out of a checkpoint,
      which must be of the form [HandlingError env]. *)

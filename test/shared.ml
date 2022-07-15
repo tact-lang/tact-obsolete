@@ -6,11 +6,12 @@ module Syntax = Tact.Syntax.Make (Config)
 module Parser = Tact.Parser.Make (Config)
 module Lang = Tact.Lang.Make (Config)
 module Show = Tact.Show.Make (Config)
-module Interpreter = Tact.Interpreter
+module Interpreter = Tact.Interpreter.Make (Config)
+module Builtin = Tact.Builtin.Make (Config)
+module Codegen = Tact.Codegen_func.Make (Config)
 module Errors = Tact.Errors
 module Zint = Tact.Zint
 module C = Tact.Compiler
-module Codegen = Tact.Codegen_func
 module Func = Tact.Func
 include Core
 
@@ -28,7 +29,7 @@ let strip : program:Lang.program -> previous:Lang.program -> Lang.program =
   { program with
     bindings =
       strip_if_exists_in_other program.bindings previous.bindings
-        ~equal:Lang.equal_binding;
+        ~equal:(fun (x1, _) (y1, _) -> Config.equal_located equal_string x1 y1);
     structs =
       strip_if_exists_in_other program.structs previous.structs
         ~equal:(fun (id1, _) (id2, _) -> equal_int id1 id2);
@@ -53,7 +54,7 @@ let build_program ?(errors = make_errors Show.show_error)
     p =
   let std =
     let c = new Lang.constructor ~program:prev_program errors in
-    let p' = c#visit_program () (parse_program Tact.Builtin.std) in
+    let p' = c#visit_program () (parse_program Builtin.std) in
     p'
   in
   (* This will make a deep copy of the std. Lang.constructor mutates input program,

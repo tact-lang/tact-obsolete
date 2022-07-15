@@ -16,7 +16,9 @@ functor
         method visit_located
             : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
             =
-          fun f env l -> make_located ~value:(f env (value l)) ~loc:(loc l) ()
+          fun f env l -> {value = f env l.value; span = l.span}
+
+        method visit_span _ span = span
       end
 
     type ident = Ident of string
@@ -24,7 +26,8 @@ functor
     and struct_definition =
       { fields : struct_field located list; [@sexp.list]
         struct_bindings : binding located list; [@sexp.list]
-        impls : impl list [@sexp.list] }
+        impls : impl list; [@sexp.list]
+        struct_span : (span[@sexp.opaque]) }
 
     and impl = {interface : expr located; methods : binding located list}
 
@@ -51,7 +54,8 @@ functor
     and union_definition =
       { union_members : expr located list; [@sexpa.list]
         union_bindings : binding located list; [@sexp.list]
-        union_impls : impl list [@sexp.list] }
+        union_impls : impl list; [@sexp.list]
+        union_span : (span[@sexp.opaque]) }
 
     and expr =
       | Struct of struct_definition
@@ -59,7 +63,7 @@ functor
       | Interface of interface_definition
       | Enum of enum_definition
       | Union of union_definition
-      | Reference of ident
+      | Reference of ident located
       | FieldAccess of field_access
       | FunctionCall of function_call
       | MethodCall of method_call
@@ -74,17 +78,18 @@ functor
       | Let of binding located
       | DestructuringLet of destructuring_binding located
       | If of if_
-      | Return of expr
-      | Break of stmt
-      | Expr of expr
+      | Return of expr located
+      | Break of stmt located
+      | Expr of expr located
       | Switch of switch
 
     and switch =
       { switch_condition : expr located;
-        branches : switch_branch list;
+        branches : switch_branch located list;
         default : stmt option [@sexp.option] }
 
-    and switch_branch = {ty : expr located; var : ident located; stmt : stmt}
+    and switch_branch =
+      {ty : expr located; var : ident located; stmt : stmt located}
 
     and struct_constructor =
       { constructor_id : expr located;
@@ -99,9 +104,10 @@ functor
       { name : ident located option; [@sexp.option]
         params : function_param located list; [@sexp.list]
         returns : expr located option; [@sexp.option]
-        function_body : function_body option [@sexp.option] }
+        function_body : function_body option; [@sexp.option]
+        function_def_span : (span[@sexp.opaque]) }
 
-    and function_body = {function_stmt : stmt}
+    and function_body = {function_stmt : stmt located}
 
     and binding = {binding_name : ident located; binding_expr : expr located}
 

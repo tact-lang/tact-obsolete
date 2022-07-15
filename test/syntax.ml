@@ -52,7 +52,11 @@ let%expect_test "let struct" =
     |} in
   pp source ;
   [%expect
-    {| ((stmts ((Let ((binding_name (Ident MyType)) (binding_expr (Struct ()))))))) |}]
+    {|
+      ((stmts
+        ((Let
+          ((binding_name (Ident MyType))
+           (binding_expr (Struct ((struct_span <opaque>))))))))) |}]
 
 let%expect_test "let struct with parameter (shorthand)" =
   let source = {|
@@ -67,8 +71,9 @@ let%expect_test "let struct with parameter (shorthand)" =
          (binding_expr
           (Function
            ((params (((Ident T) (Reference (Ident Type)))))
-            (returns (Reference (Ident Type)))
-            (function_body ((function_stmt (Expr (Struct ()))))))))))))) |}]
+            (function_body
+             ((function_stmt (Expr (Struct ((struct_span <opaque>)))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "struct definition (shorthand)" =
   let source = {|
@@ -77,7 +82,10 @@ let%expect_test "struct definition (shorthand)" =
   pp source ;
   [%expect
     {|
-      ((stmts ((Let ((binding_name (Ident MyType)) (binding_expr (Struct ()))))))) |}]
+      ((stmts
+        ((Let
+          ((binding_name (Ident MyType))
+           (binding_expr (Struct ((struct_span <opaque>))))))))) |}]
 
 let%expect_test "struct construction" =
   let source =
@@ -108,7 +116,8 @@ let%expect_test "struct construction" =
                 ((field_name (Ident b))
                  (field_type
                   (FunctionCall
-                   ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))))))))
+                   ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))
+              (struct_span <opaque>))))))
          (Let
           ((binding_name (Ident my))
            (binding_expr
@@ -129,8 +138,9 @@ let%expect_test "parameterized struct shorthand" =
          (binding_expr
           (Function
            ((params (((Ident T) (Reference (Ident Type)))))
-            (returns (Reference (Ident Type)))
-            (function_body ((function_stmt (Expr (Struct ()))))))))))))) |}]
+            (function_body
+             ((function_stmt (Expr (Struct ((struct_span <opaque>)))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "struct fields" =
   let source =
@@ -155,7 +165,8 @@ let%expect_test "struct fields" =
                 (FunctionCall
                  ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
               ((field_name (Ident f))
-               (field_type (FunctionCall ((fn (Reference (Ident get_type))))))))))))))))) |}]
+               (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))
+            (struct_span <opaque>))))))))) |}]
 
 let%expect_test "struct fields with semicolons" =
   let source = {|
@@ -175,7 +186,8 @@ let%expect_test "struct fields with semicolons" =
                 (FunctionCall
                  ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
               ((field_name (Ident f))
-               (field_type (FunctionCall ((fn (Reference (Ident get_type))))))))))))))))) |}]
+               (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))
+            (struct_span <opaque>))))))))) |}]
 
 let%expect_test "struct methods" =
   let source =
@@ -199,13 +211,16 @@ let%expect_test "struct methods" =
                (binding_expr
                 (Function
                  ((returns (Reference (Ident Bool)))
-                  (function_body ((function_stmt (CodeBlock ()))))))))
+                  (function_body ((function_stmt (CodeBlock ()))))
+                  (function_def_span <opaque>)))))
               ((binding_name (Ident todo))
                (binding_expr
                 (Function
                  ((returns
                    (FunctionCall
-                    ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))))))))))))) |}]
+                    ((fn (Reference (Ident Int))) (arguments ((Int 257))))))
+                  (function_def_span <opaque>)))))))
+            (struct_span <opaque>))))))))) |}]
 
 let%expect_test "struct with fields and methods" =
   let source =
@@ -234,7 +249,9 @@ let%expect_test "struct with fields and methods" =
                (binding_expr
                 (Function
                  ((returns (Reference (Ident Bool)))
-                  (function_body ((function_stmt (CodeBlock ())))))))))))))))))) |}]
+                  (function_body ((function_stmt (CodeBlock ()))))
+                  (function_def_span <opaque>)))))))
+            (struct_span <opaque>))))))))) |}]
 
 let%expect_test "let function definition" =
   let source = {|
@@ -251,7 +268,8 @@ let%expect_test "let function definition" =
            ((params (((Ident A) (Reference (Ident T)))))
             (returns
              (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1))))))
-            (function_body ((function_stmt (CodeBlock ())))))))))))) |}]
+            (function_body ((function_stmt (CodeBlock ()))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "function definition shorthand" =
   let source = {|
@@ -268,7 +286,8 @@ let%expect_test "function definition shorthand" =
            ((params (((Ident A) (Reference (Ident T)))))
             (returns
              (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1))))))
-            (function_body ((function_stmt (CodeBlock ())))))))))))) |}]
+            (function_body ((function_stmt (CodeBlock ()))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "function without a return type" =
   let source =
@@ -289,7 +308,8 @@ let%expect_test "function without a return type" =
            ((params
              (((Ident t)
                (FunctionCall
-                ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))))))
+                ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
+            (function_def_span <opaque>))))))
        (Let
         ((binding_name (Ident f2))
          (binding_expr
@@ -298,7 +318,8 @@ let%expect_test "function without a return type" =
              (((Ident t)
                (FunctionCall
                 ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
-            (function_body ((function_stmt (CodeBlock ())))))))))
+            (function_body ((function_stmt (CodeBlock ()))))
+            (function_def_span <opaque>))))))
        (Let
         ((binding_name (Ident f4))
          (binding_expr
@@ -307,7 +328,8 @@ let%expect_test "function without a return type" =
              (((Ident t)
                (FunctionCall
                 ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
-            (function_body ((function_stmt (CodeBlock ())))))))))))) |}]
+            (function_body ((function_stmt (CodeBlock ()))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "parse parameterized return type as part of function \
                  signature, not a function call" =
@@ -324,7 +346,8 @@ let%expect_test "parse parameterized return type as part of function \
           (Function
            ((params (((Ident A) (Reference (Ident T)))))
             (returns
-             (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1)))))))))))))) |}]
+             (FunctionCall ((fn (Reference (Ident P))) (arguments ((Int 1))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "fn signature returning function signature" =
   let source = {|
@@ -339,7 +362,10 @@ let%expect_test "fn signature returning function signature" =
          (binding_expr
           (Function
            ((params (((Ident A) (Reference (Ident T)))))
-            (returns (Function ((returns (Reference (Ident T)))))))))))))) |}]
+            (returns
+             (Function
+              ((returns (Reference (Ident T))) (function_def_span <opaque>))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "enforcing precedence of a function call over a signature" =
   let source = {|
@@ -356,7 +382,7 @@ let%expect_test "enforcing precedence of a function call over a signature" =
            ((fn
              (Function
               ((params (((Ident A) (Reference (Ident T)))))
-               (returns (Reference (Ident P))))))
+               (returns (Reference (Ident P))) (function_def_span <opaque>))))
             (arguments ((Int 1))))))))))) |}]
 
 let%expect_test "function call" =
@@ -392,7 +418,8 @@ let%expect_test "function call in a list of statements" =
                (CodeBlock
                 ((Expr
                   (FunctionCall
-                   ((fn (Reference (Ident func))) (arguments ((Int 1))))))))))))))))))) |}]
+                   ((fn (Reference (Ident func))) (arguments ((Int 1)))))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "let in function body" =
   let source =
@@ -418,7 +445,8 @@ let%expect_test "let in function body" =
              ((function_stmt
                (CodeBlock
                 ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
-                 (Return (Reference (Ident a)))))))))))))))) |}]
+                 (Return (Reference (Ident a))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "code block without trailing semicolon" =
   let source =
@@ -444,7 +472,8 @@ let%expect_test "code block without trailing semicolon" =
              ((function_stmt
                (CodeBlock
                 ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
-                 (Break (Expr (Reference (Ident a))))))))))))))))) |}]
+                 (Break (Expr (Reference (Ident a)))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "if with an empty body and no else statement" =
   let source = {|
@@ -464,7 +493,8 @@ let%expect_test "if with an empty body and no else statement" =
             (function_body
              ((function_stmt
                (CodeBlock
-                ((Break (If ((condition (Int 1)) (body (CodeBlock ())))))))))))))))))) |}]
+                ((Break (If ((condition (Int 1)) (body (CodeBlock ()))))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "if with a body and an empty else" =
   let source =
@@ -493,7 +523,8 @@ let%expect_test "if with a body and an empty else" =
                   (If
                    ((condition (Int 1))
                     (body (CodeBlock ((Expr (Reference (Ident a))))))
-                    (else_ (CodeBlock ())))))))))))))))))) |}]
+                    (else_ (CodeBlock ()))))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "if with else if" =
   let source =
@@ -519,7 +550,8 @@ let%expect_test "if with else if" =
                 ((Break
                   (If
                    ((condition (Int 1)) (body (CodeBlock ()))
-                    (else_ (If ((condition (Int 10)) (body (CodeBlock ()))))))))))))))))))))) |}]
+                    (else_ (If ((condition (Int 10)) (body (CodeBlock ())))))))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "struct construction over a parameterized type" =
   let source = {|
@@ -558,7 +590,8 @@ let%expect_test "struct construction over an anonymous type" =
                 (((field_name (Ident field))
                   (field_type
                    (FunctionCall
-                    ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))))))
+                    ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))
+               (struct_span <opaque>))))
             (fields_construction (((Ident field) (Reference (Ident value))))))))))))) |}]
 
 let%expect_test "struct construction over an anonymous type's function call" =
@@ -580,14 +613,15 @@ let%expect_test "struct construction over an anonymous type's function call" =
               ((fn
                 (Function
                  ((params (((Ident T) (Reference (Ident Type)))))
-                  (returns (Reference (Ident Struct)))
                   (function_body
                    ((function_stmt
                      (Expr
                       (Struct
                        ((fields
                          (((field_name (Ident field))
-                           (field_type (Reference (Ident T)))))))))))))))
+                           (field_type (Reference (Ident T))))))
+                        (struct_span <opaque>)))))))
+                  (function_def_span <opaque>))))
                (arguments ((Reference (Ident X)))))))
             (fields_construction (((Ident field) (Reference (Ident value))))))))))))) |}]
 
@@ -607,7 +641,8 @@ let%expect_test "tilde syntax" =
           (Function
            ((returns (Reference (Ident A)))
             (function_body
-             ((function_stmt (CodeBlock ((Expr (MutRef (Ident var)))))))))))))))) |}]
+             ((function_stmt (CodeBlock ((Expr (MutRef (Ident var))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "field access syntax" =
   let source = {|
@@ -629,7 +664,8 @@ let%expect_test "field access syntax" =
                (CodeBlock
                 ((Expr
                   (FieldAccess
-                   ((from_expr (Reference (Ident foo))) (to_field (Ident bar)))))))))))))))))) |}]
+                   ((from_expr (Reference (Ident foo))) (to_field (Ident bar))))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "field access over other expressions" =
   let source =
@@ -665,7 +701,8 @@ let%expect_test "field access over other expressions" =
                           (fields_construction
                            (((Ident field) (Reference (Ident value))))))))
                        (to_field (Ident field)))))
-                    (to_field (Ident other_field)))))))))))))))))) |}]
+                    (to_field (Ident other_field))))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "method access" =
   let source = {|
@@ -700,7 +737,8 @@ let%expect_test "union definition" =
            ((union_members
              ((FunctionCall
                ((fn (Reference (Ident Int))) (arguments ((Int 257)))))
-              (Reference (Ident Bool)))))))))))) |}]
+              (Reference (Ident Bool))))
+            (union_span <opaque>))))))))) |}]
 
 let%expect_test "union definition using let binding" =
   let source =
@@ -722,7 +760,8 @@ let%expect_test "union definition using let binding" =
            ((union_members
              ((FunctionCall
                ((fn (Reference (Ident Int))) (arguments ((Int 257)))))
-              (Reference (Ident Bool)))))))))))) |}]
+              (Reference (Ident Bool))))
+            (union_span <opaque>))))))))) |}]
 
 let%expect_test "parameterized union definition" =
   let source =
@@ -742,13 +781,14 @@ let%expect_test "parameterized union definition" =
          (binding_expr
           (Function
            ((params (((Ident T) (Reference (Ident Type)))))
-            (returns (Reference (Ident Type)))
             (function_body
              ((function_stmt
                (Expr
                 (Union
                  ((union_members
-                   ((Reference (Ident T)) (Reference (Ident Null)))))))))))))))))) |}]
+                   ((Reference (Ident T)) (Reference (Ident Null))))
+                  (union_span <opaque>)))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "parameterized union definition using let binding" =
   let source =
@@ -768,13 +808,14 @@ let%expect_test "parameterized union definition using let binding" =
          (binding_expr
           (Function
            ((params (((Ident T) (Reference (Ident Type)))))
-            (returns (Reference (Ident Type)))
             (function_body
              ((function_stmt
                (Expr
                 (Union
                  ((union_members
-                   ((Reference (Ident T)) (Reference (Ident Null)))))))))))))))))) |}]
+                   ((Reference (Ident T)) (Reference (Ident Null))))
+                  (union_span <opaque>)))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "single-line comments" =
   let source = {|
@@ -855,7 +896,9 @@ let%expect_test "interface impls inside structs" =
                   (binding_expr
                    (Function
                     ((returns (Reference (Ident Self)))
-                     (function_body ((function_stmt (CodeBlock ()))))))))))))))))))))) |}]
+                     (function_body ((function_stmt (CodeBlock ()))))
+                     (function_def_span <opaque>))))))))))
+            (struct_span <opaque>))))))))) |}]
 
 let%expect_test "interface impls inside structs" =
   let source = {|
@@ -872,7 +915,8 @@ let%expect_test "interface impls inside structs" =
          (binding_expr
           (Interface
            ((interface_members
-             (((binding_name (Ident method)) (binding_expr (Function ()))))))))))))) |}]
+             (((binding_name (Ident method))
+               (binding_expr (Function ((function_def_span <opaque>))))))))))))))) |}]
 
 let%expect_test "switch statement" =
   let source =
@@ -918,7 +962,8 @@ let%expect_test "switch statement" =
                          ((Let
                            ((binding_name (Ident a)) (binding_expr (Int 10))))
                           (Let
-                           ((binding_name (Ident b)) (binding_expr (Int 20)))))))))))))))))))))))))) |}]
+                           ((binding_name (Ident b)) (binding_expr (Int 20))))))))))))))))))
+            (function_def_span <opaque>))))))))) |}]
 
 let%expect_test "switch statement with a default case" =
   let source =
@@ -970,7 +1015,8 @@ let%expect_test "switch statement with a default case" =
                              ((binding_name (Ident b)) (binding_expr (Int 20))))))))))
                       (default
                        (CodeBlock
-                        ((Let ((binding_name (Ident c)) (binding_expr (Int 30)))))))))))))))))))))))
+                        ((Let ((binding_name (Ident c)) (binding_expr (Int 30)))))))))))))))
+              (function_def_span <opaque>)))))))))
       |}]
 
 let%expect_test "destructuring let" =
@@ -996,7 +1042,8 @@ let%expect_test "destructuring let" =
                    ((field_name (Ident y))
                     (field_type (Reference (Ident Integer))))
                    ((field_name (Ident z))
-                    (field_type (Reference (Ident Integer)))))))))
+                    (field_type (Reference (Ident Integer))))))
+                 (struct_span <opaque>))))
               (fields_construction
                (((Ident x) (Int 1)) ((Ident y) (Int 2)) ((Ident z) (Int 3)))))))
            (destructuring_binding_rest false))))))
@@ -1025,7 +1072,8 @@ let%expect_test "destructuring let with renaming" =
                  ((field_name (Ident y))
                   (field_type (Reference (Ident Integer))))
                  ((field_name (Ident z))
-                  (field_type (Reference (Ident Integer)))))))))
+                  (field_type (Reference (Ident Integer))))))
+               (struct_span <opaque>))))
             (fields_construction
              (((Ident x) (Int 1)) ((Ident y) (Int 2)) ((Ident z) (Int 3)))))))
          (destructuring_binding_rest false)))))) |}]
@@ -1052,7 +1100,8 @@ let%expect_test "destructuring let with rest ignored" =
                  ((field_name (Ident y))
                   (field_type (Reference (Ident Integer))))
                  ((field_name (Ident z))
-                  (field_type (Reference (Ident Integer)))))))))
+                  (field_type (Reference (Ident Integer))))))
+               (struct_span <opaque>))))
             (fields_construction
              (((Ident x) (Int 1)) ((Ident y) (Int 2)) ((Ident z) (Int 3)))))))
          (destructuring_binding_rest true)))))) |}]

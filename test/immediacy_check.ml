@@ -6,7 +6,7 @@ module Syntax = Tact.Syntax.Make (Config)
 module Parser = Tact.Parser.Make (Config)
 module Lang = Tact.Lang.Make (Config)
 module Show = Tact.Show.Make (Config)
-module Interpreter = Tact.Interpreter
+module Interpreter = Tact.Interpreter.Make (Config)
 module Errors = Tact.Errors
 module Zint = Tact.Zint
 module C = Tact.Compiler
@@ -28,7 +28,7 @@ let strip : program:Lang.program -> previous:Lang.program -> Lang.program =
   { program with
     bindings =
       strip_if_exists_in_other program.bindings previous.bindings
-        ~equal:Lang.equal_binding;
+        ~equal:(fun (x1, _) (y1, _) -> Config.equal_located equal_string x1 y1);
     structs =
       strip_if_exists_in_other program.structs previous.structs
         ~equal:(fun (id1, _) (id2, _) -> equal_int id1 id2);
@@ -78,31 +78,33 @@ let pp_compile ?(strip_defaults = true) s =
 open Lang
 
 let%expect_test "Immediacy Checks Comptime Reference" =
-  let scope = [[make_comptime ("Test", Value Void)]] in
-  let expr = Reference ("Test", VoidType) in
+  let scope = [[make_comptime (bl "Test", bl @@ Value Void)]] in
+  let expr = bl @@ Reference (bl "Test", VoidType) in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
 
 let%expect_test "Immediacy Checks Runtime Reference" =
-  let scope = [[make_runtime ("Test", VoidType)]] in
-  let expr = Reference ("Test", VoidType) in
+  let scope = [[make_runtime (bl "Test", VoidType)]] in
+  let expr = bl @@ Reference (bl "Test", VoidType) in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
 let%expect_test "Immediacy Checks Primitive" =
   let scope = [] in
-  let expr = Primitive EmptyBuilder in
+  let expr = bl @@ Primitive EmptyBuilder in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
 let%expect_test "Immediacy Checks Empty Function" =
   let scope = [] in
   let expr =
-    Value
-      (Function
-         { function_signature =
-             {function_params = []; function_returns = VoidType};
-           function_impl = Fn (Some (Block [])) } )
+    bl
+    @@ Value
+         (Function
+            ( bl
+            @@ { function_signature =
+                   bl @@ {function_params = []; function_returns = VoidType};
+                 function_impl = Fn (bl @@ Block []) } ) )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -110,12 +112,19 @@ let%expect_test "Immediacy Checks Empty Function" =
 let%expect_test "Immediacy Checks Function Argument" =
   let scope = [] in
   let expr =
-    Value
-      (Function
-         { function_signature =
-             {function_params = [("arg", VoidType)]; function_returns = VoidType};
-           function_impl = Fn (Some (Block [Expr (Reference ("arg", VoidType))]))
-         } )
+    bl
+    @@ Value
+         (Function
+            ( bl
+            @@ { function_signature =
+                   bl
+                   @@ { function_params = [(bl "arg", VoidType)];
+                        function_returns = VoidType };
+                 function_impl =
+                   Fn
+                     ( bl
+                     @@ Block [bl @@ Expr (bl @@ Reference (bl "arg", VoidType))]
+                     ) } ) )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -123,16 +132,19 @@ let%expect_test "Immediacy Checks Function Argument" =
 let%expect_test "Immediacy Checks Let Argument" =
   let scope = [] in
   let expr =
-    Value
-      (Function
-         { function_signature =
-             {function_params = []; function_returns = VoidType};
-           function_impl =
-             Fn
-               (Some
-                  (Block
-                     [ Let [("arg", Value Void)];
-                       Expr (Reference ("arg", VoidType)) ] ) ) } )
+    bl
+    @@ Value
+         (Function
+            ( bl
+            @@ { function_signature =
+                   bl @@ {function_params = []; function_returns = VoidType};
+                 function_impl =
+                   Fn
+                     ( bl
+                     @@ Block
+                          [ bl @@ Let [(bl "arg", bl @@ Value Void)];
+                            bl @@ Expr (bl @@ Reference (bl "arg", VoidType)) ]
+                     ) } ) )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -140,20 +152,25 @@ let%expect_test "Immediacy Checks Let Argument" =
 let%expect_test "Immediacy Checks Destructuring Let" =
   let scope = [] in
   let expr =
-    Value
-      (Function
-         { function_signature =
-             {function_params = []; function_returns = VoidType};
-           function_impl =
-             Fn
-               (Some
-                  (Block
-                     [ DestructuringLet
-                         { destructuring_let = [("a", "b"); ("c", "c")];
-                           destructuring_let_rest = false;
-                           destructuring_let_expr = Value Void };
-                       Expr (Reference ("b", VoidType));
-                       Expr (Reference ("c", VoidType)) ] ) ) } )
+    bl
+    @@ Value
+         (Function
+            ( bl
+            @@ { function_signature =
+                   bl @@ {function_params = []; function_returns = VoidType};
+                 function_impl =
+                   Fn
+                     ( bl
+                     @@ Block
+                          [ bl
+                            @@ DestructuringLet
+                                 { destructuring_let =
+                                     [(bl "a", bl "b"); (bl "c", bl "c")];
+                                   destructuring_let_rest = false;
+                                   destructuring_let_expr = bl @@ Value Void };
+                            bl @@ Expr (bl @@ Reference (bl "b", VoidType));
+                            bl @@ Expr (bl @@ Reference (bl "c", VoidType)) ] )
+               } ) )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -161,18 +178,24 @@ let%expect_test "Immediacy Checks Destructuring Let" =
 let%expect_test "Immediacy Checks Function Call WITHOUT Primitive" =
   let scope = [] in
   let expr =
-    FunctionCall
-      ( Value
-          (Function
-             { function_signature =
-                 {function_params = []; function_returns = VoidType};
-               function_impl =
-                 Fn
-                   (Some
-                      (Block
-                         [ Let [("arg", Value Void)];
-                           Expr (Reference ("arg", VoidType)) ] ) ) } ),
-        [] )
+    bl
+    @@ FunctionCall
+         ( bl
+           @@ Value
+                (Function
+                   ( bl
+                   @@ { function_signature =
+                          bl
+                          @@ {function_params = []; function_returns = VoidType};
+                        function_impl =
+                          Fn
+                            ( bl
+                            @@ Block
+                                 [ bl @@ Let [(bl "arg", bl @@ Value Void)];
+                                   bl
+                                   @@ Expr (bl @@ Reference (bl "arg", VoidType))
+                                 ] ) } ) ),
+           [] )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -180,36 +203,55 @@ let%expect_test "Immediacy Checks Function Call WITHOUT Primitive" =
 let%expect_test "Immediacy Checks Function Call WITH Primitive" =
   let scope = [] in
   let expr =
-    FunctionCall
-      ( Value
-          (Function
-             { function_signature =
-                 {function_params = []; function_returns = VoidType};
-               function_impl = Fn (Some (Block [Expr (Primitive EmptyBuilder)]))
-             } ),
-        [] )
+    bl
+    @@ FunctionCall
+         ( bl
+           @@ Value
+                (Function
+                   ( bl
+                   @@ { function_signature =
+                          bl
+                          @@ {function_params = []; function_returns = VoidType};
+                        function_impl =
+                          Fn
+                            ( bl
+                            @@ Block [bl @@ Expr (bl @@ Primitive EmptyBuilder)]
+                            ) } ) ),
+           [] )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
 let f_with_primitive =
-  Value
-    (Function
-       { function_signature = {function_params = []; function_returns = VoidType};
-         function_impl = Fn (Some (Block [Expr (Primitive EmptyBuilder)])) } )
+  bl
+  @@ Value
+       (Function
+          ( bl
+          @@ { function_signature =
+                 bl @@ {function_params = []; function_returns = VoidType};
+               function_impl =
+                 Fn (bl @@ Block [bl @@ Expr (bl @@ Primitive EmptyBuilder)]) }
+          ) )
 
 let%expect_test "Immediacy Checks Function Call that contains function with \
                  primitive" =
   let scope = [] in
   let expr =
-    FunctionCall
-      ( Value
-          (Function
-             { function_signature =
-                 {function_params = []; function_returns = VoidType};
-               function_impl = Fn (Some (Block [Let [("_", f_with_primitive)]]))
-             } ),
-        [] )
+    bl
+    @@ FunctionCall
+         ( bl
+           @@ Value
+                (Function
+                   ( bl
+                   @@ { function_signature =
+                          bl
+                          @@ {function_params = []; function_returns = VoidType};
+                        function_impl =
+                          Fn
+                            ( bl
+                            @@ Block [bl @@ Let [(bl "_", f_with_primitive)]] )
+                      } ) ),
+           [] )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -218,15 +260,25 @@ let%expect_test "Immediacy Checks Function Call that Call function with \
                  primitive" =
   let scope = [] in
   let expr =
-    FunctionCall
-      ( Value
-          (Function
-             { function_signature =
-                 {function_params = []; function_returns = VoidType};
-               function_impl =
-                 Fn (Some (Block [Expr (FunctionCall (f_with_primitive, []))]))
-             } ),
-        [] )
+    bl
+    @@ FunctionCall
+         ( bl
+           @@ Value
+                (Function
+                   ( bl
+                   @@ { function_signature =
+                          bl
+                          @@ {function_params = []; function_returns = VoidType};
+                        function_impl =
+                          Fn
+                            ( bl
+                            @@ Block
+                                 [ bl
+                                   @@ Expr
+                                        ( bl
+                                        @@ FunctionCall (f_with_primitive, [])
+                                        ) ] ) } ) ),
+           [] )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
@@ -234,18 +286,20 @@ let%expect_test "Immediacy Checks Function Call that Call function with \
 let%expect_test "Immediacy Checks Top Level Fn With Sign" =
   let scope = [] in
   let expr =
-    Value
-      (Function
-         { function_signature =
-             {function_params = []; function_returns = StructSig 0};
-           function_impl = Fn (Some (Block [])) } )
+    bl
+    @@ Value
+         (Function
+            ( bl
+            @@ { function_signature =
+                   bl @@ {function_params = []; function_returns = StructSig 0};
+                 function_impl = Fn (bl @@ Block []) } ) )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
 
 let%expect_test "Immediacy Checks Struct Sig" =
   let scope = [] in
-  let expr = Value (Type (StructSig 0)) in
+  let expr = bl @@ Value (Type (StructSig 0)) in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
@@ -292,9 +346,11 @@ let%expect_test "Immediacy Checks MyInt Type" =
     is_immediate_expr
       [List.map p.bindings ~f:make_comptime]
       p
-      (FunctionCall
-         ( List.Assoc.find_exn p.bindings "MyInt" ~equal:equal_string,
-           [Value (Integer (Z.of_int 123))] ) )
+      ( bl
+      @@ FunctionCall
+           ( List.Assoc.find_exn p.bindings (bl @@ "MyInt")
+               ~equal:(Config.equal_located equal_string),
+             [bl @@ Value (Integer (Z.of_int 123))] ) )
   in
   pp_sexp @@ sexp_of_bool res ;
   [%expect {| true |}]
