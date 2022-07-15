@@ -6,7 +6,8 @@ module Syntax = Tact.Syntax.Make (Config)
 module Parser = Tact.Parser.Make (Config)
 module Lang = Tact.Lang.Make (Config)
 module Show = Tact.Show.Make (Config)
-module Interpreter = Tact.Interpreter
+module Interpreter = Tact.Interpreter.Make (Config)
+module Builtin = Tact.Builtin.Make (Config)
 module Errors = Tact.Errors
 module Zint = Tact.Zint
 module C = Tact.Compiler
@@ -25,7 +26,7 @@ let compile_std ?(errors = make_errors Show.show_error)
     ?(prev_program = Lang.default_program ()) () =
   let std =
     let c = new Lang.constructor ~program:prev_program errors in
-    let p' = c#visit_program () (parse_program Tact.Builtin.std) in
+    let p' = c#visit_program () (parse_program Builtin.std) in
     p'
   in
   (errors, std)

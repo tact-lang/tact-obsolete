@@ -5,6 +5,7 @@ functor
   struct
     open Caml.Format
     module Lang = Lang.Make (Config)
+    module Interpreter = Interpreter.Make (Config)
 
     let format_to_string : 'a. 'a -> (formatter -> 'a -> unit) -> string =
      fun x show ->
@@ -23,7 +24,8 @@ functor
           ()
 
     let rec pp_expr : _ -> Lang.expr -> _ =
-     fun f -> function
+     fun f ex ->
+      match ex.value with
       | Value v ->
           pp_value f v
       | FunctionCall (fname, args) ->
@@ -34,9 +36,11 @@ functor
             ~flast:(fun e -> pp_expr f e) ;
           pp_print_string f ")"
       | Reference (name, _) | ResolvedReference (name, _) ->
-          pp_print_string f name
+          pp_print_string f name.value
       | StructField (s, field, _) ->
-          pp_expr f s ; pp_print_string f "." ; pp_print_string f field
+          pp_expr f s ;
+          pp_print_string f "." ;
+          pp_print_string f field.value
       | _ ->
           pp_print_string f "<anonymous>"
 
@@ -72,14 +76,14 @@ functor
 
     let show_error : error -> string = function
       | `DuplicateField (field, _) ->
-          Printf.sprintf "Duplicate field `%s`." field
+          Printf.sprintf "Duplicate field `%s`." field.value
       | `DuplicateVariant ty ->
           Printf.sprintf "Duplicate variant with type `%s`."
             (format_to_string ty pp_type)
       | `UnresolvedIdentifier id ->
-          Printf.sprintf "Unresolved identifier `%s`." id
+          Printf.sprintf "Unresolved identifier `%s`." id.value
       | `MethodNotFound (e, m) ->
-          Printf.sprintf "Method `%s` not found in `%s` expr." m
+          Printf.sprintf "Method `%s` not found in `%s` expr." m.value
             (format_to_string e pp_expr)
       | `UnexpectedType t ->
           Printf.sprintf "Unexpected type `%s`." (format_to_string t pp_type)
@@ -90,8 +94,8 @@ functor
       | `ExpectedFunction got ->
           Printf.sprintf "Expected function but got `%s`."
             (format_to_string got pp_type)
-      | `UnallowedStmt _ ->
-          Printf.sprintf "Unallowed statement at top-level."
+      | `UnallowedReturn _ ->
+          Printf.sprintf "Unallowed return statement at top-level."
       | `OnlyFunctionIsAllowed ->
           Printf.sprintf "Expected function."
       | `ArgumentNumberMismatch ->
@@ -99,7 +103,7 @@ functor
       | `UninterpretableStatement _ ->
           Printf.sprintf "Uninterpretable statement."
       | `FieldNotFoundF field | `FieldNotFound (_, field) ->
-          Printf.sprintf "Field `%s` not found." field
+          Printf.sprintf "Field `%s` not found." field.value
       | `MissingField (_, field) ->
-          Printf.sprintf "Field '%s' is missing in destructuring." field
+          Printf.sprintf "Field '%s' is missing in destructuring." field.value
   end

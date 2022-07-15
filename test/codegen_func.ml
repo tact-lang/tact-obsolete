@@ -131,7 +131,7 @@ let%expect_test "Int(bits) serializer codegen" =
        }
        _ test_int(builder b) {
          int i = 100;
-         return f0(i, b);
+         return f0(100, b);
        } |}]
 
 let%expect_test "demo struct serializer" =
