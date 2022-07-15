@@ -37,7 +37,7 @@ let alpha = ['a'-'z' 'A'-'Z']
 let integer = digit+
 let integer_with_underscores = integer ('_' integer)*
 
-let ident = (alpha) (alpha|digit|'_')* (* regex for identifier *)
+let ident = (alpha|'_') (alpha|digit|'_')* (* regex for identifier *)
 let newline = '\r' | '\n' | "\r\n"
 let whitespace = [' ' '\t']+
 

@@ -18,6 +18,22 @@ let%expect_test "empty" =
   let source = {||} in
   pp source ; [%expect {| () |}]
 
+let%expect_test "valid identifiers" =
+  let source = {|
+  let _ = 2;
+  let a = 1;
+  let _a = 2;
+  let a0 = 3;
+  let a_4 = 5;
+  |} in
+  pp source ; [%expect {|
+    ((stmts
+      ((Let ((binding_name (Ident _)) (binding_expr (Int 2))))
+       (Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+       (Let ((binding_name (Ident _a)) (binding_expr (Int 2))))
+       (Let ((binding_name (Ident a0)) (binding_expr (Int 3))))
+       (Let ((binding_name (Ident a_4)) (binding_expr (Int 5))))))) |}]
+
 let%expect_test "integer" =
   let source = {|100;-100|} in
   pp source ; [%expect {| ((stmts ((Expr (Int 100)) (Expr (Int -100))))) |}]
