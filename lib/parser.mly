@@ -229,6 +229,13 @@ let else_ :=
   | ELSE; ~= if_; <>
   | ELSE; c = code_block; { c }
 
+(* If statement 
+
+   if (boolean_expr) {
+     ...
+   } [else { ... }]
+
+*)
 let if_ :=
   IF;
   condition = delimited(LPAREN, located(expr), RPAREN);
@@ -239,15 +246,6 @@ let if_ :=
 let code_block :=
   | c = delimited(LBRACE, block_stmt, RBRACE); { CodeBlock c }
   | LBRACE; RBRACE; { CodeBlock [] }
-
-let switch_branch := 
-  | CASE; 
-    ty = located(type_expr);
-    var = located(ident);
-    REARROW;
-    (* TODO: what kind of stmts should be allowed here? *)
-    stmt = code_block;
-    { make_switch_branch ~ty ~var ~stmt () }
 
 (*
   Switch stmt
@@ -264,6 +262,17 @@ let switch :=
     branches = list(switch_branch);
     RBRACE;
     { Switch (make_switch ~switch_condition ~branches ()) }
+
+let switch_branch := 
+  | CASE; 
+    ty = located(type_expr);
+    var = located(ident);
+    REARROW;
+    (* TODO: what kind of stmts should be allowed here? *)
+    stmt = code_block;
+    { make_switch_branch ~ty ~var ~stmt () }
+
+
 
 let block_stmt :=
   | left = located(non_semicolon_stmt); right = block_stmt;
@@ -380,7 +389,6 @@ let params ==
   }
 
   * Empty structs are allowed
-  * Trailing commas are allowed
 
 *)
 let struct_definition(name) ==
