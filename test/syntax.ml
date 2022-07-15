@@ -19,14 +19,18 @@ let%expect_test "empty" =
   pp source ; [%expect {| () |}]
 
 let%expect_test "valid identifiers" =
-  let source = {|
+  let source =
+    {|
   let _ = 2;
   let a = 1;
   let _a = 2;
   let a0 = 3;
   let a_4 = 5;
-  |} in
-  pp source ; [%expect {|
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
     ((stmts
       ((Let ((binding_name (Ident _)) (binding_expr (Int 2))))
        (Let ((binding_name (Ident a)) (binding_expr (Int 1))))
