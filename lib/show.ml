@@ -211,10 +211,26 @@ functor
     let show_error : string -> error -> string =
      fun code -> function
       | `DuplicateField (field, _) ->
-          Printf.sprintf "Duplicate field `%s`." field.value
-      | `DuplicateVariant ty ->
-          Printf.sprintf "Duplicate variant with type `%s`."
-            (format_to_string ty pp_type)
+          format_to_string ()
+          @@ fun f _ ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg = "Duplicate struct field " ^ field.value;
+              spans = [(field.span, "Duplicated")];
+              additional_msg = [] }
+            code
+      | `DuplicateVariant (ty, span) ->
+          format_to_string ()
+          @@ fun f _ ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Duplicate variant with type " ^ format_to_string ty pp_type;
+              spans = [(span, "Duplicated variant in this union")];
+              additional_msg = [] }
+            code
       | `UnresolvedIdentifier id ->
           format_to_string ()
           @@ fun f _ ->

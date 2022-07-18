@@ -3114,7 +3114,7 @@ let%expect_test "unions duplicate variant" =
   pp_compile source ;
   [%expect
     {|
-    (((DuplicateVariant IntegerType))
+    (((DuplicateVariant (IntegerType <opaque>)))
      ((bindings
        ((b (Value (Type (UnionType 86)))) (a (Value (Type (UnionType 84))))
         (Test

@@ -72,4 +72,71 @@ let%expect_test "failed scope resolution" =
   let source = {|
     let T = Int256;
   |} in
-  pp source
+  pp source ;
+  [%expect
+    {|
+    Error[1]: Unresolved identifier Int256
+    File: "":2:12
+      |
+    2 |     let T = Int256;
+      |             ^^^^^^ Cannot resolve this identifier |}]
+
+let%expect_test "method not found" =
+  let source = {|
+      struct St { }
+  
+      let _ = St{}.method();
+    |} in
+  pp source ;
+  [%expect
+    {|
+    Error[1]: Method method not found in <anonymous>
+    File: "":4:19
+      |
+    4 |       let _ = St{}.method();
+      |                    ^^^^^^ Method not found |}]
+
+let%expect_test "duplicate field" =
+  let source =
+    {|
+      struct Foo {
+        val field: Integer
+        val field: Integer
+      }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    Error[1]: Duplicate struct field field
+    File: "":3:12
+      |
+    3 |         val field: Integer
+      |             ^^^^^ Duplicated |}]
+
+let%expect_test "duplicate variant" =
+  let source =
+    {|
+      union Test1 {
+        case Integer
+        case Integer
+      }
+
+      union Test2(T: Type) {
+        case Integer
+        case T
+      }
+      let _ = Test2(Integer);
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    Error[1]: Duplicate variant with type Integer
+    File: <unknown>
+
+    Error[1]: Duplicate variant with type Integer
+    File: "":7:6
+      |
+    7 |       union Test2(T: Type) {...
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^^ Duplicated variant in this union |}]

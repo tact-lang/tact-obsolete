@@ -18,7 +18,7 @@ functor
       | `FieldNotFound of expr * string located
       | `MissingField of int * string located
       | `ArgumentNumberMismatch
-      | `DuplicateVariant of type_ ]
+      | `DuplicateVariant of type_ * (span[@equal.ignore] [@sexp.opaque]) ]
     [@@deriving equal, sexp_of]
 
     let get_memoized_or_execute p (f, args) ~execute =
@@ -344,14 +344,11 @@ functor
                 updated_items <- prev_updated_items ;
                 Type (StructType struct_ty)
             | MkUnionDef mk_union ->
-                let compose f g x = g (f x) in
                 let cases =
-                  List.map mk_union.mk_cases
-                    ~f:
-                      (compose self#interpret_expr (fun x ->
-                           expr_to_type program
-                             {value = Value x; span = expr.span} ) )
-                  |> self#check_unions_for_doubled_types
+                  List.map mk_union.mk_cases ~f:(fun ex ->
+                      let ty = self#interpret_expr ex in
+                      expr_to_type program {value = Value ty; span = ex.span} )
+                  |> self#check_unions_for_doubled_types expr.span
                 in
                 let union =
                   Program.with_union_id program
@@ -545,13 +542,13 @@ functor
             | None ->
                 raise Errors.InternalCompilerError
 
-        method private check_unions_for_doubled_types : type_ list -> type_ list
-            =
-          fun xs ->
+        method private check_unions_for_doubled_types
+            : span -> type_ list -> type_ list =
+          fun span xs ->
             List.fold xs ~init:[] ~f:(fun acc x ->
                 match List.exists acc ~f:(equal_type_ x) with
                 | true ->
-                    errors#report `Error (`DuplicateVariant x) () ;
+                    errors#report `Error (`DuplicateVariant (x, span)) () ;
                     acc
                 | false ->
                     x :: acc )
