@@ -11,7 +11,7 @@
   (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
  (name tact_tests)
  (inline_tests)
- (modules syntax immediacy_check builtin lang codegen_func)
+ (modules errors syntax immediacy_check builtin lang codegen_func)
  (libraries tact core sexplib shared))
 
 (library
@@ -19,5 +19,5 @@
   (staged_pps ppx_matches ppx_sexp_conv ppx_inline_alcotest))
  (name tact_tests_)
  (inline_tests)
- (modules errors builtin_basics lang_types std)
+ (modules builtin_basics lang_types std)
  (libraries tact core sexplib shared alcotest))

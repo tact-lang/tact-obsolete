@@ -120,7 +120,7 @@ and compile_to_ir ?(prev_program = Lang.default_program ()) ~filename text =
       let program = constructor#visit_program () stx in
       match errors#to_result () with
       | Error _ ->
-          Error errors#show_errors
+          Error (errors#show_errors text)
       | Ok _ ->
           Ok program )
   | exception Lexer.Error msg ->

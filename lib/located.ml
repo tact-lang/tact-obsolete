@@ -84,6 +84,8 @@ module type T = sig
   val merge_spans_list : span list -> span
 
   val span_of_concrete : span_concrete -> span
+
+  val span_to_concrete : span -> span_concrete
 end
 
 module Enabled : T = struct
@@ -113,6 +115,8 @@ module Enabled : T = struct
   let merge_spans_list = merge_spans_concrete_list
 
   let span_of_concrete s = s
+
+  let span_to_concrete s = s
 end
 
 module Disabled : T = struct
@@ -145,4 +149,6 @@ module Disabled : T = struct
   let merge_spans_list _ = ()
 
   let span_of_concrete _ = ()
+
+  let span_to_concrete _ = (Lexing'.dummy_pos, Lexing'.dummy_pos)
 end

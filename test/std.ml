@@ -35,6 +35,6 @@ let%test "test std build" =
   Alcotest.(check bool)
     "std build" true
     (let errors, std = compile_std () in
-     pp_sexp (sexp_of_string errors#show_errors) ;
+     pp_sexp (sexp_of_string (errors#show_errors Builtin.std)) ;
      pp_sexp (Lang.sexp_of_program std) ;
      Result.is_ok (errors#to_result ()) )
