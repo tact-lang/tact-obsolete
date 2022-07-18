@@ -226,8 +226,17 @@ functor
               additional_msg = [] }
             code
       | `MethodNotFound (e, m) ->
-          Printf.sprintf "Method `%s` not found in `%s` expr." m.value
-            (format_to_string e pp_expr)
+          format_to_string ()
+          @@ fun f _ ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Method " ^ m.value ^ " not found in "
+                ^ format_to_string e pp_expr;
+              spans = [(m.span, "Method not found")];
+              additional_msg = [] }
+            code
       | `UnexpectedType t ->
           Printf.sprintf "Unexpected type `%s`." (format_to_string t pp_type)
       | `TypeError (expected, actual) ->

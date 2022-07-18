@@ -1,4 +1,5 @@
-open Shared
+open Shared.Disabled
+module Config = Shared.DisabledConfig
 
 let%expect_test "simple function generation" =
   let source = {|

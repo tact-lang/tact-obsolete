@@ -37,15 +37,19 @@ let merge_spans_concrete : span_concrete -> span_concrete -> span_concrete =
 
 let merge_spans_concrete_list list =
   let open Base in
-  let hd = List.hd_exn list in
-  let tl = List.tl_exn list in
-  let rec merge_spans_list_inner left = function
-    | [] ->
-        left
-    | x :: xs ->
-        merge_spans_list_inner (merge_spans_concrete left x) xs
-  in
-  merge_spans_list_inner hd tl
+  match list with
+  | [] ->
+      (Lexing'.dummy_pos, Lexing'.dummy_pos)
+  | _ ->
+      let hd = List.hd_exn list in
+      let tl = List.tl_exn list in
+      let rec merge_spans_list_inner left = function
+        | [] ->
+            left
+        | x :: xs ->
+            merge_spans_list_inner (merge_spans_concrete left x) xs
+      in
+      merge_spans_list_inner hd tl
 
 module type T = sig
   type span

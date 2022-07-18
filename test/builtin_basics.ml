@@ -1,4 +1,5 @@
-open Shared
+open Shared.Disabled
+module Config = Shared.DisabledConfig
 
 let find scope name =
   let open Config in

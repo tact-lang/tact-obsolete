@@ -1,5 +1,5 @@
-module Config = Tact.Located.Enabled
-module Show = Tact.Show.Make (Config)
+module Config = Shared.EnabledConfig
+module Show = Tact.Show.Make (Shared.EnabledConfig)
 open Config
 
 let fmt = Caml.Format.std_formatter
@@ -60,3 +60,16 @@ let a = test(
       |
     1 | let a = test(...
       |         ^^^^^^^^ message |}]
+
+let pp =
+  let open Base in
+  Shared.Enabled.pp_compile ~show_errors:(fun (elist, _) source ->
+      List.iter elist ~f:(fun x ->
+          let s = Show.show_error source x in
+          Caml.Format.print_string s ) )
+
+let%expect_test "failed scope resolution" =
+  let source = {|
+    let T = Int256;
+  |} in
+  pp source
