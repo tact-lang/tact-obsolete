@@ -125,11 +125,6 @@ functor
                   if is_sig_part_of_call sign_actual sign_expected then
                     Ok actual'
                   else Error (TypeError expected)
-              | StructSig sid2 ->
-                  let sign_actual = Arena.get program.struct_signs sid2 in
-                  if is_sig_part_of_call sign_actual sign_expected then
-                    Ok (StructSig sid2)
-                  else Error (TypeError expected)
               | ExprType ({value = FunctionCall _; _} as ex_ty) -> (
                   let ex_ty = type_of program ex_ty in
                   match ex_ty with
@@ -166,10 +161,8 @@ functor
                 Ok (StructSig s)
             | _ -> (
               match type_of program actual_value with
-              | StructSig s ->
-                  Ok (StructSig s)
-              | UnionSig s ->
-                  Ok (UnionSig s)
+              | (StructSig _ as ty) | (UnionSig _ as ty) ->
+                  Ok ty
               | _ ->
                   Error (TypeError expected) ) )
           | StructType s -> (

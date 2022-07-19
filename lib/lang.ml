@@ -344,10 +344,10 @@ functor
         method build_binding _env name expr = (name, expr)
 
         method build_destructuring_binding _env destructuring_binding
-            destructuring_binding_expr destructuring_binding_rest =
+            destructuring_let_expr destructuring_let_rest =
           { destructuring_let = Syntax.value destructuring_binding;
-            destructuring_let_expr = destructuring_binding_expr;
-            destructuring_let_rest = destructuring_binding_rest }
+            destructuring_let_expr;
+            destructuring_let_rest }
 
         method build_enum_definition _env _members _bindings = ()
 
@@ -384,16 +384,6 @@ functor
                     mk_err () )
             | _ ->
                 mk_err () )
-          | StructSig sign_id -> (
-              let s = Arena.get program.struct_signs sign_id in
-              match
-                List.Assoc.find s.st_sig_fields field
-                  ~equal:(equal_located equal_string)
-              with
-              | Some ty ->
-                  (expr, field, expr_to_type program ty)
-              | None ->
-                  mk_err () )
           | _ ->
               mk_err ()
 
@@ -699,10 +689,6 @@ functor
           | ResolvedReference
               (_, ({value = Value (Type (StructSig _)); _} as ty)) ->
               ( ty,
-                List.map fields ~f:(fun (name, expr) ->
-                    (Syntax.value name, expr) ) )
-          | Value (Type (StructSig _)) ->
-              ( id,
                 List.map fields ~f:(fun (name, expr) ->
                     (Syntax.value name, expr) ) )
           | _ -> (
