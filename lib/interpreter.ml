@@ -250,13 +250,7 @@ functor
                    so we do not need to check if union can be built from the expr. *)
                 let data = self#interpret_expr expr in
                 UnionVariant (data, union)
-            | MkStructDef
-                { mk_struct_fields;
-                  mk_methods;
-                  mk_impls;
-                  mk_struct_id;
-                  mk_struct_span;
-                  _ } ->
+            | MkStructDef {mk_struct_fields; mk_struct_details} ->
                 let struct_fields =
                   List.map mk_struct_fields ~f:(fun (name, field_type) ->
                       ( name,
@@ -265,132 +259,56 @@ functor
                               { value = Value (self#interpret_expr field_type);
                                 span = field_type.span } } ) )
                 in
-                let struct_id = ctx.program.type_counter in
-                ctx.program.type_counter <- ctx.program.type_counter + 1 ;
-                let struct_ty = struct_id in
-                let struct_ty_expr =
-                  {value = Value (Type (StructType struct_ty)); span = expr.span}
-                in
-                let struct_ =
-                  { struct_fields;
-                    struct_methods = [];
-                    struct_impls = [];
-                    struct_id;
-                    struct_base_id =
-                      {value = mk_struct_id; span = mk_struct_span};
-                    tensor = false }
-                in
-                let prev_updated_items = ctx.updated_items in
-                ctx.updated_items <-
-                  (mk_struct_id, struct_id) :: ctx.updated_items ;
-                let self_name = {value = "Self"; span = mk_struct_span} in
-                let _ =
-                  Program.with_struct ctx.program struct_ (fun _ ->
-                      let struct_methods =
-                        List.map mk_methods ~f:(fun (name, fn) ->
-                            let output =
-                              self#with_vars
-                                [(self_name, Comptime struct_ty_expr)]
-                                (fun _ ->
-                                  match self#interpret_expr fn with
-                                  | Function f ->
-                                      f
-                                  | _ ->
-                                      raise InternalCompilerError )
-                            in
-                            (name, output) )
+                let s =
+                  Program.with_id ctx.program
+                    (fun id ->
+                      { struct_fields;
+                        struct_details =
+                          { uty_methods = [];
+                            uty_impls = [];
+                            uty_id = id;
+                            uty_base_id = mk_struct_details.mk_id };
+                        tensor = false } )
+                    (fun s_base ->
+                      let id = s_base.struct_details.uty_id in
+                      let details =
+                        self#interpret_uty_details mk_struct_details
+                          (StructType id) id expr.span
                       in
-                      let struct_impls =
-                        List.map mk_impls ~f:(fun impl ->
-                            self#with_vars
-                              [(self_name, Comptime struct_ty_expr)]
-                              (fun _ ->
-                                { impl_interface =
-                                    Value.unwrap_intf_id
-                                      (self#interpret_expr
-                                         impl.mk_impl_interface );
-                                  impl_methods =
-                                    List.map impl.mk_impl_methods
-                                      ~f:(fun (n, x) ->
-                                        ( n,
-                                          Value.unwrap_function
-                                            (self#interpret_expr x) ) ) } ) )
-                      in
-                      Ok
-                        { struct_fields;
-                          struct_methods;
-                          struct_impls;
-                          struct_id;
-                          struct_base_id =
-                            {value = mk_struct_id; span = mk_struct_span};
-                          tensor = false } )
+                      {struct_fields; struct_details = details; tensor = false}
+                      )
                 in
-                ctx.updated_items <- prev_updated_items ;
-                Type (StructType struct_ty)
-            | MkUnionDef mk_union ->
+                Type (StructType s.struct_details.uty_id)
+            | MkUnionDef {mk_cases; mk_union_details} ->
                 let cases =
-                  List.map mk_union.mk_cases ~f:(fun ex ->
+                  List.map mk_cases ~f:(fun ex ->
                       let ty = self#interpret_expr ex in
                       expr_to_type ctx.program {value = Value ty; span = ex.span} )
                   |> self#check_unions_for_doubled_types expr.span
                 in
-                let union =
+                let u =
                   Program.with_union_id ctx.program
                     (fun id ->
                       { cases =
                           Discriminator.LocalDiscriminators
                           .choose_discriminators () id cases;
-                        union_methods = [];
-                        union_impls = [];
-                        union_id = id;
-                        union_base_id = mk_union.mk_union_id } )
+                        union_details =
+                          { uty_methods = [];
+                            uty_impls = [];
+                            uty_id = id;
+                            uty_base_id = mk_union_details.mk_id } } )
                     (fun u_base ->
-                      let union_ty_expr =
-                        { value = Value (Type (UnionType u_base.union_id));
-                          span = expr.span }
+                      let id = u_base.union_details.uty_id in
+                      let details =
+                        self#interpret_uty_details mk_union_details
+                          (UnionType id) id expr.span
                       in
-                      let self_name =
-                        {value = "Self"; span = mk_union.mk_union_span}
-                      in
-                      let union_methods =
-                        List.map mk_union.mk_union_methods ~f:(fun (name, fn) ->
-                            let output =
-                              self#with_vars
-                                [(self_name, Comptime union_ty_expr)]
-                                (fun _ ->
-                                  match self#interpret_expr fn with
-                                  | Function f ->
-                                      f
-                                  | _ ->
-                                      raise InternalCompilerError )
-                            in
-                            (name, output) )
-                      in
-                      let union_impls =
-                        self#with_vars
-                          [(self_name, Comptime union_ty_expr)]
-                          (fun _ ->
-                            List.map mk_union.mk_union_impls ~f:(fun impl ->
-                                { impl_interface =
-                                    Value.unwrap_intf_id
-                                      (self#interpret_expr
-                                         impl.mk_impl_interface );
-                                  impl_methods =
-                                    List.map impl.mk_impl_methods
-                                      ~f:(fun (n, x) ->
-                                        ( n,
-                                          Value.unwrap_function
-                                            (self#interpret_expr x) ) ) } ) )
-                      in
-                      Ok
-                        { cases = u_base.cases;
-                          union_methods;
-                          union_impls;
-                          union_id = u_base.union_id;
-                          union_base_id = u_base.union_base_id } )
-                  |> Result.ok_exn
+                      { cases =
+                          Discriminator.LocalDiscriminators
+                          .choose_discriminators () id cases;
+                        union_details = details } )
                 in
-                Type (UnionType union.union_id)
+                Type (UnionType u.union_details.uty_id)
             | MkInterfaceDef {mk_interface_methods} ->
                 let intf =
                   { interface_methods =
@@ -416,6 +334,42 @@ functor
                     {value = Expr expr; span = expr.span} )
                   () ;
                 Void
+
+        method interpret_uty_details (mk : mk_details) ty uty_id span =
+          let uty_expr = {value = Value (Type ty); span} in
+          let prev_updated_items = ctx.updated_items in
+          ctx.updated_items <- (mk.mk_id, uty_id) :: ctx.updated_items ;
+          let self_name = {value = "Self"; span = mk.mk_span} in
+          let uty_methods =
+            List.map mk.mk_methods ~f:(fun (name, fn) ->
+                let output =
+                  self#with_vars
+                    [(self_name, Comptime uty_expr)]
+                    (fun _ ->
+                      match self#interpret_expr fn with
+                      | Function f ->
+                          f
+                      | _ ->
+                          raise InternalCompilerError )
+                in
+                (name, output) )
+          in
+          let uty_impls =
+            List.map mk.mk_impls ~f:(fun impl ->
+                self#with_vars
+                  [(self_name, Comptime uty_expr)]
+                  (fun _ ->
+                    { impl_interface =
+                        Value.unwrap_intf_id
+                          (self#interpret_expr impl.mk_impl_interface);
+                      impl_methods =
+                        List.map impl.mk_impl_methods ~f:(fun (n, x) ->
+                            (n, Value.unwrap_function (self#interpret_expr x)) )
+                    } ) )
+          in
+          let out = {uty_methods; uty_impls; uty_id; uty_base_id = mk.mk_id} in
+          ctx.updated_items <- prev_updated_items ;
+          out
 
         method interpret_struct_sig sign =
           match List.Assoc.find ctx.updated_items sign ~equal:equal_int with

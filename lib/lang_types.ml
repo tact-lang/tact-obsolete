@@ -217,37 +217,32 @@ functor
       | Dependent of string located * type_
       | ValueOf of type_
 
-    and mk_union =
-      { mk_cases : expr list;
-        mk_union_methods : (string located * expr) list;
-        mk_union_impls : mk_impl list; [@sexp.list]
-        mk_union_id : int;
-        mk_union_sig : int;
-        mk_union_span : (span[@sexp.opaque]) [@equal.ignore] [@compare.ignore]
-      }
-
-    and union =
-      { cases : (type_ * discriminator) list;
-        union_methods : (string located * function_) list;
-        union_impls : impl list; [@sexp.list]
-        union_id : int;
-        union_base_id : int }
+    and mk_union = {mk_cases : expr list; mk_union_details : mk_details}
 
     and mk_struct =
       { mk_struct_fields : (string located * expr) list;
-        mk_methods : (string located * expr) list;
+        mk_struct_details : mk_details }
+
+    and mk_details =
+      { mk_methods : (string located * expr) list;
         mk_impls : mk_impl list;
-        mk_struct_id : int;
-        mk_struct_sig : int;
-        mk_struct_span : (span[@sexp.opaque]) [@equal.ignore] [@compare.ignore]
-      }
+        mk_id : int;
+        mk_sig : int;
+        mk_span : (span[@sexp.opaque]) [@equal.ignore] [@compare.ignore] }
+
+    (* uty - User Defined Type *)
+    and uty_details =
+      { uty_methods : (string located * function_) list;
+        uty_impls : impl list;
+        uty_id : int;
+        uty_base_id : int }
+
+    and union =
+      {cases : (type_ * discriminator) list; union_details : uty_details}
 
     and struct_ =
       { struct_fields : (string located * struct_field) list;
-        struct_methods : (string located * function_) list;
-        struct_impls : impl list;
-        struct_id : int;
-        struct_base_id : int located;
+        struct_details : uty_details;
         (* Used by codegen to determine if this is a tensor *)
         tensor : bool [@sexp.bool] }
 
@@ -357,7 +352,7 @@ functor
       List.filter_map bindings ~f:(fun (name, scope) ->
           match scope with Comptime value -> Some (name, value) | _ -> None )
 
-    let sig_of_struct {struct_fields; struct_methods; struct_base_id; _} sid =
+    let sig_of_struct {struct_fields; struct_details; _} sid =
       { st_sig_fields =
           List.Assoc.map struct_fields ~f:(fun {field_type} ->
               match field_type with
@@ -366,15 +361,17 @@ functor
               | _ ->
                   builtin_located (Value (Type field_type)) );
         st_sig_methods =
-          List.Assoc.map struct_methods ~f:(fun x -> x.value.function_signature);
-        st_sig_base_id = struct_base_id.value;
+          List.Assoc.map struct_details.uty_methods ~f:(fun x ->
+              x.value.function_signature );
+        st_sig_base_id = struct_details.uty_base_id;
         st_sig_id = sid }
 
-    let sig_of_union {cases; union_methods; union_base_id; _} =
+    let sig_of_union {cases; union_details; _} =
       { un_sig_cases = List.map cases ~f:fst;
         un_sig_methods =
-          List.Assoc.map union_methods ~f:(fun x -> x.value.function_signature);
-        un_sig_base_id = union_base_id }
+          List.Assoc.map union_details.uty_methods ~f:(fun x ->
+              x.value.function_signature );
+        un_sig_base_id = union_details.uty_base_id }
 
     let rec expr_to_type program expr =
       match expr.value with
@@ -427,7 +424,7 @@ functor
       | MakeUnionVariant (_, u) ->
           UnionType u
       | MkStructDef mk ->
-          StructSig mk.mk_struct_sig
+          StructSig mk.mk_struct_details.mk_sig
       | StructField (_, _, ty) ->
           ty
       | IntfMethodCall {intf_method = _, sign; intf_args; _} ->
@@ -440,7 +437,7 @@ functor
       | MkFunction mk_function ->
           FunctionType mk_function.value.function_signature
       | MkUnionDef uni ->
-          UnionSig uni.mk_union_sig
+          UnionSig uni.mk_union_details.mk_sig
       | _ ->
           InvalidType expr
 
@@ -767,20 +764,23 @@ functor
       let methods_of p = function
         | StructType s ->
             List.find_map_exn p.structs ~f:(fun (id, s') ->
-                if equal_int id s then Some s'.struct_methods else None )
+                if equal_int id s then Some s'.struct_details.uty_methods
+                else None )
         | UnionType u ->
             List.find_map_exn p.unions ~f:(fun (id, u') ->
-                if equal_int id u then Some u'.union_methods else None )
+                if equal_int id u then Some u'.union_details.uty_methods
+                else None )
         | _ ->
             []
 
       let impls_of p = function
         | StructType s ->
             List.find_map_exn p.structs ~f:(fun (id, s') ->
-                if equal_int id s then Some s'.struct_impls else None )
+                if equal_int id s then Some s'.struct_details.uty_impls
+                else None )
         | UnionType u ->
             List.find_map_exn p.unions ~f:(fun (id, u') ->
-                if equal_int id u then Some u'.union_impls else None )
+                if equal_int id u then Some u'.union_details.uty_impls else None )
         | _ ->
             []
 
@@ -809,37 +809,27 @@ functor
               match new_s with Ok new_s -> (id, new_s) :: xs | Error _ -> xs
             else (xid, old_s) :: update_list id new_s xs
 
-      let update_struct p sid ~f =
-        let s = get_struct p sid in
-        let new_s = f s in
-        p.structs <- update_list sid (Ok new_s) p.structs ;
-        new_s
-
-      let update_union p sid ~f =
-        let s = get_union p sid in
-        let new_u = f s in
-        p.unions <- update_list sid (Ok new_u) p.unions ;
-        new_u
-
       let with_struct p s f =
-        p.structs <- (s.struct_id, s) :: p.structs ;
+        p.structs <- (s.struct_details.uty_id, s) :: p.structs ;
         let new_s = f () in
-        p.structs <- update_list s.struct_id new_s p.structs ;
+        p.structs <- update_list s.struct_details.uty_id new_s p.structs ;
         new_s
 
       (* Creates new struct id, calls function with this new id and then
          places returning struct to the program.structs *)
-      let with_id p f =
+      let with_id p mk_struct f =
         let id = p.type_counter in
         p.type_counter <- p.type_counter + 1 ;
-        let new_s = f id in
-        p.structs <- (id, new_s) :: p.structs ;
+        let s = mk_struct id in
+        p.structs <- (id, s) :: p.structs ;
+        let new_s = f s in
+        p.structs <- update_list id (Ok new_s) p.structs ;
         new_s
 
       let with_union p u f =
-        p.unions <- (u.union_id, u) :: p.unions ;
+        p.unions <- (u.union_details.uty_id, u) :: p.unions ;
         let new_u = f () in
-        p.unions <- update_list u.union_id new_u p.unions ;
+        p.unions <- update_list u.union_details.uty_id new_u p.unions ;
         new_u
 
       (* Creates new struct id, calls function with this new id and then
@@ -848,19 +838,23 @@ functor
         let id = p.type_counter in
         p.type_counter <- p.type_counter + 1 ;
         let u = mk_union id in
-        p.unions <- (u.union_id, u) :: p.unions ;
+        p.unions <- (id, u) :: p.unions ;
         let new_union = f u in
-        p.unions <- update_list id new_union p.unions ;
+        p.unions <- update_list id (Ok new_union) p.unions ;
         new_union
 
-      let find_impl_intf p impl = function
+      let get_uty_details p = function
         | StructType s ->
-            List.find (get_struct p s).struct_impls
-              ~f:(fun {impl_interface; _} -> equal_int impl_interface impl)
+            Some (get_struct p s).struct_details
         | UnionType u ->
-            List.find (get_union p u).union_impls ~f:(fun {impl_interface; _} ->
-                equal_int impl_interface impl )
+            Some (get_union p u).union_details
         | _ ->
             None
+
+      let find_impl_intf p impl ty =
+        get_uty_details p ty
+        |> Option.bind ~f:(fun dets ->
+               List.find dets.uty_impls ~f:(fun {impl_interface; _} ->
+                   equal_int impl_interface impl ) )
     end
   end

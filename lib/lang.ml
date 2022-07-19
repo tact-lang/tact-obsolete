@@ -741,11 +741,12 @@ functor
             in
             let s' =
               { mk_struct_fields;
-                mk_methods = mk_methods @ impl_methods;
-                mk_impls = impls;
-                mk_struct_id;
-                mk_struct_sig = sign_id;
-                mk_struct_span = span }
+                mk_struct_details =
+                  { mk_methods = mk_methods @ impl_methods;
+                    mk_impls = impls;
+                    mk_id = mk_struct_id;
+                    mk_sig = sign_id;
+                    mk_span = span } }
             in
             (* Check for duplicate fields *)
             ( match
@@ -775,14 +776,7 @@ functor
                   st_sig_base_id = program.type_counter;
                   st_sig_id = id } )
           in
-          let mk_struct_ =
-            { mk_struct_fields = fields;
-              mk_methods = [];
-              mk_impls = [];
-              mk_struct_id = program.type_counter;
-              mk_struct_sig = sign_id;
-              mk_struct_span = syn_struct_def.struct_span }
-          in
+          let mk_id = program.type_counter in
           program.type_counter <- program.type_counter + 1 ;
           let mk_struct =
             let self_name =
@@ -804,10 +798,12 @@ functor
             let mk_struct =
               s#make_struct_definition fields
                 (s#of_located_list methods)
-                impls mk_struct_.mk_struct_id mk_struct_.mk_struct_sig
-                syn_struct_def.struct_span
+                impls mk_id sign_id syn_struct_def.struct_span
             in
-            {mk_struct with mk_struct_id = mk_struct_.mk_struct_id}
+            { mk_struct with
+              mk_struct_details =
+                { mk_struct.mk_struct_details with
+                  mk_id = mk_struct.mk_struct_details.mk_id } }
           in
           functions <- prev_functions ;
           mk_struct
@@ -865,11 +861,12 @@ functor
           let convert_impls = s#make_from_impls cases union_base_id in
           let mk_union =
             { mk_cases = cases;
-              mk_union_id = union_base_id;
-              mk_union_impls = impls @ convert_impls;
-              mk_union_methods = methods @ impl_methods;
-              mk_union_sig = sign_id;
-              mk_union_span = def.union_span }
+              mk_union_details =
+                { mk_id = union_base_id;
+                  mk_impls = impls @ convert_impls;
+                  mk_methods = methods @ impl_methods;
+                  mk_sig = sign_id;
+                  mk_span = def.union_span } }
           in
           functions <- prev_functions ;
           mk_union

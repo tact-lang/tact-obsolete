@@ -202,8 +202,8 @@ functor
           let mk =
             self#with_vars
               [ make_runtime
-                  ( {value = "Self"; span = mk.mk_struct_span},
-                    StructSig mk.mk_struct_sig ) ]
+                  ( {value = "Self"; span = mk.mk_struct_details.mk_span},
+                    StructSig mk.mk_struct_details.mk_sig ) ]
               (fun _ -> super#visit_mk_struct env mk)
           in
           mk
@@ -219,8 +219,8 @@ functor
           let mk =
             self#with_vars
               [ make_runtime
-                  ( {value = "Self"; span = mk.mk_union_span},
-                    UnionSig mk.mk_union_sig ) ]
+                  ( {value = "Self"; span = mk.mk_union_details.mk_span},
+                    UnionSig mk.mk_union_details.mk_sig ) ]
               (fun _ -> super#visit_mk_union env mk)
           in
           mk

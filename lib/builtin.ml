@@ -31,29 +31,33 @@ functor
       { struct_fields =
           [ (bl "slice", {field_type = slice_struct});
             (bl "value", {field_type = t}) ];
-        struct_methods =
-          [ ( bl "new",
-              bl
-                { function_signature =
-                    bl
-                      { function_params = [(bl "s", slice_struct); (bl "v", t)];
-                        function_returns = StructType id };
-                  function_impl =
-                    Fn
-                      (bl
-                         (Return
-                            (bl
-                               (Value
-                                  (Struct
-                                     ( bl @@ Value (Type (StructType id)),
-                                       [ ( "slice",
-                                           bl @@ Reference (bl "s", slice_struct)
-                                         );
-                                         ("value", bl @@ Reference (bl "v", t))
-                                       ] ) ) ) ) ) ) } ) ];
-        struct_impls = [];
-        struct_id = id;
-        struct_base_id = base_id;
+        struct_details =
+          { uty_methods =
+              [ ( bl "new",
+                  bl
+                    { function_signature =
+                        bl
+                          { function_params =
+                              [(bl "s", slice_struct); (bl "v", t)];
+                            function_returns = StructType id };
+                      function_impl =
+                        Fn
+                          (bl
+                             (Return
+                                (bl
+                                   (Value
+                                      (Struct
+                                         ( bl @@ Value (Type (StructType id)),
+                                           [ ( "slice",
+                                               bl
+                                               @@ Reference
+                                                    (bl "s", slice_struct) );
+                                             ( "value",
+                                               bl @@ Reference (bl "v", t) ) ]
+                                         ) ) ) ) ) ) } ) ];
+            uty_impls = [];
+            uty_id = id;
+            uty_base_id = base_id };
         tensor = false }
 
     let load_result_func a =
@@ -83,11 +87,11 @@ functor
       let make_load_result p t =
         let id = p.type_counter in
         p.type_counter <- p.type_counter + 1 ;
-        let struct_ = make_load_result_with_id (bl base_id) id t in
+        let struct_ = make_load_result_with_id base_id id t in
         let struct_ =
           Result.ok_exn @@ Program.with_struct p struct_ (fun _ -> Ok struct_)
         in
-        Type (StructType struct_.struct_id)
+        Type (StructType struct_.struct_details.uty_id)
       in
       let function_impl p = function
         | [Type t] ->
@@ -146,6 +150,8 @@ functor
             1 + (int_required_bits @@ Int.shift_right x 1)
       in
       let serialize_union_ty u p =
+        (* print_sexp (sexp_of_int u) ;
+           print_sexp (sexp_of_program p) ; *)
         let union = List.Assoc.find_exn p.unions u ~equal:equal_int in
         let discriminator_len =
           Value
@@ -215,14 +221,14 @@ functor
         in
         let switch =
           { switch_condition =
-              bl @@ Reference (bl "self", UnionType union.union_id);
+              bl @@ Reference (bl "self", UnionType union.union_details.uty_id);
             branches }
         in
         let body = Switch switch in
         { function_signature =
             bl
               { function_params =
-                  [ (bl "self", UnionType union.union_id);
+                  [ (bl "self", UnionType union.union_details.uty_id);
                     (bl "b", builder_struct) ];
                 function_returns = builder_struct };
           function_impl = Fn (bl body) }
@@ -254,7 +260,9 @@ functor
                                   @@ StructField
                                        ( bl
                                          @@ Reference
-                                              (bl "self", StructType s.struct_id),
+                                              ( bl "self",
+                                                StructType
+                                                  s.struct_details.uty_id ),
                                          name,
                                          f ) )
                                   :: [bl @@ Reference (bl "b", builder_struct)]
@@ -268,7 +276,8 @@ functor
         { function_signature =
             bl
               { function_params =
-                  [(bl "self", StructType s.struct_id); (bl "b", builder_struct)];
+                  [ (bl "self", StructType s.struct_details.uty_id);
+                    (bl "b", builder_struct) ];
                 function_returns = builder_struct };
           function_impl = Fn (bl body) }
       in
@@ -328,13 +337,14 @@ functor
 
     let tensor2 t1 t2 =
       Hashtbl.find_or_add tensor2_hashtbl (t1, t2) ~default:(fun () ->
-          { struct_id = next_builtin_struct_id ();
-            struct_fields =
+          { struct_fields =
               [ (bl "value1", {field_type = t1});
                 (bl "value2", {field_type = t2}) ];
-            struct_methods = [];
-            struct_impls = [];
-            struct_base_id = bl @@ -501;
+            struct_details =
+              { uty_id = next_builtin_struct_id ();
+                uty_methods = [];
+                uty_impls = [];
+                uty_base_id = -501 };
             tensor = true } )
 
     let builtin_bindings =
@@ -391,14 +401,16 @@ functor
         ( bl "builtin_slice_load_int",
           make_builtin_fn
             [(bl "s", BuiltinType "Slice"); (bl "bits", IntegerType)]
-            (StructType (tensor2 (BuiltinType "Slice") IntegerType).struct_id)
+            (StructType
+               (tensor2 (BuiltinType "Slice") IntegerType).struct_details.uty_id
+            )
             (SliceLoadInt
                { slice = bl @@ Reference (bl "s", BuiltinType "Slice");
                  bits = bl @@ Reference (bl "bits", IntegerType) } ) );
         ( bl "builtin_divmod",
           make_builtin_fn
             [(bl "x", IntegerType); (bl "y", IntegerType)]
-            (StructType (tensor2 IntegerType IntegerType).struct_id)
+            (StructType (tensor2 IntegerType IntegerType).struct_details.uty_id)
             (Divmod
                { x = bl @@ Reference (bl "x", IntegerType);
                  y = bl @@ Reference (bl "y", IntegerType) } ) );
@@ -436,10 +448,10 @@ functor
 
     let default_structs =
       ( Hashtbl.map tensor2_hashtbl ~f:(fun struct_ ->
-            (struct_.struct_id, struct_) )
+            (struct_.struct_details.uty_id, struct_) )
       |> Hashtbl.data )
       @ [ (let id = snd deserialize_intf in
-           (id, make_load_result_with_id (bl @@ -500) id SelfType) ) ]
+           (id, make_load_result_with_id (-500) id SelfType) ) ]
 
     let default_intfs =
       [ (serialize_intf_id, serialize_intf);
