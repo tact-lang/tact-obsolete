@@ -88,11 +88,12 @@ functor
       parse_program s
       |> build_program ~prev_program ~strip_defaults ~codegen:(fun x -> x)
       |> fun res ->
-      match res with
+      ( match res with
       | Ok t ->
           pp_sexp @@ Result.sexp_of_t Lang.sexp_of_program sexp_of_errors (Ok t)
       | Error e ->
-          show_errors e s
+          show_errors e s ) ;
+      Caml.print_newline ()
 
     let pp_codegen ?(prev_program = Lang.default_program ())
         ?(strip_defaults = false) s =

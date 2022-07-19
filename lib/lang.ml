@@ -82,7 +82,8 @@ functor
         memoized_fcalls = [];
         interfaces = Builtin.default_intfs;
         struct_signs;
-        union_signs }
+        union_signs;
+        result = None }
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
@@ -245,24 +246,21 @@ functor
                 Value Void
 
         method build_Return _env return =
-          match functions with
-          | 0 ->
-              errors#report `Error (`UnallowedReturn return) () ;
-              Return return
-          | _ -> (
-            match
+          let typecheck =
+            if functions = 0 then Ok VoidType
+            else
               type_checker#check_return_type return ~program ~current_bindings
-            with
-            | Ok _ ->
-                Return return
-            | Error (NeedFromCall func) ->
-                Return
-                  {value = FunctionCall (func, [return]); span = return.span}
-            | Error (TypeError fn_returns) ->
-                errors#report `Error
-                  (`TypeError (fn_returns, type_of program return))
-                  () ;
-                Return return )
+          in
+          match typecheck with
+          | Ok _ ->
+              Return return
+          | Error (NeedFromCall func) ->
+              Return {value = FunctionCall (func, [return]); span = return.span}
+          | Error (TypeError fn_returns) ->
+              errors#report `Error
+                (`TypeError (fn_returns, type_of program return))
+                () ;
+              Return return
 
         method build_Break _env stmt =
           match stmt.value with
@@ -672,8 +670,24 @@ functor
           in
           value
 
-        method build_program _env _ =
+        method build_program _env stmts =
           { program with
+            result =
+              ( match List.hd @@ List.rev stmts with
+              (*| Some (Expr expr) | Some (Return expr) -> *)
+              | Some stmt -> (
+                  let inter =
+                    new interpreter
+                      (make_ctx program current_bindings functions)
+                      errors s#partial_evaluate_fn
+                  in
+                  match inter#interpret_stmt stmt [] with
+                  | Void ->
+                      None
+                  | other ->
+                      Some other )
+              | _ ->
+                  None );
             bindings = extract_comptime_bindings (List.concat current_bindings)
           }
 

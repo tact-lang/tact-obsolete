@@ -1105,3 +1105,8 @@ let%expect_test "destructuring let with rest ignored" =
             (fields_construction
              (((Ident x) (Int 1)) ((Ident y) (Int 2)) ((Ident z) (Int 3)))))))
          (destructuring_binding_rest true)))))) |}]
+
+let%expect_test "program returns" =
+  let sources = [{| 1 |}; {| return 1|}] in
+  List.iter ~f:pp sources ;
+  [%expect {| ((stmts ((Expr (Int 1)))))((stmts ((Return (Int 1))))) |}]

@@ -16,6 +16,101 @@ let add_bin_op_intf p =
   in
   {p with bindings = (bl "BinOp", bl intf_ty) :: p.bindings}
 
+let%expect_test "program returns" =
+  let sources =
+    [{| 1 |}; {| return 1|}; {| fn x() { 1 } x() |}; {| struct T {} |}]
+  in
+  List.iter ~f:pp_compile sources ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ()) (result (Integer 1)) (structs ()) (type_counter <opaque>)
+      (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (5
+        (((un_sig_cases ((StructType 59) (StructType 76))) (un_sig_methods ())
+          (un_sig_base_id 77))
+         ((un_sig_cases ((StructType 55))) (un_sig_methods ())
+          (un_sig_base_id 60))
+         ((un_sig_cases ((UnionType 21) (UnionType 39))) (un_sig_methods ())
+          (un_sig_base_id 44))
+         ((un_sig_cases ((StructType 31) (StructType 35))) (un_sig_methods ())
+          (un_sig_base_id 38))
+         ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
+          (un_sig_base_id 20)))))))
+    (Ok
+                                    ((bindings ()) (result (Integer 1))
+                                     (structs ()) (type_counter <opaque>)
+                                     (memoized_fcalls <opaque>)
+                                     (struct_signs (0 ()))
+                                     (union_signs
+                                      (5
+                                       (((un_sig_cases
+                                          ((StructType 59) (StructType 76)))
+                                         (un_sig_methods ()) (un_sig_base_id 77))
+                                        ((un_sig_cases ((StructType 55)))
+                                         (un_sig_methods ()) (un_sig_base_id 60))
+                                        ((un_sig_cases
+                                          ((UnionType 21) (UnionType 39)))
+                                         (un_sig_methods ()) (un_sig_base_id 44))
+                                        ((un_sig_cases
+                                          ((StructType 31) (StructType 35)))
+                                         (un_sig_methods ()) (un_sig_base_id 38))
+                                        ((un_sig_cases
+                                          ((StructType 14) (StructType 18)))
+                                         (un_sig_methods ()) (un_sig_base_id 20)))))))
+
+    (Ok
+     ((bindings
+       ((x
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns IntegerType)))
+            (function_impl (Fn (Return (Value (Integer 1)))))))))))
+      (result (Integer 1)) (structs ()) (type_counter <opaque>)
+      (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (5
+        (((un_sig_cases ((StructType 59) (StructType 76))) (un_sig_methods ())
+          (un_sig_base_id 77))
+         ((un_sig_cases ((StructType 55))) (un_sig_methods ())
+          (un_sig_base_id 60))
+         ((un_sig_cases ((UnionType 21) (UnionType 39))) (un_sig_methods ())
+          (un_sig_base_id 44))
+         ((un_sig_cases ((StructType 31) (StructType 35))) (un_sig_methods ())
+          (un_sig_base_id 38))
+         ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
+          (un_sig_base_id 20)))))))
+    (Ok
+                                    ((bindings
+                                      ((T (Value (Type (StructType 84))))))
+                                     (structs
+                                      ((84
+                                        ((struct_fields ())
+                                         (struct_details
+                                          ((uty_methods ()) (uty_impls ())
+                                           (uty_id 84) (uty_base_id 83)))))))
+                                     (type_counter <opaque>)
+                                     (memoized_fcalls <opaque>)
+                                     (struct_signs (0 ()))
+                                     (union_signs
+                                      (5
+                                       (((un_sig_cases
+                                          ((StructType 59) (StructType 76)))
+                                         (un_sig_methods ()) (un_sig_base_id 77))
+                                        ((un_sig_cases ((StructType 55)))
+                                         (un_sig_methods ()) (un_sig_base_id 60))
+                                        ((un_sig_cases
+                                          ((UnionType 21) (UnionType 39)))
+                                         (un_sig_methods ()) (un_sig_base_id 44))
+                                        ((un_sig_cases
+                                          ((StructType 31) (StructType 35)))
+                                         (un_sig_methods ()) (un_sig_base_id 38))
+                                        ((un_sig_cases
+                                          ((StructType 14) (StructType 18)))
+                                         (un_sig_methods ()) (un_sig_base_id 20))))))) |}]
+
 let%expect_test "scope resolution" =
   let source = {|
     let T = Int(257);

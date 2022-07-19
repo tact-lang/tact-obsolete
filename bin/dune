@@ -3,4 +3,4 @@
  (package tact)
  (name main)
  (modules main)
- (libraries tact))
+ (libraries tact linenoise base))
