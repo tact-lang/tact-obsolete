@@ -6,6 +6,7 @@ module Show = Show.Make (Config)
 module Syntax = Syntax.Make (Config)
 module Parser = Parser.Make (Config)
 module Codegen_func = Codegen_func.Make (Config)
+module Builtin = Builtin.Make (Config)
 
 open struct
   open Printf

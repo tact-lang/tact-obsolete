@@ -2,6 +2,7 @@ open Base
 module Show = Tact.Compiler.Show
 module Lang = Tact.Compiler.Lang
 module Syntax = Tact.Compiler.Syntax
+module Builtin = Tact.Compiler.Builtin
 
 let interpret_file argv =
   let filename = Array.get argv 1 in
@@ -13,7 +14,13 @@ let interpret_file argv =
 
 let prompt = "# "
 
-let rec repl ?(program = Lang.default_program ()) ?(prompt = prompt) () =
+let default_program () =
+  let program = Lang.default_program () in
+  Result.ok_or_failwith
+  @@ Tact.Compiler.compile_to_ir ~filename:"std.tact" ~prev_program:program
+       Builtin.std
+
+let rec repl ?(program = default_program ()) ?(prompt = prompt) () =
   match LNoise.linenoise prompt with
   | None ->
       ()
