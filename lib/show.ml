@@ -51,6 +51,14 @@ functor
           pp_print_string f b
       | Type t ->
           pp_type f t
+      | Bool true ->
+          pp_print_string f "true"
+      | Bool false ->
+          pp_print_string f "false"
+      | String s ->
+          pp_print_string f {|"|} ;
+          pp_print_string f s ;
+          pp_print_string f {|"|}
       | _ ->
           pp_print_string f "<anonymous>"
 
