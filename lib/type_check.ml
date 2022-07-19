@@ -175,8 +175,8 @@ functor
           | StructType s -> (
               let from_intf_ =
                 let inter =
-                  new interpreter (program, current_bindings, errors, functions)
-                    (fun _ _ _ _ _ f -> f)
+                  new interpreter (make_ctx program current_bindings functions)
+                    errors (fun _ f -> f)
                 in
                 Value
                   (inter#interpret_fc
@@ -205,8 +205,8 @@ functor
           | UnionType u -> (
               let from_intf_ =
                 let inter =
-                  new interpreter (program, current_bindings, errors, functions)
-                    (fun _ _ _ _ _ f -> f)
+                  new interpreter (make_ctx program current_bindings functions)
+                    errors (fun _ f -> f)
                 in
                 Value
                   (inter#interpret_fc

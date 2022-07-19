@@ -145,8 +145,8 @@ functor
                     let fc =
                       let inter =
                         new interpreter
-                          (program, current_bindings, errors, functions)
-                          s#partial_evaluate_fn
+                          (make_ctx program current_bindings functions)
+                          errors s#partial_evaluate_fn
                       in
                       let fc = inter#interpret_fc fc in
                       fc
@@ -333,8 +333,8 @@ functor
           | true ->
               let inter =
                 new interpreter
-                  (program, current_bindings, errors, functions)
-                  s#partial_evaluate_fn
+                  (make_ctx program current_bindings functions)
+                  errors s#partial_evaluate_fn
               in
               let value' = inter#interpret_expr expr_dummy in
               Value value'
@@ -944,10 +944,8 @@ functor
                      span = case.span } );
             span = case.span }
 
-        method private partial_evaluate_fn p b u upu funcs f =
-          let partial_evaluator =
-            new partial_evaluator p b u upu funcs errors
-          in
+        method private partial_evaluate_fn ctx f =
+          let partial_evaluator = new partial_evaluator ctx errors in
           partial_evaluator#visit_function_ () f
       end
   end

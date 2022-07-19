@@ -34,32 +34,27 @@ functor
           p.memoized_fcalls <- ((f, args), res) :: p.memoized_fcalls ;
           res
 
+    type ctx =
+      { program : program;
+        mutable scope : tbinding list list;
+        mutable updated_items : (int * int) list;
+        mutable updated_unions : (int * int) list;
+        mutable functions : int }
+
+    let make_ctx program scope functions =
+      {program; scope; updated_items = []; updated_unions = []; functions}
+
     (*TODO: type checks for arguments*)
-    class interpreter
-      ((program, bindings, errors, functions) :
-        program * tbinding list list * _ errors * int )
-      ?(updated_items : (int * int) list = [])
-      ?(updated_unions : (int * int) list = [])
-      (partial_evaluate :
-        program ->
-        tbinding list list ->
-        (int * int) list ->
-        (int * int) list ->
-        int ->
-        function_ ->
-        function_ ) =
+    class interpreter (ctx : ctx) (errors : _ errors)
+      (partial_evaluate : ctx -> function_ -> function_) =
       object (self)
-        val mutable scope = bindings
+        val mutable ctx = ctx
 
         val mutable return = Void
 
         val mutable adding_structs = []
 
         val mutable errors = errors
-
-        val mutable updated_items : (int * int) list = updated_items
-
-        val mutable updated_unions : (int * int) list = updated_unions
 
         method interpret_stmt_list : stmt list -> value =
           fun stmts ->
@@ -80,14 +75,10 @@ functor
                 List.zip (List.map binds ~f:(fun (name, _) -> name)) values
               with
               | Ok args_scope ->
-                  let prev_scope = scope in
-                  scope <-
-                    List.map args_scope ~f:(fun (name, v) ->
-                        (name, Comptime v) )
-                    :: scope ;
-                  let output = self#interpret_stmt_list rest in
-                  scope <- prev_scope ;
-                  output
+                  self#with_vars
+                    (List.map args_scope ~f:(fun (name, v) ->
+                         (name, Comptime v) ) )
+                    (fun _ -> self#interpret_stmt_list rest)
               | _ ->
                   errors#report `Error `ArgumentNumberMismatch () ;
                   Void )
@@ -110,11 +101,7 @@ functor
                         { value = Value (self#interpret_expr expr);
                           span = new_name.span } ) )
               in
-              let prev_scope = scope in
-              scope <- args_scope :: scope ;
-              let output = self#interpret_stmt_list rest in
-              scope <- prev_scope ;
-              output
+              self#with_vars args_scope (fun _ -> self#interpret_stmt_list rest)
           | Break stmt ->
               self#interpret_stmt stmt []
           | Return expr ->
@@ -137,7 +124,7 @@ functor
               | value ->
                   errors#report `Error
                     (`UnexpectedType
-                      (type_of program
+                      (type_of ctx.program
                          {value = Value value; span = if_condition.span} ) )
                     () ;
                   Void )
@@ -146,7 +133,7 @@ functor
               match cond with
               | UnionVariant (v, _) -> (
                   let v_ty =
-                    type_of program
+                    type_of ctx.program
                       {value = Value v; span = switch_condition.span}
                   in
                   let correct_branch =
@@ -155,18 +142,14 @@ functor
                   in
                   match correct_branch with
                   | Some branch ->
-                      let prev_scope = scope in
-                      scope <-
+                      let new_scope =
                         [ ( branch.value.branch_var,
                             Comptime
                               {value = Value v; span = switch_condition.span} )
                         ]
-                        :: scope ;
-                      let res =
-                        self#interpret_stmt branch.value.branch_stmt []
                       in
-                      scope <- prev_scope ;
-                      res
+                      self#with_vars new_scope (fun _ ->
+                          self#interpret_stmt branch.value.branch_stmt [] )
                   | None ->
                       Void )
               | _ ->
@@ -192,7 +175,7 @@ functor
                   | _ ->
                       raise InternalCompilerError
                 in
-                match Program.find_impl_intf program intf_def ty with
+                match Program.find_impl_intf ctx.program intf_def ty with
                 | Some impl ->
                     let method_ =
                       List.find_map_exn impl.impl_methods
@@ -219,7 +202,7 @@ functor
                   | _ ->
                       raise InternalCompilerError
                 in
-                match Program.find_impl_intf program st_sig_call_def ty with
+                match Program.find_impl_intf ctx.program st_sig_call_def ty with
                 | Some impl ->
                     let method_ =
                       List.find_map_exn impl.impl_methods
@@ -256,7 +239,7 @@ functor
               | other ->
                   errors#report `Error
                     (`UnexpectedType
-                      (type_of program
+                      (type_of ctx.program
                          {value = Value other; span = struct_.span} ) )
                     () ;
                   Void )
@@ -278,12 +261,12 @@ functor
                   List.map mk_struct_fields ~f:(fun (name, field_type) ->
                       ( name,
                         { field_type =
-                            expr_to_type program
+                            expr_to_type ctx.program
                               { value = Value (self#interpret_expr field_type);
                                 span = field_type.span } } ) )
                 in
-                let struct_id = program.type_counter in
-                program.type_counter <- program.type_counter + 1 ;
+                let struct_id = ctx.program.type_counter in
+                ctx.program.type_counter <- ctx.program.type_counter + 1 ;
                 let struct_ty = struct_id in
                 let struct_ty_expr =
                   {value = Value (Type (StructType struct_ty)); span = expr.span}
@@ -297,11 +280,12 @@ functor
                       {value = mk_struct_id; span = mk_struct_span};
                     tensor = false }
                 in
-                let prev_updated_items = updated_items in
-                updated_items <- (mk_struct_id, struct_id) :: updated_items ;
+                let prev_updated_items = ctx.updated_items in
+                ctx.updated_items <-
+                  (mk_struct_id, struct_id) :: ctx.updated_items ;
                 let self_name = {value = "Self"; span = mk_struct_span} in
                 let _ =
-                  Program.with_struct program struct_ (fun _ ->
+                  Program.with_struct ctx.program struct_ (fun _ ->
                       let struct_methods =
                         List.map mk_methods ~f:(fun (name, fn) ->
                             let output =
@@ -341,17 +325,17 @@ functor
                             {value = mk_struct_id; span = mk_struct_span};
                           tensor = false } )
                 in
-                updated_items <- prev_updated_items ;
+                ctx.updated_items <- prev_updated_items ;
                 Type (StructType struct_ty)
             | MkUnionDef mk_union ->
                 let cases =
                   List.map mk_union.mk_cases ~f:(fun ex ->
                       let ty = self#interpret_expr ex in
-                      expr_to_type program {value = Value ty; span = ex.span} )
+                      expr_to_type ctx.program {value = Value ty; span = ex.span} )
                   |> self#check_unions_for_doubled_types expr.span
                 in
                 let union =
-                  Program.with_union_id program
+                  Program.with_union_id ctx.program
                     (fun id ->
                       { cases =
                           Discriminator.LocalDiscriminators
@@ -422,7 +406,7 @@ functor
                             |> fun sign' -> {value = sign'; span = sign.span} ) )
                   }
                 in
-                let intf_ty = Program.insert_interface program intf in
+                let intf_ty = Program.insert_interface ctx.program intf in
                 Type intf_ty
             | MkFunction f ->
                 Function (self#interpret_function f)
@@ -434,14 +418,14 @@ functor
                 Void
 
         method interpret_struct_sig sign =
-          match List.Assoc.find updated_items sign ~equal:equal_int with
+          match List.Assoc.find ctx.updated_items sign ~equal:equal_int with
           | Some new_id ->
               StructType new_id
           | None ->
               StructSig sign
 
         method interpret_union_sig sign =
-          match List.Assoc.find updated_unions sign ~equal:equal_int with
+          match List.Assoc.find ctx.updated_unions sign ~equal:equal_int with
           | Some new_id ->
               UnionType new_id
           | None ->
@@ -482,10 +466,7 @@ functor
             | value ->
                 value
 
-        method interpret_function : function_ -> function_ =
-          fun f ->
-            partial_evaluate program scope updated_items updated_unions
-              functions f
+        method interpret_function = partial_evaluate ctx
 
         method interpret_fc : function_call -> value =
           fun (func, args) ->
@@ -503,7 +484,8 @@ functor
               | _ ->
                   Error mk_err
             in
-            get_memoized_or_execute program (f, args') ~execute:(fun f args' ->
+            get_memoized_or_execute ctx.program (f, args')
+              ~execute:(fun f args' ->
                 match f with
                 | Function f -> (
                   match f.value with
@@ -513,26 +495,24 @@ functor
                       let args_scope = args_to_list function_params args' in
                       match args_scope with
                       | Ok args_scope ->
-                          let prev_scope = scope in
-                          scope <-
+                          let new_scope =
                             List.map args_scope ~f:(fun (name, ex) ->
                                 ( name,
                                   Comptime {value = Value ex; span = f.span} ) )
-                            :: scope ;
-                          let output = self#interpret_stmt function_impl [] in
-                          scope <- prev_scope ;
-                          output
+                          in
+                          self#with_vars new_scope (fun _ ->
+                              self#interpret_stmt function_impl [] )
                       | Error _ ->
                           Void )
                   | {function_impl = BuiltinFn (function_impl, _); _} ->
-                      let value = function_impl program args' in
+                      let value = function_impl ctx.program args' in
                       value )
                 | _ ->
                     Void )
 
         method private find_ref : string -> expr option =
           fun ref ->
-            match find_in_scope ref scope with
+            match find_in_scope ref ctx.scope with
             | Some (Comptime ex) ->
                 Some ex
             | Some (Runtime ty) ->
@@ -555,10 +535,10 @@ functor
 
         method private with_vars : 'a. tbinding list -> (unit -> 'a) -> 'a =
           fun vars f ->
-            let prev_scope = scope in
-            scope <- vars :: scope ;
+            let prev_scope = ctx.scope in
+            ctx.scope <- vars :: ctx.scope ;
             let output = f () in
-            scope <- prev_scope ;
+            ctx.scope <- prev_scope ;
             output
       end
   end

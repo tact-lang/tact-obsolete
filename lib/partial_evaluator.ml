@@ -12,15 +12,13 @@ functor
 
     open Lang_types.Make (Config)
 
-    class ['s] partial_evaluator (program : program)
-      (bindings : tbinding list list) (updated_items : (int * int) list)
-      (updated_unions : (int * int) list) (functions : int) (errors : _) =
+    class ['s] partial_evaluator (ctx : ctx) (errors : _) =
       object (self : 's)
         inherit [_] map as super
 
-        val mutable scope = bindings
-
-        val mutable functions = functions
+        (* Make a deep copy of the ctx. Local values should not flow into
+           code that call partial_evaluator. *)
+        val ctx = {ctx with program = ctx.program}
 
         method! visit_InvalidType _ ex =
           print_sexp (sexp_of_string "invalid type") ;
@@ -28,7 +26,7 @@ functor
           raise InternalCompilerError
 
         method! visit_Reference env (ref, ty) =
-          match find_in_scope ref.value scope with
+          match find_in_scope ref.value ctx.scope with
           | Some (Comptime ex) ->
               Value
                 (self#with_interpreter env (fun inter ->
@@ -37,12 +35,15 @@ functor
               Reference (ref, self#visit_type_ env ty)
           | None ->
               print_sexp (sexp_of_string ref.value) ;
-              print_sexp (sexp_of_list (sexp_of_list sexp_of_tbinding) scope) ;
+              print_sexp
+                (sexp_of_list (sexp_of_list sexp_of_tbinding) ctx.scope) ;
               raise InternalCompilerError
 
         method! visit_type_ env ty =
           let ty = super#visit_type_ env ty in
-          if is_immediate_expr scope program (builtin_located @@ Value (Type ty))
+          if
+            is_immediate_expr ctx.scope ctx.program
+              (builtin_located @@ Value (Type ty))
           then self#with_interpreter env (fun inter -> inter#interpret_type ty)
           else self#unwrap_expr_types ty
 
@@ -67,15 +68,15 @@ functor
           in
           let vars_scope =
             List.map vars' ~f:(fun (name, ex) ->
-                (name, Runtime (type_of program ex)) )
+                (name, Runtime (type_of ctx.program ex)) )
           in
-          scope <- vars_scope :: scope ;
+          ctx.scope <- vars_scope :: ctx.scope ;
           Let vars'
 
         method! visit_DestructuringLet _env let_ =
-          match type_of program let_.destructuring_let_expr with
+          match type_of ctx.program let_.destructuring_let_expr with
           | StructType id ->
-              let struct_ = Program.get_struct program id in
+              let struct_ = Program.get_struct ctx.program id in
               (* Check if field names are correct *)
               List.iter let_.destructuring_let ~f:(fun (name, name2) ->
                   if
@@ -110,7 +111,7 @@ functor
                     |> Option.value_exn
                     |> fun {field_type} -> (new_name, Runtime field_type) )
               in
-              scope <- vars :: scope ;
+              ctx.scope <- vars :: ctx.scope ;
               DestructuringLet let_
           | _ ->
               raise InternalCompilerError
@@ -133,7 +134,7 @@ functor
           let sign =
             self#visit_function_signature env f.value.function_signature
           in
-          functions <- functions + 1 ;
+          ctx.functions <- ctx.functions + 1 ;
           let args =
             List.map sign.value.function_params ~f:(fun (name, ty) ->
                 (name, Runtime ty) )
@@ -143,7 +144,7 @@ functor
                 let body = self#visit_function_impl env f.value.function_impl in
                 {function_signature = sign; function_impl = body} )
           in
-          functions <- functions - 1 ;
+          ctx.functions <- ctx.functions - 1 ;
           {value = out; span = f.span}
 
         method! visit_IntfMethodCall env call =
@@ -156,7 +157,7 @@ functor
                 false
           in
           match
-            is_immediate_expr scope program intf_instance
+            is_immediate_expr ctx.scope ctx.program intf_instance
             && not (is_dependent intf_instance.value)
           with
           | true -> (
@@ -170,7 +171,9 @@ functor
                 | _ ->
                     raise InternalCompilerError
               in
-              match Program.find_impl_intf program call.intf_def intf_ty with
+              match
+                Program.find_impl_intf ctx.program call.intf_def intf_ty
+              with
               | Some impl ->
                   let method_ =
                     List.find_map_exn impl.impl_methods ~f:(fun (name, impl) ->
@@ -189,7 +192,7 @@ functor
         val mutable visited_signs : (int * int) list = []
 
         method! visit_StructSig _ sign_id =
-          match List.Assoc.find updated_items sign_id ~equal:equal_int with
+          match List.Assoc.find ctx.updated_items sign_id ~equal:equal_int with
           | Some new_id ->
               StructType new_id
           | None ->
@@ -206,7 +209,7 @@ functor
           mk
 
         method! visit_UnionSig _ sign_id =
-          match List.Assoc.find updated_unions sign_id ~equal:equal_int with
+          match List.Assoc.find ctx.updated_unions sign_id ~equal:equal_int with
           | Some new_id ->
               UnionType new_id
           | None ->
@@ -226,7 +229,7 @@ functor
           let f = self#visit_expr env f in
           let args = self#visit_list self#visit_expr env args in
           if
-            is_immediate_expr scope program
+            is_immediate_expr ctx.scope ctx.program
               {value = FunctionCall (f, args); span = f.span}
           then
             Value
@@ -248,7 +251,7 @@ functor
                 false
           in
           match
-            is_immediate_expr scope program st_sig_instance
+            is_immediate_expr ctx.scope ctx.program st_sig_instance
             && not (is_dependent st_sig_instance.value)
           with
           | true ->
@@ -262,7 +265,7 @@ functor
                 | _ ->
                     raise InternalCompilerError
               in
-              let methods = Program.methods_of program st_sig_ty in
+              let methods = Program.methods_of ctx.program st_sig_ty in
               let method_ =
                 List.find_map_exn methods ~f:(fun (name, fn) ->
                     if equal_string name.value method_name then Some fn
@@ -281,10 +284,10 @@ functor
 
         method private with_vars : 'a. _ -> (unit -> 'a) -> 'a =
           fun vars f ->
-            let prev_vars = scope in
-            scope <- vars :: scope ;
+            let prev_vars = ctx.scope in
+            ctx.scope <- vars :: ctx.scope ;
             let out = f () in
-            scope <- prev_vars ;
+            ctx.scope <- prev_vars ;
             out
 
         (* FIXME: This function should create new instance of the partial_evaluator
@@ -293,10 +296,7 @@ functor
         method private with_interpreter
             : 'env 'a. 'env -> (interpreter -> 'a) -> 'a =
           fun _env f ->
-            let inter =
-              new interpreter (program, scope, errors, 0) ~updated_items
-                (fun _ _ _ _ _ f -> f)
-            in
+            let inter = new interpreter ctx errors (fun _ f -> f) in
             f inter
       end
   end
