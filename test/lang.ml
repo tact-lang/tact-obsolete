@@ -2187,48 +2187,77 @@ let%expect_test "Self type resolution in methods" =
          ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
           (un_sig_base_id 20))))))) |}]
 
-(* let%expect_test "union method access" =
-   let source =
-     {|
-       union Foo {
-         case Bool
-         fn bar(self: Self, i: Integer) {
-            i
-         }
-       }
-       fn make_foo(foo: Foo) -> Foo {
-         foo
-       }
-       let foo = make_foo(true);
-       let res = foo.bar(1);
-     |}
-   in
-   pp_compile source ; [%expect.unreachable]
-   [@@expect.uncaught_exn
-     {|
-   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
-      This is strongly discouraged as backtraces are fragile.
-      Please change this test to not include a backtrace. *)
-
-   (Not_found_s "List.find_map_exn: not found")
-   Raised at Base__List.find_map_exn.find_map_exn in file "src/list.ml", line 289, characters 14-29
-   Called from Tact__Lang.Make.constructor#build_method_call.make_call in file "lib/lang.ml", line 415, characters 14-49
-   Called from Tact__Syntax.Make.visitor#visit_MethodCall in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 319, characters 22-54
-   Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
-   Called from Tact__Syntax.Make.visitor#visit_binding in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
-   Called from Tact__Syntax.Make.visitor#visit_struct_constructor.(fun) in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
-   Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Shared.build_program in file "test/shared.ml", line 62, characters 11-41
-   Called from Shared.pp_compile in file "test/shared.ml", line 80, characters 2-88
-   Called from Tact_tests__Lang.(fun) in file "test/lang.ml", line 1882, characters 2-19
-   Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}] *)
+let%expect_test "union method access" =
+  let source =
+    {|
+      union Foo {
+        case Bool
+        fn bar(self: Self, i: Integer) {
+          i
+        }
+      }
+      fn make_foo(foo: Foo) -> Foo {
+        foo
+      }
+      let foo = make_foo(true);
+      let res = foo.bar(1);
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((res (Value (Integer 1))) (foo (Value (UnionVariant ((Bool true) 84))))
+        (make_foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((foo (UnionType 84))))
+              (function_returns (UnionType 84))))
+            (function_impl (Fn (Return (Reference (foo (UnionType 84))))))))))
+        (Foo (Value (Type (UnionType 84))))))
+      (structs ())
+      (unions
+       ((84
+         ((cases ((BoolType (Discriminator 0))))
+          (union_details
+           ((uty_methods
+             ((bar
+               ((function_signature
+                 ((function_params ((self (UnionType 84)) (i IntegerType)))
+                  (function_returns IntegerType)))
+                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
+            (uty_impls
+             (((impl_interface 85)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((v BoolType)))
+                     (function_returns (UnionType 83))))
+                   (function_impl
+                    (Fn
+                     (Return (MakeUnionVariant ((Reference (v BoolType)) 84))))))))))))
+            (uty_id 84) (uty_base_id 83)))))))
+      (interfaces
+       ((85
+         ((interface_methods
+           ((from
+             ((function_params ((from BoolType))) (function_returns SelfType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (6
+        (((un_sig_cases (BoolType)) (un_sig_methods ()) (un_sig_base_id 83))
+         ((un_sig_cases ((StructType 59) (StructType 76))) (un_sig_methods ())
+          (un_sig_base_id 77))
+         ((un_sig_cases ((StructType 55))) (un_sig_methods ())
+          (un_sig_base_id 60))
+         ((un_sig_cases ((UnionType 21) (UnionType 39))) (un_sig_methods ())
+          (un_sig_base_id 44))
+         ((un_sig_cases ((StructType 31) (StructType 35))) (un_sig_methods ())
+          (un_sig_base_id 38))
+         ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
+          (un_sig_base_id 20))))))) |}]
 
 let%expect_test "union type method access" =
   let source =
@@ -2279,7 +2308,7 @@ let%expect_test "union type method access" =
                      (function_returns (UnionType 83))))
                    (function_impl
                     (Fn
-                     (Return (MakeUnionVariant ((Reference (v BoolType)) 83))))))))))))
+                     (Return (MakeUnionVariant ((Reference (v BoolType)) 84))))))))))))
             (uty_id 84) (uty_base_id 83)))))))
       (interfaces
        ((85
@@ -3191,8 +3220,8 @@ let%expect_test "union variants constructing" =
           (UnionVariant
            ((Struct
              ((Value (Type (StructType 52))) ((value (Value (Integer 1))))))
-            83))))
-        (a (Value (UnionVariant ((Integer 10) 83))))
+            84))))
+        (a (Value (UnionVariant ((Integer 10) 84))))
         (test
          (Value
           (Function
@@ -3217,7 +3246,7 @@ let%expect_test "union variants constructing" =
                      (function_returns (UnionType 83))))
                    (function_impl
                     (Fn
-                     (Return (MakeUnionVariant ((Reference (v IntegerType)) 83))))))))))
+                     (Return (MakeUnionVariant ((Reference (v IntegerType)) 84))))))))))
               ((impl_interface 85)
                (impl_methods
                 ((from
@@ -3227,7 +3256,7 @@ let%expect_test "union variants constructing" =
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 52))) 83))))))))))))
+                      (MakeUnionVariant ((Reference (v (StructType 52))) 84))))))))))))
             (uty_id 84) (uty_base_id 83)))))))
       (interfaces
        ((85
@@ -3338,18 +3367,16 @@ let%expect_test "unions duplicate variant" =
                      (function_returns (UnionType 83))))
                    (function_impl
                     (Fn
-                     (Return (MakeUnionVariant ((Reference (v IntegerType)) 83))))))))))
+                     (Return (MakeUnionVariant ((Reference (v IntegerType)) 86))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
                   ((function_signature
-                    ((function_params ((v (ExprType (Reference (T (TypeN 0)))))))
+                    ((function_params ((v IntegerType)))
                      (function_returns (UnionType 83))))
                    (function_impl
                     (Fn
-                     (Return
-                      (MakeUnionVariant
-                       ((Reference (v (ExprType (Reference (T (TypeN 0)))))) 83))))))))))))
+                     (Return (MakeUnionVariant ((Reference (v IntegerType)) 86))))))))))))
             (uty_id 86) (uty_base_id 83)))))
         (84
          ((cases
@@ -3366,18 +3393,18 @@ let%expect_test "unions duplicate variant" =
                      (function_returns (UnionType 83))))
                    (function_impl
                     (Fn
-                     (Return (MakeUnionVariant ((Reference (v IntegerType)) 83))))))))))
+                     (Return (MakeUnionVariant ((Reference (v IntegerType)) 84))))))))))
               ((impl_interface 85)
                (impl_methods
                 ((from
                   ((function_signature
-                    ((function_params ((v (ExprType (Reference (T (TypeN 0)))))))
+                    ((function_params ((v (BuiltinType Builder))))
                      (function_returns (UnionType 83))))
                    (function_impl
                     (Fn
                      (Return
                       (MakeUnionVariant
-                       ((Reference (v (ExprType (Reference (T (TypeN 0)))))) 83))))))))))))
+                       ((Reference (v (BuiltinType Builder))) 84))))))))))))
             (uty_id 84) (uty_base_id 83)))))))
       (interfaces
        ((85
@@ -3590,7 +3617,7 @@ let%expect_test "unions" =
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 83))) 85))))))))))
+                      (MakeUnionVariant ((Reference (v (StructType 83))) 86))))))))))
               ((impl_interface 88)
                (impl_methods
                 ((from
@@ -3600,7 +3627,7 @@ let%expect_test "unions" =
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 50))) 85))))))))))))
+                      (MakeUnionVariant ((Reference (v (StructType 50))) 86))))))))))))
             (uty_id 86) (uty_base_id 85)))))))
       (interfaces
        ((88
@@ -3776,7 +3803,7 @@ let%expect_test "switch statement" =
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 52))) 83))))))))))
+                      (MakeUnionVariant ((Reference (v (StructType 52))) 84))))))))))
               ((impl_interface 86)
                (impl_methods
                 ((from
@@ -3786,7 +3813,7 @@ let%expect_test "switch statement" =
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 50))) 83))))))))))))
+                      (MakeUnionVariant ((Reference (v (StructType 50))) 84))))))))))))
             (uty_id 84) (uty_base_id 83)))))))
       (interfaces
        ((86
@@ -4279,7 +4306,8 @@ let%expect_test "destructuring let with missing fields" =
   pp_compile source ;
   [%expect
     {|
-    (((MissingField (84 x)) (MissingField (84 z)))
+    (((MissingField (84 x)) (MissingField (84 z)) (MissingField (84 x))
+      (MissingField (84 z)))
      ((bindings
        ((test
          (Value

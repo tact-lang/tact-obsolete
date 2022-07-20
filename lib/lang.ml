@@ -482,6 +482,11 @@ functor
               make_call (StructType st) ~mk_args:(fun args ->
                   in_receiver :: args )
           | UnionType ut ->
+              (* print_sexp @@ sexp_of_int ut ;
+                 print_sexp @@ sexp_of_string "|" ;
+                 print_sexp @@ sexp_of_expr in_receiver ;
+                 print_sexp @@ sexp_of_string "|" ; *)
+              (* print_sexp @@ sexp_of_program program ; *)
               make_call (UnionType ut) ~mk_args:(fun args ->
                   in_receiver :: args )
           | ExprType ex -> (

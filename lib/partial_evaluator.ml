@@ -225,6 +225,28 @@ functor
           in
           mk
 
+        method! visit_MakeUnionVariant env (expr, uid) =
+          let expr = self#visit_expr env expr in
+          let new_id =
+            match List.Assoc.find ctx.updated_items uid ~equal:equal_int with
+            | Some new_id ->
+                new_id
+            | None ->
+                uid
+          in
+          MakeUnionVariant (expr, new_id)
+
+        method! visit_UnionVariant env (expr, uid) =
+          let expr = self#visit_value env expr in
+          let new_id =
+            match List.Assoc.find ctx.updated_items uid ~equal:equal_int with
+            | Some new_id ->
+                new_id
+            | None ->
+                uid
+          in
+          UnionVariant (expr, new_id)
+
         method! visit_FunctionCall env (f, args) =
           let f = self#visit_expr env f in
           let args = self#visit_list self#visit_expr env args in

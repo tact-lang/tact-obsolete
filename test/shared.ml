@@ -55,18 +55,22 @@ functor
 
     let build_program ?(errors = make_errors Show.show_error)
         ?(prev_program = Lang.default_program ()) ?(strip_defaults = true)
-        ~codegen p =
-      let std =
-        let c = new Lang.constructor ~program:prev_program errors in
-        let p' = c#visit_program () (parse_program Builtin.std) in
-        p'
+        ~include_std ~codegen p =
+      let prev_prog =
+        match include_std with
+        | true ->
+            let c = new Lang.constructor ~program:prev_program errors in
+            let p' = c#visit_program () (parse_program Builtin.std) in
+            p'
+        | false ->
+            prev_program
       in
-      (* This will make a deep copy of the std. Lang.constructor mutates input program,
-         so we need deep copy of an std if we want to strip std bindings later. *)
-      let std_copy = {std with bindings = std.bindings} in
-      let p' = compile_pass p std_copy errors in
+      (* This will make a deep copy. Lang.constructor mutates input program,
+         so we need deep copy if we want to strip bindings later. *)
+      let prev_prog_copy = {prev_prog with bindings = prev_prog.bindings} in
+      let p' = compile_pass p prev_prog_copy errors in
       let p'' =
-        if strip_defaults then strip ~program:p' ~previous:std else p'
+        if strip_defaults then strip ~program:p' ~previous:prev_prog else p'
       in
       errors#to_result p''
       |> Result.map_error ~f:(fun errors ->
@@ -83,10 +87,11 @@ functor
       pp_sexp (Result.sexp_of_t Lang.sexp_of_program sexp_of_errors e)
 
     let pp_compile ?(prev_program = Lang.default_program ())
-        ?(strip_defaults = true)
+        ?(strip_defaults = true) ?(include_std = true)
         ?(show_errors = fun x _ -> pp_sexp (sexp_of_errors x)) s =
       parse_program s
-      |> build_program ~prev_program ~strip_defaults ~codegen:(fun x -> x)
+      |> build_program ~prev_program ~strip_defaults ~include_std
+           ~codegen:(fun x -> x)
       |> fun res ->
       ( match res with
       | Ok t ->
@@ -96,10 +101,11 @@ functor
       Caml.print_newline ()
 
     let pp_codegen ?(prev_program = Lang.default_program ())
-        ?(strip_defaults = false) s =
+        ?(strip_defaults = false) ?(include_std = true) s =
       let _ =
         parse_program s
-        |> build_program ~prev_program ~strip_defaults ~codegen:Codegen.codegen
+        |> build_program ~prev_program ~strip_defaults ~include_std
+             ~codegen:Codegen.codegen
         |> Result.map ~f:(Func.pp_program Caml.Format.std_formatter)
         |> Result.map_error ~f:(fun e -> pp_sexp (sexp_of_errors e))
       in
@@ -109,7 +115,7 @@ functor
 
     let compile s =
       parse_program s
-      |> build_program ~codegen:(fun x -> x)
+      |> build_program ~codegen:(fun x -> x) ~include_std:true
       |> Result.map_error ~f:(fun (errs, p) -> Exn (errs, p))
       |> Result.ok_exn
   end

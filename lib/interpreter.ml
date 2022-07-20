@@ -417,6 +417,8 @@ functor
                         ( n,
                           {value = Value (self#interpret_expr f); span = f.span}
                         ) ) )
+            | Function f ->
+                Function (self#interpret_function f)
             | value ->
                 value
 
