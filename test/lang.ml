@@ -4444,9 +4444,9 @@ let%expect_test "type that does not implement interface passed to the \
          ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
           (un_sig_base_id 20))))))) |}]
 
-(* let%expect_test "struct signatures" =
-   let source =
-     {|
+let%expect_test "struct signatures" =
+  let source =
+    {|
        struct Int2(bits: Integer) {
          val value: Integer
          fn new(i: Integer) -> Self {
@@ -4461,45 +4461,132 @@ let%expect_test "type that does not implement interface passed to the \
        let five = extract_value(10)(Int2(10).new(5));
        let zero = extract_value(20)(Int2(20).new(0));
      |}
-   in
-   pp_compile source ; [%expect.unreachable]
-   [@@expect.uncaught_exn
-     {|
-   (* CR expect_test_collector: This test expectation appears to contain a backtrace.
-      This is strongly discouraged as backtraces are fragile.
-      Please change this test to not include a backtrace. *)
-
-   (Tact.Errors.InternalCompilerError)
-   Raised at Tact__Interpreter.interpreter#interpret_type in file "lib/interpreter.ml", line 474, characters 12-39
-   Called from Tact__Lang_types.map#visit_Type in file "lib/lang_types.ml", line 89, characters 0-1023
-   Called from Tact__Lang_types.map#visit_Value in file "lib/lang_types.ml", line 89, characters 0-1023
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
-   Called from Tact__Partial_evaluator.partial_evaluator#visit_FunctionCall in file "lib/partial_evaluator.ml", line 215, characters 17-57
-   Called from Tact__Lang_types.map#visit_ExprType in file "lib/lang_types.ml", line 89, characters 0-1023
-   Called from Tact__Partial_evaluator.partial_evaluator#visit_type_ in file "lib/partial_evaluator.ml", line 34, characters 15-39
-   Called from Tact__Lang_types.map#visit_function_signature.(fun) in file "lib/lang_types.ml", line 89, characters 0-1023
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
-   Called from Tact__Lang_types.map#visit_function_signature in file "lib/lang_types.ml", line 89, characters 0-1023
-   Called from Tact__Partial_evaluator.partial_evaluator#visit_function_ in file "lib/partial_evaluator.ml", line 113, characters 17-71
-   Called from Tact__Interpreter.interpreter#interpret_expr in file "lib/interpreter.ml", line 446, characters 21-48
-   Called from Tact__Interpreter.interpreter#interpret_fc.(fun) in file "lib/interpreter.ml", line 532, characters 37-64
-   Called from Tact__Interpreter.get_memoized_or_execute in file "lib/interpreter.ml", line 113, characters 16-30
-   Called from Tact__Lang.Make.constructor#build_FunctionCall in file "lib/lang.ml", line 149, characters 31-52
-   Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 319, characters 22-54
-   Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
-   Called from Tact__Syntax.Make.visitor#visit_function_call in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Tact__Syntax.Make.visitor#visit_FunctionCall in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Tact__Lang.Make.constructor#visit_expr in file "lib/lang.ml", line 319, characters 22-54
-   Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
-   Called from Tact__Syntax.Make.visitor#visit_binding in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
-   Called from Tact__Syntax.Make.visitor#visit_struct_constructor.(fun) in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Tact__Syntax.Make.base_visitor#visit_located in file "lib/syntax.ml", line 19, characters 45-62
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 264, characters 18-25
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
-   Called from VisitorsRuntime.map#visit_list in file "runtime/VisitorsRuntime.ml", line 265, characters 15-41
-   Called from Tact__Syntax.Make.visitor#visit_program in file "lib/syntax.ml", line 22, characters 4-1023
-   Called from Shared.build_program in file "test/shared.ml", line 62, characters 11-41
-   Called from Shared.pp_compile in file "test/shared.ml", line 80, characters 2-88
-   Called from Tact_tests__Lang.(fun) in file "test/lang.ml", line 3962, characters 2-19
-   Called from Expect_test_collector.Make.Instance_io.exec in file "collector/expect_test_collector.ml", line 262, characters 12-19 |}] *)
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((zero (Value (Integer 0))) (five (Value (Integer 5)))
+        (extract_value
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((n IntegerType)))
+              (function_returns
+               (FunctionType
+                ((function_params ((x (StructType 84))))
+                 (function_returns IntegerType))))))
+            (function_impl
+             (Fn
+              (Return
+               (MkFunction
+                ((function_signature
+                  ((function_params
+                    ((x
+                      (ExprType
+                       (FunctionCall
+                        ((ResolvedReference (Int2 <opaque>))
+                         ((Reference (n IntegerType)))))))))
+                   (function_returns IntegerType)))
+                 (function_impl
+                  (Fn
+                   (Return
+                    (StructField
+                     ((Reference
+                       (x
+                        (ExprType
+                         (FunctionCall
+                          ((ResolvedReference (Int2 <opaque>))
+                           ((Reference (n IntegerType))))))))
+                      value IntegerType))))))))))))))
+        (Int2
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((bits IntegerType)))
+              (function_returns (StructSig 77))))
+            (function_impl
+             (Fn
+              (Return
+               (MkStructDef
+                ((mk_struct_fields
+                  ((value (ResolvedReference (Integer <opaque>)))))
+                 (mk_struct_details
+                  ((mk_methods
+                    ((new
+                      (MkFunction
+                       ((function_signature
+                         ((function_params ((i IntegerType)))
+                          (function_returns
+                           (ExprType (Reference (Self (StructSig 77)))))))
+                        (function_impl
+                         (Fn
+                          (Return
+                           (Value
+                            (Struct
+                             ((Reference (Self (StructSig 77)))
+                              ((value (Reference (i IntegerType)))))))))))))))
+                   (mk_impls ()) (mk_id 83) (mk_sig 77) (mk_span <opaque>))))))))))))))
+      (structs
+       ((86
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 86))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 86)))
+                      ((value (Reference (i IntegerType))))))))))))))
+            (uty_impls ()) (uty_id 86) (uty_base_id 83)))))
+        (85
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 85))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 85)))
+                      ((value (Reference (i IntegerType))))))))))))))
+            (uty_impls ()) (uty_id 85) (uty_base_id 83)))))
+        (84
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 84))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 84)))
+                      ((value (Reference (i IntegerType))))))))))))))
+            (uty_impls ()) (uty_id 84) (uty_base_id 83)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (5
+        (((un_sig_cases ((StructType 59) (StructType 76))) (un_sig_methods ())
+          (un_sig_base_id 77))
+         ((un_sig_cases ((StructType 55))) (un_sig_methods ())
+          (un_sig_base_id 60))
+         ((un_sig_cases ((UnionType 21) (UnionType 39))) (un_sig_methods ())
+          (un_sig_base_id 44))
+         ((un_sig_cases ((StructType 31) (StructType 35))) (un_sig_methods ())
+          (un_sig_base_id 38))
+         ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
+          (un_sig_base_id 20))))))) |}]

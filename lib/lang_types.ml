@@ -42,8 +42,6 @@ functor
         Vec.push a.items item ; (id, item)
 
       let update a id ~f =
-        (* print_sexp (sexp_of_int id) ;
-           print_sexp (sexp_of_string "|") ; *)
         let item = get a id in
         let new_item = f item in
         Vec.set a.items id new_item ;
@@ -523,9 +521,6 @@ functor
                 else UnionSig id
 
           method! visit_Dependent _ ref ty =
-            (* if equal_string ref "T" then (
-               print_sexp @@ sexp_of_list sexp_of_binding associated ;
-               print_sexp @@ sexp_of_type_ returns ) ; *)
             List.find_map associated ~f:(fun (name, x) ->
                 if equal_string name ref.value then
                   Some

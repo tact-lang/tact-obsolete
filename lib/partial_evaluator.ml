@@ -18,7 +18,7 @@ functor
 
         (* Make a deep copy of the ctx. Local values should not flow into
            code that call partial_evaluator. *)
-        val ctx = {ctx with program = ctx.program}
+        val mutable ctx = {ctx with program = ctx.program}
 
         method! visit_InvalidType _ ex =
           print_sexp (sexp_of_string "invalid type") ;
@@ -317,8 +317,18 @@ functor
            generics I can not solve yet. *)
         method private with_interpreter
             : 'env 'a. 'env -> (interpreter -> 'a) -> 'a =
-          fun _env f ->
-            let inter = new interpreter ctx errors (fun _ f -> f) in
+          fun env f ->
+            let inter =
+              new interpreter ctx errors (fun ctx f ->
+                  self#with_new_ctx ctx (fun _ -> self#visit_function_ env f) )
+            in
             f inter
+
+        method private with_new_ctx new_ctx f =
+          let old_ctx = ctx in
+          ctx <- new_ctx ;
+          let out = f () in
+          ctx <- old_ctx ;
+          out
       end
   end
