@@ -70,21 +70,6 @@ functor
           make_loc sign ~f:(fun _ -> {function_params; function_returns})
       end
 
-    (* Unit is important, because this function should return
-       new program for each call, not one global mutable variable. *)
-    let default_program () =
-      let struct_signs = Arena.default () in
-      let union_signs = Arena.default () in
-      { bindings = Builtin.default_bindings struct_signs;
-        structs = Builtin.default_structs;
-        unions = [];
-        type_counter = 0;
-        memoized_fcalls = [];
-        interfaces = Builtin.default_intfs;
-        struct_signs;
-        union_signs;
-        result = None }
-
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super

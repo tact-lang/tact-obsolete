@@ -99,12 +99,11 @@ functor
         | _ ->
             Void
       in
-      bl
-      @@ Value
-           (Function
-              (bl
-                 { function_signature;
-                   function_impl = BuiltinFn (builtin_fun function_impl) } ) )
+      Value
+        (Function
+           (bl
+              { function_signature;
+                function_impl = BuiltinFn (builtin_fun function_impl) } ) )
 
     let serialize_intf =
       let intf =
@@ -289,14 +288,13 @@ functor
         | _ ->
             Void
       in
-      bl
-      @@ Value
-           (Function
-              (bl
-                 { function_signature;
-                   function_impl = BuiltinFn (builtin_fun function_impl) } ) )
+      Value
+        (Function
+           (bl
+              { function_signature;
+                function_impl = BuiltinFn (builtin_fun function_impl) } ) )
 
-    let from_intf =
+    let from_intf_ =
       let function_signature =
         bl {function_params = [(bl "T", type0)]; function_returns = HoleType}
       in
@@ -312,22 +310,22 @@ functor
         Type intf_ty
       in
       let function_impl p = function [Type t] -> make_from p t | _ -> Void in
-      bl
-      @@ Value
-           (Function
-              (bl
-                 { function_signature;
-                   function_impl = BuiltinFn (builtin_fun function_impl) } ) )
+      Value
+        (Function
+           (bl
+              { function_signature;
+                function_impl = BuiltinFn (builtin_fun function_impl) } ) )
+
+    let from_intf = bl from_intf_
 
     let make_builtin_fn params ret_ty primitive =
-      bl
-      @@ Value
-           (Function
-              (bl
-                 { function_signature =
-                     bl {function_params = params; function_returns = ret_ty};
-                   function_impl = Fn (bl (Return (bl @@ Primitive primitive)))
-                 } ) )
+      Value
+        (Function
+           (bl
+              { function_signature =
+                  bl {function_params = params; function_returns = ret_ty};
+                function_impl = Fn (bl (Return (bl @@ Primitive primitive))) } )
+        )
 
     let tensor2_hashtbl =
       Hashtbl.create
@@ -347,115 +345,145 @@ functor
                 uty_base_id = -501 };
             tensor = true } )
 
-    let builtin_bindings =
-      [ (bl "builtin_Builder", bl @@ Value (Type (BuiltinType "Builder")));
-        (bl "builtin_Cell", bl @@ Value (Type (BuiltinType "Cell")));
-        (bl "builtin_Slice", bl @@ Value (Type (BuiltinType "Slice")));
-        ( bl "builtin_builder_new",
-          bl
-          @@ Value
-               (Function
-                  (bl
-                     { function_signature =
-                         bl
-                           { function_params = [];
-                             function_returns = BuiltinType "Builder" };
-                       function_impl =
-                         Fn (bl (Return (bl @@ Primitive EmptyBuilder))) } ) )
-        );
-        ( bl "builtin_builder_build",
-          make_builtin_fn
-            [(bl "b", BuiltinType "Builder")]
-            (BuiltinType "Cell")
-            (BuildCell
-               {builder = bl @@ Reference (bl "b", BuiltinType "Builder")} ) );
-        ( bl "builtin_builder_store_int",
-          make_builtin_fn
-            [ (bl "b", BuiltinType "Builder");
-              (bl "int", IntegerType);
-              (bl "bits", IntegerType) ]
-            (BuiltinType "Builder")
-            (StoreInt
-               { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
-                 length = bl @@ Reference (bl "bits", IntegerType);
-                 integer = bl @@ Reference (bl "int", IntegerType);
-                 signed = true } ) );
-        ( bl "builtin_builder_store_coins",
-          make_builtin_fn
-            [(bl "b", BuiltinType "Builder"); (bl "c", IntegerType)]
-            BoolType
-            (StoreCoins
-               { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
-                 coins = bl @@ Reference (bl "c", IntegerType) } ) );
-        ( bl "builtin_slice_begin_parse",
-          make_builtin_fn
-            [(bl "c", BuiltinType "Cell")]
-            (BuiltinType "Slice")
-            (ParseCell {cell = bl @@ Reference (bl "c", BuiltinType "Cell")}) );
-        ( bl "builtin_slice_end_parse",
-          make_builtin_fn
-            [(bl "s", BuiltinType "Slice")]
-            VoidType
-            (SliceEndParse
-               {slice = bl @@ Reference (bl "s", BuiltinType "Slice")} ) );
-        ( bl "builtin_slice_load_int",
-          make_builtin_fn
-            [(bl "s", BuiltinType "Slice"); (bl "bits", IntegerType)]
-            (StructType
-               (tensor2 (BuiltinType "Slice") IntegerType).struct_details.uty_id
-            )
-            (SliceLoadInt
-               { slice = bl @@ Reference (bl "s", BuiltinType "Slice");
-                 bits = bl @@ Reference (bl "bits", IntegerType) } ) );
-        ( bl "builtin_divmod",
-          make_builtin_fn
-            [(bl "x", IntegerType); (bl "y", IntegerType)]
-            (StructType (tensor2 IntegerType IntegerType).struct_details.uty_id)
-            (Divmod
-               { x = bl @@ Reference (bl "x", IntegerType);
-                 y = bl @@ Reference (bl "y", IntegerType) } ) );
-        ( bl "builtin_send_raw_msg",
-          make_builtin_fn
-            [(bl "msg", BuiltinType "Cell"); (bl "flags", IntegerType)]
-            VoidType
-            (SendRawMsg
-               { msg = bl @@ Reference (bl "msg", BuiltinType "Cell");
-                 flags = bl @@ Reference (bl "flags", IntegerType) } ) );
-        ( bl "builtin_equal",
-          make_builtin_fn
-            [(bl "x", IntegerType); (bl "y", IntegerType)]
-            BoolType
-            (Equality
-               { x = bl @@ Reference (bl "x", IntegerType);
-                 y = bl @@ Reference (bl "y", IntegerType) } ) ) ]
+    let empty_program () =
+      { bindings = [];
+        structs = [];
+        unions = [];
+        type_counter = 0;
+        memoized_fcalls = [];
+        interfaces = [];
+        struct_signs = Arena.default ();
+        union_signs = Arena.default ();
+        result = None }
 
-    let default_bindings signs =
-      [ (bl "Integer", bl @@ Value (Type IntegerType));
-        (bl "Bool", bl @@ Value (Type BoolType));
-        (bl "Type", bl @@ Value (Type type0));
-        (bl "Void", bl @@ Value Void);
-        (bl "VoidType", bl @@ Value (Type VoidType));
-        (* TODO: re-design the serialization API surface; this is more for demonstration
-         * purposes
-         *)
-        (bl "serializer", serializer);
-        (bl "Serialize", bl @@ Value (Type (InterfaceType serialize_intf_id)));
-        ( bl "Deserialize",
-          bl @@ Value (Type (InterfaceType deserialize_intf_id)) );
-        (bl "LoadResult", load_result_func signs);
-        (bl "From", from_intf) ]
-      @ builtin_bindings
+    let make_bindings = List.map ~f:(fun (x, y) -> (bl x, bl y))
 
-    let default_structs =
+    let add_builtin_bindings p =
+      let bs =
+        make_bindings
+          [ ("builtin_Builder", Value (Type (BuiltinType "Builder")));
+            ("builtin_Cell", Value (Type (BuiltinType "Cell")));
+            ("builtin_Slice", Value (Type (BuiltinType "Slice")));
+            ( "builtin_builder_new",
+              Value
+                (Function
+                   (bl
+                      { function_signature =
+                          bl
+                            { function_params = [];
+                              function_returns = BuiltinType "Builder" };
+                        function_impl =
+                          Fn (bl (Return (bl @@ Primitive EmptyBuilder))) } ) )
+            );
+            ( "builtin_builder_build",
+              make_builtin_fn
+                [(bl "b", BuiltinType "Builder")]
+                (BuiltinType "Cell")
+                (BuildCell
+                   {builder = bl @@ Reference (bl "b", BuiltinType "Builder")}
+                ) );
+            ( "builtin_builder_store_int",
+              make_builtin_fn
+                [ (bl "b", BuiltinType "Builder");
+                  (bl "int", IntegerType);
+                  (bl "bits", IntegerType) ]
+                (BuiltinType "Builder")
+                (StoreInt
+                   { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
+                     length = bl @@ Reference (bl "bits", IntegerType);
+                     integer = bl @@ Reference (bl "int", IntegerType);
+                     signed = true } ) );
+            ( "builtin_builder_store_coins",
+              make_builtin_fn
+                [(bl "b", BuiltinType "Builder"); (bl "c", IntegerType)]
+                BoolType
+                (StoreCoins
+                   { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
+                     coins = bl @@ Reference (bl "c", IntegerType) } ) );
+            ( "builtin_slice_begin_parse",
+              make_builtin_fn
+                [(bl "c", BuiltinType "Cell")]
+                (BuiltinType "Slice")
+                (ParseCell {cell = bl @@ Reference (bl "c", BuiltinType "Cell")})
+            );
+            ( "builtin_slice_end_parse",
+              make_builtin_fn
+                [(bl "s", BuiltinType "Slice")]
+                VoidType
+                (SliceEndParse
+                   {slice = bl @@ Reference (bl "s", BuiltinType "Slice")} ) );
+            ( "builtin_slice_load_int",
+              make_builtin_fn
+                [(bl "s", BuiltinType "Slice"); (bl "bits", IntegerType)]
+                (StructType
+                   (tensor2 (BuiltinType "Slice") IntegerType).struct_details
+                     .uty_id )
+                (SliceLoadInt
+                   { slice = bl @@ Reference (bl "s", BuiltinType "Slice");
+                     bits = bl @@ Reference (bl "bits", IntegerType) } ) );
+            ( "builtin_divmod",
+              make_builtin_fn
+                [(bl "x", IntegerType); (bl "y", IntegerType)]
+                (StructType
+                   (tensor2 IntegerType IntegerType).struct_details.uty_id )
+                (Divmod
+                   { x = bl @@ Reference (bl "x", IntegerType);
+                     y = bl @@ Reference (bl "y", IntegerType) } ) );
+            ( "builtin_send_raw_msg",
+              make_builtin_fn
+                [(bl "msg", BuiltinType "Cell"); (bl "flags", IntegerType)]
+                VoidType
+                (SendRawMsg
+                   { msg = bl @@ Reference (bl "msg", BuiltinType "Cell");
+                     flags = bl @@ Reference (bl "flags", IntegerType) } ) );
+            ( "builtin_equal",
+              make_builtin_fn
+                [(bl "x", IntegerType); (bl "y", IntegerType)]
+                BoolType
+                (Equality
+                   { x = bl @@ Reference (bl "x", IntegerType);
+                     y = bl @@ Reference (bl "y", IntegerType) } ) ) ]
+      in
+      {p with bindings = p.bindings @ bs}
+
+    let add_default_bindings p =
+      let bs =
+        make_bindings
+          [ ("Integer", Value (Type IntegerType));
+            ("Bool", Value (Type BoolType));
+            ("Type", Value (Type type0));
+            ("Void", Value Void);
+            ("VoidType", Value (Type VoidType));
+            (* TODO: re-design the serialization API surface; this is more for demonstration
+             * purposes
+             *)
+            ("serializer", serializer);
+            ("Serialize", Value (Type (InterfaceType serialize_intf_id)));
+            ("Deserialize", Value (Type (InterfaceType deserialize_intf_id)));
+            ("LoadResult", load_result_func p.struct_signs);
+            ("From", from_intf_) ]
+      in
+      {p with bindings = p.bindings @ bs}
+
+    let default_structs () =
       ( Hashtbl.map tensor2_hashtbl ~f:(fun struct_ ->
             (struct_.struct_details.uty_id, struct_) )
       |> Hashtbl.data )
       @ [ (let id = snd deserialize_intf in
            (id, make_load_result_with_id (-500) id SelfType) ) ]
 
-    let default_intfs =
+    let default_intfs () =
       [ (serialize_intf_id, serialize_intf);
         (deserialize_intf_id, fst deserialize_intf) ]
+
+    (* Unit is important, because this function should return
+       new program for each call, not one global mutable variable. *)
+    let default_program () =
+      empty_program () |> add_builtin_bindings |> add_default_bindings
+      |> fun p ->
+      p.structs <- p.structs @ default_structs () ;
+      p.interfaces <- p.interfaces @ default_intfs () ;
+      p
 
     let std = [%blob "std/std.tact"]
   end
