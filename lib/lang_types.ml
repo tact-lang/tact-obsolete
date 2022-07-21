@@ -128,7 +128,6 @@ functor
 
     and program =
       { bindings : (string located * expr) list;
-        result : value option; [@sexp.option]
         mutable structs : (int * struct_) list; [@hash.ignore]
         mutable unions : (int * union) list; [@sexp.list] [@hash.ignore]
         mutable interfaces : (int * interface) list; [@sexp.list] [@hash.ignore]

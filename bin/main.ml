@@ -16,8 +16,8 @@ let prompt = "# "
 
 let default_program () =
   let program = Lang.default_program () in
-  Result.ok_or_failwith
-  @@ Tact.Compiler.compile_to_ir ~filename:"std.tact" ~prev_program:program
+  Result.ok_or_failwith @@ Result.map ~f:fst
+  @@ Tact.Compiler.compile_to_ir' ~filename:"std.tact" ~prev_program:program
        Builtin.std
 
 let rec repl ?(program = default_program ()) ?(prompt = prompt) () =
@@ -25,21 +25,21 @@ let rec repl ?(program = default_program ()) ?(prompt = prompt) () =
   | None ->
       ()
   | Some input -> (
+      let bindings = program#bindings in
       ignore @@ LNoise.history_add input ;
       match
-        Tact.Compiler.compile_to_ir ~filename:"<stdin>" ~prev_program:program
-          input
+        Tact.Compiler.eval_stmt ~constructor:program ~filename:"<stdin>" input
       with
-      | Ok ({result = Some result; _} as program) ->
+      | Ok result when not @@ Lang.equal_value result Void ->
           Show.pp_value Caml.Format.std_formatter result ;
           Caml.Format.print_newline () ;
           Caml.Format.print_flush () ;
           repl ~program ~prompt ()
-      | Ok ({bindings; _} as program') ->
-          List.iter bindings ~f:(fun (name, value) ->
+      | Ok _ ->
+          List.iter program#bindings ~f:(fun (name, value) ->
               if
                 Option.is_none
-                @@ List.find program.bindings ~f:(fun (name', value') ->
+                @@ List.find bindings ~f:(fun (name', value') ->
                        Syntax.equal_located String.equal name name'
                        && Syntax.equal_located Lang.equal_expr_kind value value' )
               then (
@@ -48,7 +48,7 @@ let rec repl ?(program = default_program ()) ?(prompt = prompt) () =
                 Show.pp_expr Caml.Format.std_formatter value ;
                 Caml.Format.print_newline () ) ) ;
           Caml.Format.print_flush () ;
-          repl ~program:program' ~prompt ()
+          repl ~program ~prompt ()
       | Error errors ->
           Caml.Format.print_string errors ;
           Caml.Format.print_flush () ;
