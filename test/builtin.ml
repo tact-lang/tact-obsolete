@@ -126,7 +126,7 @@ let%expect_test "Int(bits) constructor" =
                            (StructField
                             ((Reference (self (StructType 83))) value IntegerType))
                            (Value (Integer 257)))))))))))))
-                ((impl_interface -3)
+                ((impl_interface -2)
                  (impl_methods
                   ((deserialize
                     ((function_signature
@@ -446,7 +446,7 @@ let%expect_test "demo struct serializer" =
                            (StructField
                             ((Reference (self (StructType 83))) value IntegerType))
                            (Value (Integer 16)))))))))))))
-                ((impl_interface -3)
+                ((impl_interface -2)
                  (impl_methods
                   ((deserialize
                     ((function_signature

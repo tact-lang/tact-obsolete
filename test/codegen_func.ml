@@ -1083,7 +1083,7 @@ let%expect_test "deserialization api" =
        if (builtin_equal(second(res_body_discr), 0))
        {
          [slice, []] body = f20(first(res_body_discr));
-       [tuple, _] mes =
+       [tuple, [tuple, []]] mes =
        [second(res_info), second(body)];
        return
        f22(first(body), mes);

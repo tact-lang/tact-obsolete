@@ -213,7 +213,6 @@ functor
       | SelfType
       | InvalidType of expr
       | ExprType of expr
-      | Dependent of string located * type_
       | ValueOf of type_
 
     and mk_union = {mk_cases : expr list; mk_union_details : mk_details}
@@ -397,8 +396,6 @@ functor
           BoolType
       | Value Void ->
           VoidType
-      | Value (Type (Dependent (_, ty))) ->
-          ty
       | Value (Type t) ->
           type_of_type program t
       | Hole ->
@@ -465,7 +462,7 @@ functor
       let dependent_types_monomophizer (program : program)
           ?(self_sig : int option = None) (associated : (string * expr) list) =
         object (self : _)
-          inherit [_] map
+          inherit [_] map as super
 
           val mutable inside_self_sig = false
 
@@ -520,20 +517,17 @@ functor
                   UnionSig sign_id )
                 else UnionSig id
 
-          method! visit_Dependent _ ref ty =
+          method! visit_Reference _ (ref, ty) =
             List.find_map associated ~f:(fun (name, x) ->
-                if equal_string name ref.value then
-                  Some
-                    ( match x.value with
-                    (* If we depend on reference, it means we depend on function argument,
-                       so type must be dependent. *)
-                    | Reference (r, t) ->
-                        if equal_string r.value "Self" then ExprType x
-                        else Dependent (r, t)
-                    | _ ->
-                        type_of program x )
-                else None )
-            |> Option.value_or_thunk ~default:(fun _ -> Dependent (ref, ty))
+                if equal_string name ref.value then Some x.value else None )
+            |> Option.value_or_thunk ~default:(fun _ -> Reference (ref, ty))
+
+          method! visit_type_ env =
+            function
+            | ExprType {value = Value (Type ty); _} ->
+                self#visit_type_ env ty
+            | ty ->
+                super#visit_type_ env ty
         end
       in
       let monomorphizer =
@@ -564,6 +558,7 @@ functor
       | NonImmediateRef
       | NonImmediatePrimitive
       | NonImmediatetSig
+      | NonImmediateSelfType
     [@@deriving sexp_of]
 
     type is_immediate =
@@ -585,6 +580,9 @@ functor
           | NonImmediate NonImmediatePrimitive, _
           | _, NonImmediate NonImmediatePrimitive ->
               NonImmediate NonImmediatePrimitive
+          | NonImmediate NonImmediateSelfType, _
+          | _, NonImmediate NonImmediateSelfType ->
+              NonImmediate NonImmediateSelfType
           | NonImmediate NonImmediatetSig, _ | _, NonImmediate NonImmediatetSig
             ->
               Immediate
@@ -708,6 +706,20 @@ functor
           let out = f arguments in
           arguments <- prev_args ;
           out
+
+        method! visit_mk_interface env intf =
+          match super#visit_mk_interface env intf with
+          | NonImmediate NonImmediateSelfType ->
+              Immediate
+          | x ->
+              x
+
+        method! visit_IntfMethodCall env fc =
+          let is_intf_instance = self#visit_expr env fc.intf_instance in
+          let is_args = self#visit_list self#visit_expr env fc.intf_args in
+          self#plus is_intf_instance is_args
+
+        method! visit_SelfType _ = NonImmediate NonImmediateSelfType
       end
 
     let rec is_immediate_expr scope _p expr =

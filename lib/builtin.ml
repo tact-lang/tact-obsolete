@@ -71,13 +71,19 @@ functor
                      { st_sig_fields =
                          [ (bl "slice", bl @@ Value (Type slice_struct));
                            ( bl "value",
-                             bl @@ Value (Type (Dependent (bl "T", type0))) ) ];
+                             bl
+                             @@ Value
+                                  (Type
+                                     (ExprType (bl @@ Reference (bl "T", type0)))
+                                  ) ) ];
                        st_sig_methods =
                          [ ( bl "new",
                              bl
                                { function_params =
                                    [ (bl "s", slice_struct);
-                                     (bl "v", Dependent (bl "T", type0)) ];
+                                     ( bl "v",
+                                       ExprType (bl @@ Reference (bl "T", type0))
+                                     ) ];
                                  function_returns = StructSig id } ) ];
                        st_sig_base_id = base_id;
                        st_sig_id = id } )
@@ -118,16 +124,25 @@ functor
 
     let serialize_intf_id = next_builtin_struct_id ()
 
-    let deserialize_intf =
-      let id = next_builtin_struct_id () in
+    let deserialize_intf p =
+      let load_result_f =
+        List.find_map_exn p.bindings ~f:(fun (name, v) ->
+            if String.equal name.value "LoadResult" then Some v else None )
+      in
       let intf =
         { interface_methods =
             [ ( "deserialize",
                 bl
                   { function_params = [(bl "b", builder_struct)];
-                    function_returns = StructType id } ) ] }
+                    function_returns =
+                      ExprType
+                        ( bl
+                        @@ FunctionCall
+                             ( load_result_f,
+                               [bl @@ Reference (bl "Self", SelfType)] ) ) } )
+            ] }
       in
-      (intf, id)
+      intf
 
     let deserialize_intf_id = next_builtin_struct_id ()
 
@@ -465,25 +480,26 @@ functor
       in
       {p with bindings = p.bindings @ bs}
 
-    let default_structs () =
-      ( Hashtbl.map tensor2_hashtbl ~f:(fun struct_ ->
+    let add_default_structs p =
+      let s =
+        Hashtbl.map tensor2_hashtbl ~f:(fun struct_ ->
             (struct_.struct_details.uty_id, struct_) )
-      |> Hashtbl.data )
-      @ [ (let id = snd deserialize_intf in
-           (id, make_load_result_with_id (-500) id SelfType) ) ]
+        |> Hashtbl.data
+      in
+      {p with structs = p.structs @ s}
 
-    let default_intfs () =
-      [ (serialize_intf_id, serialize_intf);
-        (deserialize_intf_id, fst deserialize_intf) ]
+    let add_default_intfs p =
+      let intfs =
+        [ (serialize_intf_id, serialize_intf);
+          (deserialize_intf_id, deserialize_intf p) ]
+      in
+      {p with interfaces = p.interfaces @ intfs}
 
     (* Unit is important, because this function should return
        new program for each call, not one global mutable variable. *)
     let default_program () =
       empty_program () |> add_builtin_bindings |> add_default_bindings
-      |> fun p ->
-      p.structs <- p.structs @ default_structs () ;
-      p.interfaces <- p.interfaces @ default_intfs () ;
-      p
+      |> add_default_structs |> add_default_intfs
 
     let std = [%blob "std/std.tact"]
   end

@@ -303,6 +303,14 @@ let%expect_test "Immediacy Checks Struct Sig" =
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
+let%expect_test "Immediacy Checks Self Type" =
+  let scope = [] in
+  let expr =
+    bl @@ FunctionCall (bl @@ Value Void, [bl @@ Value (Type SelfType)])
+  in
+  pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
+  [%expect {| false |}]
+
 let%expect_test "Immediacy Checks MyInt Type" =
   let source =
     {|

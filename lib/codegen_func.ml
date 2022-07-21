@@ -378,9 +378,6 @@ functor
               F.SliceType
           | HoleType | VoidType ->
               F.InferType
-          (* TODO: this is a bug that SelfType flows into codegen stage *)
-          | SelfType ->
-              F.InferType
           | _ ->
               raise Invalid
 

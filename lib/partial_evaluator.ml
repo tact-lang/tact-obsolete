@@ -130,6 +130,19 @@ functor
           in
           {switch_condition = cond; branches}
 
+        method! visit_function_signature env
+            {value = {function_params; function_returns}; span} =
+          let function_params =
+            self#visit_list
+              (fun env (n, e) -> (n, self#visit_type_ env e))
+              env function_params
+          in
+          let vars = List.map function_params ~f:make_runtime in
+          let function_returns =
+            self#with_vars vars (fun _ -> self#visit_type_ env function_returns)
+          in
+          {value = {function_params; function_returns}; span}
+
         method! visit_function_ env f =
           let sign =
             self#visit_function_signature env f.value.function_signature
@@ -150,16 +163,7 @@ functor
         method! visit_IntfMethodCall env call =
           let intf_instance = self#visit_expr env call.intf_instance in
           let args = self#visit_list self#visit_expr env call.intf_args in
-          let is_dependent = function
-            | Value (Type (Dependent _)) ->
-                true
-            | _ ->
-                false
-          in
-          match
-            is_immediate_expr ctx.scope ctx.program intf_instance
-            && not (is_dependent intf_instance.value)
-          with
+          match is_immediate_expr ctx.scope ctx.program intf_instance with
           | true -> (
               let intf_ty =
                 match
@@ -266,16 +270,7 @@ functor
           in
           let method_name, m_temp = call.st_sig_call_method in
           let visited_method_ = self#visit_function_signature env m_temp in
-          let is_dependent = function
-            | Value (Type (Dependent _)) ->
-                true
-            | _ ->
-                false
-          in
-          match
-            is_immediate_expr ctx.scope ctx.program st_sig_instance
-            && not (is_dependent st_sig_instance.value)
-          with
+          match is_immediate_expr ctx.scope ctx.program st_sig_instance with
           | true ->
               let st_sig_ty =
                 match

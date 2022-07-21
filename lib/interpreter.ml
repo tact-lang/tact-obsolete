@@ -311,6 +311,16 @@ functor
                 in
                 Type (UnionType u.union_details.uty_id)
             | MkInterfaceDef {mk_interface_methods} ->
+                let partial_evaluate_type ty =
+                  match
+                    is_immediate_expr ctx.scope ctx.program
+                      {value = Value (Type ty); span = expr.span}
+                  with
+                  | true ->
+                      self#interpret_type ty
+                  | false ->
+                      ty
+                in
                 let intf =
                   { interface_methods =
                       List.map mk_interface_methods ~f:(fun (name, sign) ->
@@ -318,10 +328,10 @@ functor
                             { function_params =
                                 List.map sign.value.function_params
                                   ~f:(fun (pname, ty) ->
-                                    (pname, self#interpret_type ty) );
+                                    (pname, partial_evaluate_type ty) );
                               function_returns =
-                                self#interpret_type sign.value.function_returns
-                            }
+                                partial_evaluate_type
+                                  sign.value.function_returns }
                             |> fun sign' -> {value = sign'; span = sign.span} ) )
                   }
                 in

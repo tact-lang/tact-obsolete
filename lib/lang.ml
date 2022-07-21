@@ -33,41 +33,11 @@ functor
 
     include Builtin
 
-    (* If we have signature fn(X: Type) -> X, so
-       we need to change it to fn(X: Type) -> Dependent(X) *)
-    class ['s] make_dependent_types (_errors : _) =
-      object (self : 's)
-        inherit ['s] Lang_types.map
+    class ['s] self_type_updater (new_ty : type_) =
+      object (_ : 's)
+        inherit ['s] map
 
-        val mutable previous_arguments = []
-
-        method! visit_Reference _ (ref, ty) =
-          let concrete_ty =
-            List.find_map previous_arguments ~f:(fun (name, x) ->
-                if equal_string name.value ref.value then Some x else None )
-          in
-          match concrete_ty with
-          | Some ty' ->
-              Value (Type (Dependent (ref, ty')))
-          | None ->
-              Reference (ref, ty)
-
-        method! visit_function_signature env sign =
-          let prev = previous_arguments in
-          let function_params =
-            List.map
-              ~f:(fun (name, ty) ->
-                let ty' = self#visit_type_ env ty in
-                let arg = (name, ty') in
-                previous_arguments <- arg :: previous_arguments ;
-                arg )
-              sign.value.function_params
-          in
-          let function_returns =
-            self#visit_type_ env sign.value.function_returns
-          in
-          previous_arguments <- prev ;
-          make_loc sign ~f:(fun _ -> {function_params; function_returns})
+        method! visit_SelfType _ = new_ty
       end
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
@@ -454,10 +424,28 @@ functor
                   ~equal:String.equal
               with
               | Some m ->
+                  (*
+                     Interface function can have signature with `SelfType` type
+                     which is unknown at the interface definition point, but it should be
+                     updated to the actual type when interface method was called.
+
+                     Example:
+                     ```
+                      interface Intf { fn make() -> Self }
+                      fn test(I: Intf) -> I {
+                        let obj = I.make(); // Interface method has output type `SelfType`
+                                            // which should be update to the `I` type.
+                      }
+                     ```
+                  *)
+                  let sign =
+                    (new self_type_updater (ExprType in_receiver))
+                      #visit_function_signature () m
+                  in
                   IntfMethodCall
                     { intf_instance = in_receiver;
                       intf_def = intf_id;
-                      intf_method = (fn.value, m);
+                      intf_method = (fn.value, sign);
                       intf_args = args;
                       intf_loc = fn.span }
               | None ->
@@ -553,9 +541,9 @@ functor
             s#with_bindings
               (List.map param_bindings ~f:(fun (name, ty) ->
                    ( name,
-                     Comptime
-                       { value = Value (Type (Dependent (name, ty)));
-                         span = name.span } ) ) )
+                     Runtime
+                       (ExprType {value = Reference (name, ty); span = name.span}
+                       ) ) ) )
               (fun _ ->
                 f.returns
                 |> Option.map ~f:(fun x ->
@@ -574,8 +562,7 @@ functor
                     function_returns = fn_returns };
                 span = f.function_def_span }
             in
-            let sig_maker = new make_dependent_types errors in
-            sig_maker#visit_function_signature () sign
+            sign
           in
           { value =
               { function_signature;
@@ -637,7 +624,7 @@ functor
           let signatures =
             List.filter_map (s#of_located_list members) ~f:(fun (name, x) ->
                 match x.value with
-                | Value (Function f) ->
+                | Value (Function f) | MkFunction f ->
                     Some (name.value, f.value.function_signature)
                 | _ ->
                     errors#report `Error `OnlyFunctionIsAllowed () ;
