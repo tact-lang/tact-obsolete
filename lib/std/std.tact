@@ -53,7 +53,7 @@ struct Coins {
   }
 }
 
-struct Int(bits: Integer) {
+struct Int[bits: Integer] {
   val value: Integer
 
   fn new(i: Integer) -> Self {
@@ -444,7 +444,7 @@ union CommonMsgInfoRelaxed {
   }
 }
 
-struct MessageRelaxed(X: Serialize) {
+struct MessageRelaxed[X: Serialize] {
   val info: CommonMsgInfoRelaxed
   val body: X
 
@@ -459,7 +459,7 @@ struct MessageRelaxed(X: Serialize) {
   }
 }
 
-struct Message(X: Deserialize) {
+struct Message[X: Deserialize] {
   val info: CommonMsgInfo
   val body: X
 

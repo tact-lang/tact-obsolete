@@ -224,9 +224,13 @@ let function_param ==
   * Trailing commas are allowed
 *)
 let function_call :=
-  fn = located(fexpr);
+  | fn = located(fexpr);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
   { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+  | fn = located(fexpr);
+  arguments = delimited_separated_trailing_list(LBRACKET, located(expr), COMMA, RBRACKET);
+  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+
 
 let else_ :=
   | ELSE; ~= if_; <>
@@ -393,7 +397,7 @@ let fexpr :=
  | TILDE; ~= located(ident); <MutRef>
 
 let params ==
-    delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
+    delimited_separated_trailing_list(LBRACKET, function_param, COMMA, RBRACKET)
 
 (* Struct
 

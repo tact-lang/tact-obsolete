@@ -1396,7 +1396,7 @@ let%expect_test "duplicate type field" =
 let%expect_test "parametric struct instantiation" =
   let source =
     {|
-      struct T(A: Type) { val a: A }
+      struct T[A: Type] { val a: A }
       let TA = T(Int(257));
    |}
   in
@@ -4496,7 +4496,7 @@ let%expect_test "type that does not implement interface passed to the \
 let%expect_test "struct signatures" =
   let source =
     {|
-       struct Int2(bits: Integer) {
+       struct Int2[bits: Integer] {
          val value: Integer
          fn new(i: Integer) -> Self {
            Self { value: i }

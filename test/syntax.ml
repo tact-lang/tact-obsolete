@@ -127,7 +127,7 @@ let%expect_test "struct construction" =
 
 let%expect_test "parameterized struct shorthand" =
   let source = {|
-  struct MyType(T: Type) {}
+  struct MyType[T: Type] {}
   |} in
   pp source ;
   [%expect
@@ -597,7 +597,7 @@ let%expect_test "struct construction over an anonymous type" =
 let%expect_test "struct construction over an anonymous type's function call" =
   let source =
     {|
-  let a = struct(T: Type) { val field: T }(X) { field: value };
+  let a = struct[T: Type] { val field: T }(X) { field: value };
   |}
   in
   pp source ;
@@ -766,7 +766,7 @@ let%expect_test "union definition using let binding" =
 let%expect_test "parameterized union definition" =
   let source =
     {|
-    union Option(T: Type) {
+    union Option[T: Type] {
        case T
        case Null 
     }  
