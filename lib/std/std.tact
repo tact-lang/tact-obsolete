@@ -31,11 +31,11 @@ struct Slice {
     Self { s: builtin_slice_begin_parse(cell.c) }
   }
 
-  fn load_int(self: Self, bits: Integer) -> LoadResult(Integer) {
+  fn load_int(self: Self, bits: Integer) -> LoadResult[Integer] {
     let output = builtin_slice_load_int(self.s, bits);
     let slice = Self { s: output.value1 };
     let int = output.value2;
-    LoadResult(Integer) { slice: slice, value: int }
+    LoadResult[Integer] { slice: slice, value: int }
   }
 }
 
@@ -145,7 +145,7 @@ union MsgAddressExt {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 
@@ -178,7 +178,7 @@ struct AddressStd {
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
       let b = b.serialize_int(0, 0); // AnyCast
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 
@@ -208,7 +208,7 @@ struct AddressVar {
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
       let b = b.serialize_int(0, 0); // AnyCast
-      let b = serializer(Self)(self, b);
+      let b = serializer[Self](self, b);
       return b;
     }
   }
@@ -239,7 +239,7 @@ union MsgAddressInt {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 
@@ -262,7 +262,7 @@ union MsgAddress {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 
@@ -350,7 +350,7 @@ struct IntMsgInfoRelaxedFlags {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 }
@@ -361,7 +361,7 @@ struct IntMsgInfoRelaxedAddresses {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 }
@@ -372,7 +372,7 @@ struct IntMsgInfoRelaxedCoins {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 }
@@ -390,7 +390,7 @@ struct Timestamps {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 }
@@ -419,7 +419,7 @@ struct IntMsgInfoRelaxed {
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
-      serializer(Self)(self, b)
+      serializer[Self](self, b)
     }
   }
 }

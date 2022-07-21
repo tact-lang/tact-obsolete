@@ -3018,7 +3018,7 @@ let%expect_test "serializer inner struct" =
     {|
       struct Inner { val x: Int(32) }
       struct Outer { val y: Int(32) val z: Inner }
-      let serialize_outer = serializer(Outer);
+      let serialize_outer = serializer[Outer];
     |}
   in
   pp_compile source ;
@@ -3142,7 +3142,7 @@ let%expect_test "dependent types" =
         f
       }
       fn test(Y: Type) {
-        identity(Y)
+        identity[Y]
       }
     |}
   in
@@ -3214,7 +3214,7 @@ let%expect_test "TypeN" =
   let source =
     {|
       fn id(X: Type) { X }
-      let must_fail = id(Type);
+      let must_fail = id[Type];
     |}
   in
   pp_compile source ;
@@ -3337,8 +3337,8 @@ let%expect_test "unions duplicate variant" =
           case T
         }
       }
-      let a = Test(builtin_Builder); // should be OK
-      let b = Test(Integer); // should fail
+      let a = Test[builtin_Builder]; // should be OK
+      let b = Test[Integer]; // should fail
     |}
   in
   pp_compile source ;
@@ -3712,11 +3712,11 @@ let%expect_test "methods monomorphization" =
           fn id(self: Self, x: X) -> X { x }
         }
       }
-      let foo = Foo(Integer) {};
+      let foo = Foo[Integer] {};
       let x = foo.id(10);
 
       struct Empty {}
-      let foo_empty = Foo(Empty) {};
+      let foo_empty = Foo[Empty] {};
       let y = foo_empty.id(Empty{});
     |}
   in

@@ -366,7 +366,7 @@ let%expect_test "serializer inner struct" =
     {|
       struct Pubkey { val x: Int[160] }
       struct Wallet { val seqno: Int[32] val pubkey: Pubkey }
-      let serialize_wallet = serializer(Wallet);
+      let serialize_wallet = serializer[Wallet];
     |}
   in
   pp_codegen source ;
