@@ -12,7 +12,6 @@ functor
     module Codegen = Tact.Codegen_func.Make (Config)
     module Errors = Tact.Errors
     module Zint = Tact.Zint
-    module C = Tact.Compiler
     module Func = Tact.Func
     include Core
 

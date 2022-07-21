@@ -90,6 +90,8 @@ module type T = sig
   val span_of_concrete : span_concrete -> span
 
   val span_to_concrete : span -> span_concrete
+
+  val map_located : 'a 'b. f:('a -> 'b) -> 'a located -> 'b located
 end
 
 module Enabled : T = struct
@@ -121,6 +123,8 @@ module Enabled : T = struct
   let span_of_concrete s = s
 
   let span_to_concrete s = s
+
+  let map_located ~f {span; value} = {span; value = f value}
 end
 
 module Disabled : T = struct
@@ -155,4 +159,6 @@ module Disabled : T = struct
   let span_of_concrete _ = ()
 
   let span_to_concrete _ = (Lexing'.dummy_pos, Lexing'.dummy_pos)
+
+  let map_located ~f {span; value; _} = {span; value = f value}
 end

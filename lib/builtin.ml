@@ -368,8 +368,7 @@ functor
         memoized_fcalls = [];
         interfaces = [];
         struct_signs = Arena.default ();
-        union_signs = Arena.default ();
-        result = None }
+        union_signs = Arena.default () }
 
     let make_bindings = List.map ~f:(fun (x, y) -> (bl x, bl y))
 

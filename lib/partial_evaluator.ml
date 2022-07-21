@@ -26,7 +26,7 @@ functor
           raise InternalCompilerError
 
         method! visit_Reference env (ref, ty) =
-          match find_in_scope ref.value ctx.scope with
+          match find_in_scope ref.value !(ctx.scope) with
           | Some (Comptime ex) ->
               Value
                 (self#with_interpreter env (fun inter ->
@@ -36,13 +36,13 @@ functor
           | None ->
               print_sexp (sexp_of_string ref.value) ;
               print_sexp
-                (sexp_of_list (sexp_of_list sexp_of_tbinding) ctx.scope) ;
+                (sexp_of_list (sexp_of_list sexp_of_tbinding) !(ctx.scope)) ;
               raise InternalCompilerError
 
         method! visit_type_ env ty =
           let ty = super#visit_type_ env ty in
           if
-            is_immediate_expr ctx.scope ctx.program
+            is_immediate_expr !(ctx.scope) ctx.program
               (builtin_located @@ Value (Type ty))
           then self#with_interpreter env (fun inter -> inter#interpret_type ty)
           else self#unwrap_expr_types ty
@@ -70,7 +70,7 @@ functor
             List.map vars' ~f:(fun (name, ex) ->
                 (name, Runtime (type_of ctx.program ex)) )
           in
-          ctx.scope <- vars_scope :: ctx.scope ;
+          ctx.scope := vars_scope :: !(ctx.scope) ;
           Let vars'
 
         method! visit_DestructuringLet _env let_ =
@@ -111,7 +111,7 @@ functor
                     |> Option.value_exn
                     |> fun {field_type} -> (new_name, Runtime field_type) )
               in
-              ctx.scope <- vars :: ctx.scope ;
+              ctx.scope := vars :: !(ctx.scope) ;
               DestructuringLet let_
           | _ ->
               raise InternalCompilerError
@@ -163,7 +163,7 @@ functor
         method! visit_IntfMethodCall env call =
           let intf_instance = self#visit_expr env call.intf_instance in
           let args = self#visit_list self#visit_expr env call.intf_args in
-          match is_immediate_expr ctx.scope ctx.program intf_instance with
+          match is_immediate_expr !(ctx.scope) ctx.program intf_instance with
           | true -> (
               let intf_ty =
                 match
@@ -255,7 +255,7 @@ functor
           let f = self#visit_expr env f in
           let args = self#visit_list self#visit_expr env args in
           if
-            is_immediate_expr ctx.scope ctx.program
+            is_immediate_expr !(ctx.scope) ctx.program
               {value = FunctionCall (f, args); span = f.span}
           then
             Value
@@ -270,7 +270,7 @@ functor
           in
           let method_name, m_temp = call.st_sig_call_method in
           let visited_method_ = self#visit_function_signature env m_temp in
-          match is_immediate_expr ctx.scope ctx.program st_sig_instance with
+          match is_immediate_expr !(ctx.scope) ctx.program st_sig_instance with
           | true ->
               let st_sig_ty =
                 match
@@ -301,10 +301,10 @@ functor
 
         method private with_vars : 'a. _ -> (unit -> 'a) -> 'a =
           fun vars f ->
-            let prev_vars = ctx.scope in
-            ctx.scope <- vars :: ctx.scope ;
+            let prev_vars = !(ctx.scope) in
+            ctx.scope := vars :: prev_vars ;
             let out = f () in
-            ctx.scope <- prev_vars ;
+            ctx.scope := prev_vars ;
             out
 
         (* FIXME: This function should create new instance of the partial_evaluator

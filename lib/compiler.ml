@@ -112,21 +112,53 @@ and codegen ?(codegen_impl = Codegen_func.codegen) program =
   | Error e ->
       Error e
 
-and compile_to_ir ?(prev_program = Lang.default_program ()) ~filename text =
+and eval_stmt ~(constructor : _ Lang.constructor) ~filename text =
   let lexbuf = L.init filename @@ Lexing.from_string text in
-  match Parser.program Lexer.token lexbuf with
+  match Parser.just_stmt Lexer.token lexbuf with
   | stx -> (
-      let errors = new Errors.errors Show.show_error in
-      let constructor = new Lang.constructor ~program:prev_program errors in
-      let program = constructor#visit_program () stx in
+      let errors = constructor#get_errors in
+      let stmt = constructor#visit_located constructor#visit_stmt () stx in
+      let result =
+        constructor#make_interpreter#interpret_stmt
+          (Syntax.map_located
+             ~f:(function Lang.Expr e -> Lang.Return e | stmt -> stmt)
+             stmt )
+          []
+      in
       match errors#to_result () with
       | Error _ ->
           Error (errors#show_errors text)
       | Ok _ ->
-          Ok program )
+          Ok result )
   | exception Lexer.Error msg ->
       Error ("lexing error: " ^ msg)
   | exception Parser.Error ->
       let buffer = Buffer.create 0 in
       slowpath buffer filename text ;
       Error (Buffer.contents buffer)
+
+and construct ?(prev_program = Lang.default_program ()) ~filename text =
+  let lexbuf = L.init filename @@ Lexing.from_string text in
+  let stx = Parser.program Lexer.token lexbuf in
+  let errors = new Errors.errors Show.show_error in
+  (stx, new Lang.constructor ~program:prev_program errors)
+
+and compile_to_ir' ?(prev_program = Lang.default_program ()) ~filename text =
+  match construct ~prev_program ~filename text with
+  | stx, constructor -> (
+      let program = constructor#visit_program () stx in
+      let errors = constructor#get_errors in
+      match errors#to_result () with
+      | Error _ ->
+          Error (errors#show_errors text)
+      | Ok _ ->
+          Ok (constructor, program) )
+  | exception Lexer.Error msg ->
+      Error ("lexing error: " ^ msg)
+  | exception Parser.Error ->
+      let buffer = Buffer.create 0 in
+      slowpath buffer filename text ;
+      Error (Buffer.contents buffer)
+
+and compile_to_ir ?(prev_program = Lang.default_program ()) ~filename text =
+  Result.map snd @@ compile_to_ir' ~prev_program ~filename text

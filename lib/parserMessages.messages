@@ -1,8 +1,8 @@
-program: VAL
+just_stmt: VAL
 ##
 ## Ends in an error in state: 0.
 ##
-## program' -> . program [ # ]
+## just_stmt' -> . just_stmt [ # ]
 ##
 ## The known suffix of the stack is as follows:
 ##
@@ -10,7 +10,7 @@ program: VAL
 
 Invalid syntax
 
-program: UNION VAL
+just_stmt: UNION VAL
 ##
 ## Ends in an error in state: 1.
 ##
@@ -27,7 +27,7 @@ program: UNION VAL
 
 Invalid syntax
 
-program: UNION LBRACE VAL
+just_stmt: UNION LBRACE VAL
 ##
 ## Ends in an error in state: 2.
 ##
@@ -41,7 +41,7 @@ program: UNION LBRACE VAL
 
 Invalid syntax
 
-program: UNION LBRACE CASE VAL
+just_stmt: UNION LBRACE CASE VAL
 ##
 ## Ends in an error in state: 3.
 ##
@@ -53,7 +53,7 @@ program: UNION LBRACE CASE VAL
 
 Invalid syntax
 
-program: RETURN UNION VAL
+just_stmt: RETURN UNION VAL
 ##
 ## Ends in an error in state: 4.
 ##
@@ -66,7 +66,7 @@ program: RETURN UNION VAL
 
 Invalid syntax
 
-program: RETURN UNION LBRACE VAL
+just_stmt: RETURN UNION LBRACE VAL
 ##
 ## Ends in an error in state: 5.
 ##
@@ -79,7 +79,7 @@ program: RETURN UNION LBRACE VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN VAL
+just_stmt: ENUM LBRACE FN VAL
 ##
 ## Ends in an error in state: 7.
 ##
@@ -96,7 +96,7 @@ program: ENUM LBRACE FN VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT VAL
+just_stmt: ENUM LBRACE FN IDENT VAL
 ##
 ## Ends in an error in state: 8.
 ##
@@ -113,7 +113,7 @@ program: ENUM LBRACE FN IDENT VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LPAREN VAL
 ##
 ## Ends in an error in state: 9.
 ##
@@ -126,7 +126,7 @@ program: ENUM LBRACE FN IDENT LPAREN VAL
 
 Invalid syntax
 
-program: FN LPAREN IDENT VAL
+just_stmt: FN LPAREN IDENT VAL
 ##
 ## Ends in an error in state: 10.
 ##
@@ -141,7 +141,7 @@ program: FN LPAREN IDENT VAL
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON VAL
+just_stmt: FN LPAREN IDENT COLON VAL
 ##
 ## Ends in an error in state: 11.
 ##
@@ -156,7 +156,7 @@ program: FN LPAREN IDENT COLON VAL
 
 Invalid syntax
 
-program: RETURN TILDE VAL
+just_stmt: RETURN TILDE VAL
 ##
 ## Ends in an error in state: 12.
 ##
@@ -169,7 +169,7 @@ program: RETURN TILDE VAL
 
 Invalid syntax
 
-program: RETURN TILDE IDENT UNION
+just_stmt: RETURN TILDE IDENT UNION
 ##
 ## Ends in an error in state: 13.
 ##
@@ -182,7 +182,7 @@ program: RETURN TILDE IDENT UNION
 
 Invalid syntax
 
-program: RETURN STRUCT VAL
+just_stmt: RETURN STRUCT VAL
 ##
 ## Ends in an error in state: 14.
 ##
@@ -195,7 +195,7 @@ program: RETURN STRUCT VAL
 
 Invalid syntax
 
-program: STRUCT LBRACKET VAL
+just_stmt: STRUCT LBRACKET VAL
 ##
 ## Ends in an error in state: 15.
 ##
@@ -208,7 +208,7 @@ program: STRUCT LBRACKET VAL
 
 Invalid syntax
 
-program: STRUCT LBRACKET IDENT COLON BOOL COMMA RPAREN
+just_stmt: STRUCT LBRACKET IDENT COLON BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 17.
 ##
@@ -226,7 +226,7 @@ program: STRUCT LBRACKET IDENT COLON BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: STRUCT LBRACKET IDENT COLON BOOL RPAREN
+just_stmt: STRUCT LBRACKET IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 19.
 ##
@@ -246,7 +246,7 @@ program: STRUCT LBRACKET IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: RETURN STRUCT LBRACKET RBRACKET VAL
+just_stmt: RETURN STRUCT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 21.
 ##
@@ -259,7 +259,7 @@ program: RETURN STRUCT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: RETURN STRUCT LBRACE UNION
+just_stmt: RETURN STRUCT LBRACE UNION
 ##
 ## Ends in an error in state: 22.
 ##
@@ -272,7 +272,7 @@ program: RETURN STRUCT LBRACE UNION
 
 Invalid syntax
 
-program: STRUCT LBRACE VAL VAL
+just_stmt: STRUCT LBRACE VAL VAL
 ##
 ## Ends in an error in state: 23.
 ##
@@ -284,7 +284,7 @@ program: STRUCT LBRACE VAL VAL
 
 Invalid syntax
 
-program: STRUCT LBRACE VAL IDENT VAL
+just_stmt: STRUCT LBRACE VAL IDENT VAL
 ##
 ## Ends in an error in state: 24.
 ##
@@ -296,7 +296,7 @@ program: STRUCT LBRACE VAL IDENT VAL
 
 Invalid syntax
 
-program: STRUCT LBRACE VAL IDENT COLON VAL
+just_stmt: STRUCT LBRACE VAL IDENT COLON VAL
 ##
 ## Ends in an error in state: 25.
 ##
@@ -308,7 +308,7 @@ program: STRUCT LBRACE VAL IDENT COLON VAL
 
 Invalid syntax
 
-program: RETURN STRING UNION
+just_stmt: RETURN STRING UNION
 ##
 ## Ends in an error in state: 26.
 ##
@@ -321,7 +321,7 @@ program: RETURN STRING UNION
 
 Invalid syntax
 
-program: LPAREN VAL
+just_stmt: LPAREN VAL
 ##
 ## Ends in an error in state: 27.
 ##
@@ -345,7 +345,7 @@ program: LPAREN VAL
 
 Invalid syntax
 
-program: LPAREN UNION VAL
+just_stmt: LPAREN UNION VAL
 ##
 ## Ends in an error in state: 28.
 ##
@@ -358,7 +358,7 @@ program: LPAREN UNION VAL
 
 Invalid syntax
 
-program: LPAREN UNION LBRACE VAL
+just_stmt: LPAREN UNION LBRACE VAL
 ##
 ## Ends in an error in state: 29.
 ##
@@ -371,7 +371,7 @@ program: LPAREN UNION LBRACE VAL
 
 Invalid syntax
 
-program: UNION LBRACE IMPL VAL
+just_stmt: UNION LBRACE IMPL VAL
 ##
 ## Ends in an error in state: 32.
 ##
@@ -383,7 +383,7 @@ program: UNION LBRACE IMPL VAL
 
 Invalid syntax
 
-program: LET IDENT COLON UNION VAL
+just_stmt: LET IDENT COLON UNION VAL
 ##
 ## Ends in an error in state: 33.
 ##
@@ -395,7 +395,7 @@ program: LET IDENT COLON UNION VAL
 
 Invalid syntax
 
-program: LET IDENT COLON UNION LBRACE VAL
+just_stmt: LET IDENT COLON UNION LBRACE VAL
 ##
 ## Ends in an error in state: 34.
 ##
@@ -407,7 +407,7 @@ program: LET IDENT COLON UNION LBRACE VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN LBRACE RBRACE VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 39.
 ##
@@ -419,7 +419,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN RPAREN LBRACE RBRACE VAL
+just_stmt: ENUM LBRACE FN IDENT LPAREN RPAREN LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 41.
 ##
@@ -431,7 +431,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LET IDENT COLON TILDE VAL
+just_stmt: LET IDENT COLON TILDE VAL
 ##
 ## Ends in an error in state: 43.
 ##
@@ -443,7 +443,7 @@ program: LET IDENT COLON TILDE VAL
 
 Invalid syntax
 
-program: LET IDENT COLON STRUCT VAL
+just_stmt: LET IDENT COLON STRUCT VAL
 ##
 ## Ends in an error in state: 45.
 ##
@@ -455,7 +455,7 @@ program: LET IDENT COLON STRUCT VAL
 
 Invalid syntax
 
-program: LET IDENT COLON STRUCT LBRACKET RBRACKET VAL
+just_stmt: LET IDENT COLON STRUCT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 46.
 ##
@@ -467,7 +467,7 @@ program: LET IDENT COLON STRUCT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: LET IDENT COLON STRUCT LBRACE UNION
+just_stmt: LET IDENT COLON STRUCT LBRACE UNION
 ##
 ## Ends in an error in state: 47.
 ##
@@ -479,7 +479,7 @@ program: LET IDENT COLON STRUCT LBRACE UNION
 
 Invalid syntax
 
-program: UNION LBRACE IMPL LPAREN VAL
+just_stmt: UNION LBRACE IMPL LPAREN VAL
 ##
 ## Ends in an error in state: 53.
 ##
@@ -492,7 +492,7 @@ program: UNION LBRACE IMPL LPAREN VAL
 
 Invalid syntax
 
-program: LET IDENT COLON INTERFACE VAL
+just_stmt: LET IDENT COLON INTERFACE VAL
 ##
 ## Ends in an error in state: 54.
 ##
@@ -504,7 +504,7 @@ program: LET IDENT COLON INTERFACE VAL
 
 Invalid syntax
 
-program: LET IDENT COLON INTERFACE LBRACE VAL
+just_stmt: LET IDENT COLON INTERFACE LBRACE VAL
 ##
 ## Ends in an error in state: 55.
 ##
@@ -516,7 +516,7 @@ program: LET IDENT COLON INTERFACE LBRACE VAL
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN VAL
+just_stmt: INTERFACE LBRACE FN VAL
 ##
 ## Ends in an error in state: 56.
 ##
@@ -529,7 +529,7 @@ program: INTERFACE LBRACE FN VAL
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN IDENT VAL
+just_stmt: INTERFACE LBRACE FN IDENT VAL
 ##
 ## Ends in an error in state: 57.
 ##
@@ -542,7 +542,7 @@ program: INTERFACE LBRACE FN IDENT VAL
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN IDENT LPAREN VAL
+just_stmt: INTERFACE LBRACE FN IDENT LPAREN VAL
 ##
 ## Ends in an error in state: 58.
 ##
@@ -555,7 +555,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN VAL
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 59.
 ##
@@ -573,7 +573,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 60.
 ##
@@ -585,7 +585,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: FN LPAREN RPAREN RARROW VAL
+just_stmt: FN LPAREN RPAREN RARROW VAL
 ##
 ## Ends in an error in state: 61.
 ##
@@ -597,7 +597,7 @@ program: FN LPAREN RPAREN RARROW VAL
 
 Invalid syntax
 
-program: LET IDENT COLON ENUM VAL
+just_stmt: LET IDENT COLON ENUM VAL
 ##
 ## Ends in an error in state: 64.
 ##
@@ -610,7 +610,7 @@ program: LET IDENT COLON ENUM VAL
 
 Invalid syntax
 
-program: LET IDENT COLON ENUM LBRACE VAL
+just_stmt: LET IDENT COLON ENUM LBRACE VAL
 ##
 ## Ends in an error in state: 65.
 ##
@@ -623,7 +623,7 @@ program: LET IDENT COLON ENUM LBRACE VAL
 
 Invalid syntax
 
-program: ENUM LBRACE IDENT VAL
+just_stmt: ENUM LBRACE IDENT VAL
 ##
 ## Ends in an error in state: 66.
 ##
@@ -642,7 +642,7 @@ program: ENUM LBRACE IDENT VAL
 
 Invalid syntax
 
-program: ENUM LBRACE IDENT EQUALS VAL
+just_stmt: ENUM LBRACE IDENT EQUALS VAL
 ##
 ## Ends in an error in state: 67.
 ##
@@ -657,7 +657,7 @@ program: ENUM LBRACE IDENT EQUALS VAL
 
 Invalid syntax
 
-program: RETURN INTERFACE VAL
+just_stmt: RETURN INTERFACE VAL
 ##
 ## Ends in an error in state: 68.
 ##
@@ -670,7 +670,7 @@ program: RETURN INTERFACE VAL
 
 Invalid syntax
 
-program: RETURN INTERFACE LBRACE VAL
+just_stmt: RETURN INTERFACE LBRACE VAL
 ##
 ## Ends in an error in state: 69.
 ##
@@ -683,7 +683,7 @@ program: RETURN INTERFACE LBRACE VAL
 
 Invalid syntax
 
-program: RETURN INTERFACE LBRACE RBRACE UNION
+just_stmt: RETURN INTERFACE LBRACE RBRACE UNION
 ##
 ## Ends in an error in state: 71.
 ##
@@ -696,7 +696,7 @@ program: RETURN INTERFACE LBRACE RBRACE UNION
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
+just_stmt: INTERFACE LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 72.
 ##
@@ -715,7 +715,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: RETURN INT UNION
+just_stmt: RETURN INT UNION
 ##
 ## Ends in an error in state: 74.
 ##
@@ -728,7 +728,7 @@ program: RETURN INT UNION
 
 Invalid syntax
 
-program: RETURN IDENT UNION
+just_stmt: RETURN IDENT UNION
 ##
 ## Ends in an error in state: 75.
 ##
@@ -742,7 +742,7 @@ program: RETURN IDENT UNION
 
 Invalid syntax
 
-program: RETURN FN VAL
+just_stmt: RETURN FN VAL
 ##
 ## Ends in an error in state: 76.
 ##
@@ -755,7 +755,7 @@ program: RETURN FN VAL
 
 Invalid syntax
 
-program: RETURN FN LPAREN VAL
+just_stmt: RETURN FN LPAREN VAL
 ##
 ## Ends in an error in state: 77.
 ##
@@ -768,7 +768,7 @@ program: RETURN FN LPAREN VAL
 
 Invalid syntax
 
-program: RETURN FN LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: RETURN FN LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 78.
 ##
@@ -786,7 +786,7 @@ program: RETURN FN LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: RETURN FN LPAREN IDENT COLON BOOL COMMA RPAREN UNION
+just_stmt: RETURN FN LPAREN IDENT COLON BOOL COMMA RPAREN UNION
 ##
 ## Ends in an error in state: 79.
 ##
@@ -798,7 +798,7 @@ program: RETURN FN LPAREN IDENT COLON BOOL COMMA RPAREN UNION
 
 Invalid syntax
 
-program: LBRACE VAL
+just_stmt: LBRACE VAL
 ##
 ## Ends in an error in state: 81.
 ##
@@ -811,7 +811,7 @@ program: LBRACE VAL
 
 Invalid syntax
 
-program: TILDE VAL
+just_stmt: TILDE VAL
 ##
 ## Ends in an error in state: 82.
 ##
@@ -825,7 +825,7 @@ program: TILDE VAL
 
 Invalid syntax
 
-program: TILDE IDENT VAL
+just_stmt: TILDE IDENT VAL
 ##
 ## Ends in an error in state: 83.
 ##
@@ -839,7 +839,7 @@ program: TILDE IDENT VAL
 
 Invalid syntax
 
-program: SWITCH VAL
+just_stmt: SWITCH VAL
 ##
 ## Ends in an error in state: 84.
 ##
@@ -851,7 +851,7 @@ program: SWITCH VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN VAL
+just_stmt: SWITCH LPAREN VAL
 ##
 ## Ends in an error in state: 85.
 ##
@@ -863,7 +863,7 @@ program: SWITCH LPAREN VAL
 
 Invalid syntax
 
-program: RETURN ENUM VAL
+just_stmt: RETURN ENUM VAL
 ##
 ## Ends in an error in state: 86.
 ##
@@ -878,7 +878,7 @@ program: RETURN ENUM VAL
 
 Invalid syntax
 
-program: RETURN ENUM LBRACE VAL
+just_stmt: RETURN ENUM LBRACE VAL
 ##
 ## Ends in an error in state: 87.
 ##
@@ -893,7 +893,7 @@ program: RETURN ENUM LBRACE VAL
 
 Invalid syntax
 
-program: RETURN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
+just_stmt: RETURN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 90.
 ##
@@ -916,7 +916,7 @@ program: RETURN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: RETURN ENUM LBRACE IDENT COMMA RBRACE UNION
+just_stmt: RETURN ENUM LBRACE IDENT COMMA RBRACE UNION
 ##
 ## Ends in an error in state: 91.
 ##
@@ -929,7 +929,7 @@ program: RETURN ENUM LBRACE IDENT COMMA RBRACE UNION
 
 Invalid syntax
 
-program: RETURN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: RETURN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 93.
 ##
@@ -952,7 +952,7 @@ program: RETURN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: RETURN ENUM LBRACE RBRACE UNION
+just_stmt: RETURN ENUM LBRACE RBRACE UNION
 ##
 ## Ends in an error in state: 94.
 ##
@@ -965,7 +965,7 @@ program: RETURN ENUM LBRACE RBRACE UNION
 
 Invalid syntax
 
-program: RETURN BOOL UNION
+just_stmt: RETURN BOOL UNION
 ##
 ## Ends in an error in state: 95.
 ##
@@ -978,7 +978,7 @@ program: RETURN BOOL UNION
 
 Invalid syntax
 
-program: LPAREN BOOL RPAREN IDENT
+just_stmt: LPAREN BOOL RPAREN IDENT
 ##
 ## Ends in an error in state: 96.
 ##
@@ -991,7 +991,7 @@ program: LPAREN BOOL RPAREN IDENT
 
 Invalid syntax
 
-program: IDENT LBRACE VAL
+just_stmt: IDENT LBRACE VAL
 ##
 ## Ends in an error in state: 97.
 ##
@@ -1004,7 +1004,7 @@ program: IDENT LBRACE VAL
 
 Invalid syntax
 
-program: IDENT LBRACE IDENT VAL
+just_stmt: IDENT LBRACE IDENT VAL
 ##
 ## Ends in an error in state: 98.
 ##
@@ -1019,7 +1019,7 @@ program: IDENT LBRACE IDENT VAL
 
 Invalid syntax
 
-program: IDENT LBRACE IDENT COLON VAL
+just_stmt: IDENT LBRACE IDENT COLON VAL
 ##
 ## Ends in an error in state: 99.
 ##
@@ -1034,7 +1034,7 @@ program: IDENT LBRACE IDENT COLON VAL
 
 Invalid syntax
 
-program: RETURN BOOL LBRACKET RBRACKET UNION
+just_stmt: RETURN BOOL LBRACKET RBRACKET UNION
 ##
 ## Ends in an error in state: 102.
 ##
@@ -1048,7 +1048,7 @@ program: RETURN BOOL LBRACKET RBRACKET UNION
 
 Invalid syntax
 
-program: LET IDENT COLON BOOL VAL
+just_stmt: LET IDENT COLON BOOL VAL
 ##
 ## Ends in an error in state: 103.
 ##
@@ -1063,7 +1063,7 @@ program: LET IDENT COLON BOOL VAL
 
 Invalid syntax
 
-program: BOOL LPAREN VAL
+just_stmt: BOOL LPAREN VAL
 ##
 ## Ends in an error in state: 104.
 ##
@@ -1076,7 +1076,7 @@ program: BOOL LPAREN VAL
 
 Invalid syntax
 
-program: BOOL LPAREN BOOL COMMA RBRACKET
+just_stmt: BOOL LPAREN BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 106.
 ##
@@ -1094,7 +1094,7 @@ program: BOOL LPAREN BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: BOOL LPAREN BOOL RBRACKET
+just_stmt: BOOL LPAREN BOOL RBRACKET
 ##
 ## Ends in an error in state: 108.
 ##
@@ -1114,7 +1114,7 @@ program: BOOL LPAREN BOOL RBRACKET
 
 Invalid syntax
 
-program: BOOL LBRACKET BOOL VAL
+just_stmt: BOOL LBRACKET BOOL VAL
 ##
 ## Ends in an error in state: 110.
 ##
@@ -1138,7 +1138,7 @@ program: BOOL LBRACKET BOOL VAL
 
 Invalid syntax
 
-program: RETURN BOOL DOT VAL
+just_stmt: RETURN BOOL DOT VAL
 ##
 ## Ends in an error in state: 111.
 ##
@@ -1152,7 +1152,7 @@ program: RETURN BOOL DOT VAL
 
 Invalid syntax
 
-program: RETURN BOOL DOT IDENT UNION
+just_stmt: RETURN BOOL DOT IDENT UNION
 ##
 ## Ends in an error in state: 112.
 ##
@@ -1166,7 +1166,7 @@ program: RETURN BOOL DOT IDENT UNION
 
 Invalid syntax
 
-program: RETURN BOOL DOT IDENT LPAREN VAL
+just_stmt: RETURN BOOL DOT IDENT LPAREN VAL
 ##
 ## Ends in an error in state: 113.
 ##
@@ -1179,7 +1179,7 @@ program: RETURN BOOL DOT IDENT LPAREN VAL
 
 Invalid syntax
 
-program: RETURN BOOL DOT IDENT LPAREN BOOL COMMA RBRACKET
+just_stmt: RETURN BOOL DOT IDENT LPAREN BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 114.
 ##
@@ -1197,7 +1197,7 @@ program: RETURN BOOL DOT IDENT LPAREN BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: RETURN BOOL DOT IDENT LPAREN BOOL RBRACKET
+just_stmt: RETURN BOOL DOT IDENT LPAREN BOOL RBRACKET
 ##
 ## Ends in an error in state: 116.
 ##
@@ -1217,7 +1217,7 @@ program: RETURN BOOL DOT IDENT LPAREN BOOL RBRACKET
 
 Invalid syntax
 
-program: BOOL LBRACKET BOOL COMMA VAL
+just_stmt: BOOL LBRACKET BOOL COMMA VAL
 ##
 ## Ends in an error in state: 118.
 ##
@@ -1231,7 +1231,7 @@ program: BOOL LBRACKET BOOL COMMA VAL
 
 Invalid syntax
 
-program: BOOL LBRACKET VAL
+just_stmt: BOOL LBRACKET VAL
 ##
 ## Ends in an error in state: 121.
 ##
@@ -1244,7 +1244,7 @@ program: BOOL LBRACKET VAL
 
 Invalid syntax
 
-program: BOOL LBRACKET BOOL COMMA RPAREN
+just_stmt: BOOL LBRACKET BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 122.
 ##
@@ -1262,7 +1262,7 @@ program: BOOL LBRACKET BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: BOOL LBRACKET BOOL RPAREN
+just_stmt: BOOL LBRACKET BOOL RPAREN
 ##
 ## Ends in an error in state: 124.
 ##
@@ -1282,7 +1282,7 @@ program: BOOL LBRACKET BOOL RPAREN
 
 Invalid syntax
 
-program: IDENT LBRACE IDENT COLON BOOL VAL
+just_stmt: IDENT LBRACE IDENT COLON BOOL VAL
 ##
 ## Ends in an error in state: 126.
 ##
@@ -1306,7 +1306,7 @@ program: IDENT LBRACE IDENT COLON BOOL VAL
 
 Invalid syntax
 
-program: IDENT LBRACE IDENT COLON BOOL COMMA VAL
+just_stmt: IDENT LBRACE IDENT COLON BOOL COMMA VAL
 ##
 ## Ends in an error in state: 127.
 ##
@@ -1320,7 +1320,7 @@ program: IDENT LBRACE IDENT COLON BOOL COMMA VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL VAL
+just_stmt: SWITCH LPAREN BOOL VAL
 ##
 ## Ends in an error in state: 135.
 ##
@@ -1341,7 +1341,7 @@ program: SWITCH LPAREN BOOL VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN VAL
 ##
 ## Ends in an error in state: 136.
 ##
@@ -1353,7 +1353,7 @@ program: SWITCH LPAREN BOOL RPAREN VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE VAL
 ##
 ## Ends in an error in state: 137.
 ##
@@ -1365,7 +1365,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE CASE VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE CASE VAL
 ##
 ## Ends in an error in state: 138.
 ##
@@ -1377,7 +1377,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE CASE VAL
 
 Invalid syntax
 
-program: LET IDENT COLON IDENT VAL
+just_stmt: LET IDENT COLON IDENT VAL
 ##
 ## Ends in an error in state: 139.
 ##
@@ -1390,7 +1390,7 @@ program: LET IDENT COLON IDENT VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT LBRACE
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT LBRACE
 ##
 ## Ends in an error in state: 141.
 ##
@@ -1408,7 +1408,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT LBRACE
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT VAL
 ##
 ## Ends in an error in state: 142.
 ##
@@ -1420,7 +1420,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT REARROW VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT REARROW VAL
 ##
 ## Ends in an error in state: 143.
 ##
@@ -1432,7 +1432,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT REARROW VAL
 
 Invalid syntax
 
-program: LET IDENT COLON BOOL LBRACKET RBRACKET VAL
+just_stmt: LET IDENT COLON BOOL LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 145.
 ##
@@ -1445,7 +1445,7 @@ program: LET IDENT COLON BOOL LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT REARROW LBRACE RBRACE VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT REARROW LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 146.
 ##
@@ -1457,7 +1457,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE CASE IDENT IDENT REARROW LBRACE RBRACE
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE ELSE VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE ELSE VAL
 ##
 ## Ends in an error in state: 149.
 ##
@@ -1469,7 +1469,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE ELSE VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE ELSE REARROW VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE ELSE REARROW VAL
 ##
 ## Ends in an error in state: 150.
 ##
@@ -1481,7 +1481,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE ELSE REARROW VAL
 
 Invalid syntax
 
-program: SWITCH LPAREN BOOL RPAREN LBRACE ELSE REARROW LBRACE RBRACE VAL
+just_stmt: SWITCH LPAREN BOOL RPAREN LBRACE ELSE REARROW LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 152.
 ##
@@ -1493,7 +1493,7 @@ program: SWITCH LPAREN BOOL RPAREN LBRACE ELSE REARROW LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: STRUCT VAL
+just_stmt: STRUCT VAL
 ##
 ## Ends in an error in state: 155.
 ##
@@ -1510,7 +1510,7 @@ program: STRUCT VAL
 
 Invalid syntax
 
-program: STRUCT IDENT VAL
+just_stmt: STRUCT IDENT VAL
 ##
 ## Ends in an error in state: 156.
 ##
@@ -1524,7 +1524,7 @@ program: STRUCT IDENT VAL
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACKET VAL
+just_stmt: STRUCT IDENT LBRACKET VAL
 ##
 ## Ends in an error in state: 157.
 ##
@@ -1537,7 +1537,7 @@ program: STRUCT IDENT LBRACKET VAL
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
+just_stmt: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 158.
 ##
@@ -1555,7 +1555,7 @@ program: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
+just_stmt: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 ##
 ## Ends in an error in state: 159.
 ##
@@ -1567,7 +1567,7 @@ program: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE UNION
+just_stmt: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE UNION
 ##
 ## Ends in an error in state: 160.
 ##
@@ -1579,7 +1579,7 @@ program: STRUCT IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE UNION
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACKET IDENT COLON BOOL RPAREN
+just_stmt: STRUCT IDENT LBRACKET IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 165.
 ##
@@ -1599,7 +1599,7 @@ program: STRUCT IDENT LBRACKET IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACKET RBRACKET VAL
+just_stmt: STRUCT IDENT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 166.
 ##
@@ -1611,7 +1611,7 @@ program: STRUCT IDENT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACKET RBRACKET LBRACE UNION
+just_stmt: STRUCT IDENT LBRACKET RBRACKET LBRACE UNION
 ##
 ## Ends in an error in state: 167.
 ##
@@ -1623,7 +1623,7 @@ program: STRUCT IDENT LBRACKET RBRACKET LBRACE UNION
 
 Invalid syntax
 
-program: STRUCT IDENT LBRACE UNION
+just_stmt: STRUCT IDENT LBRACE UNION
 ##
 ## Ends in an error in state: 172.
 ##
@@ -1635,7 +1635,7 @@ program: STRUCT IDENT LBRACE UNION
 
 Invalid syntax
 
-program: STRUCT LBRACKET RBRACKET VAL
+just_stmt: STRUCT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 177.
 ##
@@ -1649,7 +1649,7 @@ program: STRUCT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: STRUCT LBRACE UNION
+just_stmt: STRUCT LBRACE UNION
 ##
 ## Ends in an error in state: 178.
 ##
@@ -1663,7 +1663,7 @@ program: STRUCT LBRACE UNION
 
 Invalid syntax
 
-program: STRUCT LBRACE RBRACE VAL
+just_stmt: STRUCT LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 182.
 ##
@@ -1677,7 +1677,7 @@ program: STRUCT LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: STRING VAL
+just_stmt: STRING VAL
 ##
 ## Ends in an error in state: 183.
 ##
@@ -1691,7 +1691,7 @@ program: STRING VAL
 
 Invalid syntax
 
-program: RETURN VAL
+just_stmt: RETURN VAL
 ##
 ## Ends in an error in state: 184.
 ##
@@ -1703,7 +1703,7 @@ program: RETURN VAL
 
 Invalid syntax
 
-program: RETURN BOOL VAL
+just_stmt: RETURN BOOL VAL
 ##
 ## Ends in an error in state: 185.
 ##
@@ -1724,7 +1724,7 @@ program: RETURN BOOL VAL
 
 Invalid syntax
 
-program: LET VAL
+just_stmt: LET VAL
 ##
 ## Ends in an error in state: 187.
 ##
@@ -1740,7 +1740,7 @@ program: LET VAL
 
 Invalid syntax
 
-program: LET LBRACE VAL
+just_stmt: LET LBRACE VAL
 ##
 ## Ends in an error in state: 188.
 ##
@@ -1753,7 +1753,7 @@ program: LET LBRACE VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT VAL
+just_stmt: LET LBRACE IDENT VAL
 ##
 ## Ends in an error in state: 189.
 ##
@@ -1772,7 +1772,7 @@ program: LET LBRACE IDENT VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT COMMA VAL
+just_stmt: LET LBRACE IDENT COMMA VAL
 ##
 ## Ends in an error in state: 190.
 ##
@@ -1786,7 +1786,7 @@ program: LET LBRACE IDENT COMMA VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT AS VAL
+just_stmt: LET LBRACE IDENT AS VAL
 ##
 ## Ends in an error in state: 193.
 ##
@@ -1801,7 +1801,7 @@ program: LET LBRACE IDENT AS VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT AS IDENT VAL
+just_stmt: LET LBRACE IDENT AS IDENT VAL
 ##
 ## Ends in an error in state: 194.
 ##
@@ -1816,7 +1816,7 @@ program: LET LBRACE IDENT AS IDENT VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT AS IDENT COMMA VAL
+just_stmt: LET LBRACE IDENT AS IDENT COMMA VAL
 ##
 ## Ends in an error in state: 195.
 ##
@@ -1830,7 +1830,7 @@ program: LET LBRACE IDENT AS IDENT COMMA VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT COMMA DOUBLEDOT VAL
+just_stmt: LET LBRACE IDENT COMMA DOUBLEDOT VAL
 ##
 ## Ends in an error in state: 201.
 ##
@@ -1842,7 +1842,7 @@ program: LET LBRACE IDENT COMMA DOUBLEDOT VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT COMMA RBRACE VAL
+just_stmt: LET LBRACE IDENT COMMA RBRACE VAL
 ##
 ## Ends in an error in state: 202.
 ##
@@ -1854,7 +1854,7 @@ program: LET LBRACE IDENT COMMA RBRACE VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT COMMA RBRACE EQUALS VAL
+just_stmt: LET LBRACE IDENT COMMA RBRACE EQUALS VAL
 ##
 ## Ends in an error in state: 203.
 ##
@@ -1866,7 +1866,7 @@ program: LET LBRACE IDENT COMMA RBRACE EQUALS VAL
 
 Invalid syntax
 
-program: LET LBRACE IDENT COMMA RBRACE EQUALS BOOL VAL
+just_stmt: LET LBRACE IDENT COMMA RBRACE EQUALS BOOL VAL
 ##
 ## Ends in an error in state: 204.
 ##
@@ -1887,7 +1887,7 @@ program: LET LBRACE IDENT COMMA RBRACE EQUALS BOOL VAL
 
 Invalid syntax
 
-program: LET LBRACE DOUBLEDOT VAL
+just_stmt: LET LBRACE DOUBLEDOT VAL
 ##
 ## Ends in an error in state: 206.
 ##
@@ -1899,7 +1899,7 @@ program: LET LBRACE DOUBLEDOT VAL
 
 Invalid syntax
 
-program: LET LBRACE RBRACE VAL
+just_stmt: LET LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 207.
 ##
@@ -1911,7 +1911,7 @@ program: LET LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LET LBRACE RBRACE EQUALS VAL
+just_stmt: LET LBRACE RBRACE EQUALS VAL
 ##
 ## Ends in an error in state: 208.
 ##
@@ -1923,7 +1923,7 @@ program: LET LBRACE RBRACE EQUALS VAL
 
 Invalid syntax
 
-program: LET LBRACE RBRACE EQUALS BOOL VAL
+just_stmt: LET LBRACE RBRACE EQUALS BOOL VAL
 ##
 ## Ends in an error in state: 209.
 ##
@@ -1944,7 +1944,7 @@ program: LET LBRACE RBRACE EQUALS BOOL VAL
 
 Invalid syntax
 
-program: LET IDENT VAL
+just_stmt: LET IDENT VAL
 ##
 ## Ends in an error in state: 210.
 ##
@@ -1958,7 +1958,7 @@ program: LET IDENT VAL
 
 Invalid syntax
 
-program: LET IDENT LPAREN VAL
+just_stmt: LET IDENT LPAREN VAL
 ##
 ## Ends in an error in state: 211.
 ##
@@ -1971,7 +1971,7 @@ program: LET IDENT LPAREN VAL
 
 Invalid syntax
 
-program: LET IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: LET IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 212.
 ##
@@ -1989,7 +1989,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 213.
 ##
@@ -2001,7 +2001,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS VAL
+just_stmt: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS VAL
 ##
 ## Ends in an error in state: 214.
 ##
@@ -2013,7 +2013,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS VAL
 
 Invalid syntax
 
-program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS BOOL VAL
+just_stmt: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS BOOL VAL
 ##
 ## Ends in an error in state: 215.
 ##
@@ -2034,7 +2034,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL COMMA RPAREN EQUALS BOOL VAL
 
 Invalid syntax
 
-program: LET IDENT LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: LET IDENT LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 216.
 ##
@@ -2054,7 +2054,7 @@ program: LET IDENT LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: LET IDENT LPAREN RPAREN VAL
+just_stmt: LET IDENT LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 217.
 ##
@@ -2066,7 +2066,7 @@ program: LET IDENT LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: LET IDENT LPAREN RPAREN EQUALS VAL
+just_stmt: LET IDENT LPAREN RPAREN EQUALS VAL
 ##
 ## Ends in an error in state: 218.
 ##
@@ -2078,7 +2078,7 @@ program: LET IDENT LPAREN RPAREN EQUALS VAL
 
 Invalid syntax
 
-program: LET IDENT LPAREN RPAREN EQUALS BOOL VAL
+just_stmt: LET IDENT LPAREN RPAREN EQUALS BOOL VAL
 ##
 ## Ends in an error in state: 219.
 ##
@@ -2099,7 +2099,7 @@ program: LET IDENT LPAREN RPAREN EQUALS BOOL VAL
 
 Invalid syntax
 
-program: LET IDENT COLON VAL
+just_stmt: LET IDENT COLON VAL
 ##
 ## Ends in an error in state: 220.
 ##
@@ -2111,7 +2111,7 @@ program: LET IDENT COLON VAL
 
 Invalid syntax
 
-program: LET IDENT COLON IDENT LBRACE
+just_stmt: LET IDENT COLON IDENT LBRACE
 ##
 ## Ends in an error in state: 222.
 ##
@@ -2130,7 +2130,7 @@ program: LET IDENT COLON IDENT LBRACE
 
 Invalid syntax
 
-program: LET IDENT EQUALS VAL
+just_stmt: LET IDENT EQUALS VAL
 ##
 ## Ends in an error in state: 223.
 ##
@@ -2142,7 +2142,7 @@ program: LET IDENT EQUALS VAL
 
 Invalid syntax
 
-program: LET IDENT EQUALS BOOL VAL
+just_stmt: LET IDENT EQUALS BOOL VAL
 ##
 ## Ends in an error in state: 224.
 ##
@@ -2163,7 +2163,7 @@ program: LET IDENT EQUALS BOOL VAL
 
 Invalid syntax
 
-program: INTERFACE VAL
+just_stmt: INTERFACE VAL
 ##
 ## Ends in an error in state: 225.
 ##
@@ -2180,7 +2180,7 @@ program: INTERFACE VAL
 
 Invalid syntax
 
-program: INTERFACE LBRACE VAL
+just_stmt: INTERFACE LBRACE VAL
 ##
 ## Ends in an error in state: 226.
 ##
@@ -2194,7 +2194,7 @@ program: INTERFACE LBRACE VAL
 
 Invalid syntax
 
-program: INTERFACE LBRACE RBRACE VAL
+just_stmt: INTERFACE LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 228.
 ##
@@ -2208,7 +2208,7 @@ program: INTERFACE LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: INTERFACE IDENT VAL
+just_stmt: INTERFACE IDENT VAL
 ##
 ## Ends in an error in state: 229.
 ##
@@ -2222,7 +2222,7 @@ program: INTERFACE IDENT VAL
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACKET VAL
+just_stmt: INTERFACE IDENT LBRACKET VAL
 ##
 ## Ends in an error in state: 230.
 ##
@@ -2235,7 +2235,7 @@ program: INTERFACE IDENT LBRACKET VAL
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
+just_stmt: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 231.
 ##
@@ -2253,7 +2253,7 @@ program: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
+just_stmt: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 ##
 ## Ends in an error in state: 232.
 ##
@@ -2265,7 +2265,7 @@ program: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
+just_stmt: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
 ##
 ## Ends in an error in state: 233.
 ##
@@ -2277,7 +2277,7 @@ program: INTERFACE IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACKET IDENT COLON BOOL RPAREN
+just_stmt: INTERFACE IDENT LBRACKET IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 236.
 ##
@@ -2297,7 +2297,7 @@ program: INTERFACE IDENT LBRACKET IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACKET RBRACKET VAL
+just_stmt: INTERFACE IDENT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 237.
 ##
@@ -2309,7 +2309,7 @@ program: INTERFACE IDENT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACKET RBRACKET LBRACE VAL
+just_stmt: INTERFACE IDENT LBRACKET RBRACKET LBRACE VAL
 ##
 ## Ends in an error in state: 238.
 ##
@@ -2321,7 +2321,7 @@ program: INTERFACE IDENT LBRACKET RBRACKET LBRACE VAL
 
 Invalid syntax
 
-program: INTERFACE IDENT LBRACE VAL
+just_stmt: INTERFACE IDENT LBRACE VAL
 ##
 ## Ends in an error in state: 241.
 ##
@@ -2333,7 +2333,7 @@ program: INTERFACE IDENT LBRACE VAL
 
 Invalid syntax
 
-program: INT VAL
+just_stmt: INT VAL
 ##
 ## Ends in an error in state: 244.
 ##
@@ -2347,7 +2347,7 @@ program: INT VAL
 
 Invalid syntax
 
-program: IF VAL
+just_stmt: IF VAL
 ##
 ## Ends in an error in state: 245.
 ##
@@ -2359,7 +2359,7 @@ program: IF VAL
 
 Invalid syntax
 
-program: IF LPAREN VAL
+just_stmt: IF LPAREN VAL
 ##
 ## Ends in an error in state: 246.
 ##
@@ -2371,7 +2371,7 @@ program: IF LPAREN VAL
 
 Invalid syntax
 
-program: IF LPAREN BOOL VAL
+just_stmt: IF LPAREN BOOL VAL
 ##
 ## Ends in an error in state: 247.
 ##
@@ -2392,7 +2392,7 @@ program: IF LPAREN BOOL VAL
 
 Invalid syntax
 
-program: IF LPAREN BOOL RPAREN VAL
+just_stmt: IF LPAREN BOOL RPAREN VAL
 ##
 ## Ends in an error in state: 248.
 ##
@@ -2404,7 +2404,7 @@ program: IF LPAREN BOOL RPAREN VAL
 
 Invalid syntax
 
-program: IF LPAREN BOOL RPAREN LBRACE RBRACE VAL
+just_stmt: IF LPAREN BOOL RPAREN LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 249.
 ##
@@ -2416,7 +2416,7 @@ program: IF LPAREN BOOL RPAREN LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: IF LPAREN BOOL RPAREN LBRACE RBRACE ELSE VAL
+just_stmt: IF LPAREN BOOL RPAREN LBRACE RBRACE ELSE VAL
 ##
 ## Ends in an error in state: 250.
 ##
@@ -2429,7 +2429,7 @@ program: IF LPAREN BOOL RPAREN LBRACE RBRACE ELSE VAL
 
 Invalid syntax
 
-program: IDENT VAL
+just_stmt: IDENT VAL
 ##
 ## Ends in an error in state: 255.
 ##
@@ -2444,7 +2444,7 @@ program: IDENT VAL
 
 Invalid syntax
 
-program: FN VAL
+just_stmt: FN VAL
 ##
 ## Ends in an error in state: 256.
 ##
@@ -2465,7 +2465,7 @@ program: FN VAL
 
 Invalid syntax
 
-program: FN LPAREN VAL
+just_stmt: FN LPAREN VAL
 ##
 ## Ends in an error in state: 257.
 ##
@@ -2480,7 +2480,7 @@ program: FN LPAREN VAL
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: FN LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 258.
 ##
@@ -2499,7 +2499,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 259.
 ##
@@ -2512,7 +2512,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
+just_stmt: FN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 260.
 ##
@@ -2531,7 +2531,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE RBRACE VAL
+just_stmt: FN LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 262.
 ##
@@ -2544,7 +2544,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA RPAREN LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: FN LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 263.
 ##
@@ -2565,7 +2565,7 @@ program: FN LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: FN LPAREN RPAREN VAL
+just_stmt: FN LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 264.
 ##
@@ -2578,7 +2578,7 @@ program: FN LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: FN LPAREN RPAREN RARROW BOOL VAL
+just_stmt: FN LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 265.
 ##
@@ -2597,7 +2597,7 @@ program: FN LPAREN RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: FN LPAREN RPAREN LBRACE RBRACE VAL
+just_stmt: FN LPAREN RPAREN LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 267.
 ##
@@ -2610,7 +2610,7 @@ program: FN LPAREN RPAREN LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: FN IDENT VAL
+just_stmt: FN IDENT VAL
 ##
 ## Ends in an error in state: 268.
 ##
@@ -2627,7 +2627,7 @@ program: FN IDENT VAL
 
 Invalid syntax
 
-program: FN IDENT LPAREN VAL
+just_stmt: FN IDENT LPAREN VAL
 ##
 ## Ends in an error in state: 269.
 ##
@@ -2640,7 +2640,7 @@ program: FN IDENT LPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 270.
 ##
@@ -2658,7 +2658,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 271.
 ##
@@ -2670,7 +2670,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
+just_stmt: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 272.
 ##
@@ -2688,7 +2688,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: FN IDENT LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: FN IDENT LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 274.
 ##
@@ -2708,7 +2708,7 @@ program: FN IDENT LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: FN IDENT LPAREN RPAREN VAL
+just_stmt: FN IDENT LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 275.
 ##
@@ -2720,7 +2720,7 @@ program: FN IDENT LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LPAREN RPAREN RARROW BOOL VAL
+just_stmt: FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 276.
 ##
@@ -2738,7 +2738,7 @@ program: FN IDENT LPAREN RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET VAL
+just_stmt: FN IDENT LBRACKET VAL
 ##
 ## Ends in an error in state: 278.
 ##
@@ -2753,7 +2753,7 @@ program: FN IDENT LBRACKET VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 279.
 ##
@@ -2772,7 +2772,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 ##
 ## Ends in an error in state: 280.
 ##
@@ -2785,7 +2785,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN VAL
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN VAL
 ##
 ## Ends in an error in state: 281.
 ##
@@ -2798,7 +2798,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 282.
 ##
@@ -2816,7 +2816,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BO
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 283.
 ##
@@ -2828,7 +2828,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BO
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 284.
 ##
@@ -2846,7 +2846,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BO
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 286.
 ##
@@ -2866,7 +2866,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BO
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN VAL
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 287.
 ##
@@ -2878,7 +2878,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN RARROW BOOL VAL
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 288.
 ##
@@ -2896,7 +2896,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN RARROW 
 
 Invalid syntax
 
-program: FN IDENT LBRACKET IDENT COLON BOOL RPAREN
+just_stmt: FN IDENT LBRACKET IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 290.
 ##
@@ -2917,7 +2917,7 @@ program: FN IDENT LBRACKET IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET VAL
+just_stmt: FN IDENT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 291.
 ##
@@ -2930,7 +2930,7 @@ program: FN IDENT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET LPAREN VAL
+just_stmt: FN IDENT LBRACKET RBRACKET LPAREN VAL
 ##
 ## Ends in an error in state: 292.
 ##
@@ -2943,7 +2943,7 @@ program: FN IDENT LBRACKET RBRACKET LPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 293.
 ##
@@ -2961,7 +2961,7 @@ program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 294.
 ##
@@ -2973,7 +2973,7 @@ program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
+just_stmt: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 295.
 ##
@@ -2991,7 +2991,7 @@ program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW 
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 297.
 ##
@@ -3011,7 +3011,7 @@ program: FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET LPAREN RPAREN VAL
+just_stmt: FN IDENT LBRACKET RBRACKET LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 298.
 ##
@@ -3023,7 +3023,7 @@ program: FN IDENT LBRACKET RBRACKET LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: FN IDENT LBRACKET RBRACKET LPAREN RPAREN RARROW BOOL VAL
+just_stmt: FN IDENT LBRACKET RBRACKET LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 299.
 ##
@@ -3041,7 +3041,7 @@ program: FN IDENT LBRACKET RBRACKET LPAREN RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: ENUM VAL
+just_stmt: ENUM VAL
 ##
 ## Ends in an error in state: 301.
 ##
@@ -3064,7 +3064,7 @@ program: ENUM VAL
 
 Invalid syntax
 
-program: ENUM LBRACE VAL
+just_stmt: ENUM LBRACE VAL
 ##
 ## Ends in an error in state: 302.
 ##
@@ -3081,7 +3081,7 @@ program: ENUM LBRACE VAL
 
 Invalid syntax
 
-program: ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 304.
 ##
@@ -3105,7 +3105,7 @@ program: ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: ENUM LBRACE IDENT COMMA RBRACE VAL
+just_stmt: ENUM LBRACE IDENT COMMA RBRACE VAL
 ##
 ## Ends in an error in state: 305.
 ##
@@ -3119,7 +3119,7 @@ program: ENUM LBRACE IDENT COMMA RBRACE VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 307.
 ##
@@ -3143,7 +3143,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: ENUM LBRACE RBRACE VAL
+just_stmt: ENUM LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 308.
 ##
@@ -3157,7 +3157,7 @@ program: ENUM LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: ENUM IDENT VAL
+just_stmt: ENUM IDENT VAL
 ##
 ## Ends in an error in state: 309.
 ##
@@ -3174,7 +3174,7 @@ program: ENUM IDENT VAL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET VAL
+just_stmt: ENUM IDENT LBRACKET VAL
 ##
 ## Ends in an error in state: 310.
 ##
@@ -3189,7 +3189,7 @@ program: ENUM IDENT LBRACKET VAL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
+just_stmt: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 311.
 ##
@@ -3208,7 +3208,7 @@ program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
+just_stmt: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 ##
 ## Ends in an error in state: 312.
 ##
@@ -3221,7 +3221,7 @@ program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
+just_stmt: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
 ##
 ## Ends in an error in state: 313.
 ##
@@ -3234,7 +3234,7 @@ program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 315.
 ##
@@ -3256,7 +3256,7 @@ program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE IDENT COMMA 
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 318.
 ##
@@ -3278,7 +3278,7 @@ program: ENUM IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE FN IDENT LPA
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET IDENT COLON BOOL RPAREN
+just_stmt: ENUM IDENT LBRACKET IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 320.
 ##
@@ -3299,7 +3299,7 @@ program: ENUM IDENT LBRACKET IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET RBRACKET VAL
+just_stmt: ENUM IDENT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 321.
 ##
@@ -3312,7 +3312,7 @@ program: ENUM IDENT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET RBRACKET LBRACE VAL
+just_stmt: ENUM IDENT LBRACKET RBRACKET LBRACE VAL
 ##
 ## Ends in an error in state: 322.
 ##
@@ -3325,7 +3325,7 @@ program: ENUM IDENT LBRACKET RBRACKET LBRACE VAL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET RBRACKET LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM IDENT LBRACKET RBRACKET LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 324.
 ##
@@ -3347,7 +3347,7 @@ program: ENUM IDENT LBRACKET RBRACKET LBRACE IDENT COMMA FN IDENT LPAREN RPAREN 
 
 Invalid syntax
 
-program: ENUM IDENT LBRACKET RBRACKET LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM IDENT LBRACKET RBRACKET LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 327.
 ##
@@ -3369,7 +3369,7 @@ program: ENUM IDENT LBRACKET RBRACKET LBRACE FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACE VAL
+just_stmt: ENUM IDENT LBRACE VAL
 ##
 ## Ends in an error in state: 329.
 ##
@@ -3382,7 +3382,7 @@ program: ENUM IDENT LBRACE VAL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM IDENT LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 331.
 ##
@@ -3404,7 +3404,7 @@ program: ENUM IDENT LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 334.
 ##
@@ -3426,7 +3426,7 @@ program: ENUM IDENT LBRACE FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: BOOL VAL
+just_stmt: BOOL VAL
 ##
 ## Ends in an error in state: 336.
 ##
@@ -3440,7 +3440,7 @@ program: BOOL VAL
 
 Invalid syntax
 
-program: IDENT LBRACE RBRACE VAL
+just_stmt: IDENT LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 338.
 ##
@@ -3479,7 +3479,7 @@ program: LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: BOOL LBRACKET RBRACKET VAL
+just_stmt: BOOL LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 348.
 ##
@@ -3494,7 +3494,7 @@ program: BOOL LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: BOOL DOT VAL
+just_stmt: BOOL DOT VAL
 ##
 ## Ends in an error in state: 350.
 ##
@@ -3511,7 +3511,7 @@ program: BOOL DOT VAL
 
 Invalid syntax
 
-program: BOOL DOT IDENT VAL
+just_stmt: BOOL DOT IDENT VAL
 ##
 ## Ends in an error in state: 351.
 ##
@@ -3528,7 +3528,7 @@ program: BOOL DOT IDENT VAL
 
 Invalid syntax
 
-program: BOOL DOT IDENT LPAREN VAL
+just_stmt: BOOL DOT IDENT LPAREN VAL
 ##
 ## Ends in an error in state: 352.
 ##
@@ -3543,7 +3543,7 @@ program: BOOL DOT IDENT LPAREN VAL
 
 Invalid syntax
 
-program: BOOL DOT IDENT LPAREN BOOL COMMA RBRACKET
+just_stmt: BOOL DOT IDENT LPAREN BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 353.
 ##
@@ -3562,7 +3562,7 @@ program: BOOL DOT IDENT LPAREN BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: BOOL DOT IDENT LPAREN BOOL COMMA RPAREN VAL
+just_stmt: BOOL DOT IDENT LPAREN BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 354.
 ##
@@ -3575,7 +3575,7 @@ program: BOOL DOT IDENT LPAREN BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: BOOL DOT IDENT LPAREN BOOL RBRACKET
+just_stmt: BOOL DOT IDENT LPAREN BOOL RBRACKET
 ##
 ## Ends in an error in state: 355.
 ##
@@ -3596,7 +3596,7 @@ program: BOOL DOT IDENT LPAREN BOOL RBRACKET
 
 Invalid syntax
 
-program: BOOL DOT IDENT LPAREN RPAREN VAL
+just_stmt: BOOL DOT IDENT LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 356.
 ##
@@ -3609,7 +3609,7 @@ program: BOOL DOT IDENT LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: LBRACE BOOL EOF
+just_stmt: LBRACE BOOL EOF
 ##
 ## Ends in an error in state: 360.
 ##
@@ -3630,7 +3630,7 @@ program: LBRACE BOOL EOF
 
 Invalid syntax
 
-program: RETURN FN LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: RETURN FN LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 363.
 ##
@@ -3650,7 +3650,7 @@ program: RETURN FN LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: RETURN FN LPAREN RPAREN UNION
+just_stmt: RETURN FN LPAREN RPAREN UNION
 ##
 ## Ends in an error in state: 364.
 ##
@@ -3662,7 +3662,7 @@ program: RETURN FN LPAREN RPAREN UNION
 
 Invalid syntax
 
-program: ENUM LBRACE IDENT EQUALS BOOL VAL
+just_stmt: ENUM LBRACE IDENT EQUALS BOOL VAL
 ##
 ## Ends in an error in state: 366.
 ##
@@ -3686,7 +3686,7 @@ program: ENUM LBRACE IDENT EQUALS BOOL VAL
 
 Invalid syntax
 
-program: ENUM LBRACE IDENT EQUALS BOOL COMMA VAL
+just_stmt: ENUM LBRACE IDENT EQUALS BOOL COMMA VAL
 ##
 ## Ends in an error in state: 367.
 ##
@@ -3700,7 +3700,7 @@ program: ENUM LBRACE IDENT EQUALS BOOL COMMA VAL
 
 Invalid syntax
 
-program: ENUM LBRACE IDENT COMMA VAL
+just_stmt: ENUM LBRACE IDENT COMMA VAL
 ##
 ## Ends in an error in state: 370.
 ##
@@ -3714,7 +3714,7 @@ program: ENUM LBRACE IDENT COMMA VAL
 
 Invalid syntax
 
-program: LET IDENT COLON ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
+just_stmt: LET IDENT COLON ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 374.
 ##
@@ -3736,7 +3736,7 @@ program: LET IDENT COLON ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: LET IDENT COLON ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: LET IDENT COLON ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 377.
 ##
@@ -3758,7 +3758,7 @@ program: LET IDENT COLON ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: FN LPAREN RPAREN RARROW BOOL UNION
+just_stmt: FN LPAREN RPAREN RARROW BOOL UNION
 ##
 ## Ends in an error in state: 380.
 ##
@@ -3774,7 +3774,7 @@ program: FN LPAREN RPAREN RARROW BOOL UNION
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 382.
 ##
@@ -3794,7 +3794,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: INTERFACE LBRACE FN IDENT LPAREN RPAREN VAL
+just_stmt: INTERFACE LBRACE FN IDENT LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 383.
 ##
@@ -3806,7 +3806,7 @@ program: INTERFACE LBRACE FN IDENT LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: LPAREN FN VAL
+just_stmt: LPAREN FN VAL
 ##
 ## Ends in an error in state: 387.
 ##
@@ -3819,7 +3819,7 @@ program: LPAREN FN VAL
 
 Invalid syntax
 
-program: LPAREN FN LPAREN VAL
+just_stmt: LPAREN FN LPAREN VAL
 ##
 ## Ends in an error in state: 388.
 ##
@@ -3832,7 +3832,7 @@ program: LPAREN FN LPAREN VAL
 
 Invalid syntax
 
-program: LPAREN FN LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: LPAREN FN LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 389.
 ##
@@ -3850,7 +3850,7 @@ program: LPAREN FN LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: LPAREN FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: LPAREN FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 390.
 ##
@@ -3862,7 +3862,7 @@ program: LPAREN FN LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: LPAREN FN LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: LPAREN FN LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 392.
 ##
@@ -3882,7 +3882,7 @@ program: LPAREN FN LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: LPAREN FN LPAREN RPAREN VAL
+just_stmt: LPAREN FN LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 393.
 ##
@@ -3894,7 +3894,7 @@ program: LPAREN FN LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: LPAREN IDENT LBRACE RBRACE VAL
+just_stmt: LPAREN IDENT LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 395.
 ##
@@ -3906,7 +3906,7 @@ program: LPAREN IDENT LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LPAREN FN LPAREN RPAREN RARROW BOOL VAL
+just_stmt: LPAREN FN LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 397.
 ##
@@ -3925,7 +3925,7 @@ program: LPAREN FN LPAREN RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: UNION LBRACE IMPL BOOL VAL
+just_stmt: UNION LBRACE IMPL BOOL VAL
 ##
 ## Ends in an error in state: 399.
 ##
@@ -3941,7 +3941,7 @@ program: UNION LBRACE IMPL BOOL VAL
 
 Invalid syntax
 
-program: UNION LBRACE IMPL BOOL LBRACE VAL
+just_stmt: UNION LBRACE IMPL BOOL LBRACE VAL
 ##
 ## Ends in an error in state: 400.
 ##
@@ -3953,7 +3953,7 @@ program: UNION LBRACE IMPL BOOL LBRACE VAL
 
 Invalid syntax
 
-program: UNION LBRACE IMPL BOOL LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: UNION LBRACE IMPL BOOL LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 401.
 ##
@@ -3975,7 +3975,7 @@ program: UNION LBRACE IMPL BOOL LBRACE FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: UNION LBRACE IMPL BOOL LBRACE RBRACE VAL
+just_stmt: UNION LBRACE IMPL BOOL LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 402.
 ##
@@ -3987,7 +3987,7 @@ program: UNION LBRACE IMPL BOOL LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LPAREN UNION LBRACE RBRACE VAL
+just_stmt: LPAREN UNION LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 405.
 ##
@@ -4000,7 +4000,7 @@ program: LPAREN UNION LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LPAREN TILDE VAL
+just_stmt: LPAREN TILDE VAL
 ##
 ## Ends in an error in state: 407.
 ##
@@ -4013,7 +4013,7 @@ program: LPAREN TILDE VAL
 
 Invalid syntax
 
-program: LPAREN TILDE IDENT VAL
+just_stmt: LPAREN TILDE IDENT VAL
 ##
 ## Ends in an error in state: 408.
 ##
@@ -4026,7 +4026,7 @@ program: LPAREN TILDE IDENT VAL
 
 Invalid syntax
 
-program: LPAREN STRUCT VAL
+just_stmt: LPAREN STRUCT VAL
 ##
 ## Ends in an error in state: 410.
 ##
@@ -4039,7 +4039,7 @@ program: LPAREN STRUCT VAL
 
 Invalid syntax
 
-program: LPAREN STRUCT LBRACKET RBRACKET VAL
+just_stmt: LPAREN STRUCT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 411.
 ##
@@ -4052,7 +4052,7 @@ program: LPAREN STRUCT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: LPAREN STRUCT LBRACE UNION
+just_stmt: LPAREN STRUCT LBRACE UNION
 ##
 ## Ends in an error in state: 412.
 ##
@@ -4065,7 +4065,7 @@ program: LPAREN STRUCT LBRACE UNION
 
 Invalid syntax
 
-program: LPAREN STRUCT LBRACE RBRACE VAL
+just_stmt: LPAREN STRUCT LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 416.
 ##
@@ -4078,7 +4078,7 @@ program: LPAREN STRUCT LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LPAREN STRING VAL
+just_stmt: LPAREN STRING VAL
 ##
 ## Ends in an error in state: 418.
 ##
@@ -4091,7 +4091,7 @@ program: LPAREN STRING VAL
 
 Invalid syntax
 
-program: LPAREN INTERFACE VAL
+just_stmt: LPAREN INTERFACE VAL
 ##
 ## Ends in an error in state: 420.
 ##
@@ -4104,7 +4104,7 @@ program: LPAREN INTERFACE VAL
 
 Invalid syntax
 
-program: LPAREN INTERFACE LBRACE VAL
+just_stmt: LPAREN INTERFACE LBRACE VAL
 ##
 ## Ends in an error in state: 421.
 ##
@@ -4117,7 +4117,7 @@ program: LPAREN INTERFACE LBRACE VAL
 
 Invalid syntax
 
-program: LPAREN INTERFACE LBRACE RBRACE VAL
+just_stmt: LPAREN INTERFACE LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 423.
 ##
@@ -4130,7 +4130,7 @@ program: LPAREN INTERFACE LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LPAREN INT VAL
+just_stmt: LPAREN INT VAL
 ##
 ## Ends in an error in state: 425.
 ##
@@ -4143,7 +4143,7 @@ program: LPAREN INT VAL
 
 Invalid syntax
 
-program: LPAREN IDENT VAL
+just_stmt: LPAREN IDENT VAL
 ##
 ## Ends in an error in state: 427.
 ##
@@ -4157,7 +4157,7 @@ program: LPAREN IDENT VAL
 
 Invalid syntax
 
-program: LPAREN ENUM VAL
+just_stmt: LPAREN ENUM VAL
 ##
 ## Ends in an error in state: 429.
 ##
@@ -4172,7 +4172,7 @@ program: LPAREN ENUM VAL
 
 Invalid syntax
 
-program: LPAREN ENUM LBRACE VAL
+just_stmt: LPAREN ENUM LBRACE VAL
 ##
 ## Ends in an error in state: 430.
 ##
@@ -4187,7 +4187,7 @@ program: LPAREN ENUM LBRACE VAL
 
 Invalid syntax
 
-program: LPAREN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
+just_stmt: LPAREN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 432.
 ##
@@ -4210,7 +4210,7 @@ program: LPAREN ENUM LBRACE IDENT COMMA FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: LPAREN ENUM LBRACE IDENT COMMA RBRACE VAL
+just_stmt: LPAREN ENUM LBRACE IDENT COMMA RBRACE VAL
 ##
 ## Ends in an error in state: 433.
 ##
@@ -4223,7 +4223,7 @@ program: LPAREN ENUM LBRACE IDENT COMMA RBRACE VAL
 
 Invalid syntax
 
-program: LPAREN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
+just_stmt: LPAREN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 ##
 ## Ends in an error in state: 436.
 ##
@@ -4246,7 +4246,7 @@ program: LPAREN ENUM LBRACE FN IDENT LPAREN RPAREN IMPL
 
 Invalid syntax
 
-program: LPAREN ENUM LBRACE RBRACE VAL
+just_stmt: LPAREN ENUM LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 437.
 ##
@@ -4259,7 +4259,7 @@ program: LPAREN ENUM LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: LPAREN BOOL VAL
+just_stmt: LPAREN BOOL VAL
 ##
 ## Ends in an error in state: 439.
 ##
@@ -4272,7 +4272,7 @@ program: LPAREN BOOL VAL
 
 Invalid syntax
 
-program: LPAREN BOOL LBRACKET RBRACKET VAL
+just_stmt: LPAREN BOOL LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 441.
 ##
@@ -4286,7 +4286,7 @@ program: LPAREN BOOL LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: STRUCT LBRACE VAL IDENT COLON BOOL RPAREN
+just_stmt: STRUCT LBRACE VAL IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 443.
 ##
@@ -4307,7 +4307,7 @@ program: STRUCT LBRACE VAL IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: STRUCT LBRACE VAL IDENT COLON BOOL SEMICOLON UNION
+just_stmt: STRUCT LBRACE VAL IDENT COLON BOOL SEMICOLON UNION
 ##
 ## Ends in an error in state: 445.
 ##
@@ -4319,7 +4319,7 @@ program: STRUCT LBRACE VAL IDENT COLON BOOL SEMICOLON UNION
 
 Invalid syntax
 
-program: RETURN STRUCT LBRACE RBRACE UNION
+just_stmt: RETURN STRUCT LBRACE RBRACE UNION
 ##
 ## Ends in an error in state: 450.
 ##
@@ -4332,7 +4332,7 @@ program: RETURN STRUCT LBRACE RBRACE UNION
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON BOOL VAL
+just_stmt: FN LPAREN IDENT COLON BOOL VAL
 ##
 ## Ends in an error in state: 451.
 ##
@@ -4356,7 +4356,7 @@ program: FN LPAREN IDENT COLON BOOL VAL
 
 Invalid syntax
 
-program: FN LPAREN IDENT COLON BOOL COMMA VAL
+just_stmt: FN LPAREN IDENT COLON BOOL COMMA VAL
 ##
 ## Ends in an error in state: 452.
 ##
@@ -4370,7 +4370,7 @@ program: FN LPAREN IDENT COLON BOOL COMMA VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 455.
 ##
@@ -4388,7 +4388,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RBRACKET
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 456.
 ##
@@ -4400,7 +4400,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
+just_stmt: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 457.
 ##
@@ -4418,7 +4418,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL V
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 459.
 ##
@@ -4438,7 +4438,7 @@ program: ENUM LBRACE FN IDENT LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN RPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 460.
 ##
@@ -4450,7 +4450,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
+just_stmt: ENUM LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 461.
 ##
@@ -4468,7 +4468,7 @@ program: ENUM LBRACE FN IDENT LPAREN RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET VAL
 ##
 ## Ends in an error in state: 463.
 ##
@@ -4483,7 +4483,7 @@ program: ENUM LBRACE FN IDENT LBRACKET VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 464.
 ##
@@ -4502,7 +4502,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 ##
 ## Ends in an error in state: 465.
 ##
@@ -4515,7 +4515,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN VAL
 ##
 ## Ends in an error in state: 466.
 ##
@@ -4528,7 +4528,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN VA
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 467.
 ##
@@ -4546,7 +4546,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN ID
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 468.
 ##
@@ -4558,7 +4558,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN ID
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 469.
 ##
@@ -4576,7 +4576,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN ID
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 471.
 ##
@@ -4596,7 +4596,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN ID
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 472.
 ##
@@ -4608,7 +4608,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RP
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN RARROW BOOL VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 473.
 ##
@@ -4626,7 +4626,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LPAREN RP
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL RPAREN
+just_stmt: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 475.
 ##
@@ -4647,7 +4647,7 @@ program: ENUM LBRACE FN IDENT LBRACKET IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 476.
 ##
@@ -4660,7 +4660,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN VAL
 ##
 ## Ends in an error in state: 477.
 ##
@@ -4673,7 +4673,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RBRACKET
 ##
 ## Ends in an error in state: 478.
 ##
@@ -4691,7 +4691,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RB
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN VAL
 ##
 ## Ends in an error in state: 479.
 ##
@@ -4703,7 +4703,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RP
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 480.
 ##
@@ -4721,7 +4721,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL COMMA RP
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL RBRACKET
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL RBRACKET
 ##
 ## Ends in an error in state: 482.
 ##
@@ -4741,7 +4741,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN IDENT COLON BOOL RBRACKET
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN VAL
 ##
 ## Ends in an error in state: 483.
 ##
@@ -4753,7 +4753,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN VAL
 
 Invalid syntax
 
-program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN RARROW BOOL VAL
+just_stmt: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN RARROW BOOL VAL
 ##
 ## Ends in an error in state: 484.
 ##
@@ -4771,7 +4771,7 @@ program: ENUM LBRACE FN IDENT LBRACKET RBRACKET LPAREN RPAREN RARROW BOOL VAL
 
 Invalid syntax
 
-program: RETURN UNION LBRACE RBRACE UNION
+just_stmt: RETURN UNION LBRACE RBRACE UNION
 ##
 ## Ends in an error in state: 488.
 ##
@@ -4784,7 +4784,7 @@ program: RETURN UNION LBRACE RBRACE UNION
 
 Invalid syntax
 
-program: UNION LBRACE CASE BOOL VAL
+just_stmt: UNION LBRACE CASE BOOL VAL
 ##
 ## Ends in an error in state: 489.
 ##
@@ -4805,7 +4805,7 @@ program: UNION LBRACE CASE BOOL VAL
 
 Invalid syntax
 
-program: UNION LBRACE RBRACE VAL
+just_stmt: UNION LBRACE RBRACE VAL
 ##
 ## Ends in an error in state: 494.
 ##
@@ -4819,7 +4819,7 @@ program: UNION LBRACE RBRACE VAL
 
 Invalid syntax
 
-program: UNION IDENT VAL
+just_stmt: UNION IDENT VAL
 ##
 ## Ends in an error in state: 495.
 ##
@@ -4833,7 +4833,7 @@ program: UNION IDENT VAL
 
 Invalid syntax
 
-program: UNION IDENT LBRACKET VAL
+just_stmt: UNION IDENT LBRACKET VAL
 ##
 ## Ends in an error in state: 496.
 ##
@@ -4846,7 +4846,7 @@ program: UNION IDENT LBRACKET VAL
 
 Invalid syntax
 
-program: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
+just_stmt: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 ##
 ## Ends in an error in state: 497.
 ##
@@ -4864,7 +4864,7 @@ program: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RPAREN
 
 Invalid syntax
 
-program: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
+just_stmt: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 ##
 ## Ends in an error in state: 498.
 ##
@@ -4876,7 +4876,7 @@ program: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET VAL
 
 Invalid syntax
 
-program: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
+just_stmt: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
 ##
 ## Ends in an error in state: 499.
 ##
@@ -4888,7 +4888,7 @@ program: UNION IDENT LBRACKET IDENT COLON BOOL COMMA RBRACKET LBRACE VAL
 
 Invalid syntax
 
-program: UNION IDENT LBRACKET IDENT COLON BOOL RPAREN
+just_stmt: UNION IDENT LBRACKET IDENT COLON BOOL RPAREN
 ##
 ## Ends in an error in state: 504.
 ##
@@ -4908,7 +4908,7 @@ program: UNION IDENT LBRACKET IDENT COLON BOOL RPAREN
 
 Invalid syntax
 
-program: UNION IDENT LBRACKET RBRACKET VAL
+just_stmt: UNION IDENT LBRACKET RBRACKET VAL
 ##
 ## Ends in an error in state: 505.
 ##
@@ -4920,7 +4920,7 @@ program: UNION IDENT LBRACKET RBRACKET VAL
 
 Invalid syntax
 
-program: UNION IDENT LBRACKET RBRACKET LBRACE VAL
+just_stmt: UNION IDENT LBRACKET RBRACKET LBRACE VAL
 ##
 ## Ends in an error in state: 506.
 ##
@@ -4932,7 +4932,7 @@ program: UNION IDENT LBRACKET RBRACKET LBRACE VAL
 
 Invalid syntax
 
-program: UNION IDENT LBRACE VAL
+just_stmt: UNION IDENT LBRACE VAL
 ##
 ## Ends in an error in state: 511.
 ##
@@ -4944,9 +4944,41 @@ program: UNION IDENT LBRACE VAL
 
 Invalid syntax
 
+just_stmt: BOOL SEMICOLON
+##
+## Ends in an error in state: 516.
+##
+## just_stmt -> stmt . EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## stmt
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 336, spurious reduction of production stmt_expr -> BOOL
+## In state 339, spurious reduction of production semicolon_stmt -> stmt_expr
+## In state 518, spurious reduction of production stmt -> semicolon_stmt
+##
+
+Invalid syntax
+
+program: VAL
+##
+## Ends in an error in state: 521.
+##
+## program' -> . program [ # ]
+##
+## The known suffix of the stack is as follows:
+##
+##
+
+Invalid syntax
+
 program: BOOL RBRACE
 ##
-## Ends in an error in state: 518.
+## Ends in an error in state: 524.
 ##
 ## program -> block_stmt . EOF [ # ]
 ##

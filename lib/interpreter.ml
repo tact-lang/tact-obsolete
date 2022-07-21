@@ -36,7 +36,7 @@ functor
 
     type ctx =
       { program : program;
-        mutable scope : tbinding list list;
+        mutable scope : tbinding list list ref;
         mutable updated_items : (int * int) list;
         mutable updated_unions : (int * int) list;
         mutable functions : int }
@@ -313,7 +313,7 @@ functor
             | MkInterfaceDef {mk_interface_methods} ->
                 let partial_evaluate_type ty =
                   match
-                    is_immediate_expr ctx.scope ctx.program
+                    is_immediate_expr !(ctx.scope) ctx.program
                       {value = Value (Type ty); span = expr.span}
                   with
                   | true ->
@@ -479,7 +479,7 @@ functor
 
         method private find_ref : string -> expr option =
           fun ref ->
-            match find_in_scope ref ctx.scope with
+            match find_in_scope ref !(ctx.scope) with
             | Some (Comptime ex) ->
                 Some ex
             | Some (Runtime ty) ->
@@ -502,10 +502,10 @@ functor
 
         method private with_vars : 'a. tbinding list -> (unit -> 'a) -> 'a =
           fun vars f ->
-            let prev_scope = ctx.scope in
-            ctx.scope <- vars :: ctx.scope ;
+            let prev_scope = !(ctx.scope) in
+            ctx.scope := vars :: prev_scope ;
             let output = f () in
-            ctx.scope <- prev_scope ;
+            ctx.scope := prev_scope ;
             output
       end
   end

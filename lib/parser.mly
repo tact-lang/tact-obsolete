@@ -1,6 +1,7 @@
 %parameter<Config : Config.T>
 
 %start <program> program
+%start <stmt located> just_stmt
 
 %{              
   (* This is a workaround for Dune and Menhir as discovered in https://github.com/ocaml/dune/issues/2450#issuecomment-515895672 and
@@ -303,6 +304,9 @@ let block_stmt :=
 let stmt := 
   | semicolon_stmt 
   | non_semicolon_stmt
+
+let just_stmt := 
+  | stmt = located(stmt) ; EOF; { stmt }
 
 let semicolon_stmt :=
   | ~= located(stmt_expr); <Expr>

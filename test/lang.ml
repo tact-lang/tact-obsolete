@@ -24,7 +24,7 @@ let%expect_test "program returns" =
   [%expect
     {|
     (Ok
-     ((bindings ()) (result (Integer 1)) (structs ()) (type_counter <opaque>)
+     ((bindings ()) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>) (struct_signs (0 ()))
       (union_signs
        (5
@@ -39,8 +39,8 @@ let%expect_test "program returns" =
          ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
           (un_sig_base_id 20)))))))
     (Ok
-                                    ((bindings ()) (result (Integer 1))
-                                     (structs ()) (type_counter <opaque>)
+                                    ((bindings ()) (structs ())
+                                     (type_counter <opaque>)
                                      (memoized_fcalls <opaque>)
                                      (struct_signs (0 ()))
                                      (union_signs
@@ -68,8 +68,8 @@ let%expect_test "program returns" =
            ((function_signature
              ((function_params ()) (function_returns IntegerType)))
             (function_impl (Fn (Return (Value (Integer 1)))))))))))
-      (result (Integer 1)) (structs ()) (type_counter <opaque>)
-      (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ()))
       (union_signs
        (5
         (((un_sig_cases ((StructType 59) (StructType 76))) (un_sig_methods ())
@@ -4355,8 +4355,7 @@ let%expect_test "destructuring let with missing fields" =
   pp_compile source ;
   [%expect
     {|
-    (((MissingField (84 x)) (MissingField (84 z)) (MissingField (84 x))
-      (MissingField (84 z)))
+    (((MissingField (84 x)) (MissingField (84 z)))
      ((bindings
        ((test
          (Value

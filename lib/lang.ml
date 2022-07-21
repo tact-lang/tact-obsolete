@@ -44,9 +44,10 @@ functor
       object (s : 's)
         inherit ['s] Syntax.visitor as super
 
+        method get_errors = errors
+
         (* Bindings in scope *)
-        val mutable current_bindings =
-          [List.map program.bindings ~f:make_comptime]
+        val current_bindings = ref [List.map program.bindings ~f:make_comptime]
 
         val type_checker = new type_checker errors 0
 
@@ -95,7 +96,7 @@ functor
               | Ok args' when !no_errors ->
                   let fc = (f, args') in
                   if
-                    is_immediate_expr current_bindings program
+                    is_immediate_expr !current_bindings program
                       {value = FunctionCall (f, args'); span}
                   then
                     let fc =
@@ -138,15 +139,15 @@ functor
                   (binding :: bindings) :: rest
             in
             let name, expr = Syntax.value let_ in
-            match is_immediate_expr current_bindings program expr with
+            match is_immediate_expr !current_bindings program expr with
             | true ->
-                current_bindings <-
-                  amend_bindings (make_comptime (name, expr)) current_bindings ;
+                current_bindings :=
+                  amend_bindings (make_comptime (name, expr)) !current_bindings ;
                 Let [(name, expr)]
             | false ->
                 let ty = type_of program expr in
-                current_bindings <-
-                  amend_bindings (make_runtime (name, ty)) current_bindings ;
+                current_bindings :=
+                  amend_bindings (make_runtime (name, ty)) !current_bindings ;
                 Let [(name, expr)]
 
         method build_DestructuringLet _env let_ =
@@ -158,7 +159,7 @@ functor
           in
           let let_ = Syntax.value let_ in
           match
-            is_immediate_expr current_bindings program
+            is_immediate_expr !current_bindings program
               let_.destructuring_let_expr
           with
           | true ->
@@ -168,10 +169,10 @@ functor
                         StructField (let_.destructuring_let_expr, name, HoleType);
                       span = let_.destructuring_let_expr.span }
                   in
-                  current_bindings <-
+                  current_bindings :=
                     amend_bindings
                       (make_comptime (new_name, expr))
-                      current_bindings ) ;
+                      !current_bindings ) ;
               DestructuringLet let_
           | false ->
               List.iter let_.destructuring_let ~f:(fun (name, new_name) ->
@@ -181,17 +182,17 @@ functor
                       span = let_.destructuring_let_expr.span }
                   in
                   let ty = type_of program expr in
-                  current_bindings <-
+                  current_bindings :=
                     amend_bindings
                       (make_runtime (new_name, ty))
-                      current_bindings ) ;
+                      !current_bindings ) ;
               DestructuringLet let_
 
         method build_MutRef _env _mutref = InvalidExpr
 
         method build_Reference : _ -> string located -> _ =
           fun _ ref ->
-            match find_in_scope ref.value current_bindings with
+            match find_in_scope ref.value !current_bindings with
             | Some (Runtime ty) ->
                 Reference (ref, ty)
             | Some (Comptime ex) ->
@@ -280,7 +281,7 @@ functor
           let expr' = super#visit_expr env syntax_expr in
           let expr_dummy = builtin_located expr' in
           match
-            is_immediate_expr current_bindings program expr_dummy
+            is_immediate_expr !current_bindings program expr_dummy
             && equal functions 0
           with
           | true ->
@@ -642,26 +643,7 @@ functor
           in
           value
 
-        method build_program _env stmts =
-          { program with
-            result =
-              ( match List.hd @@ List.rev stmts with
-              (*| Some (Expr expr) | Some (Return expr) -> *)
-              | Some stmt -> (
-                  let inter =
-                    new interpreter
-                      (make_ctx program current_bindings functions)
-                      errors s#partial_evaluate_fn
-                  in
-                  match inter#interpret_stmt stmt [] with
-                  | Void ->
-                      None
-                  | other ->
-                      Some other )
-              | _ ->
-                  None );
-            bindings = extract_comptime_bindings (List.concat current_bindings)
-          }
+        method build_program _env _stmts = {program with bindings = s#bindings}
 
         method build_struct_constructor _env id fields =
           match id.value with
@@ -857,6 +839,14 @@ functor
           functions <- prev_functions ;
           mk_union
 
+        method bindings =
+          extract_comptime_bindings (List.concat !current_bindings)
+
+        method make_interpreter =
+          new interpreter
+            (make_ctx program current_bindings functions)
+            errors s#partial_evaluate_fn
+
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
 
@@ -865,10 +855,10 @@ functor
 
         method private with_bindings : 'a. tbinding list -> (unit -> 'a) -> 'a =
           fun added_bindings f ->
-            let current_bindings' = current_bindings in
-            current_bindings <- added_bindings :: current_bindings ;
+            let current_bindings' = !current_bindings in
+            current_bindings := added_bindings :: current_bindings' ;
             let result = f () in
-            current_bindings <- current_bindings' ;
+            current_bindings := current_bindings' ;
             result
 
         method private make_from_impls : expr list -> int -> mk_impl list =
