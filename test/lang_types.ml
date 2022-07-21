@@ -40,7 +40,7 @@ let%test "carbon copy structure equality" =
 let%test "parameterized structure equality" =
   let source =
     {|
-  struct T(X: Type) { val a: X }
+  struct T[X: Type] { val a: X }
   let T1 = T(Int(257));
   let T2 = T(Bool);
   let T3 = T(Int(257));

@@ -91,13 +91,13 @@ let%expect_test "struct construction" =
   let source =
     {|
     struct MyType { 
-     val a: Int(257)
-     val b: Int(257)
-  }
-  let my = MyType {
-    a: 0,
-    b: 1
-  };
+     val a: Int[257]
+     val b: Int[257]
+    }
+    let my = MyType {
+      a: 0,
+      b: 1
+    };
   |}
   in
   pp source ;
@@ -127,7 +127,7 @@ let%expect_test "struct construction" =
 
 let%expect_test "parameterized struct shorthand" =
   let source = {|
-  struct MyType(T: Type) {}
+  struct MyType[T: Type] {}
   |} in
   pp source ;
   [%expect
@@ -146,7 +146,7 @@ let%expect_test "struct fields" =
   let source =
     {|
   struct MyType {
-    val a: Int(257)
+    val a: Int[257]
     val f: get_type()
   }
   |}
@@ -170,7 +170,7 @@ let%expect_test "struct fields" =
 
 let%expect_test "struct fields with semicolons" =
   let source = {|
-  struct MyType { val a: Int(257); val f: get_type() }
+  struct MyType { val a: Int[257]; val f: get_type() }
   |} in
   pp source ;
   [%expect
@@ -194,7 +194,7 @@ let%expect_test "struct methods" =
     {|
     struct MyType {
       fn test() -> Bool {}
-      fn todo() -> Int(257)
+      fn todo() -> Int[257]
     }
   |}
   in
@@ -226,7 +226,7 @@ let%expect_test "struct with fields and methods" =
   let source =
     {|
     struct MyType {
-      val a: Int(257)
+      val a: Int[257]
       fn test() -> Bool {}
     }
   |}
@@ -292,9 +292,9 @@ let%expect_test "function definition shorthand" =
 let%expect_test "function without a return type" =
   let source =
     {|
-    let f1 = fn(t: Int(257));
-    let f2 = fn(t: Int(257)) {};
-    fn f4(t: Int(257)) {}
+    let f1 = fn(t: Int[257]);
+    let f2 = fn(t: Int[257]) {};
+    fn f4(t: Int[257]) {}
     |}
   in
   pp source ;
@@ -424,11 +424,11 @@ let%expect_test "function call in a list of statements" =
 let%expect_test "let in function body" =
   let source =
     {|
-  let f = fn() -> Int(257) { 
-       let a = 1;
-       return a;
-  };
-  |}
+      let f = fn() -> Integer { 
+          let a = 1;
+          return a;
+      };
+    |}
   in
   pp source ;
   [%expect
@@ -438,9 +438,7 @@ let%expect_test "let in function body" =
         ((binding_name (Ident f))
          (binding_expr
           (Function
-           ((returns
-             (FunctionCall
-              ((fn (Reference (Ident Int))) (arguments ((Int 257))))))
+           ((returns (Reference (Ident Integer)))
             (function_body
              ((function_stmt
                (CodeBlock
@@ -451,7 +449,7 @@ let%expect_test "let in function body" =
 let%expect_test "code block without trailing semicolon" =
   let source =
     {|
-    let f = fn() -> Int(257) { 
+    let f = fn() -> Integer { 
       let a = 1;
       a
     };
@@ -465,9 +463,7 @@ let%expect_test "code block without trailing semicolon" =
         ((binding_name (Ident f))
          (binding_expr
           (Function
-           ((returns
-             (FunctionCall
-              ((fn (Reference (Ident Int))) (arguments ((Int 257))))))
+           ((returns (Reference (Ident Integer)))
             (function_body
              ((function_stmt
                (CodeBlock
@@ -573,7 +569,7 @@ let%expect_test "struct construction over a parameterized type" =
 let%expect_test "struct construction over an anonymous type" =
   let source =
     {|
-  let a = (struct { val field: Int(257) }) { field: value };
+  let a = (struct { val field: Int[257] }) { field: value };
   |}
   in
   pp source ;
@@ -597,7 +593,7 @@ let%expect_test "struct construction over an anonymous type" =
 let%expect_test "struct construction over an anonymous type's function call" =
   let source =
     {|
-  let a = struct(T: Type) { val field: T }(X) { field: value };
+  let a = struct[T: Type] { val field: T }(X) { field: value };
   |}
   in
   pp source ;
@@ -721,7 +717,7 @@ let%expect_test "union definition" =
   let source =
     {|
     union U {
-       case Int(257)
+       case Int[257]
        case Bool
     }  
     |}
@@ -744,7 +740,7 @@ let%expect_test "union definition using let binding" =
   let source =
     {|
     let U = union {
-       case Int(257)
+       case Int[257]
        case Bool
     };
     |}
@@ -766,7 +762,7 @@ let%expect_test "union definition using let binding" =
 let%expect_test "parameterized union definition" =
   let source =
     {|
-    union Option(T: Type) {
+    union Option[T: Type] {
        case T
        case Null 
     }  
@@ -970,7 +966,7 @@ let%expect_test "switch statement with a default case" =
     {|
     fn test() {
       switch (expr) {
-        case Type(T) vax => { let a = 10; }
+        case Type[T] vax => { let a = 10; }
         case Baz vax => {
           let a = 10;
           let b = 20;

@@ -113,7 +113,7 @@ let%expect_test "program returns" =
 
 let%expect_test "scope resolution" =
   let source = {|
-    let T = Int(257);
+    let T = Int[257];
   |} in
   pp_compile source ;
   [%expect
@@ -286,7 +286,7 @@ let%expect_test "scope resolution" =
 
 let%expect_test "binding resolution" =
   let source = {|
-    let T = Int(257);
+    let T = Int[257];
   |} in
   pp_compile source ;
   [%expect
@@ -482,7 +482,7 @@ let%expect_test "failed scope resolution" =
 
 let%expect_test "scope resolution after let binding" =
   let source = {|
-    let A = Int(257);
+    let A = Int[257];
     let B = A;
   |} in
   pp_compile source ;
@@ -657,7 +657,7 @@ let%expect_test "scope resolution after let binding" =
 
 let%expect_test "basic struct definition" =
   let source = {|
-    struct T { val t: Int(257) }
+    struct T { val t: Int[257] }
   |} in
   pp_compile source ;
   [%expect
@@ -835,10 +835,10 @@ let%expect_test "basic struct definition" =
 let%expect_test "Tact function evaluation" =
   let source =
     {|
-    fn test(i: Int(257)) -> Int(257) {
+    fn test(i: Int[257]) -> Int[257] {
       i
     }
-    let a = test(test(Int(257).new(1)));
+    let a = test(test(Int[257].new(1)));
   |}
   in
   pp_compile source ;
@@ -1024,7 +1024,7 @@ let%expect_test "struct definition" =
   let source =
     {|
   let MyType = struct {
-       val a: Int(257)
+       val a: Int[257]
        val b: Bool
   };
   |}
@@ -1207,7 +1207,7 @@ let%expect_test "duplicate type field" =
   let source =
     {|
   let MyType = struct {
-      val a: Int(257)
+      val a: Int[257]
       val a: Bool
   };
   |}
@@ -1396,8 +1396,8 @@ let%expect_test "duplicate type field" =
 let%expect_test "parametric struct instantiation" =
   let source =
     {|
-      struct T(A: Type) { val a: A }
-      let TA = T(Int(257));
+      struct T[A: Type] { val a: A }
+      let TA = T[Int[257]];
    |}
   in
   pp_compile source ;
@@ -1623,11 +1623,11 @@ let%expect_test "function without a return type" =
 let%expect_test "scoping that `let` introduces in code" =
   let source =
     {|
-    fn f(i: Int(257)) {
+    fn f(i: Int[257]) {
       let a = i;
       a
     }
-    let b = f(Int(257).new(1));
+    let b = f(Int[257].new(1));
     |}
   in
   pp_compile source ;
@@ -1816,11 +1816,11 @@ let%expect_test "scoping that `let` introduces in code" =
 let%expect_test "reference in function bodies" =
   let source =
     {|
-      fn op(i: Int(257), i_: Int(257)) {
+      fn op(i: Int[257], i_: Int[257]) {
         i
       }
 
-      fn f(x: Int(257)) {
+      fn f(x: Int[257]) {
         let a = op(x, x);
         let b = op(a, a);
       }
@@ -2374,7 +2374,7 @@ let%expect_test "struct instantiation" =
 
 let%expect_test "type check error" =
   let source = {|
-    fn foo(i: Int(32)) -> Int(64) { return i; }
+    fn foo(i: Int[32]) -> Int[64] { return i; }
   |} in
   pp_compile source ;
   [%expect
@@ -3249,13 +3249,13 @@ let%expect_test "union variants constructing" =
     {|
       union Uni {
         case Integer
-        case Int(32)
+        case Int[32]
       }
       fn test(value: Uni) -> Uni {
         value
       }
       let a = test(10);
-      let b = test(Int(32).new(1));
+      let b = test(Int[32].new(1));
     |}
   in
   pp_compile source ;
@@ -3480,8 +3480,8 @@ let%expect_test "unions" =
   let source =
     {|
       union Test {
-        case Int(257)
-        case Int(64)
+        case Int[257]
+        case Int[64]
         fn id(self: Self) -> Self {
           self
         }
@@ -3797,17 +3797,17 @@ let%expect_test "switch statement" =
   let source =
     {|
       union Ints {
-        case Int(32)
-        case Int(64)
+        case Int[32]
+        case Int[64]
       }
       fn test(i: Ints) -> Integer {
         switch (i) {
-          case Int(32) vax => { return 32; }
-          case Int(64) vax => { return 64; }
+          case Int[32] vax => { return 32; }
+          case Int[64] vax => { return 64; }
         }
       }
-      let must_be_32 = test(Int(32).new(0));
-      let must_be_64 = test(Int(64).new(0));
+      let must_be_32 = test(Int[32].new(0));
+      let must_be_64 = test(Int[64].new(0));
     |}
   in
   pp_compile source ;
@@ -3968,8 +3968,8 @@ let%expect_test "partial evaluation of a function" =
 
 let%expect_test "let binding with type" =
   let source = {|
-      let a: Int(257) = 1;
-      let a: Int(32) = 2;
+      let a: Int[257] = 1;
+      let a: Int[32] = 2;
     |} in
   pp_compile source ;
   [%expect
@@ -4496,19 +4496,17 @@ let%expect_test "type that does not implement interface passed to the \
 let%expect_test "struct signatures" =
   let source =
     {|
-       struct Int2(bits: Integer) {
+       struct Int2[bits: Integer] {
          val value: Integer
          fn new(i: Integer) -> Self {
            Self { value: i }
          }
        }
-       fn extract_value(n: Integer) {
-         fn(x: Int2(n)) -> Integer {
-           x.value
-         }
+       fn extract_value[n: Integer](x: Int2(n)) -> Integer {
+         x.value
        }
-       let five = extract_value(10)(Int2(10).new(5));
-       let zero = extract_value(20)(Int2(20).new(0));
+       let five = extract_value[10](Int2[10].new(5));
+       let zero = extract_value[20](Int2[20].new(0));
      |}
   in
   pp_compile source ;
@@ -4632,7 +4630,7 @@ let%expect_test "struct signatures" =
 let%expect_test "Deserilize intf with constraints" =
   let source =
     {|
-      struct Container(X: Type) { val x: X }
+      struct Container[X: Type] { val x: X }
       interface Deserialize2 {
         fn deserialize() -> Container(Self)
       }
@@ -4643,8 +4641,8 @@ let%expect_test "Deserilize intf with constraints" =
 
       struct Empty { 
         impl Deserialize2 { 
-          fn deserialize() -> Container(Self) { 
-            Container(Self) { x: Self {} }
+          fn deserialize() -> Container[Self] { 
+            Container[Self] { x: Self {} }
           } 
         }
       }

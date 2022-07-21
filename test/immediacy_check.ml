@@ -334,7 +334,7 @@ let%expect_test "Immediacy Checks MyInt Type" =
           LoadResult(Integer) { slice: slice, value: int }
         }
       }
-      struct MyInt(bits: Integer) {
+      struct MyInt[bits: Integer] {
         val value: Integer
         impl Deserialize {
           fn deserialize(s: Slice) -> LoadResult(Self) {

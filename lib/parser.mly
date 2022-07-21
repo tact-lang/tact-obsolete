@@ -224,9 +224,13 @@ let function_param ==
   * Trailing commas are allowed
 *)
 let function_call :=
-  fn = located(fexpr);
+  | fn = located(fexpr);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
   { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+  | fn = located(fexpr);
+  arguments = delimited_separated_trailing_list(LBRACKET, located(expr), COMMA, RBRACKET);
+  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+
 
 let else_ :=
   | ELSE; ~= if_; <>
@@ -393,7 +397,7 @@ let fexpr :=
  | TILDE; ~= located(ident); <MutRef>
 
 let params ==
-    delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN)
+    delimited_separated_trailing_list(LBRACKET, function_param, COMMA, RBRACKET)
 
 (* Struct
 
@@ -523,31 +527,13 @@ let union_definition(name) ==
   LBRACE;
   (members, bindings) =
     pair(
-      list(preceded(CASE, located(union_member))), 
+      list(preceded(CASE, located(expr))), 
       list(sugared_function_definition(option(located(code_block))))
     );
   impls = list(impl);
   RBRACE;
   { (n, Union (make_union_definition ~union_span: union_span.span ~union_members: members ~union_bindings: bindings ()
                     ~union_impls: impls)) }
-
-let union_member :=
- (* can be a struct definition *)
- | (_, s) = struct_definition(nothing); { s }
- (* can be an `interface` definition *)
- | (_, i) = interface_definition(nothing); { i }
- (* can be an `enum` definition *)
- | (_, e) = enum_definition(nothing); { e }
- (* can be an `union` definition *)
- | (_, u) = union_definition(nothing); { u }
- (* can be an identifier, as a reference to some identifier *)
- | ident = located(ident); {Reference ident }
- (* can be a function call [by identifier only] *)
- | fn = located(ident);
-  arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
-  { FunctionCall (make_function_call
-    ~fn: ({span = (span fn); value = (Reference (fn))}) 
-    ~arguments: arguments ()) }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==

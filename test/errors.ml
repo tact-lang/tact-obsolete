@@ -122,7 +122,7 @@ let%expect_test "duplicate variant" =
         case Integer
       }
 
-      union Test2(T: Type) {
+      union Test2[T: Type] {
         case Integer
         case T
       }
@@ -138,5 +138,5 @@ let%expect_test "duplicate variant" =
     Error[1]: Duplicate variant with type Integer
     File: "":7:6
       |
-    7 |       union Test2(T: Type) {...
+    7 |       union Test2[T: Type] {...
       |       ^^^^^^^^^^^^^^^^^^^^^^^^^ Duplicated variant in this union |}]
