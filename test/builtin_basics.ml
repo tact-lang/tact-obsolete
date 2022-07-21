@@ -9,9 +9,9 @@ let find scope name =
 let%test "int type equality" =
   let source =
     {|
-  let T = Int(257);
-  let T1 = Int(257);
-  let T2 = Int(256);
+  let T = Int[257];
+  let T1 = Int[257];
+  let T2 = Int[256];
   |}
   in
   Alcotest.(check bool)

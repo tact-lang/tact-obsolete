@@ -1,11 +1,11 @@
 open Shared.Disabled
 module Config = Shared.DisabledConfig
 
-let%expect_test "Int(bits) constructor" =
+let%expect_test "Int[bits] constructor" =
   let source =
     {|
-      let i = Int(257).new(100);
-      let overflow = Int(8).new(513);
+      let i = Int[257].new(100);
+      let overflow = Int[8].new(513);
     |}
   in
   pp_compile source ;
@@ -185,11 +185,11 @@ let%expect_test "Int(bits) constructor" =
            ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
             (un_sig_base_id 20))))))) |}]
 
-let%expect_test "Int(bits) serializer" =
+let%expect_test "Int[bits] serializer" =
   let source =
     {|
       fn test(b: Builder) {
-        let i = Int(32).new(100);
+        let i = Int[32].new(100);
         i.serialize(b);
       }
     |}
@@ -237,14 +237,14 @@ let%expect_test "demo struct serializer" =
   let source =
     {|
       struct T {
-        val a: Int(32)
-        val b: Int(16)
+        val a: Int[32]
+        val b: Int[16]
       }
       let T_serializer = serializer(T);
 
       fn test() {
         let b = Builder.new();
-        T_serializer(T{a: Int(32).new(0), b: Int(16).new(1)}, b);
+        T_serializer(T{a: Int[32].new(0), b: Int[16].new(1)}, b);
       }
     |}
   in

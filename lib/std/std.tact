@@ -67,10 +67,10 @@ struct Int[bits: Integer] {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res = s.load_int(bits);
       
-      LoadResult(Self) { 
+      LoadResult[Self] { 
         slice: res.slice, 
         value: Self { value: res.value }
       }
@@ -112,7 +112,7 @@ struct AddrNone {
 // deriving from the `len` field which requires more powerful dependent types than we have for now.
 // Do we want to make such declarations possible?
 struct AddrExtern { 
-  val len: Int(9)
+  val len: Int[9]
   val bits: Integer
 
   impl Serialize {
@@ -124,11 +124,11 @@ struct AddrExtern {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
-      let res_len = Int(9).deserialize(s);
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let res_len = Int[9].deserialize(s);
       let res_bits = res_len.slice.load_int(res_len.value);
 
-      LoadResult(Self) { 
+      LoadResult[Self] { 
         slice: res_bits.slice, 
         value: Self { 
           len: res_len.value,
@@ -150,13 +150,13 @@ union MsgAddressExt {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
-        return LoadResult(Self).new(res_discr.slice, AddrNone{});
+        return LoadResult[Self].new(res_discr.slice, AddrNone{});
       } else if (builtin_equal(res_discr.value, 1)) {
         let res_addr = AddrExtern.deserialize(res_discr.slice);
-        return LoadResult(Self).new(res_addr.slice, res_addr.value);
+        return LoadResult[Self].new(res_addr.slice, res_addr.value);
       } else {
         /* TODO: throw an exception */
       }
@@ -165,10 +165,10 @@ union MsgAddressExt {
 }
 
 struct AddressStd {
-  val workchain_id: Int(8)
-  val address: Int(256)
+  val workchain_id: Int[8]
+  val address: Int[256]
 
-  fn new(workchain_id: Int(8), address: Int(256)) -> Self {
+  fn new(workchain_id: Int[8], address: Int[256]) -> Self {
     Self {
       workchain_id: workchain_id,
       address: address,
@@ -183,12 +183,12 @@ struct AddressStd {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_anycast = s.load_int(1);
       if (builtin_equal(res_anycast.value, 0)) {
-        let res_workchain = Int(8).deserialize(res_anycast.slice);
-        let res_address = Int(256).deserialize(res_workchain.slice);
-        return LoadResult(Self)
+        let res_workchain = Int[8].deserialize(res_anycast.slice);
+        let res_address = Int[256].deserialize(res_workchain.slice);
+        return LoadResult[Self]
           .new(res_address.slice, Self {
             workchain_id: res_workchain.value,
             address: res_address.value,
@@ -201,8 +201,8 @@ struct AddressStd {
 }
 
 struct AddressVar {
-  val len: Int(9)
-  val workchain_id: Int(8)
+  val len: Int[9]
+  val workchain_id: Int[8]
   val address: Integer
 
   impl Serialize {
@@ -214,13 +214,13 @@ struct AddressVar {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_anycast = s.load_int(1);
       if (builtin_equal(res_anycast.value, 0)) {
-        let res_len = Int(9).deserialize(res_anycast.slice);
-        let res_workchain = Int(8).deserialize(res_len.slice);
+        let res_len = Int[9].deserialize(res_anycast.slice);
+        let res_workchain = Int[8].deserialize(res_len.slice);
         let res_address = res_workchain.slice.load_int(res_len);
-        return LoadResult(Self)
+        return LoadResult[Self]
           .new(res_address.slice, Self {
             len: res_len.value,
             workchain_id: res_workchain.value,
@@ -244,14 +244,14 @@ union MsgAddressInt {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
         let res_addr = AddressStd.deserialize(res_discr.slice);
-        return LoadResult(Self).new(res_addr.slice, res_addr.value);
+        return LoadResult[Self].new(res_addr.slice, res_addr.value);
       } else {
         let res_addr = AddressVar.deserialize(res_discr.slice);
-        return LoadResult(Self).new(res_addr.slice, res_addr.value);
+        return LoadResult[Self].new(res_addr.slice, res_addr.value);
       }
     }
   }
@@ -267,14 +267,14 @@ union MsgAddress {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_discr = s.load_int(1);
       if (builtin_equal(res_discr.value, 0)) {
         let res_addr = MsgAddressExt.deserialize(res_discr.slice);
-        return LoadResult(Self).new(res_addr.slice, res_addr.value);
+        return LoadResult[Self].new(res_addr.slice, res_addr.value);
       } else {
         let res_addr = MsgAddressInt.deserialize(res_discr.slice);
-        return LoadResult(Self).new(res_addr.slice, res_addr.value);
+        return LoadResult[Self].new(res_addr.slice, res_addr.value);
       }
     }
   }
@@ -283,16 +283,16 @@ union MsgAddress {
 struct ExtOutMsgInfo {
   val src: MsgAddressInt
   val dest: MsgAddressExt
-  val created_lt: Int(64) // TODO: uint
-  val created_at: Int(32) // TODO: uint
+  val created_lt: Int[64] // TODO: uint
+  val created_at: Int[32] // TODO: uint
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_src = MsgAddressInt.deserialize(s);
       let res_dest = MsgAddressExt.deserialize(res_src.slice);
-      let res_created_lt = Int(64).deserialize(res_dest.slice);
-      let res_created_at = Int(64).deserialize(res_created_lt.slice);
-      return LoadResult(Self)
+      let res_created_lt = Int[64].deserialize(res_dest.slice);
+      let res_created_at = Int[64].deserialize(res_created_lt.slice);
+      return LoadResult[Self]
         .new(res_created_at.slice, Self {
           src: res_src.value,
           dest: res_dest.value,
@@ -306,8 +306,8 @@ struct ExtOutMsgInfo {
 struct ExtOutMsgInfoRelaxed {
   val src: MsgAddress
   val dest: MsgAddressExt
-  val created_lt: Int(64) // TODO: uint
-  val created_at: Int(32) // TODO: uint
+  val created_lt: Int[64] // TODO: uint
+  val created_at: Int[32] // TODO: uint
 
   impl Serialize {
     // TODO: There is bugs when tried to use `serializer` fn here.
@@ -326,7 +326,7 @@ union CommonMsgInfo {
   // TODO: int_msg_info, ext_in_msg_info
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_discr1 = s.load_int(1);
       if (builtin_equal(res_discr1.value, 0)) {
         /* TODO: int_msg_info */
@@ -336,7 +336,7 @@ union CommonMsgInfo {
           /* TODO: ext_in_msg_info */
         } else {
           let res_info = ExtOutMsgInfo.deserialize(res_discr2.slice);
-          return LoadResult(Self).new(res_info.slice, res_info.value);
+          return LoadResult[Self].new(res_info.slice, res_info.value);
         }
       }
     }
@@ -344,9 +344,9 @@ union CommonMsgInfo {
 }
 
 struct IntMsgInfoRelaxedFlags {
-  val ihr_disabled: Int(1)
-  val bounce: Int(1)
-  val bounced: Int(1)
+  val ihr_disabled: Int[1]
+  val bounce: Int[1]
+  val bounced: Int[1]
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
@@ -378,8 +378,8 @@ struct IntMsgInfoRelaxedCoins {
 }
 
 struct Timestamps {
-  val created_lt: Int(64) // TODO: uint
-  val created_at: Int(32) // TODO: uint
+  val created_lt: Int[64] // TODO: uint
+  val created_at: Int[32] // TODO: uint
 
   fn zeros() -> Self {
     Self {
@@ -464,7 +464,7 @@ struct Message[X: Deserialize] {
   val body: X
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult(Self) {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_info = CommonMsgInfo.deserialize(s);
       let res_init = res_info.slice.load_int(1);
 
@@ -473,7 +473,7 @@ struct Message[X: Deserialize] {
         if (builtin_equal(res_body_discr.value, 0)) {
           let body = X.deserialize(res_body_discr.slice);
           let mes = Self { info: res_info.value, body: body.value };
-          return LoadResult(Self).new(body.slice, mes);
+          return LoadResult[Self].new(body.slice, mes);
         } else {
           /* TODO: cells */
         }

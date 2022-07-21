@@ -48,9 +48,9 @@ let%expect_test "passing struct to a function" =
 let%expect_test "function calls" =
   let source =
     {|
-         fn test(value: Integer) -> Integer { return value; }
-         fn test2(value: Integer) -> Integer { return test(value); }
-       |}
+      fn test(value: Integer) -> Integer { return value; }
+      fn test2(value: Integer) -> Integer { return test(value); }
+    |}
   in
   pp_codegen source ~strip_defaults:true ;
   [%expect
@@ -70,14 +70,14 @@ let%expect_test "function calls" =
          return test(value);
        } |}]
 
-let%expect_test "Int(bits) serializer codegen" =
+let%expect_test "Int[bits] serializer codegen" =
   let source =
     {|
-           fn test_int(b: Builder) {
-             let i = Int(32).new(100);
-             i.serialize(b);
-           }
-         |}
+      fn test_int(b: Builder) {
+        let i = Int[32].new(100);
+        i.serialize(b);
+      }
+    |}
   in
   pp_codegen source ;
   [%expect
@@ -138,17 +138,17 @@ let%expect_test "Int(bits) serializer codegen" =
 let%expect_test "demo struct serializer" =
   let source =
     {|
-           struct T {
-             val a: Int(32)
-             val b: Int(16)
-           }
-           let T_serializer = serializer(T);
+      struct T {
+        val a: Int[32]
+        val b: Int[16]
+      }
+      let T_serializer = serializer(T);
 
-           fn test() {
-             let b = Builder.new();
-             T_serializer(T{a: Int(32).new(0), b: Int(16).new(1)}, b);
-           }
-         |}
+      fn test() {
+        let b = Builder.new();
+        T_serializer(T{a: Int(32).new(0), b: Int(16).new(1)}, b);
+      }
+    |}
   in
   pp_codegen source ;
   [%expect
@@ -220,17 +220,17 @@ let%expect_test "demo struct serializer" =
 let%expect_test "demo struct serializer 2" =
   let source =
     {|
-         struct Foo {
-           val a: Int(32)
-           val b: Int(16)
-         }
-         let serialize_foo = serializer(Foo);
+      struct Foo {
+        val a: Int[32]
+        val b: Int[16]
+      }
+      let serialize_foo = serializer(Foo);
 
-         fn test() -> Builder {
-           let b = Builder.new();
-           return serialize_foo(Foo{a: Int(32).new(0), b: Int(16).new(1)}, b);
-         }
-       |}
+      fn test() -> Builder {
+        let b = Builder.new();
+        return serialize_foo(Foo{a: Int[32].new(0), b: Int[16].new(1)}, b);
+      }
+    |}
   in
   pp_codegen source ;
   [%expect
@@ -302,14 +302,14 @@ let%expect_test "demo struct serializer 2" =
 let%expect_test "true and false" =
   let source =
     {|
-       fn test(flag: Bool) {
-         if (flag) {
-           return false;
-         } else {
-           return true;
-         }
-       }
-       |}
+      fn test(flag: Bool) {
+        if (flag) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+    |}
   in
   pp_codegen source ~strip_defaults:true ;
   [%expect
@@ -333,14 +333,14 @@ let%expect_test "true and false" =
 let%expect_test "if/then/else" =
   let source =
     {|
-       fn test(flag: Bool) {
-         if (flag) {
-           return 1;
-         } else {
-           return 2;
-         }
-       }
-       |}
+      fn test(flag: Bool) {
+        if (flag) {
+          return 1;
+        } else {
+          return 2;
+        }
+      }
+    |}
   in
   pp_codegen source ~strip_defaults:true ;
   [%expect
@@ -364,10 +364,10 @@ let%expect_test "if/then/else" =
 let%expect_test "serializer inner struct" =
   let source =
     {|
-         struct Pubkey { val x: Int(160) }
-         struct Wallet { val seqno: Int(32) val pubkey: Pubkey }
-         let serialize_wallet = serializer(Wallet);
-       |}
+      struct Pubkey { val x: Int[160] }
+      struct Wallet { val seqno: Int[32] val pubkey: Pubkey }
+      let serialize_wallet = serializer(Wallet);
+    |}
   in
   pp_codegen source ;
   [%expect
@@ -459,13 +459,13 @@ let%expect_test "switch statement" =
   let source =
     {|
          union Ints {
-           case Int(32)
-           case Int(64)
+           case Int[32]
+           case Int[64]
          }
          fn test(i: Ints) -> Integer {
            switch (i) {
-             case Int(32) vax => { return 32; }
-             case Int(64) vax => { return 64; }
+             case Int[32] vax => { return 32; }
+             case Int[64] vax => { return 64; }
            }
          }
        |}
@@ -540,7 +540,7 @@ let%expect_test "tensor2" =
          let x = builtin_divmod(10, 2);
          return x.value1;
        }
-       |}
+    |}
   in
   pp_codegen source ;
   [%expect
@@ -595,18 +595,18 @@ let%expect_test "tensor2" =
 let%expect_test "serialization api" =
   let source =
     {|
-        struct Empty {
-         impl Serialize {
-           fn serialize(self: Self, b: Builder) -> Builder {
-             return b;
-           }
-         }
+      struct Empty {
+        impl Serialize {
+          fn serialize(self: Self, b: Builder) -> Builder {
+            return b;
+          }
         }
-        fn test(m: MessageRelaxed(Empty)) {
-          let b = Builder.new();
-          let b = m.serialize(b);
-        }
-        |}
+      }
+      fn test(m: MessageRelaxed[Empty]) {
+        let b = Builder.new();
+        let b = m.serialize(b);
+      }
+    |}
   in
   pp_codegen source ;
   [%expect
@@ -891,18 +891,18 @@ let%expect_test "serialization api" =
 let%expect_test "deserialization api" =
   let source =
     {|
-        struct Empty {
-         impl Deserialize {
-           fn deserialize(s: Slice) -> LoadResult(Self) {
-             return LoadResult(Self).new(s, Self{});
-           }
-         }
-       }
-        fn test(c: Cell) {
-          let s = Slice.parse(c);
-          let msg = Message(Empty).deserialize(s);
+      struct Empty {
+        impl Deserialize {
+          fn deserialize(s: Slice) -> LoadResult[Self] {
+            return LoadResult[Self].new(s, Self{});
+          }
         }
-        |}
+      }
+      fn test(c: Cell) {
+        let s = Slice.parse(c);
+        let msg = Message[Empty].deserialize(s);
+      }
+    |}
   in
   pp_codegen source ;
   [%expect
@@ -1100,16 +1100,15 @@ let%expect_test "deserialization api" =
 let%expect_test "destructuring let" =
   let source =
     {|
-         struct T {
-            val x: Integer
-            val y: Integer
-            val z: Integer
-         }
-         fn test(t: T) -> Integer {
-           let {x, y as y2, z} = t;
-           y2
-         }
-
+      struct T {
+        val x: Integer
+        val y: Integer
+        val z: Integer
+      }
+      fn test(t: T) -> Integer {
+        let {x, y as y2, z} = t;
+        y2
+      }
      |}
   in
   pp_codegen source ~strip_defaults:true ;
@@ -1132,15 +1131,15 @@ let%expect_test "destructuring let" =
 let%expect_test "destructuring let with rest ignored" =
   let source =
     {|
-         struct T {
-            val x: Integer
-            val y: Integer
-            val z: Integer
-         }
-         fn test(t: T) -> Integer {
-           let {y as y2, ..} = t;
-           y2
-         }
+      struct T {
+        val x: Integer
+        val y: Integer
+        val z: Integer
+      }
+      fn test(t: T) -> Integer {
+        let {y as y2, ..} = t;
+        y2
+      }
      |}
   in
   pp_codegen source ~strip_defaults:true ;
