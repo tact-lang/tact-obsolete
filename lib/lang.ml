@@ -247,6 +247,44 @@ functor
                     () ) ;
           DestructuringLet let_
 
+        method build_Assignment _env assignment =
+          let {assignment_ident; assignment_expr; _} = assignment in
+          let make name expr =
+            match is_immediate_expr !current_bindings program expr with
+            | true ->
+                make_comptime (name, expr)
+            | false ->
+                make_runtime (name, type_of program expr)
+          in
+          (* Update individual bindings *)
+          let rec update' = function
+            | [] ->
+                None
+            | (name, _) :: rest
+              when equal_located String.equal name assignment_ident ->
+                Some (make name assignment_expr :: rest)
+            | binding :: rest -> (
+              match update' rest with
+              | Some updated ->
+                  Some (binding :: updated)
+              | None ->
+                  None )
+          in
+          (* Update binding sets *)
+          let rec update = function
+            | [] ->
+                errors#report `Error (`UnresolvedIdentifier assignment_ident) () ;
+                []
+            | binding_set :: bindings -> (
+              match update' binding_set with
+              | Some binding_set' ->
+                  binding_set' :: bindings
+              | None ->
+                  binding_set :: update bindings )
+          in
+          current_bindings := update !current_bindings ;
+          Assignment assignment
+
         method build_MutRef _env _mutref = InvalidExpr
 
         method build_Reference : _ -> string located -> _ =
@@ -370,7 +408,10 @@ functor
             destructuring_let_expr;
             destructuring_let_rest }
 
-        method build_enum_definition _env _attributes _members _bindings = ()
+        method build_assignment _env assignment_ident assignment_expr =
+          {assignment_ident; assignment_expr}
+
+        method build_enum_definition _env _ _ _ = ()
 
         method build_enum_member _env _name _value = ()
 

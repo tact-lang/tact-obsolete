@@ -1615,3 +1615,30 @@ let%expect_test "deserializer unions" =
     } else
     throw(0);
     }} |}]
+
+let%expect_test "assignment" =
+  let source =
+    {|
+      fn test(x: Int(257)) {
+        let a = 1;
+        a = x;
+        a
+      }
+  |}
+  in
+  pp_codegen source ~strip_defaults:true ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int test(int x) {
+      int a = 1;
+      a = x;
+      return a;
+    } |}]

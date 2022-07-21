@@ -1271,3 +1271,15 @@ let%expect_test "attributes" =
         ((binding_name (Ident E1))
          (binding_expr
           (Enum ((enum_attributes (((attribute_ident (Ident attr))))))))))))) |}]
+
+let%expect_test "assignment" =
+  let source = {|
+      let a = 1;
+      a = 2;
+  |} in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
+       (Assignment ((assignment_ident (Ident a)) (assignment_expr (Int 2))))))) |}]
