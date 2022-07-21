@@ -2464,6 +2464,54 @@ let%expect_test "scope doesn't leak bindings" =
          ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
           (un_sig_base_id 20))))))) |}]
 
+let%expect_test "compile-time if/then/else continues interpretation after \
+                 condition check (bug fix)" =
+  let source =
+    {|
+    fn T() {
+      if (false) {
+        return 1;
+      }
+      return 2;
+    }
+
+    let a = T();
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((a (Value (Integer 2)))
+        (T
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              (Block
+               ((If
+                 ((if_condition (Value (Bool false)))
+                  (if_then (Block ((Return (Value (Integer 1)))))) (if_else ())))
+                (Return (Value (Integer 2)))))))))))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ()))
+      (union_signs
+       (5
+        (((un_sig_cases ((StructType 59) (StructType 76))) (un_sig_methods ())
+          (un_sig_base_id 77))
+         ((un_sig_cases ((StructType 55))) (un_sig_methods ())
+          (un_sig_base_id 60))
+         ((un_sig_cases ((UnionType 21) (UnionType 39))) (un_sig_methods ())
+          (un_sig_base_id 44))
+         ((un_sig_cases ((StructType 31) (StructType 35))) (un_sig_methods ())
+          (un_sig_base_id 38))
+         ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
+          (un_sig_base_id 20)))))))
+|}]
+
 let%expect_test "compile-time if/then/else" =
   let source =
     {|

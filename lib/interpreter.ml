@@ -116,11 +116,12 @@ functor
               let result = self#interpret_expr if_condition in
               match result with
               | Bool true ->
-                  self#interpret_stmt if_then []
+                  self#interpret_stmt if_then rest
               | Bool false ->
                   Option.map if_else ~f:(fun stmt ->
-                      self#interpret_stmt stmt [] )
-                  |> Option.value ~default:Void
+                      self#interpret_stmt stmt rest )
+                  |> Option.value_or_thunk ~default:(fun _ ->
+                         self#interpret_stmt_list rest )
               | value ->
                   errors#report `Error
                     (`UnexpectedType
