@@ -53,7 +53,7 @@ functor
             is_part := false ) ;
       !is_part
 
-    class type_checker (errors : _) (functions : _) =
+    class type_checker (errors : _) (nesting_level : _) =
       object (self)
         val mutable fn_returns : type_ option = None
 
@@ -168,8 +168,9 @@ functor
           | (StructType _ as ty) | (UnionType _ as ty) -> (
               let from_intf_ =
                 let inter =
-                  new interpreter (make_ctx program current_bindings functions)
-                    errors (fun _ f -> f)
+                  new interpreter
+                    (make_ctx program current_bindings nesting_level) errors
+                    (fun _ f -> f)
                 in
                 Value
                   (inter#interpret_fc

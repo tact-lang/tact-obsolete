@@ -147,7 +147,7 @@ functor
           let sign =
             self#visit_function_signature env f.value.function_signature
           in
-          ctx.functions <- ctx.functions + 1 ;
+          ctx.nesting_level <- ctx.nesting_level + 1 ;
           let args =
             List.map sign.value.function_params ~f:(fun (name, ty) ->
                 (name, Runtime ty) )
@@ -157,7 +157,7 @@ functor
                 let body = self#visit_function_impl env f.value.function_impl in
                 {function_signature = sign; function_impl = body} )
           in
-          ctx.functions <- ctx.functions - 1 ;
+          ctx.nesting_level <- ctx.nesting_level - 1 ;
           {value = out; span = f.span}
 
         method! visit_IntfMethodCall env call =

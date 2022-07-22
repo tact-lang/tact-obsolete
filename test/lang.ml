@@ -2569,6 +2569,82 @@ let%expect_test "compile-time if/then/else" =
          ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
           (un_sig_base_id 20))))))) |}]
 
+let%expect_test "compile-time if's then/else branches don't get immediately \
+                 interpreted" =
+  let source =
+    {|
+      if (true) {
+        test(1);
+      } else {
+        test(2);
+      }
+      let t1 = result(1);
+      let t2 = result(2);
+    |}
+  in
+  let counters = [ref 0; ref 0] in
+  let test =
+    Function
+      (bl
+         { function_signature =
+             bl
+               { function_params = [(bl "i", IntegerType)];
+                 function_returns = VoidType };
+           function_impl =
+             BuiltinFn
+               { (builtin_fun (fun _p -> function
+                    | Integer i :: _ ->
+                        let counter =
+                          List.nth_exn counters @@ (Z.to_int i - 1)
+                        in
+                        counter := !counter + 1 ;
+                        Void
+                    | _ ->
+                        Void ) )
+                 with
+                 builtin_immediate = false } } )
+  in
+  let result =
+    Function
+      (bl
+         { function_signature =
+             bl
+               { function_params = [(bl "i", IntegerType)];
+                 function_returns = IntegerType };
+           function_impl =
+             BuiltinFn
+               (builtin_fun (fun _p -> function
+                  | Integer i :: _ ->
+                      let counter = List.nth_exn counters @@ (Z.to_int i - 1) in
+                      Integer (Z.of_int !counter)
+                  | _ ->
+                      Integer Z.zero ) ) } )
+  in
+  let p = Lang.default_program () in
+  pp_compile source
+    ~prev_program:
+      { p with
+        bindings =
+          [(bl "test", bl (Value test)); (bl "result", bl (Value result))]
+          @ p.bindings } ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((t2 (Value (Integer 0))) (t1 (Value (Integer 1))))) (structs ())
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (5
+        (((un_sig_cases ((StructType 59) (StructType 76))) (un_sig_methods ())
+          (un_sig_base_id 77))
+         ((un_sig_cases ((StructType 55))) (un_sig_methods ())
+          (un_sig_base_id 60))
+         ((un_sig_cases ((UnionType 21) (UnionType 39))) (un_sig_methods ())
+          (un_sig_base_id 44))
+         ((un_sig_cases ((StructType 31) (StructType 35))) (un_sig_methods ())
+          (un_sig_base_id 38))
+         ((un_sig_cases ((StructType 14) (StructType 18))) (un_sig_methods ())
+          (un_sig_base_id 20))))))) |}]
+
 let%expect_test "type check error" =
   let source =
     {|

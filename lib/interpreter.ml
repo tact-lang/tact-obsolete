@@ -39,10 +39,10 @@ functor
         mutable scope : tbinding list list ref;
         mutable updated_items : (int * int) list;
         mutable updated_unions : (int * int) list;
-        mutable functions : int }
+        mutable nesting_level : int }
 
-    let make_ctx program scope functions =
-      {program; scope; updated_items = []; updated_unions = []; functions}
+    let make_ctx program scope nesting_level =
+      {program; scope; updated_items = []; updated_unions = []; nesting_level}
 
     (*TODO: type checks for arguments*)
     class interpreter (ctx : ctx) (errors : _ errors)
@@ -471,7 +471,9 @@ functor
                               self#interpret_stmt function_impl [] )
                       | Error _ ->
                           Void )
-                  | {function_impl = BuiltinFn (function_impl, _); _} ->
+                  | { function_impl =
+                        BuiltinFn {builtin_fn = function_impl, _; _};
+                      _ } ->
                       let value = function_impl ctx.program args' in
                       value )
                 | _ ->

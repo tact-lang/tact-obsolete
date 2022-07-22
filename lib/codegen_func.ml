@@ -20,7 +20,7 @@ functor
 
         val mutable fn_name_counter = 0
 
-        val mutable functions : (T.function_ * F.function_) list = []
+        val mutable nesting_level : (T.function_ * F.function_) list = []
 
         method cg_Fn body = F.Fn (List.concat (Option.value_exn body))
 
@@ -257,7 +257,7 @@ functor
               @@ List.range ~start:`inclusive ~stop:`inclusive 1 sz
             in
             make_tensor_accessors 2
-            @ List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
+            @ List.map (List.rev nesting_level) ~f:(fun (_, f) -> F.Function f)
 
         method cg_StructField : T.expr * string located * T.type_ -> _ =
           fun (from_expr, field, _) ->
@@ -417,10 +417,10 @@ functor
                     self#generate_func_name )
               in
               let fn' = self#cg_function_ name fn in
-              functions <- (fn, fn') :: functions ;
+              nesting_level <- (fn, fn') :: nesting_level ;
               fn'
             in
-            List.Assoc.find functions ~equal:T.equal_function_ fn
+            List.Assoc.find nesting_level ~equal:T.equal_function_ fn
             |> Option.value_or_thunk ~default
 
         method private generate_func_name =

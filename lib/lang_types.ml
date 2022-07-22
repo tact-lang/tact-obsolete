@@ -270,7 +270,9 @@ functor
       (program -> value list -> value
       [@visitors.opaque] [@equal.ignore] [@compare.ignore] )
 
-    and builtin_fn = native_function * (int[@sexp.opaque])
+    and builtin_fn =
+      { builtin_fn : native_function * (int[@sexp.opaque]);
+        builtin_immediate : bool }
 
     and function_ = function_kind located
 
@@ -719,6 +721,9 @@ functor
           self#plus is_intf_instance is_args
 
         method! visit_SelfType _ = NonImmediate NonImmediateSelfType
+
+        method! visit_BuiltinFn _env {builtin_immediate; _} =
+          if builtin_immediate then Immediate else NonImmediate NonImmediatetSig
       end
 
     let rec is_immediate_expr scope _p expr =
@@ -736,7 +741,9 @@ functor
     let rec builtin_fun_counter = ref 0
 
     and builtin_fun f =
-      let res = (f, !builtin_fun_counter) in
+      let res =
+        {builtin_fn = (f, !builtin_fun_counter); builtin_immediate = true}
+      in
       builtin_fun_counter := !builtin_fun_counter + 1 ;
       res
 

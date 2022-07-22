@@ -51,8 +51,8 @@ functor
 
         val type_checker = new type_checker errors 0
 
-        (* Are we inside of a function body? How deep? *)
-        val mutable functions = 0
+        (* Are we inside of a code block outside of direct execution path? How deep? *)
+        val mutable nesting_level = 0
 
         (* TODO: can we remove duplicating bindings here and the above? *)
         (* Program handle we pass to builtin functions. *)
@@ -102,7 +102,7 @@ functor
                     let fc =
                       let inter =
                         new interpreter
-                          (make_ctx program current_bindings functions)
+                          (make_ctx program current_bindings nesting_level)
                           errors s#partial_evaluate_fn
                       in
                       let fc = inter#interpret_fc fc in
@@ -203,7 +203,7 @@ functor
 
         method build_Return _env return =
           let typecheck =
-            if functions = 0 then Ok VoidType
+            if nesting_level = 0 then Ok VoidType
             else
               type_checker#check_return_type return ~program ~current_bindings
           in
@@ -221,7 +221,7 @@ functor
         method build_Break _env stmt =
           match stmt.value with
           | Expr ex -> (
-            match functions with
+            match nesting_level with
             | 0 ->
                 raise InternalCompilerError
             | _ -> (
@@ -253,6 +253,7 @@ functor
             expr_to_type program @@ s#visit_located s#visit_expr env b.ty
           in
           let ref = s#visit_located s#visit_ident env b.var in
+          nesting_level <- nesting_level + 1 ;
           let stmt =
             s#with_bindings
               [make_runtime (ref, ty)]
@@ -260,6 +261,7 @@ functor
                 let stmt = s#visit_located s#visit_stmt env b.stmt in
                 stmt )
           in
+          nesting_level <- nesting_level - 1 ;
           {branch_ty = ty; branch_var = ref; branch_stmt = stmt}
 
         method build_switch _env cond branches _default =
@@ -282,12 +284,12 @@ functor
           let expr_dummy = builtin_located expr' in
           match
             is_immediate_expr !current_bindings program expr_dummy
-            && equal functions 0
+            && equal nesting_level 0
           with
           | true ->
               let inter =
                 new interpreter
-                  (make_ctx program current_bindings functions)
+                  (make_ctx program current_bindings nesting_level)
                   errors s#partial_evaluate_fn
               in
               let value' = inter#interpret_expr expr_dummy in
@@ -575,9 +577,9 @@ functor
 
         method! visit_function_body env body =
           (* save the function enclosure count *)
-          let functions' = functions in
+          let nesting_level' = nesting_level in
           (* increment function counter *)
-          functions <- functions + 1 ;
+          nesting_level <- nesting_level + 1 ;
           let body =
             match body.function_stmt.value with
             | Expr ex ->
@@ -611,7 +613,7 @@ functor
             handle_returning_break {value = result; span = body.span}
           in
           (* restore function enclosure count *)
-          functions <- functions' ;
+          nesting_level <- nesting_level' ;
           result.value
 
         method build_function_body _env stmt = stmt.value
@@ -620,6 +622,22 @@ functor
 
         method build_if_ _env if_condition if_then if_else =
           {if_condition; if_then; if_else}
+
+        method! visit_if_ env _visitors_this =
+          let _visitors_r0 =
+            s#visit_located s#visit_expr env _visitors_this.condition
+          in
+          nesting_level <- nesting_level + 1 ;
+          let _visitors_r1 =
+            s#visit_located s#visit_stmt env _visitors_this.body
+          in
+          let _visitors_r2 =
+            s#visit_option
+              (s#visit_located s#visit_stmt)
+              env _visitors_this.else_
+          in
+          nesting_level <- nesting_level - 1 ;
+          s#build_if_ env _visitors_r0 _visitors_r1 _visitors_r2
 
         method build_interface_definition _env members =
           let signatures =
@@ -729,8 +747,8 @@ functor
             s'
 
         method! visit_struct_definition env syn_struct_def =
-          let prev_functions = functions in
-          functions <- functions + 1 ;
+          let prev_nesting_level = nesting_level in
+          nesting_level <- nesting_level + 1 ;
           let fields =
             s#visit_list
               (s#visit_located s#visit_struct_field)
@@ -773,7 +791,7 @@ functor
                 { mk_struct.mk_struct_details with
                   mk_id = mk_struct.mk_struct_details.mk_id } }
           in
-          functions <- prev_functions ;
+          nesting_level <- prev_nesting_level ;
           mk_struct
 
         method build_struct_field : _ -> _ -> _ -> string located * expr =
@@ -782,8 +800,8 @@ functor
         method build_union_definition _ _ _ = raise InternalCompilerError
 
         method! visit_union_definition env def =
-          let prev_functions = functions in
-          functions <- functions + 1 ;
+          let prev_nesting_level = nesting_level in
+          nesting_level <- nesting_level + 1 ;
           let cases =
             s#visit_list (s#visit_located s#visit_expr) env def.union_members
           in
@@ -836,7 +854,7 @@ functor
                   mk_sig = sign_id;
                   mk_span = def.union_span } }
           in
-          functions <- prev_functions ;
+          nesting_level <- prev_nesting_level ;
           mk_union
 
         method bindings =
@@ -844,7 +862,7 @@ functor
 
         method make_interpreter =
           new interpreter
-            (make_ctx program current_bindings functions)
+            (make_ctx program current_bindings nesting_level)
             errors s#partial_evaluate_fn
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
