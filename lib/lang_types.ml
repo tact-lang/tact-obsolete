@@ -320,7 +320,7 @@ functor
       | SendRawMsg of {msg : expr; flags : expr}
       | ParseCell of {cell : expr}
       | SliceEndParse of {slice : expr}
-      | SliceLoadInt of {slice : expr; bits : expr}
+      | SliceLoadInt of {slice : expr; bits : expr; signed : bool}
     [@@deriving
       equal,
         compare,

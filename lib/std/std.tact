@@ -18,6 +18,10 @@ struct Builder {
     let b = builtin_builder_store_int(self.b, int, bits);
     Self { b: b }
   }
+  fn serialize_uint(self: Self, uint: Integer, bits: Integer) -> Self {
+    let b = builtin_builder_store_uint(self.b, uint, bits);
+    Self { b: b }
+  }
   fn serialize_coins(self: Self, c: Integer) -> Self {
     let b = builtin_builder_store_coins(self.b, c);
     Self { b: b }
@@ -33,6 +37,13 @@ struct Slice {
 
   fn load_int(self: Self, bits: Integer) -> LoadResult[Integer] {
     let output = builtin_slice_load_int(self.s, bits);
+    let slice = Self { s: output.value1 };
+    let int = output.value2;
+    LoadResult[Integer] { slice: slice, value: int }
+  }
+
+  fn load_uint(self: Self, bits: Integer) -> LoadResult[Integer] {
+    let output = builtin_slice_load_uint(self.s, bits);
     let slice = Self { s: output.value1 };
     let int = output.value2;
     LoadResult[Integer] { slice: slice, value: int }
@@ -84,19 +95,34 @@ struct Int[bits: Integer] {
   }
 }
 
-struct SendRawMsgFlags {
+struct Uint[bits: Integer] {
   val value: Integer
 
-  fn default() -> Self {
-    Self { value: 0 }
+  fn new(i: Integer) -> Self {
+    Self { value: i }
   }
 
-  fn carry_smart_contract_balance() -> Self {
-    Self { value: 128 }
+  impl Serialize {
+    fn serialize(self: Self, builder: Builder) -> Builder {
+      builder.serialize_uint(self.value, bits)
+    } 
   }
 
-  fn carry_rest_from_transaction_input() -> Self {
-    Self { value: 64 }
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let res = s.load_uint(bits);
+      
+      LoadResult[Self] { 
+        slice: res.slice, 
+        value: Self { value: res.value }
+      }
+    }
+  }
+
+  impl From(Integer) {
+    fn from(i: Integer) -> Self {
+      Self { value: i }
+    }
   }
 }
 
@@ -481,6 +507,22 @@ struct Message[X: Deserialize] {
         /* TODO: can be init state != 0? */
       }
     }
+  }
+}
+
+struct SendRawMsgFlags {
+  val value: Integer
+
+  fn default() -> Self {
+    Self { value: 0 }
+  }
+
+  fn carry_smart_contract_balance() -> Self {
+    Self { value: 128 }
+  }
+
+  fn carry_rest_from_transaction_input() -> Self {
+    Self { value: 64 }
   }
 }
 

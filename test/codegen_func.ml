@@ -99,6 +99,9 @@ let%expect_test "Int[bits] serializer codegen" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -110,6 +113,9 @@ let%expect_test "Int[bits] serializer codegen" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);
@@ -170,6 +176,9 @@ let%expect_test "demo struct serializer" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -181,6 +190,9 @@ let%expect_test "demo struct serializer" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);
@@ -252,6 +264,9 @@ let%expect_test "demo struct serializer 2" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -263,6 +278,9 @@ let%expect_test "demo struct serializer 2" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);
@@ -389,6 +407,9 @@ let%expect_test "serializer inner struct" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -400,6 +421,9 @@ let%expect_test "serializer inner struct" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);
@@ -490,6 +514,9 @@ let%expect_test "switch statement" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -501,6 +528,9 @@ let%expect_test "switch statement" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);
@@ -562,6 +592,9 @@ let%expect_test "tensor2" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -573,6 +606,9 @@ let%expect_test "tensor2" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);
@@ -628,6 +664,9 @@ let%expect_test "serialization api" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -639,6 +678,9 @@ let%expect_test "serialization api" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);
@@ -924,6 +966,9 @@ let%expect_test "deserialization api" =
        (int, int) builtin_divmod(int x, int y) {
          return divmod(x, y);
        }
+       (slice, int) builtin_slice_load_uint(slice s, int bits) {
+         return load_uint(s, bits);
+       }
        (slice, int) builtin_slice_load_int(slice s, int bits) {
          return load_int(s, bits);
        }
@@ -935,6 +980,9 @@ let%expect_test "deserialization api" =
        }
        int builtin_builder_store_coins(builder b, int c) {
          return store_grams(b, c);
+       }
+       builder builtin_builder_store_uint(builder b, int int_, int bits) {
+         return store_uint(b, int_, bits);
        }
        builder builtin_builder_store_int(builder b, int int_, int bits) {
          return store_int(b, int_, bits);

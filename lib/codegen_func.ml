@@ -340,9 +340,12 @@ functor
               F.FunctionCall ("begin_parse", [self#cg_expr cell], F.SliceType)
           | SliceEndParse {slice} ->
               F.FunctionCall ("end_parse", [self#cg_expr slice], F.InferType)
-          | SliceLoadInt {slice; bits} ->
+          | SliceLoadInt {slice; bits; signed} ->
+              let fname =
+                match signed with true -> "load_int" | false -> "load_uint"
+              in
               F.FunctionCall
-                ( "load_int",
+                ( fname,
                   [self#cg_expr slice; self#cg_expr bits],
                   F.TensorType [F.SliceType; F.IntType] )
           | Equality {x; y} ->

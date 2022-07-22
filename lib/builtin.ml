@@ -407,6 +407,17 @@ functor
                      length = bl @@ Reference (bl "bits", IntegerType);
                      integer = bl @@ Reference (bl "int", IntegerType);
                      signed = true } ) );
+            ( "builtin_builder_store_uint",
+              make_builtin_fn
+                [ (bl "b", BuiltinType "Builder");
+                  (bl "int", IntegerType);
+                  (bl "bits", IntegerType) ]
+                (BuiltinType "Builder")
+                (StoreInt
+                   { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
+                     length = bl @@ Reference (bl "bits", IntegerType);
+                     integer = bl @@ Reference (bl "int", IntegerType);
+                     signed = false } ) );
             ( "builtin_builder_store_coins",
               make_builtin_fn
                 [(bl "b", BuiltinType "Builder"); (bl "c", IntegerType)]
@@ -434,7 +445,18 @@ functor
                      .uty_id )
                 (SliceLoadInt
                    { slice = bl @@ Reference (bl "s", BuiltinType "Slice");
-                     bits = bl @@ Reference (bl "bits", IntegerType) } ) );
+                     bits = bl @@ Reference (bl "bits", IntegerType);
+                     signed = true } ) );
+            ( "builtin_slice_load_uint",
+              make_builtin_fn
+                [(bl "s", BuiltinType "Slice"); (bl "bits", IntegerType)]
+                (StructType
+                   (tensor2 (BuiltinType "Slice") IntegerType).struct_details
+                     .uty_id )
+                (SliceLoadInt
+                   { slice = bl @@ Reference (bl "s", BuiltinType "Slice");
+                     bits = bl @@ Reference (bl "bits", IntegerType);
+                     signed = false } ) );
             ( "builtin_divmod",
               make_builtin_fn
                 [(bl "x", IntegerType); (bl "y", IntegerType)]
