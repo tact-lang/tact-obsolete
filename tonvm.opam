@@ -9,6 +9,7 @@ bug-reports: "https://github.com/tact-lang/tact/issues"
 depends: [
   "ocaml" {>= "4.14.0"}
   "base" {>= "0.15.0"}
+  "core" {>= "0.15.0"}
   "bitstring" {>= "4.1.0"}
   "ppx_bitstring" {>= "4.1.0"}
   "zarith" {>= "1.12"}
