@@ -162,3 +162,12 @@ and compile_to_ir' ?(prev_program = Lang.default_program ()) ~filename text =
 
 and compile_to_ir ?(prev_program = Lang.default_program ()) ~filename text =
   Result.map snd @@ compile_to_ir' ~prev_program ~filename text
+
+let compile_with_std ?(codegen_impl = Codegen_func.codegen)
+    ?(filename = "<unnamed>") ch =
+  let prev_program =
+    compile_to_ir ~filename:"std.tact" Builtin.std |> Result.get_ok
+  in
+  let text = really_input_string ch (in_channel_length ch) in
+  close_in ch ;
+  codegen ~codegen_impl (compile_to_ir ~prev_program ~filename text)

@@ -6,7 +6,7 @@ module Builtin = Tact.Compiler.Builtin
 
 let interpret_file argv =
   let filename = Array.get argv 1 in
-  match Tact.Compiler.compile ~filename (Caml.open_in filename) with
+  match Tact.Compiler.compile_with_std ~filename (Caml.open_in filename) with
   | Ok program ->
       Caml.Format.print_string program
   | Error errors ->
@@ -56,7 +56,8 @@ let rec repl ?(program = default_program ()) ?(prompt = prompt) () =
 
 let () =
   let argv = Sys.get_argv () in
-  if Array.length argv > 2 then interpret_file argv
-  else LNoise.set_multiline true ;
-  ignore @@ LNoise.history_set ~max_length:1000 ;
-  repl ()
+  if Array.length argv > 1 then interpret_file argv
+  else (
+    LNoise.set_multiline true ;
+    ignore @@ LNoise.history_set ~max_length:1000 ;
+    repl () )
