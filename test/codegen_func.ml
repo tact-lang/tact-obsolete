@@ -840,75 +840,78 @@ let%expect_test "serialization api" =
        builder f6(tuple self, builder b) {
          return f7(self, b);
        }
-       builder f21(int self, builder builder_) {
-         return f3(builder_, self, 64);
+       builder f22(builder self, int uint, int bits) {
+         return builtin_builder_store_uint(self, uint, bits);
        }
-       builder f22(int self, builder builder_) {
-         return f3(builder_, self, 32);
+       builder f21(int self, builder builder_) {
+         return f22(builder_, self, 64);
+       }
+       builder f23(int self, builder builder_) {
+         return f22(builder_, self, 32);
        }
        builder f5([tuple, tuple, int, int] self, builder b) {
          builder b = f6(first(self), b);
          builder b = f8(second(self), b);
          builder b = f21(third(self), b);
-         builder b = f22(fourth(self), b);
+         builder b = f23(fourth(self), b);
          return b;
        }
        builder f4([tuple, tuple, int, int] self, builder b) {
          return f5(self, b);
        }
-       builder f27(int self, builder builder_) {
+       builder f28(int self, builder builder_) {
          return f3(builder_, self, 1);
        }
-       builder f26([int, int, int] self, builder b) {
-         builder b = f27(first(self), b);
-         builder b = f27(second(self), b);
-         builder b = f27(third(self), b);
+       builder f27([int, int, int] self, builder b) {
+         builder b = f28(first(self), b);
+         builder b = f28(second(self), b);
+         builder b = f28(third(self), b);
          return b;
        }
-       builder f25([int, int, int] self, builder b) {
-         return f26(self, b);
+       builder f26([int, int, int] self, builder b) {
+         return f27(self, b);
        }
-       builder f29([tuple, tuple] self, builder b) {
+       builder f30([tuple, tuple] self, builder b) {
          builder b = f13(first(self), b);
          builder b = f13(second(self), b);
          return b;
        }
-       builder f28([tuple, tuple] self, builder b) {
-         return f29(self, b);
+       builder f29([tuple, tuple] self, builder b) {
+         return f30(self, b);
        }
-       builder f33(builder self, int c) {
+       builder f34(builder self, int c) {
          return builtin_builder_store_coins(self, c);
        }
-       builder f32(int self, builder builder_) {
-         return f33(builder_, self);
+       builder f33(int self, builder builder_) {
+         return f34(builder_, self);
+       }
+       builder f32([int, int] self, builder b) {
+         builder b = f33(first(self), b);
+         builder b = f33(second(self), b);
+         return b;
        }
        builder f31([int, int] self, builder b) {
-         builder b = f32(first(self), b);
-         builder b = f32(second(self), b);
-         return b;
+         return f32(self, b);
        }
-       builder f30([int, int] self, builder b) {
-         return f31(self, b);
+       builder f36([int, int] self, builder b) {
+         builder b = f21(first(self), b);
+         builder b = f23(second(self), b);
+         return b;
        }
        builder f35([int, int] self, builder b) {
-         builder b = f21(first(self), b);
-         builder b = f22(second(self), b);
-         return b;
+         return f36(self, b);
        }
-       builder f34([int, int] self, builder b) {
-         return f35(self, b);
+       builder f25([[int, int, int], [tuple, tuple], [int, int], [int, int]]
+           self, builder b) {
+         builder b = f26(first(self), b);
+         builder b = f29(second(self), b);
+         builder b = f31(third(self), b);
+         builder b = f35(fourth(self), b);
+         return b;
        }
        builder f24([[int, int, int], [tuple, tuple], [int, int], [int, int]]
            self, builder b) {
-         builder b = f25(first(self), b);
-         builder b = f28(second(self), b);
-         builder b = f30(third(self), b);
-         builder b = f34(fourth(self), b);
-         return b;
-       }
-       builder f23([[int, int, int], [tuple, tuple], [int, int], [int, int]]
-           self, builder b) {
-         return f24(self, b);
+         return f25(self, b);
        }
        builder f2(tuple self, builder b) {
          {
@@ -922,7 +925,7 @@ let%expect_test "serialization api" =
        {
          builder b = f3(b, 0, 1);
        return
-       f23(info, b);
+       f24(info, b);
        }} else if (discr == 0)
        {
          [tuple, tuple, int, int] info = second(temp);
@@ -933,14 +936,14 @@ let%expect_test "serialization api" =
        }} else
        {
          }}}
-       builder f36([] self, builder b) {
+       builder f37([] self, builder b) {
          return b;
        }
        builder f1([tuple, []] self, builder b) {
          builder b = f2(first(self), b);
          builder b = f3(b, 0, 1);
          builder b = f3(b, 0, 1);
-         builder b = f36(second(self), b);
+         builder b = f37(second(self), b);
          return b;
        }
        _ test([tuple, []] m) {
@@ -1107,27 +1110,31 @@ let%expect_test "deserialization api" =
        {
          throw(0);
        }}
-       [slice, int] f18(slice s) {
-         [slice, int] res = f3(s, 64);
-         [slice slice_, int value] = res;
-         return [slice_, value];
+       [slice, int] f19(slice self, int bits) {
+         (slice, int) output = builtin_slice_load_uint(self, bits);
+         slice slice_ = tensor2_value1(output);
+         int int_ = tensor2_value2(output);
+         return [slice_, int_];
        }
-       [slice, int] f19(slice s) {
-         [slice, int] res = f3(s, 32);
-         [slice slice_, int value] = res;
-         return [slice_, value];
+       [slice, int] f18(slice s) {
+         [slice, int] res = f19(s, 64);
+         return [first(res), second(res)];
+       }
+       [slice, int] f20(slice s) {
+         [slice, int] res = f19(s, 32);
+         return [first(res), second(res)];
        }
        [slice, [tuple, tuple, int, int]] f5(slice slice_) {
          [slice slice_, tuple src] = f6(slice_);
          [slice slice_, tuple dest] = f15(slice_);
          [slice slice_, int created_lt] = f18(slice_);
-         [slice slice_, int created_at] = f19(slice_);
+         [slice slice_, int created_at] = f20(slice_);
          return [[src, dest, created_lt, created_at], slice_];
        }
        [slice, [tuple, tuple, int, int]] f4(slice s) {
          return f5(s);
        }
-       [slice, tuple] f20(slice s, tuple v) {
+       [slice, tuple] f21(slice s, tuple v) {
          return [s, v];
        }
        [slice, tuple] f2(slice s) {
@@ -1142,15 +1149,15 @@ let%expect_test "deserialization api" =
        {
          [slice, [tuple, tuple, int, int]] res_info = f4(first(res_discr2));
        return
-       f20(first(res_info), second(res_info));
+       f21(first(res_info), second(res_info));
        }}}
-       [slice, []] f22(slice s, [] v) {
+       [slice, []] f23(slice s, [] v) {
          return [s, v];
        }
-       [slice, []] f21(slice s) {
-         return f22(s, []);
+       [slice, []] f22(slice s) {
+         return f23(s, []);
        }
-       [slice, [tuple, []]] f23(slice s, [tuple, []] v) {
+       [slice, [tuple, []]] f24(slice s, [tuple, []] v) {
          return [s, v];
        }
        [slice, [tuple, []]] f1(slice s) {
@@ -1160,11 +1167,11 @@ let%expect_test "deserialization api" =
          [slice, int] res_body_discr = f3(first(res_init), 1);
        if (builtin_equal(second(res_body_discr), 0))
        {
-         [slice, []] body = f21(first(res_body_discr));
+         [slice, []] body = f22(first(res_body_discr));
        [tuple, [tuple, []]] mes =
        [second(res_info), second(body)];
        return
-       f23(first(body), mes);
+       f24(first(body), mes);
        } else
        {
          }} else

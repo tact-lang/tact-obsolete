@@ -300,8 +300,8 @@ union MsgAddress {
 struct ExtOutMsgInfo {
   val src: MsgAddressInt
   val dest: MsgAddressExt
-  val created_lt: Int[64] // TODO: uint
-  val created_at: Int[32] // TODO: uint
+  val created_lt: Uint[64]
+  val created_at: Uint[32]
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
@@ -313,8 +313,8 @@ struct ExtOutMsgInfo {
 struct ExtOutMsgInfoRelaxed {
   val src: MsgAddress
   val dest: MsgAddressExt
-  val created_lt: Int[64] // TODO: uint
-  val created_at: Int[32] // TODO: uint
+  val created_lt: Uint[64]
+  val created_at: Uint[32]
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
@@ -380,8 +380,8 @@ struct IntMsgInfoRelaxedCoins {
 }
 
 struct Timestamps {
-  val created_lt: Int[64] // TODO: uint
-  val created_at: Int[32] // TODO: uint
+  val created_lt: Uint[64]
+  val created_at: Uint[32]
 
   fn zeros() -> Self {
     Self {
