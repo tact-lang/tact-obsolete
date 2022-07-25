@@ -309,6 +309,109 @@ functor
               { function_signature;
                 function_impl = BuiltinFn (builtin_fun function_impl) } ) )
 
+    let add_deserializer prog =
+      let slice_ty = slice_struct in
+      let load_result_fn =
+        List.find_map prog.bindings ~f:(fun (n, x) ->
+            if String.equal n.value "LoadResult" then Some x else None )
+        |> Option.value_exn
+      in
+      let function_signature =
+        bl
+          { function_params = [(bl "t", type0)];
+            function_returns =
+              FunctionType
+                (bl
+                   { function_params = [(bl "slice", slice_ty)];
+                     function_returns =
+                       ExprType
+                         ( bl
+                         @@ FunctionCall
+                              (load_result_fn, [bl @@ Reference (bl "t", type0)])
+                         ) } ) }
+      in
+      let deserializer_struct_ty sid p =
+        let s = Program.get_struct p sid in
+        let load_result_ty =
+          let id = p.type_counter in
+          p.type_counter <- p.type_counter + 1 ;
+          let struct_ = make_load_result_with_id (-500) id (StructType sid) in
+          let struct_ =
+            Result.ok_exn @@ Program.with_struct p struct_ (fun _ -> Ok struct_)
+          in
+          StructType struct_.struct_details.uty_id
+        in
+        let deserialize_fields =
+          List.fold (List.rev s.struct_fields) ~init:[]
+            ~f:(fun exprs (name, {field_type}) ->
+              let field_deserialize_fn =
+                match
+                  List.Assoc.find
+                    (Program.methods_of p field_type)
+                    ~equal:(fun v1 v2 -> equal_string v1.value v2.value)
+                    (bl "deserialize")
+                with
+                | Some m ->
+                    m
+                | None ->
+                    raise Errors.InternalCompilerError
+              in
+              let deserialize_field_expr =
+                FunctionCall
+                  ( bl @@ Value (Function field_deserialize_fn),
+                    [bl @@ Reference (bl "slice", slice_ty)] )
+              in
+              let deserialize_field =
+                bl
+                @@ DestructuringLet
+                     { destructuring_let =
+                         [(bl "slice", bl "slice"); (bl "value", name)];
+                       destructuring_let_expr = bl @@ deserialize_field_expr;
+                       destructuring_let_rest = false }
+              in
+              deserialize_field :: exprs )
+        in
+        let out_value =
+          bl
+          @@ Value
+               (Struct
+                  ( bl @@ Value (Type (StructType sid)),
+                    List.map s.struct_fields ~f:(fun (n, {field_type}) ->
+                        (n.value, bl @@ Reference (bl @@ n.value, field_type)) )
+                  ) )
+        in
+        let out =
+          bl
+          @@ Value
+               (Struct
+                  ( bl @@ Value (Type load_result_ty),
+                    [ ("value", out_value);
+                      ("slice", bl @@ Reference (bl "slice", slice_ty)) ] ) )
+        in
+        let body = Block (deserialize_fields @ [bl @@ Return out]) in
+        { function_signature =
+            bl
+              { function_params = [(bl "slice", slice_ty)];
+                function_returns = load_result_ty };
+          function_impl = Fn (bl body) }
+      in
+      let function_impl p = function
+        | [Type (StructType s)] ->
+            Function (bl @@ deserializer_struct_ty s p)
+            (* | [Type (UnionType u)] ->
+                 Function (bl @@ deserializer_union_ty u p) *)
+        | _ ->
+            Void
+      in
+      let des =
+        Value
+          (Function
+             (bl
+                { function_signature;
+                  function_impl = BuiltinFn (builtin_fun function_impl) } ) )
+      in
+      {prog with bindings = (bl "deserializer", bl des) :: prog.bindings}
+
     let from_intf_ =
       let function_signature =
         bl {function_params = [(bl "T", type0)]; function_returns = HoleType}
@@ -525,7 +628,7 @@ functor
        new program for each call, not one global mutable variable. *)
     let default_program () =
       empty_program () |> add_builtin_bindings |> add_default_bindings
-      |> add_default_structs |> add_default_intfs
+      |> add_default_structs |> add_default_intfs |> add_deserializer
 
     let std = [%blob "std/std.tact"]
   end

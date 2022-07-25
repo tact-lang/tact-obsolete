@@ -694,3 +694,149 @@ let%expect_test "slice api" =
             (un_sig_base_id 37))
            ((un_sig_cases ((StructType 13) (StructType 17))) (un_sig_methods ())
             (un_sig_base_id 19))))))) |}]
+
+let%expect_test "deserializer" =
+  let source =
+    {|
+      struct Something {
+        val value1: Int[9]
+        val value2: Int[256]
+      }
+      let test = deserializer[Something];
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((slice (StructType 6))))
+              (function_returns (StructType 86))))
+            (function_impl
+             (Fn
+              (Block
+               ((DestructuringLet
+                 ((destructuring_let ((slice slice) (value value1)))
+                  (destructuring_let_expr
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params ((s (StructType 6))))
+                          (function_returns (StructType 15))))
+                        (function_impl
+                         (Fn
+                          (Block
+                           ((Let
+                             ((res
+                               (FunctionCall
+                                ((ResolvedReference (load_int <opaque>))
+                                 ((Reference (s (StructType 6)))
+                                  (Value (Integer 9))))))))
+                            (DestructuringLet
+                             ((destructuring_let ((slice slice) (value value)))
+                              (destructuring_let_expr
+                               (Reference (res (StructType 5))))
+                              (destructuring_let_rest false)))
+                            (Return
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 15)))
+                                ((slice (Reference (slice (StructType 6))))
+                                 (value
+                                  (Value
+                                   (Struct
+                                    ((Value (Type (StructType 14)))
+                                     ((value (Reference (value IntegerType))))))))))))))))))))
+                     ((Reference (slice (StructType 6)))))))
+                  (destructuring_let_rest false)))
+                (DestructuringLet
+                 ((destructuring_let ((slice slice) (value value2)))
+                  (destructuring_let_expr
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params ((s (StructType 6))))
+                          (function_returns (StructType 28))))
+                        (function_impl
+                         (Fn
+                          (Block
+                           ((Let
+                             ((res
+                               (FunctionCall
+                                ((ResolvedReference (load_int <opaque>))
+                                 ((Reference (s (StructType 6)))
+                                  (Value (Integer 256))))))))
+                            (DestructuringLet
+                             ((destructuring_let ((slice slice) (value value)))
+                              (destructuring_let_expr
+                               (Reference (res (StructType 5))))
+                              (destructuring_let_rest false)))
+                            (Return
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 28)))
+                                ((slice (Reference (slice (StructType 6))))
+                                 (value
+                                  (Value
+                                   (Struct
+                                    ((Value (Type (StructType 27)))
+                                     ((value (Reference (value IntegerType))))))))))))))))))))
+                     ((Reference (slice (StructType 6)))))))
+                  (destructuring_let_rest false)))
+                (Return
+                 (Value
+                  (Struct
+                   ((Value (Type (StructType 86)))
+                    ((value
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 85)))
+                         ((value1 (Reference (value1 (StructType 14))))
+                          (value2 (Reference (value2 (StructType 27)))))))))
+                     (slice (Reference (slice (StructType 6)))))))))))))))))
+        (Something (Value (Type (StructType 85))))))
+      (structs
+       ((86
+         ((struct_fields
+           ((slice ((field_type (StructType 6))))
+            (value ((field_type (StructType 85))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((s (StructType 6)) (v (StructType 85))))
+                  (function_returns (StructType 86))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 86)))
+                      ((slice (Reference (s (StructType 6))))
+                       (value (Reference (v (StructType 85)))))))))))))))
+            (uty_impls ()) (uty_id 86) (uty_base_id -500)))))
+        (85
+         ((struct_fields
+           ((value1 ((field_type (StructType 14))))
+            (value2 ((field_type (StructType 27))))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 85) (uty_base_id 84)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (5
+        (((un_sig_cases ((StructType 58) (StructType 75))) (un_sig_methods ())
+          (un_sig_base_id 76))
+         ((un_sig_cases ((StructType 54))) (un_sig_methods ())
+          (un_sig_base_id 59))
+         ((un_sig_cases ((UnionType 20) (UnionType 38))) (un_sig_methods ())
+          (un_sig_base_id 43))
+         ((un_sig_cases ((StructType 30) (StructType 34))) (un_sig_methods ())
+          (un_sig_base_id 37))
+         ((un_sig_cases ((StructType 13) (StructType 17))) (un_sig_methods ())
+          (un_sig_base_id 19))))))) |}]

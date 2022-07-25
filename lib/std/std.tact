@@ -209,13 +209,7 @@ struct AddressStd {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_anycast = s.load_int(1);
       if (builtin_equal(res_anycast.value, 0)) {
-        let res_workchain = Int[8].deserialize(res_anycast.slice);
-        let res_address = Int[256].deserialize(res_workchain.slice);
-        return LoadResult[Self]
-          .new(res_address.slice, Self {
-            workchain_id: res_workchain.value,
-            address: res_address.value,
-          });
+        return deserializer[Self](s);
       } else {
         throw(0); // unreachable
       }
@@ -311,17 +305,7 @@ struct ExtOutMsgInfo {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      let res_src = MsgAddressInt.deserialize(s);
-      let res_dest = MsgAddressExt.deserialize(res_src.slice);
-      let res_created_lt = Int[64].deserialize(res_dest.slice);
-      let res_created_at = Int[64].deserialize(res_created_lt.slice);
-      return LoadResult[Self]
-        .new(res_created_at.slice, Self {
-          src: res_src.value,
-          dest: res_dest.value,
-          created_lt: res_created_lt.value,
-          created_at: res_created_at.value,
-        });
+      return deserializer[Self](s);
     }
   }
 }

@@ -457,6 +457,12 @@ functor
         | Ok t ->
             t
         | _ ->
+            print_sexp
+            @@ sexp_of_list
+                 (Sexplib.Conv.sexp_of_pair
+                    (sexp_of_located sexp_of_string)
+                    sexp_of_type_ )
+                 arg_types ;
             raise Errors.InternalCompilerError
       in
       let dependent_types_monomophizer (program : program)

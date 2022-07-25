@@ -1203,7 +1203,7 @@ let%expect_test "duplicate type field" =
           ((a (Value (Type (StructType 84))))
            (a (ResolvedReference (Bool <opaque>)))))
          (mk_struct_details
-          ((mk_methods ()) (mk_impls ()) (mk_id 86) (mk_sig 84)
+          ((mk_methods ()) (mk_impls ()) (mk_id 86) (mk_sig 88)
            (mk_span <opaque>)))))))
      ((bindings ((MyType (Value (Type (StructType 87))))))
       (structs
@@ -1390,14 +1390,14 @@ let%expect_test "parametric struct instantiation" =
           (Function
            ((function_signature
              ((function_params ((A (TypeN 0))))
-              (function_returns (StructSig 84))))
+              (function_returns (StructSig 88))))
             (function_impl
              (Fn
               (Return
                (MkStructDef
                 ((mk_struct_fields ((a (Reference (A (TypeN 0))))))
                  (mk_struct_details
-                  ((mk_methods ()) (mk_impls ()) (mk_id 84) (mk_sig 84)
+                  ((mk_methods ()) (mk_impls ()) (mk_id 84) (mk_sig 88)
                    (mk_span <opaque>))))))))))))))
       (structs
        ((87
@@ -3695,7 +3695,7 @@ let%expect_test "methods monomorphization" =
           (Function
            ((function_signature
              ((function_params ((X (TypeN 0))))
-              (function_returns (StructSig 84))))
+              (function_returns (StructSig 88))))
             (function_impl
              (Fn
               (Return
@@ -3707,14 +3707,14 @@ let%expect_test "methods monomorphization" =
                       (MkFunction
                        ((function_signature
                          ((function_params
-                           ((self (ExprType (Reference (Self (StructSig 84)))))
+                           ((self (ExprType (Reference (Self (StructSig 88)))))
                             (x (ExprType (Reference (X (TypeN 0)))))))
                           (function_returns (ExprType (Reference (X (TypeN 0)))))))
                         (function_impl
                          (Fn
                           (Return
                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))
-                   (mk_impls ()) (mk_id 84) (mk_sig 84) (mk_span <opaque>))))))))))))))
+                   (mk_impls ()) (mk_id 84) (mk_sig 88) (mk_span <opaque>))))))))))))))
       (structs
        ((88
          ((struct_fields ())
@@ -4514,7 +4514,7 @@ let%expect_test "struct signatures" =
           (Function
            ((function_signature
              ((function_params ((bits IntegerType)))
-              (function_returns (StructSig 84))))
+              (function_returns (StructSig 88))))
             (function_impl
              (Fn
               (Return
@@ -4528,15 +4528,15 @@ let%expect_test "struct signatures" =
                        ((function_signature
                          ((function_params ((i IntegerType)))
                           (function_returns
-                           (ExprType (Reference (Self (StructSig 84)))))))
+                           (ExprType (Reference (Self (StructSig 88)))))))
                         (function_impl
                          (Fn
                           (Return
                            (Value
                             (Struct
-                             ((Reference (Self (StructSig 84)))
+                             ((Reference (Self (StructSig 88)))
                               ((value (Reference (i IntegerType)))))))))))))))
-                   (mk_impls ()) (mk_id 84) (mk_sig 84) (mk_span <opaque>))))))))))))))
+                   (mk_impls ()) (mk_id 84) (mk_sig 88) (mk_span <opaque>))))))))))))))
       (structs
        ((86
          ((struct_fields ((value ((field_type IntegerType)))))
