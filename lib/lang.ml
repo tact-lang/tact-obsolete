@@ -28,6 +28,7 @@ functor
       | `ExpectedFunction of type_
       | `UnallowedReturn of expr
       | `OnlyFunctionIsAllowed
+      | `MissingField of type_ * string located
       | `FieldNotFoundF of string located ]
     [@@deriving equal, sexp_of]
 
@@ -158,35 +159,49 @@ functor
                 (binding :: bindings) :: rest
           in
           let let_ = Syntax.value let_ in
-          match
-            is_immediate_expr !current_bindings program
-              let_.destructuring_let_expr
-          with
-          | true ->
-              List.iter let_.destructuring_let ~f:(fun (name, new_name) ->
-                  let expr =
-                    { value =
-                        StructField (let_.destructuring_let_expr, name, HoleType);
-                      span = let_.destructuring_let_expr.span }
-                  in
+          let st_ty = type_of program let_.destructuring_let_expr in
+          let fields =
+            match st_ty with
+            | StructType id ->
+                (Program.get_struct program id).struct_fields
+                |> List.map ~f:(fun (n, ty) -> (n, ty.field_type))
+            | ExprType ex -> (
+              match type_of program ex with
+              | StructSig id ->
+                  (Arena.get program.struct_signs id).st_sig_fields
+                  |> List.map ~f:(fun (n, exty) ->
+                         (n, expr_to_type program exty) )
+              | _ ->
+                  raise InternalCompilerError )
+            | _ ->
+                raise InternalCompilerError
+          in
+          (* Check if field names are correct *)
+          List.iter let_.destructuring_let ~f:(fun (name, name2) ->
+              match
+                List.find fields ~f:(fun (n, _) ->
+                    String.equal n.value name.value )
+              with
+              | Some (_, ty) ->
                   current_bindings :=
-                    amend_bindings
-                      (make_comptime (new_name, expr))
-                      !current_bindings ) ;
-              DestructuringLet let_
-          | false ->
-              List.iter let_.destructuring_let ~f:(fun (name, new_name) ->
-                  let expr =
-                    { value =
-                        StructField (let_.destructuring_let_expr, name, HoleType);
-                      span = let_.destructuring_let_expr.span }
-                  in
-                  let ty = type_of program expr in
-                  current_bindings :=
-                    amend_bindings
-                      (make_runtime (new_name, ty))
-                      !current_bindings ) ;
-              DestructuringLet let_
+                    amend_bindings (make_runtime (name2, ty)) !current_bindings
+              | _ ->
+                  errors#report `Error
+                    (`FieldNotFound
+                      ({value = Value (Type st_ty); span = name2.span}, name) )
+                    () ) ;
+          (* If rest of fields are not ignored, check for completeness *)
+          if let_.destructuring_let_rest then ()
+          else
+            List.iter fields ~f:(fun (name, _) ->
+                if
+                  List.Assoc.find let_.destructuring_let
+                    ~equal:(equal_located String.equal)
+                    name
+                  |> Option.is_some
+                then ()
+                else errors#report `Error (`MissingField (st_ty, name)) () ) ;
+          DestructuringLet let_
 
         method build_MutRef _env _mutref = InvalidExpr
 

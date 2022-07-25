@@ -611,6 +611,8 @@ functor
             | Some (Error _) ->
                 NonImmediate NonImmediateRef
             | None ->
+                print_sexp @@ sexp_of_string ref.value ;
+                print_sexp @@ sexp_of_list (sexp_of_list sexp_of_tbinding) scope ;
                 raise Errors.InternalCompilerError )
 
         method! visit_Primitive _ _ = NonImmediate NonImmediatePrimitive

@@ -82,22 +82,20 @@ let%expect_test "Int[bits] constructor" =
                          (FunctionCall
                           ((ResolvedReference (load_int <opaque>))
                            ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                      (DestructuringLet
+                       ((destructuring_let ((slice slice) (value value)))
+                        (destructuring_let_expr (Reference (res (StructType 5))))
+                        (destructuring_let_rest false)))
                       (Return
                        (Value
                         (Struct
                          ((Value (Type (StructType 85)))
-                          ((slice
-                            (StructField
-                             ((Reference (res (StructType 5))) slice
-                              (StructType 6))))
+                          ((slice (Reference (slice (StructType 6))))
                            (value
                             (Value
                              (Struct
                               ((Value (Type (StructType 84)))
-                               ((value
-                                 (StructField
-                                  ((Reference (res (StructType 5))) value
-                                   IntegerType)))))))))))))))))))
+                               ((value (Reference (value IntegerType)))))))))))))))))))
                 (from
                  ((function_signature
                    ((function_params ((i IntegerType)))
@@ -141,22 +139,21 @@ let%expect_test "Int[bits] constructor" =
                              ((ResolvedReference (load_int <opaque>))
                               ((Reference (s (StructType 6)))
                                (Value (Integer 257))))))))
+                         (DestructuringLet
+                          ((destructuring_let ((slice slice) (value value)))
+                           (destructuring_let_expr
+                            (Reference (res (StructType 5))))
+                           (destructuring_let_rest false)))
                          (Return
                           (Value
                            (Struct
                             ((Value (Type (StructType 85)))
-                             ((slice
-                               (StructField
-                                ((Reference (res (StructType 5))) slice
-                                 (StructType 6))))
+                             ((slice (Reference (slice (StructType 6))))
                               (value
                                (Value
                                 (Struct
                                  ((Value (Type (StructType 84)))
-                                  ((value
-                                    (StructField
-                                     ((Reference (res (StructType 5))) value
-                                      IntegerType))))))))))))))))))))))
+                                  ((value (Reference (value IntegerType))))))))))))))))))))))
                 ((impl_interface 10)
                  (impl_methods
                   ((from
@@ -402,22 +399,20 @@ let%expect_test "demo struct serializer" =
                          (FunctionCall
                           ((ResolvedReference (load_int <opaque>))
                            ((Reference (s (StructType 6))) (Value (Integer 16))))))))
+                      (DestructuringLet
+                       ((destructuring_let ((slice slice) (value value)))
+                        (destructuring_let_expr (Reference (res (StructType 5))))
+                        (destructuring_let_rest false)))
                       (Return
                        (Value
                         (Struct
                          ((Value (Type (StructType 85)))
-                          ((slice
-                            (StructField
-                             ((Reference (res (StructType 5))) slice
-                              (StructType 6))))
+                          ((slice (Reference (slice (StructType 6))))
                            (value
                             (Value
                              (Struct
                               ((Value (Type (StructType 84)))
-                               ((value
-                                 (StructField
-                                  ((Reference (res (StructType 5))) value
-                                   IntegerType)))))))))))))))))))
+                               ((value (Reference (value IntegerType)))))))))))))))))))
                 (from
                  ((function_signature
                    ((function_params ((i IntegerType)))
@@ -460,22 +455,21 @@ let%expect_test "demo struct serializer" =
                             (FunctionCall
                              ((ResolvedReference (load_int <opaque>))
                               ((Reference (s (StructType 6))) (Value (Integer 16))))))))
+                         (DestructuringLet
+                          ((destructuring_let ((slice slice) (value value)))
+                           (destructuring_let_expr
+                            (Reference (res (StructType 5))))
+                           (destructuring_let_rest false)))
                          (Return
                           (Value
                            (Struct
                             ((Value (Type (StructType 85)))
-                             ((slice
-                               (StructField
-                                ((Reference (res (StructType 5))) slice
-                                 (StructType 6))))
+                             ((slice (Reference (slice (StructType 6))))
                               (value
                                (Value
                                 (Struct
                                  ((Value (Type (StructType 84)))
-                                  ((value
-                                    (StructField
-                                     ((Reference (res (StructType 5))) value
-                                      IntegerType))))))))))))))))))))))
+                                  ((value (Reference (value IntegerType))))))))))))))))))))))
                 ((impl_interface 10)
                  (impl_methods
                   ((from

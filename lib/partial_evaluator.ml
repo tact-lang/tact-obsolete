@@ -73,36 +73,11 @@ functor
           ctx.scope := vars_scope :: !(ctx.scope) ;
           Let vars'
 
-        method! visit_DestructuringLet _env let_ =
-          match type_of ctx.program let_.destructuring_let_expr with
+        method! visit_DestructuringLet env let_ =
+          let expr = self#visit_expr env let_.destructuring_let_expr in
+          match type_of ctx.program expr with
           | StructType id ->
               let struct_ = Program.get_struct ctx.program id in
-              (* Check if field names are correct *)
-              List.iter let_.destructuring_let ~f:(fun (name, name2) ->
-                  if
-                    List.Assoc.find struct_.struct_fields
-                      ~equal:(equal_located equal_string)
-                      name
-                    |> Option.is_some
-                  then ()
-                  else
-                    errors#report `Error
-                      (`FieldNotFound
-                        ( { value = Value (Type (StructType id));
-                            span = name2.span },
-                          name ) )
-                      () ) ;
-              (* If rest of fields are not ignored, check for completeness *)
-              if let_.destructuring_let_rest then ()
-              else
-                List.iter struct_.struct_fields ~f:(fun (name, _) ->
-                    if
-                      List.Assoc.find let_.destructuring_let
-                        ~equal:(equal_located String.equal)
-                        name
-                      |> Option.is_some
-                    then ()
-                    else errors#report `Error (`MissingField (id, name)) () ) ;
               let vars =
                 List.map let_.destructuring_let ~f:(fun (name, new_name) ->
                     List.Assoc.find struct_.struct_fields
@@ -112,7 +87,24 @@ functor
                     |> fun {field_type} -> (new_name, Runtime field_type) )
               in
               ctx.scope := vars :: !(ctx.scope) ;
-              DestructuringLet let_
+              DestructuringLet {let_ with destructuring_let_expr = expr}
+          | ExprType ex -> (
+            match type_of ctx.program ex with
+            | StructSig sign ->
+                let struct_sign = Arena.get ctx.program.struct_signs sign in
+                let vars =
+                  List.map let_.destructuring_let ~f:(fun (name, new_name) ->
+                      List.Assoc.find struct_sign.st_sig_fields
+                        ~equal:(equal_located String.equal)
+                        name
+                      |> Option.value_exn
+                      |> fun field_type ->
+                      (new_name, Runtime (ExprType field_type)) )
+                in
+                ctx.scope := vars :: !(ctx.scope) ;
+                DestructuringLet {let_ with destructuring_let_expr = expr}
+            | _ ->
+                raise InternalCompilerError )
           | _ ->
               raise InternalCompilerError
 

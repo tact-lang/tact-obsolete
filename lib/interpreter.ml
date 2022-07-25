@@ -16,7 +16,6 @@ functor
       | `UninterpretableStatement of stmt
       | `UnexpectedType of type_
       | `FieldNotFound of expr * string located
-      | `MissingField of int * string located
       | `ArgumentNumberMismatch
       | `DuplicateVariant of type_ * (span[@equal.ignore] [@sexp.opaque]) ]
     [@@deriving equal, sexp_of]

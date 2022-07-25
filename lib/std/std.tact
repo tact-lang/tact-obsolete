@@ -5,26 +5,22 @@ struct Cell {
 // Do not change place of builder struct - for internal reasons
 // it should be second struct in the file.
 struct Builder {
-  val b: builtin_Builder
+  val inner: builtin_Builder
 
   fn new() -> Self {
-    Self { b: builtin_builder_new() }
+    Self { inner: builtin_builder_new() }
   }
   fn build(self: Self) -> Cell {
-    let c = builtin_builder_build(self.b);
-    Cell { c: c }
+    Cell { c: builtin_builder_build(self.inner) }
   }
   fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
-    let b = builtin_builder_store_int(self.b, int, bits);
-    Self { b: b }
+    Self { inner: builtin_builder_store_int(self.inner, int, bits) }
   }
   fn serialize_uint(self: Self, uint: Integer, bits: Integer) -> Self {
-    let b = builtin_builder_store_uint(self.b, uint, bits);
-    Self { b: b }
+    Self { inner: builtin_builder_store_uint(self.inner, uint, bits) }
   }
   fn serialize_coins(self: Self, c: Integer) -> Self {
-    let b = builtin_builder_store_coins(self.b, c);
-    Self { b: b }
+    Self { inner: builtin_builder_store_coins(self.inner, c) }
   }
 }
 
@@ -80,10 +76,11 @@ struct Int[bits: Integer] {
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let res = s.load_int(bits);
+      let {slice, value} = res;
       
       LoadResult[Self] { 
-        slice: res.slice, 
-        value: Self { value: res.value }
+        slice: slice, 
+        value: Self { value: value }
       }
     }
   }
@@ -150,15 +147,15 @@ struct AddrExtern {
   }
 
   impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      let res_len = Int[9].deserialize(s);
-      let res_bits = res_len.slice.load_int(res_len.value);
+    fn deserialize(slice: Slice) -> LoadResult[Self] {
+      let {value as len, slice} = Int[9].deserialize(slice);
+      let {value as bits, slice} = slice.load_int(len);
 
       LoadResult[Self] { 
-        slice: res_bits.slice, 
+        slice: slice, 
         value: Self { 
-          len: res_len.value,
-          bits: res_bits.value,
+          len: len,
+          bits: bits,
         }
       }
     } 

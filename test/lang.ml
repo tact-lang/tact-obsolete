@@ -181,22 +181,20 @@ let%expect_test "scope resolution" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -240,22 +238,21 @@ let%expect_test "scope resolution" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -354,22 +351,20 @@ let%expect_test "binding resolution" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -413,22 +408,21 @@ let%expect_test "binding resolution" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -552,22 +546,20 @@ let%expect_test "scope resolution after let binding" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -611,22 +603,21 @@ let%expect_test "scope resolution after let binding" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -729,22 +720,20 @@ let%expect_test "basic struct definition" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -788,22 +777,21 @@ let%expect_test "basic struct definition" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -917,22 +905,20 @@ let%expect_test "Tact function evaluation" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -976,22 +962,21 @@ let%expect_test "Tact function evaluation" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -1100,22 +1085,20 @@ let%expect_test "struct definition" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -1159,22 +1142,21 @@ let%expect_test "struct definition" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -1290,22 +1272,20 @@ let%expect_test "duplicate type field" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -1349,22 +1329,21 @@ let%expect_test "duplicate type field" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -1485,22 +1464,20 @@ let%expect_test "parametric struct instantiation" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 86)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 85)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -1544,22 +1521,21 @@ let%expect_test "parametric struct instantiation" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 86)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 85)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -1710,22 +1686,20 @@ let%expect_test "scoping that `let` introduces in code" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -1769,22 +1743,21 @@ let%expect_test "scoping that `let` introduces in code" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -1920,22 +1893,20 @@ let%expect_test "reference in function bodies" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -1979,22 +1950,21 @@ let%expect_test "reference in function bodies" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -2645,22 +2615,20 @@ let%expect_test "type check error" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 10))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 87)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 86)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -2703,22 +2671,21 @@ let%expect_test "type check error" =
                           (FunctionCall
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6))) (Value (Integer 10))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 87)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 86)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -2793,22 +2760,20 @@ let%expect_test "type check error" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 99))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -2851,22 +2816,21 @@ let%expect_test "type check error" =
                           (FunctionCall
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6))) (Value (Integer 99))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -3554,22 +3518,20 @@ let%expect_test "unions" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -3613,22 +3575,21 @@ let%expect_test "unions" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -4043,22 +4004,20 @@ let%expect_test "let binding with type" =
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
                          ((Reference (s (StructType 6))) (Value (Integer 257))))))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
                     (Return
                      (Value
                       (Struct
                        ((Value (Type (StructType 85)))
-                        ((slice
-                          (StructField
-                           ((Reference (res (StructType 5))) slice
-                            (StructType 6))))
+                        ((slice (Reference (slice (StructType 6))))
                          (value
                           (Value
                            (Struct
                             ((Value (Type (StructType 84)))
-                             ((value
-                               (StructField
-                                ((Reference (res (StructType 5))) value
-                                 IntegerType)))))))))))))))))))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
               (from
                ((function_signature
                  ((function_params ((i IntegerType)))
@@ -4102,22 +4061,21 @@ let%expect_test "let binding with type" =
                            ((ResolvedReference (load_int <opaque>))
                             ((Reference (s (StructType 6)))
                              (Value (Integer 257))))))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
                        (Return
                         (Value
                          (Struct
                           ((Value (Type (StructType 85)))
-                           ((slice
-                             (StructField
-                              ((Reference (res (StructType 5))) slice
-                               (StructType 6))))
+                           ((slice (Reference (slice (StructType 6))))
                             (value
                              (Value
                               (Struct
                                ((Value (Type (StructType 84)))
-                                ((value
-                                  (StructField
-                                   ((Reference (res (StructType 5))) value
-                                    IntegerType))))))))))))))))))))))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
               ((impl_interface 10)
                (impl_methods
                 ((from
@@ -4315,7 +4273,7 @@ let%expect_test "destructuring let" =
                  ((destructuring_let ((x x) (y y2) (z z)))
                   (destructuring_let_expr (Reference (t (StructType 85))))
                   (destructuring_let_rest false)))
-                (Return (Reference (y2 HoleType)))))))))))
+                (Return (Reference (y2 IntegerType)))))))))))
         (T (Value (Type (StructType 85))))))
       (structs
        ((85
@@ -4355,7 +4313,7 @@ let%expect_test "destructuring let with missing fields" =
   pp_compile source ;
   [%expect
     {|
-    (((MissingField (85 x)) (MissingField (85 z)))
+    (((MissingField ((StructType 85) x)) (MissingField ((StructType 85) z)))
      ((bindings
        ((test
          (Value
@@ -4370,7 +4328,7 @@ let%expect_test "destructuring let with missing fields" =
                  ((destructuring_let ((y y2)))
                   (destructuring_let_expr (Reference (t (StructType 85))))
                   (destructuring_let_rest false)))
-                (Return (Reference (y2 HoleType)))))))))))
+                (Return (Reference (y2 IntegerType)))))))))))
         (T (Value (Type (StructType 85))))))
       (structs
        ((85
@@ -4425,7 +4383,7 @@ let%expect_test "destructuring let with missing fields ignored" =
                  ((destructuring_let ((y y2)))
                   (destructuring_let_expr (Reference (t (StructType 85))))
                   (destructuring_let_rest true)))
-                (Return (Reference (y2 HoleType)))))))))))
+                (Return (Reference (y2 IntegerType)))))))))))
         (T (Value (Type (StructType 85))))))
       (structs
        ((85
