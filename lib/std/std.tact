@@ -181,7 +181,7 @@ union MsgAddressExt {
         let res_addr = AddrExtern.deserialize(res_discr.slice);
         return LoadResult[Self].new(res_addr.slice, res_addr.value);
       } else {
-        /* TODO: throw an exception */
+        throw(0);
       }
     }
   }
@@ -217,7 +217,7 @@ struct AddressStd {
             address: res_address.value,
           });
       } else {
-        /* TODO: Anycast is unsupported by TON for now, what we should do here? */
+        throw(0); // unreachable
       }
     }
   }
@@ -250,7 +250,7 @@ struct AddressVar {
             address: res_address.value,
           });
       } else {
-        /* TODO: Anycast is unsupported by TON for now, what we should do here? */
+        throw(0); // unreachable
       }
     }
   }
@@ -501,7 +501,7 @@ struct Message[X: Deserialize] {
           /* TODO: cells */
         }
       } else {
-        /* TODO: can be init state != 0? */
+        throw(0);
       }
     }
   }

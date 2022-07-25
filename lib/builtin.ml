@@ -478,7 +478,12 @@ functor
                 BoolType
                 (Equality
                    { x = bl @@ Reference (bl "x", IntegerType);
-                     y = bl @@ Reference (bl "y", IntegerType) } ) ) ]
+                     y = bl @@ Reference (bl "y", IntegerType) } ) );
+            ( "throw",
+              make_builtin_fn
+                [(bl "n", IntegerType)]
+                VoidType
+                (Throw {n = bl @@ Reference (bl "n", IntegerType)}) ) ]
       in
       {p with bindings = p.bindings @ bs}
 

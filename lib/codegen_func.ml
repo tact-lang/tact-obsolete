@@ -350,6 +350,8 @@ functor
                   F.TensorType [F.SliceType; F.IntType] )
           | Equality {x; y} ->
               Operator (self#cg_expr x, F.EqualityOperator, self#cg_expr y)
+          | Throw {n} ->
+              F.FunctionCall ("throw", [self#cg_expr n], F.InferType)
 
         method cg_EmptyBuilder = F.FunctionCall ("begin_cell", [], F.BuilderType)
 

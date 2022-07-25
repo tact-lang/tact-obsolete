@@ -90,6 +90,9 @@ let%expect_test "Int[bits] serializer codegen" =
          (_, Value2 value) = tensor;
          return value;
        }
+       _ throw(int n) {
+         return throw(n);
+       }
        int builtin_equal(int x, int y) {
          return x == y;
        }
@@ -165,6 +168,9 @@ let%expect_test "demo struct serializer" =
        forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
          (_, Value2 value) = tensor;
          return value;
+       }
+       _ throw(int n) {
+         return throw(n);
        }
        int builtin_equal(int x, int y) {
          return x == y;
@@ -252,6 +258,9 @@ let%expect_test "demo struct serializer 2" =
        forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
          (_, Value2 value) = tensor;
          return value;
+       }
+       _ throw(int n) {
+         return throw(n);
        }
        int builtin_equal(int x, int y) {
          return x == y;
@@ -395,6 +404,9 @@ let%expect_test "serializer inner struct" =
          (_, Value2 value) = tensor;
          return value;
        }
+       _ throw(int n) {
+         return throw(n);
+       }
        int builtin_equal(int x, int y) {
          return x == y;
        }
@@ -501,6 +513,9 @@ let%expect_test "switch statement" =
          (_, Value2 value) = tensor;
          return value;
        }
+       _ throw(int n) {
+         return throw(n);
+       }
        int builtin_equal(int x, int y) {
          return x == y;
        }
@@ -579,6 +594,9 @@ let%expect_test "tensor2" =
          (_, Value2 value) = tensor;
          return value;
        }
+       _ throw(int n) {
+         return throw(n);
+       }
        int builtin_equal(int x, int y) {
          return x == y;
        }
@@ -650,6 +668,9 @@ let%expect_test "serialization api" =
        forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
          (_, Value2 value) = tensor;
          return value;
+       }
+       _ throw(int n) {
+         return throw(n);
        }
        int builtin_equal(int x, int y) {
          return x == y;
@@ -951,6 +972,9 @@ let%expect_test "deserialization api" =
          (_, Value2 value) = tensor;
          return value;
        }
+       _ throw(int n) {
+         return throw(n);
+       }
        int builtin_equal(int x, int y) {
          return x == y;
        }
@@ -1024,7 +1048,8 @@ let%expect_test "deserialization api" =
        f9(first(res_address), [second(res_len), second(res_workchain), second(res_address)]);
        } else
        {
-         }}
+         throw(0);
+       }}
        [slice, tuple] f10(slice s, tuple v) {
          return [s, v];
        }
@@ -1046,7 +1071,8 @@ let%expect_test "deserialization api" =
        f13(first(res_address), [second(res_workchain), second(res_address)]);
        } else
        {
-         }}
+         throw(0);
+       }}
        [slice, tuple] f5(slice s) {
          [slice, int] res_discr = f3(s, 1);
          if (builtin_equal(second(res_discr), 0)) {
@@ -1059,10 +1085,10 @@ let%expect_test "deserialization api" =
        return
        f10(first(res_addr), second(res_addr));
        }}
-       [slice, [int, int]] f15(slice s) {
-         [slice, int] res_len = f7(s);
-         [slice, int] res_bits = f3(first(res_len), second(res_len));
-         return [first(res_bits), [second(res_len), second(res_bits)]];
+       [slice, [int, int]] f15(slice slice_) {
+         [slice slice_, int len] = f7(slice_);
+         [slice slice_, int bits] = f3(slice_, len);
+         return [slice_, [len, bits]];
        }
        [slice, tuple] f16(slice s, tuple v) {
          return [s, v];
@@ -1078,7 +1104,8 @@ let%expect_test "deserialization api" =
        f16(first(res_addr), second(res_addr));
        } else
        {
-         }}
+         throw(0);
+       }}
        [slice, int] f17(slice s) {
          [slice, int] res = f3(s, 64);
          [slice slice_, int value] = res;
@@ -1137,7 +1164,8 @@ let%expect_test "deserialization api" =
        {
          }} else
        {
-         }}
+         throw(0);
+       }}
        _ test(cell c) {
          slice s = f0(c);
          [slice, [tuple, []]] msg = f1(s);

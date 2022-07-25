@@ -321,6 +321,7 @@ functor
       | ParseCell of {cell : expr}
       | SliceEndParse of {slice : expr}
       | SliceLoadInt of {slice : expr; bits : expr; signed : bool}
+      | Throw of {n : expr}
     [@@deriving
       equal,
         compare,
