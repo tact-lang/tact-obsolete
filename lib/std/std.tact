@@ -317,13 +317,8 @@ struct ExtOutMsgInfoRelaxed {
   val created_at: Int[32] // TODO: uint
 
   impl Serialize {
-    // TODO: There is bugs when tried to use `serializer` fn here.
     fn serialize(self: Self, b: Builder) -> Builder {
-      let b = self.src.serialize(b);
-      let b = self.dest.serialize(b);
-      let b = self.created_lt.serialize(b);
-      let b = self.created_at.serialize(b);
-      return b;
+      return serializer[Self](self, b);
     }
   }
 }
