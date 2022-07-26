@@ -44,8 +44,7 @@ functor
         struct_signs =
           Lang.Arena.strip_if_exists program.struct_signs previous.struct_signs;
         union_signs =
-          Lang.Arena.strip_if_exists program.union_signs previous.struct_signs
-      }
+          Lang.Arena.strip_if_exists program.union_signs previous.union_signs }
 
     let compile_pass p prev_program errors =
       let c = new Lang.constructor ~program:prev_program errors in
@@ -66,7 +65,12 @@ functor
       in
       (* This will make a deep copy. Lang.constructor mutates input program,
          so we need deep copy if we want to strip bindings later. *)
-      let prev_prog_copy = {prev_prog with bindings = prev_prog.bindings} in
+      let prev_prog_copy =
+        { prev_prog with
+          bindings = prev_prog.bindings;
+          struct_signs = Lang.Arena.deep_copy prev_prog.struct_signs;
+          union_signs = Lang.Arena.deep_copy prev_prog.union_signs }
+      in
       let p' = compile_pass p prev_prog_copy errors in
       let p'' =
         if strip_defaults then strip ~program:p' ~previous:prev_prog else p'

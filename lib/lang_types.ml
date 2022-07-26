@@ -34,6 +34,8 @@ functor
 
       let default () = {items = Vec.create ()}
 
+      let length a = Vec.length a.items
+
       let get a id = Vec.get a.items id
 
       let with_id a ~f =
@@ -58,6 +60,8 @@ functor
               |> fun items ->
               Vec.truncate items (ll - rl) ;
               Vec.rev items ) }
+
+      let deep_copy a = {items = Vec.copy a.items}
 
       let unsafe_drop_last a =
         let _ = Vec.pop_exn a.items in
