@@ -24,15 +24,20 @@ functor
     type ident = Ident of string
 
     and struct_definition =
-      { fields : struct_field located list; [@sexp.list]
+      { struct_attributes : attribute list; [@sexp.list]
+        fields : struct_field located list; [@sexp.list]
         struct_bindings : binding located list; [@sexp.list]
         impls : impl list; [@sexp.list]
         struct_span : (span[@sexp.opaque]) }
 
-    and impl = {interface : expr located; methods : binding located list}
+    and impl =
+      { impl_attributes : attribute list; [@sexp.list]
+        interface : expr located;
+        methods : binding located list }
 
     and interface_definition =
-      {interface_members : binding located list [@sexp.list]}
+      { interface_attributes : attribute list; [@sexp.list]
+        interface_members : binding located list [@sexp.list] }
 
     and function_call =
       {fn : expr located; arguments : expr located list [@sexp.list]}
@@ -43,7 +48,8 @@ functor
         receiver_arguments : expr located list }
 
     and enum_definition =
-      { enum_members : enum_member located list; [@sexp.list]
+      { enum_attributes : attribute list; [@sexp.list]
+        enum_members : enum_member located list; [@sexp.list]
         enum_bindings : binding located list [@sexp.list] }
 
     and enum_member =
@@ -52,10 +58,15 @@ functor
 
     (* TODO: union impls *)
     and union_definition =
-      { union_members : expr located list; [@sexpa.list]
+      { union_attributes : attribute list; [@sexp.list]
+        union_members : expr located list; [@sexpa.list]
         union_bindings : binding located list; [@sexp.list]
         union_impls : impl list; [@sexp.list]
         union_span : (span[@sexp.opaque]) }
+
+    and attribute =
+      { attribute_ident : ident located;
+        attribute_exprs : expr located list [@sexp.list] }
 
     and expr =
       | Struct of struct_definition
@@ -96,12 +107,16 @@ functor
         fields_construction : (ident located * expr located) list [@sexp.list]
       }
 
-    and struct_field = {field_name : ident located; field_type : expr located}
+    and struct_field =
+      { field_attributes : attribute list; [@sexp.list]
+        field_name : ident located;
+        field_type : expr located }
 
     and function_param = ident located * expr located
 
     and function_definition =
-      { name : ident located option; [@sexp.option]
+      { function_attributes : attribute list; [@sexp.list]
+        name : ident located option; [@sexp.option]
         params : function_param located list; [@sexp.list]
         returns : expr located option; [@sexp.option]
         function_body : function_body option; [@sexp.option]

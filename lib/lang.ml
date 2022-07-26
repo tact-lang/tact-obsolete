@@ -76,6 +76,9 @@ functor
         (* Program handle we pass to builtin functions. *)
         val mutable program = program
 
+        method build_attribute _env attribute_ident attribute_exprs =
+          {attribute_ident; attribute_exprs}
+
         method build_CodeBlock _env code_block = Block code_block
 
         method! visit_CodeBlock env block =
@@ -305,8 +308,9 @@ functor
 
         method build_Expr _env expr = Expr expr
 
-        method build_impl _env intf bindings =
-          { mk_impl_interface = intf;
+        method build_impl _env attributes intf bindings =
+          { mk_impl_attributes = attributes;
+            mk_impl_interface = intf;
             mk_impl_methods = s#of_located_list bindings }
 
         method! visit_expr env syntax_expr =
@@ -335,7 +339,7 @@ functor
             destructuring_let_expr;
             destructuring_let_rest }
 
-        method build_enum_definition _env _members _bindings = ()
+        method build_enum_definition _env _attributes _members _bindings = ()
 
         method build_enum_member _env _name _value = ()
 
@@ -384,7 +388,8 @@ functor
                          { value =
                              { function_signature =
                                  { value =
-                                     { function_params = [];
+                                     { function_attributes = [];
+                                       function_params = [];
                                        function_returns = VoidType };
                                    span = fn.span };
                                function_impl =
@@ -592,10 +597,14 @@ functor
                 type_checker#with_fn_returns env function_returns (fun env' ->
                     s#visit_option s#visit_function_body env' f.function_body ) )
           in
+          let function_attributes =
+            s#visit_list s#visit_attribute env f.function_attributes
+          in
           let function_signature =
             let sign =
               { value =
-                  { function_params = param_bindings;
+                  { function_attributes;
+                    function_params = param_bindings;
                     function_returns = fn_returns };
                 span = f.function_def_span }
             in
@@ -657,7 +666,7 @@ functor
         method build_if_ _env if_condition if_then if_else =
           {if_condition; if_then; if_else}
 
-        method build_interface_definition _env members =
+        method build_interface_definition _env attributes members =
           let signatures =
             List.filter_map (s#of_located_list members) ~f:(fun (name, x) ->
                 match x.value with
@@ -667,7 +676,8 @@ functor
                     errors#report `Error `OnlyFunctionIsAllowed () ;
                     None )
           in
-          {mk_interface_methods = signatures}
+          { mk_interface_attributes = attributes;
+            mk_interface_methods = signatures }
 
         method! visit_interface_definition env def =
           let value =
@@ -710,9 +720,11 @@ functor
         method build_struct_definition _ _ _ _ = raise InternalCompilerError
 
         method make_struct_definition
-            : (string located * expr) list -> (string located * expr) list -> _
-            =
-          fun struct_fields bindings impls mk_struct_id sign_id span ->
+            : attribute list ->
+              (string located * expr) list ->
+              (string located * expr) list ->
+              _ =
+          fun attributes struct_fields bindings impls mk_struct_id sign_id span ->
             let mk_struct_fields = struct_fields in
             let mk_methods =
               List.filter_map bindings ~f:(fun binding ->
@@ -735,7 +747,8 @@ functor
             in
             let _ =
               Arena.update program.struct_signs sign_id ~f:(fun sign ->
-                  { st_sig_fields = mk_struct_fields;
+                  { st_sig_attributes = attributes;
+                    st_sig_fields = mk_struct_fields;
                     st_sig_methods =
                       List.Assoc.map (mk_methods @ impl_methods) ~f:(fun f ->
                           match f.value with
@@ -747,7 +760,8 @@ functor
                     st_sig_id = sign.st_sig_id } )
             in
             let s' =
-              { mk_struct_fields;
+              { mk_struct_attributes = attributes;
+                mk_struct_fields;
                 mk_struct_details =
                   { mk_methods = mk_methods @ impl_methods;
                     mk_impls = impls;
@@ -776,9 +790,13 @@ functor
               env syn_struct_def.fields
             |> s#of_located_list
           in
+          let attributes =
+            s#visit_list s#visit_attribute env syn_struct_def.struct_attributes
+          in
           let sign_id, _ =
             Arena.with_id program.struct_signs ~f:(fun id ->
-                { st_sig_fields = fields;
+                { st_sig_attributes = attributes;
+                  st_sig_fields = fields;
                   st_sig_methods = [];
                   st_sig_base_id = program.type_counter;
                   st_sig_id = id } )
@@ -803,7 +821,7 @@ functor
                 (fun _ -> s#visit_list s#visit_impl env syn_struct_def.impls)
             in
             let mk_struct =
-              s#make_struct_definition fields
+              s#make_struct_definition attributes fields
                 (s#of_located_list methods)
                 impls mk_id sign_id syn_struct_def.struct_span
             in
@@ -815,8 +833,8 @@ functor
           functions <- prev_functions ;
           mk_struct
 
-        method build_struct_field : _ -> _ -> _ -> string located * expr =
-          fun _env field_name field_type -> (field_name, field_type)
+        method build_struct_field : _ -> _ -> _ -> _ -> string located * expr =
+          fun _env _attributes field_name field_type -> (field_name, field_type)
 
         method build_union_definition _ _ _ = raise InternalCompilerError
 
@@ -826,11 +844,15 @@ functor
           let cases =
             s#visit_list (s#visit_located s#visit_expr) env def.union_members
           in
+          let attributes =
+            s#visit_list s#visit_attribute env def.union_attributes
+          in
           let union_base_id = program.type_counter in
           program.type_counter <- program.type_counter + 1 ;
           let sign_id, _ =
             Arena.with_id program.union_signs ~f:(fun _ ->
-                { un_sig_cases = List.map cases ~f:(expr_to_type program);
+                { un_sig_attributes = attributes;
+                  un_sig_cases = List.map cases ~f:(expr_to_type program);
                   un_sig_methods = [];
                   un_sig_base_id = union_base_id } )
           in
@@ -867,7 +889,8 @@ functor
           in
           let convert_impls = s#make_from_impls cases union_base_id in
           let mk_union =
-            { mk_cases = cases;
+            { mk_union_attributes = attributes;
+              mk_cases = cases;
               mk_union_details =
                 { mk_id = union_base_id;
                   mk_impls = impls @ convert_impls;
@@ -911,7 +934,8 @@ functor
                               span = case.span } ] );
                     span = case.span }
                 in
-                { mk_impl_interface = from_intf_;
+                { mk_impl_attributes = [];
+                  mk_impl_interface = from_intf_;
                   mk_impl_methods =
                     [ ( {value = "from"; span = case.span},
                         s#make_from_impl_fn case union ) ] } )
@@ -923,7 +947,8 @@ functor
                    { value =
                        { function_signature =
                            { value =
-                               { function_params =
+                               { function_attributes = [];
+                                 function_params =
                                    [ ( builtin_located "v",
                                        expr_to_type program case ) ];
                                  function_returns = UnionType union };

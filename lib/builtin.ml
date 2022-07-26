@@ -28,7 +28,8 @@ functor
     let bl = builtin_located
 
     let make_load_result_with_id base_id id t =
-      { struct_fields =
+      { struct_attributes = [];
+        struct_fields =
           [ (bl "slice", {field_type = slice_struct});
             (bl "value", {field_type = t}) ];
         struct_details =
@@ -37,7 +38,8 @@ functor
                   bl
                     { function_signature =
                         bl
-                          { function_params =
+                          { function_attributes = [];
+                            function_params =
                               [(bl "s", slice_struct); (bl "v", t)];
                             function_returns = StructType id };
                       function_impl =
@@ -64,11 +66,13 @@ functor
       let base_id = -500 in
       let function_signature =
         bl
-          { function_params = [(bl "T", type0)];
+          { function_attributes = [];
+            function_params = [(bl "T", type0)];
             function_returns =
               (let id, _ =
                  Arena.with_id a ~f:(fun id ->
-                     { st_sig_fields =
+                     { st_sig_attributes = [];
+                       st_sig_fields =
                          [ (bl "slice", bl @@ Value (Type slice_struct));
                            ( bl "value",
                              bl
@@ -79,7 +83,8 @@ functor
                        st_sig_methods =
                          [ ( bl "new",
                              bl
-                               { function_params =
+                               { function_attributes = [];
+                                 function_params =
                                    [ (bl "s", slice_struct);
                                      ( bl "v",
                                        ExprType (bl @@ Reference (bl "T", type0))
@@ -113,10 +118,12 @@ functor
 
     let serialize_intf =
       let intf =
-        { interface_methods =
+        { interface_attributes = [];
+          interface_methods =
             [ ( "serialize",
                 bl
-                  { function_params =
+                  { function_attributes = [];
+                    function_params =
                       [(bl "self", SelfType); (bl "b", builder_struct)];
                     function_returns = builder_struct } ) ] }
       in
@@ -130,10 +137,12 @@ functor
             if String.equal name.value "LoadResult" then Some v else None )
       in
       let intf =
-        { interface_methods =
+        { interface_attributes = [];
+          interface_methods =
             [ ( "deserialize",
                 bl
-                  { function_params = [(bl "b", builder_struct)];
+                  { function_attributes = [];
+                    function_params = [(bl "b", builder_struct)];
                     function_returns =
                       ExprType
                         ( bl
@@ -149,11 +158,13 @@ functor
     let serializer =
       let function_signature =
         bl
-          { function_params = [(bl "t", type0)];
+          { function_attributes = [];
+            function_params = [(bl "t", type0)];
             function_returns =
               FunctionType
                 (bl
-                   { function_params =
+                   { function_attributes = [];
+                     function_params =
                        [(bl "t", HoleType); (bl "b", builder_struct)];
                      function_returns = builder_struct } ) }
       in
@@ -242,7 +253,8 @@ functor
         let body = Switch switch in
         { function_signature =
             bl
-              { function_params =
+              { function_attributes = [];
+                function_params =
                   [ (bl "self", UnionType union.union_details.uty_id);
                     (bl "b", builder_struct) ];
                 function_returns = builder_struct };
@@ -290,7 +302,8 @@ functor
         in
         { function_signature =
             bl
-              { function_params =
+              { function_attributes = [];
+                function_params =
                   [ (bl "self", StructType s.struct_details.uty_id);
                     (bl "b", builder_struct) ];
                 function_returns = builder_struct };
@@ -319,11 +332,13 @@ functor
       in
       let function_signature =
         bl
-          { function_params = [(bl "t", type0)];
+          { function_attributes = [];
+            function_params = [(bl "t", type0)];
             function_returns =
               FunctionType
                 (bl
-                   { function_params = [(bl "slice", slice_ty)];
+                   { function_attributes = [];
+                     function_params = [(bl "slice", slice_ty)];
                      function_returns =
                        ExprType
                          ( bl
@@ -392,7 +407,8 @@ functor
         let body = Block (deserialize_fields @ [bl @@ Return out]) in
         { function_signature =
             bl
-              { function_params = [(bl "slice", slice_ty)];
+              { function_attributes = [];
+                function_params = [(bl "slice", slice_ty)];
                 function_returns = load_result_ty };
           function_impl = Fn (bl body) }
       in
@@ -415,14 +431,19 @@ functor
 
     let from_intf_ =
       let function_signature =
-        bl {function_params = [(bl "T", type0)]; function_returns = HoleType}
+        bl
+          { function_attributes = [];
+            function_params = [(bl "T", type0)];
+            function_returns = HoleType }
       in
       let make_from p t =
         let intf =
-          { interface_methods =
+          { interface_attributes = [];
+            interface_methods =
               [ ( "from",
                   bl
-                    { function_params = [(bl "from", t)];
+                    { function_attributes = [];
+                      function_params = [(bl "from", t)];
                       function_returns = SelfType } ) ] }
         in
         let intf_ty = Program.insert_interface p intf in
@@ -445,7 +466,8 @@ functor
 
     let tensor2 t1 t2 =
       Hashtbl.find_or_add tensor2_hashtbl (t1, t2) ~default:(fun () ->
-          { struct_fields =
+          { struct_attributes = [];
+            struct_fields =
               [ (bl "value1", {field_type = t1});
                 (bl "value2", {field_type = t2}) ];
             struct_details =
@@ -487,7 +509,10 @@ functor
               (Function
                  (bl
                     { function_signature =
-                        bl {function_params = args; function_returns = ret_ty};
+                        bl
+                          { function_attributes = [];
+                            function_params = args;
+                            function_returns = ret_ty };
                       function_impl =
                         Fn
                           (bl
