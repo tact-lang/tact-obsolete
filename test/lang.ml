@@ -5500,3 +5500,240 @@ let%expect_test "Deserilize intf with constraints" =
          ((st_sig_fields ((x (Reference (X (TypeN 0)))))) (st_sig_methods ())
           (st_sig_base_id 0) (st_sig_id 1)))))
       (union_signs (0 ())))) |}]
+
+let%expect_test "Interface inner constraints" =
+  let source =
+    {|
+      interface Intf { fn do_stuff(self: Self) -> Integer }
+      struct Test[X: Intf] { 
+        val x: X
+        impl Intf { 
+          fn do_stuff(self: Self) { self.x.do_stuff(); } 
+        } 
+      }
+      fn test_intf[X: Intf](value: X) -> Integer {
+        let temp = Test[X] { x: value };
+        return temp.do_stuff();
+      }
+
+      struct IntfImpl { 
+        impl Intf { 
+          fn do_stuff(self: Self) -> Integer {
+            return 1;
+          } 
+        } 
+      }
+
+      let one = test_intf[IntfImpl](IntfImpl {});
+    |}
+  in
+  pp_compile source ~include_std:false ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((one (Value (Integer 1))) (IntfImpl (Value (Type (StructType 3))))
+        (test_intf
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((X (InterfaceType 0))))
+              (function_returns
+               (FunctionType
+                ((function_params
+                  ((value (ExprType (Reference (X (InterfaceType 0)))))))
+                 (function_returns IntegerType))))))
+            (function_impl
+             (Fn
+              (Return
+               (MkFunction
+                ((function_signature
+                  ((function_params
+                    ((value (ExprType (Reference (X (InterfaceType 0)))))))
+                   (function_returns IntegerType)))
+                 (function_impl
+                  (Fn
+                   (Block
+                    ((Let
+                      ((temp
+                        (Value
+                         (Struct
+                          ((FunctionCall
+                            ((ResolvedReference (Test <opaque>))
+                             ((Reference (X (InterfaceType 0))))))
+                           ((x
+                             (Reference
+                              (value
+                               (ExprType (Reference (X (InterfaceType 0))))))))))))))
+                     (Return
+                      (StructSigMethodCall
+                       ((st_sig_call_instance
+                         (FunctionCall
+                          ((ResolvedReference (Test <opaque>))
+                           ((Reference (X (InterfaceType 0)))))))
+                        (st_sig_call_def 1)
+                        (st_sig_call_method
+                         (do_stuff
+                          ((function_params
+                            ((self
+                              (ExprType
+                               (FunctionCall
+                                ((ResolvedReference (Test <opaque>))
+                                 ((Reference (X (InterfaceType 0))))))))))
+                           (function_returns HoleType))))
+                        (st_sig_call_args
+                         ((Reference
+                           (temp
+                            (ExprType
+                             (FunctionCall
+                              ((ResolvedReference (Test <opaque>))
+                               ((Reference (X (InterfaceType 0)))))))))))
+                        (st_sig_call_span <opaque>)
+                        (st_sig_call_kind StructSigKind)))))))))))))))))
+        (Test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((X (InterfaceType 0))))
+              (function_returns (StructSig 1))))
+            (function_impl
+             (Fn
+              (Return
+               (MkStructDef
+                ((mk_struct_fields ((x (Reference (X (InterfaceType 0))))))
+                 (mk_struct_details
+                  ((mk_methods
+                    ((do_stuff
+                      (MkFunction
+                       ((function_signature
+                         ((function_params
+                           ((self (ExprType (Reference (Self (StructSig 1)))))))
+                          (function_returns HoleType)))
+                        (function_impl
+                         (Fn
+                          (Return
+                           (IntfMethodCall
+                            ((intf_instance (Reference (X (InterfaceType 0))))
+                             (intf_def 0)
+                             (intf_method
+                              (do_stuff
+                               ((function_params ((self SelfType)))
+                                (function_returns IntegerType))))
+                             (intf_args
+                              ((StructField
+                                ((Reference
+                                  (self
+                                   (ExprType (Reference (Self (StructSig 1))))))
+                                 x (ExprType (Reference (X (InterfaceType 0))))))))
+                             (intf_loc <opaque>)))))))))))
+                   (mk_impls
+                    (((mk_impl_interface (ResolvedReference (Intf <opaque>)))
+                      (mk_impl_methods
+                       ((do_stuff
+                         (MkFunction
+                          ((function_signature
+                            ((function_params
+                              ((self (ExprType (Reference (Self (StructSig 1)))))))
+                             (function_returns HoleType)))
+                           (function_impl
+                            (Fn
+                             (Return
+                              (IntfMethodCall
+                               ((intf_instance (Reference (X (InterfaceType 0))))
+                                (intf_def 0)
+                                (intf_method
+                                 (do_stuff
+                                  ((function_params ((self SelfType)))
+                                   (function_returns IntegerType))))
+                                (intf_args
+                                 ((StructField
+                                   ((Reference
+                                     (self
+                                      (ExprType (Reference (Self (StructSig 1))))))
+                                    x
+                                    (ExprType (Reference (X (InterfaceType 0))))))))
+                                (intf_loc <opaque>))))))))))))))
+                   (mk_id 1) (mk_sig 1) (mk_span <opaque>))))))))))))
+        (Intf (Value (Type (InterfaceType 0))))))
+      (structs
+       ((4
+         ((struct_fields ((x ((field_type (StructType 3))))))
+          (struct_details
+           ((uty_methods
+             ((do_stuff
+               ((function_signature
+                 ((function_params ((self (StructType 4))))
+                  (function_returns HoleType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params ((self (StructType 3))))
+                          (function_returns IntegerType)))
+                        (function_impl (Fn (Return (Value (Integer 1))))))))
+                     ((StructField
+                       ((Reference (self (StructType 4))) x (StructType 3)))))))))))))
+            (uty_impls
+             (((impl_interface 0)
+               (impl_methods
+                ((do_stuff
+                  ((function_signature
+                    ((function_params ((self (StructType 4))))
+                     (function_returns HoleType)))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((Value
+                         (Function
+                          ((function_signature
+                            ((function_params ((self (StructType 3))))
+                             (function_returns IntegerType)))
+                           (function_impl (Fn (Return (Value (Integer 1))))))))
+                        ((StructField
+                          ((Reference (self (StructType 4))) x (StructType 3))))))))))))))))
+            (uty_id 4) (uty_base_id 1)))))
+        (3
+         ((struct_fields ())
+          (struct_details
+           ((uty_methods
+             ((do_stuff
+               ((function_signature
+                 ((function_params ((self (StructType 3))))
+                  (function_returns IntegerType)))
+                (function_impl (Fn (Return (Value (Integer 1)))))))))
+            (uty_impls
+             (((impl_interface 0)
+               (impl_methods
+                ((do_stuff
+                  ((function_signature
+                    ((function_params ((self (StructType 3))))
+                     (function_returns IntegerType)))
+                   (function_impl (Fn (Return (Value (Integer 1))))))))))))
+            (uty_id 3) (uty_base_id 2)))))))
+      (interfaces
+       ((0
+         ((interface_methods
+           ((do_stuff
+             ((function_params ((self SelfType))) (function_returns IntegerType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (2
+        (((st_sig_fields ())
+          (st_sig_methods
+           ((do_stuff
+             ((function_params
+               ((self (ExprType (Reference (Self (StructSig 2)))))))
+              (function_returns IntegerType)))))
+          (st_sig_base_id 2) (st_sig_id 2))
+         ((st_sig_fields ((x (Reference (X (InterfaceType 0))))))
+          (st_sig_methods
+           ((do_stuff
+             ((function_params
+               ((self (ExprType (Reference (Self (StructSig 1)))))))
+              (function_returns HoleType)))))
+          (st_sig_base_id 1) (st_sig_id 1)))))
+      (union_signs (0 ())))) |}]

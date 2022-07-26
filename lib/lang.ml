@@ -41,6 +41,23 @@ functor
         method! visit_SelfType _ = new_ty
       end
 
+    (*  *)
+    class ['s] self_ref_updater (new_expr : expr_kind) =
+      object (self : 's)
+        inherit ['s] map as super
+
+        method! visit_Reference env (name, ty) =
+          if String.equal name.value "Self" then new_expr
+          else Reference (name, self#visit_type_ env ty)
+
+        method! visit_type_ env =
+          function
+          | ExprType {value = Value (Type t); _} ->
+              self#visit_type_ env t
+          | ty ->
+              super#visit_type_ env ty
+      end
+
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
         inherit ['s] Syntax.visitor as super
@@ -510,6 +527,10 @@ functor
                     ~equal:(equal_located String.equal)
                 with
                 | Some m ->
+                    let m =
+                      (new self_ref_updater ex.value)#visit_function_signature
+                        () m
+                    in
                     StructSigMethodCall
                       { st_sig_call_instance = ex;
                         st_sig_call_def = sign_id;
