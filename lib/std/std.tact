@@ -505,3 +505,17 @@ struct SendRawMsgFlags {
 fn send_raw_msg(msg: Cell, flags: SendRawMsgFlags) -> VoidType {
   builtin_send_raw_msg(msg.c, flags.value);
 }
+
+fn send_internal[X: Serialize](header: IntMsgInfoRelaxed, body: X, flags: SendRawMsgFlags) -> VoidType {
+  let info: CommonMsgInfoRelaxed = header;
+  let msg = MessageRelaxed[X] { info: info, body: body };
+  let ce = msg.serialize(Builder.new()).build();
+  send_raw_msg(ce, flags);
+}
+
+fn send_external[X: Serialize](header: ExtOutMsgInfoRelaxed, body: X, flags: SendRawMsgFlags) -> VoidType {
+  let info: CommonMsgInfoRelaxed = header;
+  let msg = MessageRelaxed[X] { info: info, body: body };
+  let ce = msg.serialize(Builder.new()).build();
+  send_raw_msg(ce, flags);
+}
