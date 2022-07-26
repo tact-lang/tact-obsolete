@@ -58,6 +58,12 @@ struct Coins {
       builder.serialize_coins(self.value)
     } 
   }
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      LoadResult[Self].new(Self{value: 1}, s) // TODO
+    } 
+  }
 }
 
 struct Int[bits: Integer] {
@@ -297,19 +303,6 @@ union MsgAddress {
   }
 }
 
-struct ExtOutMsgInfo {
-  val src: MsgAddressInt
-  val dest: MsgAddressExt
-  val created_lt: Uint[64]
-  val created_at: Uint[32]
-
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      return deserializer[Self](s);
-    }
-  }
-}
-
 struct ExtOutMsgInfoRelaxed {
   val src: MsgAddress
   val dest: MsgAddressExt
@@ -319,62 +312,6 @@ struct ExtOutMsgInfoRelaxed {
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
       return serializer[Self](self, b);
-    }
-  }
-}
-
-union CommonMsgInfo {
-  case ExtOutMsgInfo
-  // TODO: int_msg_info, ext_in_msg_info
-
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      let res_discr1 = s.load_int(1);
-      if (builtin_equal(res_discr1.value, 0)) {
-        /* TODO: int_msg_info */
-      } else {
-        let res_discr2 = res_discr1.slice.load_int(1);
-        if (builtin_equal(res_discr2.value, 0)) {
-          /* TODO: ext_in_msg_info */
-        } else {
-          let res_info = ExtOutMsgInfo.deserialize(res_discr2.slice);
-          return LoadResult[Self].new(res_info.slice, res_info.value);
-        }
-      }
-    }
-  }
-}
-
-struct IntMsgInfoRelaxedFlags {
-  val ihr_disabled: Int[1]
-  val bounce: Int[1]
-  val bounced: Int[1]
-
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
-}
-
-struct IntMsgInfoRelaxedAddresses {
-  val src: MsgAddressInt
-  val dst: MsgAddressInt
-
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
-}
-
-struct IntMsgInfoRelaxedCoins {
-  val ihr_fee: Coins
-  val fwd_fee: Coins
-
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
     }
   }
 }
@@ -395,18 +332,145 @@ struct Timestamps {
       serializer[Self](self, b)
     }
   }
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      deserializer[Self](s)
+    }
+  }
 }
 
-struct IntMsgInfoRelaxed {
-  val flags: IntMsgInfoRelaxedFlags
-  val addresses: IntMsgInfoRelaxedAddresses
-  val coins: IntMsgInfoRelaxedCoins
+struct IntMsgInfoFlags {
+  val ihr_disabled: Int[1]
+  val bounce: Int[1]
+  val bounced: Int[1]
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer[Self](self, b)
+    }
+  }
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      deserializer[Self](s)
+    }
+  }
+}
+
+struct IntMsgInfoAddresses {
+  val src: MsgAddressInt
+  val dst: MsgAddressInt
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      deserializer[Self](s)
+    }
+  }
+}
+
+struct IntMsgInfoCoins {
+  val ihr_fee: Coins
+  val fwd_fee: Coins
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer[Self](self, b)
+    }
+  }
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      deserializer[Self](s)
+    }
+  }
+}
+
+struct IntMsgInfo {
+  val flags: IntMsgInfoFlags
+  val addresses: IntMsgInfoAddresses
+  val coins: IntMsgInfoCoins
   val timestamps: Timestamps
 
   fn new(
-    flags: IntMsgInfoRelaxedFlags, 
+    flags: IntMsgInfoFlags, 
     dst: MsgAddressInt,
-    coins: IntMsgInfoRelaxedCoins,
+    coins: IntMsgInfoCoins,
+  ) -> Self {
+    Self {
+      flags: flags,
+      addresses: IntMsgInfoAddresses {
+        src: AddressStd.new(0, 0), // it will be replaced by smartcontract address by TVM
+        dst: dst,
+      },
+      coins: coins,
+      timestamps: Timestamps.zeros(), // it will be replaced by current timestamps by TVM
+    }
+  }
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      deserializer[Self](s)
+    }
+  }
+}
+
+struct ExtInMsgInfo {
+  val src: MsgAddressExt
+  val dest: MsgAddressInt
+  val import_fee: Coins
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      deserializer[Self](s)
+    }
+  }
+}
+
+union CommonMsgInfo {
+  case IntMsgInfo
+  case ExtInMsgInfo
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let res_discr1 = s.load_int(1);
+      if (builtin_equal(res_discr1.value, 0)) {
+        let res_info = IntMsgInfo.deserialize(res_discr1.slice);
+        return LoadResult[Self].new(res_info.slice, res_info.value);
+      } else {
+        let res_discr2 = res_discr1.slice.load_int(1);
+        if (builtin_equal(res_discr2.value, 0)) {
+          let res_info = ExtInMsgInfo.deserialize(res_discr2.slice);
+          return LoadResult[Self].new(res_info.slice, res_info.value);
+        } else {
+          throw(0); // unreachable
+        }
+      }
+    }
+  }
+}
+
+struct IntMsgInfoRelaxedAddresses {
+  val src: MsgAddress
+  val dst: MsgAddressInt
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      serializer[Self](self, b)
+    }
+  }
+}
+
+struct IntMsgInfoRelaxed {
+  val flags: IntMsgInfoFlags
+  val addresses: IntMsgInfoRelaxedAddresses
+  val coins: IntMsgInfoCoins
+  val timestamps: Timestamps
+
+  fn new(
+    flags: IntMsgInfoFlags, 
+    dst: MsgAddressInt,
+    coins: IntMsgInfoCoins,
   ) -> Self {
     Self {
       flags: flags,

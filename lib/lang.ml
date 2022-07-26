@@ -702,7 +702,10 @@ functor
                   List.map fields ~f:(fun (name, expr) ->
                       (Syntax.value name, expr) ) )
             | _ ->
-                raise InternalCompilerError )
+                errors#report `Error
+                  (`UnexpectedType (expr_to_type program id))
+                  () ;
+                ({value = Value Void; span = id.span}, []) )
 
         method build_struct_definition _ _ _ _ = raise InternalCompilerError
 
