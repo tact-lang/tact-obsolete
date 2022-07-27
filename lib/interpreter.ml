@@ -250,7 +250,8 @@ functor
                    so we do not need to check if union can be built from the expr. *)
                 let data = self#interpret_expr expr in
                 UnionVariant (data, union)
-            | MkStructDef {mk_struct_fields; mk_struct_details} ->
+            | MkStructDef
+                {mk_struct_attributes; mk_struct_fields; mk_struct_details} ->
                 let struct_fields =
                   List.map mk_struct_fields ~f:(fun (name, field_type) ->
                       ( name,
@@ -262,7 +263,8 @@ functor
                 let s =
                   Program.with_id ctx.program
                     (fun id ->
-                      { struct_fields;
+                      { struct_attributes = mk_struct_attributes;
+                        struct_fields;
                         struct_details =
                           { uty_methods = [];
                             uty_impls = [];
@@ -275,11 +277,13 @@ functor
                         self#interpret_uty_details mk_struct_details
                           (StructType id) id expr.span
                       in
-                      {struct_fields; struct_details = details; tensor = false}
-                      )
+                      { struct_attributes = mk_struct_attributes;
+                        struct_fields;
+                        struct_details = details;
+                        tensor = false } )
                 in
                 Type (StructType s.struct_details.uty_id)
-            | MkUnionDef {mk_cases; mk_union_details} ->
+            | MkUnionDef {mk_union_attributes; mk_cases; mk_union_details} ->
                 let cases =
                   List.map mk_cases ~f:(fun ex ->
                       let ty = self#interpret_expr ex in
@@ -289,7 +293,8 @@ functor
                 let u =
                   Program.with_union_id ctx.program
                     (fun id ->
-                      { cases =
+                      { union_attributes = mk_union_attributes;
+                        cases =
                           Discriminator.LocalDiscriminators
                           .choose_discriminators () id cases;
                         union_details =
@@ -303,13 +308,14 @@ functor
                         self#interpret_uty_details mk_union_details
                           (UnionType id) id expr.span
                       in
-                      { cases =
+                      { union_attributes = mk_union_attributes;
+                        cases =
                           Discriminator.LocalDiscriminators
                           .choose_discriminators () id cases;
                         union_details = details } )
                 in
                 Type (UnionType u.union_details.uty_id)
-            | MkInterfaceDef {mk_interface_methods} ->
+            | MkInterfaceDef {mk_interface_attributes; mk_interface_methods} ->
                 let partial_evaluate_type ty =
                   match
                     is_immediate_expr !(ctx.scope) ctx.program
@@ -321,10 +327,13 @@ functor
                       ty
                 in
                 let intf =
-                  { interface_methods =
+                  { interface_attributes = mk_interface_attributes;
+                    interface_methods =
                       List.map mk_interface_methods ~f:(fun (name, sign) ->
                           ( name,
-                            { function_params =
+                            { function_attributes =
+                                sign.value.function_attributes;
+                              function_params =
                                 List.map sign.value.function_params
                                   ~f:(fun (pname, ty) ->
                                     (pname, partial_evaluate_type ty) );
@@ -369,7 +378,8 @@ functor
                 self#with_vars
                   [(self_name, Comptime uty_expr)]
                   (fun _ ->
-                    { impl_interface =
+                    { impl_attributes = impl.mk_impl_attributes;
+                      impl_interface =
                         Value.unwrap_intf_id
                           (self#interpret_expr impl.mk_impl_interface);
                       impl_methods =

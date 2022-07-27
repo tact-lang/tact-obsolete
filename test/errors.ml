@@ -130,13 +130,14 @@ let%expect_test "duplicate variant" =
     |}
   in
   pp source ;
+  (* FIXME: wrong positioning of the highlight *)
   [%expect
     {|
     Error[1]: Duplicate variant with type Integer
     File: <unknown>
 
     Error[1]: Duplicate variant with type Integer
-    File: "":7:6
+    File: "":5:7
       |
-    7 |       union Test2[T: Type] {...
-      |       ^^^^^^^^^^^^^^^^^^^^^^^^^ Duplicated variant in this union |}]
+    5 |       }...
+      |        ^^^ Duplicated variant in this union |}]

@@ -4,10 +4,12 @@ open Shared.Disabled.Lang
 let add_bin_op_intf p =
   let bl = Tact.Located.Disabled.builtin_located in
   let intf =
-    { interface_methods =
+    { interface_attributes = [];
+      interface_methods =
         [ ( "op",
             bl
-              { function_params =
+              { function_attributes = [];
+                function_params =
                   [(bl "left", IntegerType); (bl "right", IntegerType)];
                 function_returns = IntegerType } ) ] }
   in
@@ -2013,7 +2015,7 @@ let%expect_test "union method access" =
       (structs ())
       (unions
        ((103
-         ((cases ((BoolType (Discriminator 0))))
+         ((union_attributes ()) (cases ((BoolType (Discriminator 0))))
           (union_details
            ((uty_methods
              ((bar
@@ -2073,7 +2075,7 @@ let%expect_test "union type method access" =
       (structs ())
       (unions
        ((103
-         ((cases ((BoolType (Discriminator 0))))
+         ((union_attributes ()) (cases ((BoolType (Discriminator 0))))
           (union_details
            ((uty_methods
              ((bar
@@ -3506,7 +3508,8 @@ let%expect_test "union variants constructing" =
             (uty_id 102) (uty_base_id 12)))))))
       (unions
        ((105
-         ((cases
+         ((union_attributes ())
+          (cases
            (((StructType 102) (Discriminator 1)) (IntegerType (Discriminator 0))))
           (union_details
            ((uty_methods ())
@@ -3619,7 +3622,7 @@ let%expect_test "unions duplicate variant" =
       (structs ())
       (unions
        ((105
-         ((cases ((IntegerType (Discriminator 0))))
+         ((union_attributes ()) (cases ((IntegerType (Discriminator 0))))
           (union_details
            ((uty_methods ())
             (uty_impls
@@ -3645,7 +3648,8 @@ let%expect_test "unions duplicate variant" =
                       (MakeUnionVariant ((Reference (v IntegerType)) 105))))))))))))
             (uty_id 105) (uty_base_id 102)))))
         (103
-         ((cases
+         ((union_attributes ())
+          (cases
            (((BuiltinType Builder) (Discriminator 1))
             (IntegerType (Discriminator 0))))
           (union_details
@@ -3996,7 +4000,8 @@ let%expect_test "unions" =
             (uty_id 102) (uty_base_id 12)))))))
       (unions
        ((107
-         ((cases
+         ((union_attributes ())
+          (cases
            (((StructType 104) (Discriminator 1))
             ((StructType 102) (Discriminator 0))))
           (union_details
@@ -4469,7 +4474,8 @@ let%expect_test "switch statement" =
             (uty_id 102) (uty_base_id 12)))))))
       (unions
        ((107
-         ((cases
+         ((union_attributes ())
+          (cases
            (((StructType 104) (Discriminator 1))
             ((StructType 102) (Discriminator 0))))
           (union_details
@@ -5747,3 +5753,221 @@ let%expect_test "Interface inner constraints" =
               (function_returns HoleType)))))
           (st_sig_base_id 1) (st_sig_id 1)))))
       (union_signs (0 ())))) |}]
+
+let%expect_test "attributes" =
+  let source =
+    {|
+    @attr
+    @attr(1)
+    @attr(1,2)
+    struct T {
+      @attr val a: Integer
+      @attr fn x() { true }
+    }
+
+    @attr
+    struct Ta[X: Integer] {}
+
+    let T1 = @attr struct { };
+
+    @attr
+    fn x() { }
+
+    let x1 = @attr fn () { };
+
+    @attr
+    interface I {
+      @attr
+      fn x() -> Bool
+    }
+
+    @attr
+    union U { case Void }
+
+    let U1 = @attr union { case Void };
+
+    struct Ti {
+      @attr
+      impl I {
+        @attr
+        fn x() -> Bool { true } 
+      }
+    }
+
+    /* FIXME: we don't handle enums yet
+    @attr
+    enum E {
+      @attr fn x() { true }
+    }
+
+    let E1 = @attr enum { }
+    */
+
+ 
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+      (Ok
+       ((bindings
+         ((Ti (Value (Type (StructType 114)))) (U1 (Value (Type (UnionType 112))))
+          (U (Value (Type (UnionType 109)))) (I (Value (Type (InterfaceType 107))))
+          (x1
+           (Value
+            (Function
+             ((function_signature
+               ((function_attributes
+                 (((attribute_ident attr) (attribute_exprs ()))))
+                (function_params ()) (function_returns HoleType)))
+              (function_impl (Fn (Block ())))))))
+          (x
+           (Value
+            (Function
+             ((function_signature
+               ((function_attributes
+                 (((attribute_ident attr) (attribute_exprs ()))))
+                (function_params ()) (function_returns HoleType)))
+              (function_impl (Fn (Block ())))))))
+          (T1 (Value (Type (StructType 106))))
+          (Ta
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ((X IntegerType)))
+                (function_returns (StructSig 137))))
+              (function_impl
+               (Fn
+                (Return
+                 (MkStructDef
+                  ((mk_struct_attributes
+                    (((attribute_ident attr) (attribute_exprs ()))))
+                   (mk_struct_fields ())
+                   (mk_struct_details
+                    ((mk_methods ()) (mk_impls ()) (mk_id 104) (mk_sig 137)
+                     (mk_span <opaque>))))))))))))
+          (T (Value (Type (StructType 103))))))
+        (structs
+         ((114
+           ((struct_fields ())
+            (struct_details
+             ((uty_methods
+               ((x
+                 ((function_signature
+                   ((function_attributes
+                     (((attribute_ident attr) (attribute_exprs ()))))
+                    (function_params ()) (function_returns BoolType)))
+                  (function_impl (Fn (Return (Value (Bool true)))))))))
+              (uty_impls
+               (((impl_attributes (((attribute_ident attr) (attribute_exprs ()))))
+                 (impl_interface 107)
+                 (impl_methods
+                  ((x
+                    ((function_signature
+                      ((function_attributes
+                        (((attribute_ident attr) (attribute_exprs ()))))
+                       (function_params ()) (function_returns BoolType)))
+                     (function_impl (Fn (Return (Value (Bool true))))))))))))
+              (uty_id 114) (uty_base_id 113)))))
+          (106
+           ((struct_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (struct_fields ())
+            (struct_details
+             ((uty_methods ()) (uty_impls ()) (uty_id 106) (uty_base_id 105)))))
+          (103
+           ((struct_attributes
+             (((attribute_ident attr) (attribute_exprs ()))
+              ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
+              ((attribute_ident attr)
+               (attribute_exprs ((Value (Integer 1)) (Value (Integer 2)))))))
+            (struct_fields ((a ((field_type IntegerType)))))
+            (struct_details
+             ((uty_methods
+               ((x
+                 ((function_signature
+                   ((function_attributes
+                     (((attribute_ident attr) (attribute_exprs ()))))
+                    (function_params ()) (function_returns BoolType)))
+                  (function_impl (Fn (Return (Value (Bool true)))))))))
+              (uty_impls ()) (uty_id 103) (uty_base_id 102)))))))
+        (unions
+         ((112
+           ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (cases (((ExprType (Value Void)) (Discriminator 0))))
+            (union_details
+             ((uty_methods ())
+              (uty_impls
+               (((impl_interface 110)
+                 (impl_methods
+                  ((from
+                    ((function_signature
+                      ((function_params ((v VoidType)))
+                       (function_returns (UnionType 111))))
+                     (function_impl
+                      (Fn
+                       (Return (MakeUnionVariant ((Reference (v VoidType)) 112))))))))))))
+              (uty_id 112) (uty_base_id 111)))))
+          (109
+           ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (cases (((ExprType (Value Void)) (Discriminator 0))))
+            (union_details
+             ((uty_methods ())
+              (uty_impls
+               (((impl_interface 110)
+                 (impl_methods
+                  ((from
+                    ((function_signature
+                      ((function_params ((v VoidType)))
+                       (function_returns (UnionType 108))))
+                     (function_impl
+                      (Fn
+                       (Return (MakeUnionVariant ((Reference (v VoidType)) 109))))))))))))
+              (uty_id 109) (uty_base_id 108)))))))
+        (interfaces
+         ((110
+           ((interface_methods
+             ((from
+               ((function_params ((from VoidType))) (function_returns SelfType)))))))
+          (107
+           ((interface_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (interface_methods
+             ((x
+               ((function_attributes
+                 (((attribute_ident attr) (attribute_exprs ()))))
+                (function_params ()) (function_returns BoolType)))))))))
+        (type_counter <opaque>) (memoized_fcalls <opaque>)
+        (struct_signs
+         (4
+          (((st_sig_fields ())
+            (st_sig_methods
+             ((x
+               ((function_attributes
+                 (((attribute_ident attr) (attribute_exprs ()))))
+                (function_params ()) (function_returns BoolType)))))
+            (st_sig_base_id 113) (st_sig_id 139))
+           ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 105)
+            (st_sig_id 138))
+           ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 104)
+            (st_sig_id 137))
+           ((st_sig_attributes
+             (((attribute_ident attr) (attribute_exprs ()))
+              ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
+              ((attribute_ident attr)
+               (attribute_exprs ((Value (Integer 1)) (Value (Integer 2)))))))
+            (st_sig_fields ((a (ResolvedReference (Integer <opaque>)))))
+            (st_sig_methods
+             ((x
+               ((function_attributes
+                 (((attribute_ident attr) (attribute_exprs ()))))
+                (function_params ()) (function_returns BoolType)))))
+            (st_sig_base_id 102) (st_sig_id 136)))))
+        (union_signs
+         (2
+          (((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
+            (un_sig_base_id 111))
+           ((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+            (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
+            (un_sig_base_id 108))))))) |}]

@@ -103,7 +103,10 @@ let%expect_test "Immediacy Checks Empty Function" =
          (Function
             ( bl
             @@ { function_signature =
-                   bl @@ {function_params = []; function_returns = VoidType};
+                   bl
+                   @@ { function_attributes = [];
+                        function_params = [];
+                        function_returns = VoidType };
                  function_impl = Fn (bl @@ Block []) } ) )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
@@ -118,7 +121,8 @@ let%expect_test "Immediacy Checks Function Argument" =
             ( bl
             @@ { function_signature =
                    bl
-                   @@ { function_params = [(bl "arg", VoidType)];
+                   @@ { function_attributes = [];
+                        function_params = [(bl "arg", VoidType)];
                         function_returns = VoidType };
                  function_impl =
                    Fn
@@ -137,7 +141,10 @@ let%expect_test "Immediacy Checks Let Argument" =
          (Function
             ( bl
             @@ { function_signature =
-                   bl @@ {function_params = []; function_returns = VoidType};
+                   bl
+                   @@ { function_attributes = [];
+                        function_params = [];
+                        function_returns = VoidType };
                  function_impl =
                    Fn
                      ( bl
@@ -157,7 +164,10 @@ let%expect_test "Immediacy Checks Destructuring Let" =
          (Function
             ( bl
             @@ { function_signature =
-                   bl @@ {function_params = []; function_returns = VoidType};
+                   bl
+                   @@ { function_attributes = [];
+                        function_params = [];
+                        function_returns = VoidType };
                  function_impl =
                    Fn
                      ( bl
@@ -186,7 +196,9 @@ let%expect_test "Immediacy Checks Function Call WITHOUT Primitive" =
                    ( bl
                    @@ { function_signature =
                           bl
-                          @@ {function_params = []; function_returns = VoidType};
+                          @@ { function_attributes = [];
+                               function_params = [];
+                               function_returns = VoidType };
                         function_impl =
                           Fn
                             ( bl
@@ -211,7 +223,9 @@ let%expect_test "Immediacy Checks Function Call WITH Primitive" =
                    ( bl
                    @@ { function_signature =
                           bl
-                          @@ {function_params = []; function_returns = VoidType};
+                          @@ { function_attributes = [];
+                               function_params = [];
+                               function_returns = VoidType };
                         function_impl =
                           Fn
                             ( bl
@@ -233,7 +247,10 @@ let f_with_primitive =
        (Function
           ( bl
           @@ { function_signature =
-                 bl @@ {function_params = []; function_returns = VoidType};
+                 bl
+                 @@ { function_attributes = [];
+                      function_params = [];
+                      function_returns = VoidType };
                function_impl =
                  Fn
                    ( bl
@@ -255,7 +272,9 @@ let%expect_test "Immediacy Checks Function Call that contains function with \
                    ( bl
                    @@ { function_signature =
                           bl
-                          @@ {function_params = []; function_returns = VoidType};
+                          @@ { function_attributes = [];
+                               function_params = [];
+                               function_returns = VoidType };
                         function_impl =
                           Fn
                             ( bl
@@ -278,7 +297,9 @@ let%expect_test "Immediacy Checks Function Call that Call function with \
                    ( bl
                    @@ { function_signature =
                           bl
-                          @@ {function_params = []; function_returns = VoidType};
+                          @@ { function_attributes = [];
+                               function_params = [];
+                               function_returns = VoidType };
                         function_impl =
                           Fn
                             ( bl
@@ -301,7 +322,10 @@ let%expect_test "Immediacy Checks Top Level Fn With Sign" =
          (Function
             ( bl
             @@ { function_signature =
-                   bl @@ {function_params = []; function_returns = StructSig 0};
+                   bl
+                   @@ { function_attributes = [];
+                        function_params = [];
+                        function_returns = StructSig 0 };
                  function_impl = Fn (bl @@ Block []) } ) )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;

@@ -1106,3 +1106,168 @@ let%expect_test "program returns" =
   let sources = [{| 1 |}; {| return 1|}] in
   List.iter ~f:pp sources ;
   [%expect {| ((stmts ((Expr (Int 1)))))((stmts ((Return (Int 1))))) |}]
+
+let%expect_test "attributes" =
+  let source =
+    {|
+    @attr
+    @attr(1)
+    @attr(1,2)
+    struct T {
+      @attr val a: Integer
+      @attr fn x() { true }
+    }
+
+    @attr
+    struct Ta[X: Integer] {}
+
+    let T1 = @attr struct { };
+
+    @attr
+    fn x() { }
+
+    let x1 = @attr fn () { };
+
+    @attr
+    interface I {
+      @attr
+      fn x() -> Bool
+    }
+
+    @attr
+    union U { case Void }
+
+    let U1 = @attr union { case Void };
+
+    struct Ti {
+      @attr
+      impl I {
+        @attr
+        fn x() -> Bool { true } 
+      }
+    }
+
+    @attr
+    enum E {
+      @attr fn x() { true }
+    }
+
+    let E1 = @attr enum { }
+
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Let
+        ((binding_name (Ident T))
+         (binding_expr
+          (Struct
+           ((struct_attributes
+             (((attribute_ident (Ident attr)))
+              ((attribute_ident (Ident attr)) (attribute_exprs ((Int 1))))
+              ((attribute_ident (Ident attr))
+               (attribute_exprs ((Int 1) (Int 2))))))
+            (fields
+             (((field_attributes (((attribute_ident (Ident attr)))))
+               (field_name (Ident a)) (field_type (Reference (Ident Integer))))))
+            (struct_bindings
+             (((binding_name (Ident x))
+               (binding_expr
+                (Function
+                 ((function_attributes (((attribute_ident (Ident attr)))))
+                  (function_body
+                   ((function_stmt (CodeBlock ((Break (Expr (Bool true))))))))
+                  (function_def_span <opaque>)))))))
+            (struct_span <opaque>))))))
+       (Let
+        ((binding_name (Ident Ta))
+         (binding_expr
+          (Function
+           ((params (((Ident X) (Reference (Ident Integer)))))
+            (function_body
+             ((function_stmt
+               (Expr
+                (Struct
+                 ((struct_attributes (((attribute_ident (Ident attr)))))
+                  (struct_span <opaque>)))))))
+            (function_def_span <opaque>))))))
+       (Let
+        ((binding_name (Ident T1))
+         (binding_expr
+          (Struct
+           ((struct_attributes (((attribute_ident (Ident attr)))))
+            (struct_span <opaque>))))))
+       (Let
+        ((binding_name (Ident x))
+         (binding_expr
+          (Function
+           ((function_attributes (((attribute_ident (Ident attr)))))
+            (function_body ((function_stmt (CodeBlock ()))))
+            (function_def_span <opaque>))))))
+       (Let
+        ((binding_name (Ident x1))
+         (binding_expr
+          (Function
+           ((function_attributes (((attribute_ident (Ident attr)))))
+            (function_body ((function_stmt (CodeBlock ()))))
+            (function_def_span <opaque>))))))
+       (Let
+        ((binding_name (Ident I))
+         (binding_expr
+          (Interface
+           ((interface_attributes (((attribute_ident (Ident attr)))))
+            (interface_members
+             (((binding_name (Ident x))
+               (binding_expr
+                (Function
+                 ((function_attributes (((attribute_ident (Ident attr)))))
+                  (returns (Reference (Ident Bool)))
+                  (function_def_span <opaque>))))))))))))
+       (Let
+        ((binding_name (Ident U))
+         (binding_expr
+          (Union
+           ((union_attributes (((attribute_ident (Ident attr)))))
+            (union_members ((Reference (Ident Void)))) (union_span <opaque>))))))
+       (Let
+        ((binding_name (Ident U1))
+         (binding_expr
+          (Union
+           ((union_attributes (((attribute_ident (Ident attr)))))
+            (union_members ((Reference (Ident Void)))) (union_span <opaque>))))))
+       (Let
+        ((binding_name (Ident Ti))
+         (binding_expr
+          (Struct
+           ((impls
+             (((impl_attributes (((attribute_ident (Ident attr)))))
+               (interface (Reference (Ident I)))
+               (methods
+                (((binding_name (Ident x))
+                  (binding_expr
+                   (Function
+                    ((function_attributes (((attribute_ident (Ident attr)))))
+                     (returns (Reference (Ident Bool)))
+                     (function_body
+                      ((function_stmt (CodeBlock ((Break (Expr (Bool true))))))))
+                     (function_def_span <opaque>))))))))))
+            (struct_span <opaque>))))))
+       (Let
+        ((binding_name (Ident E))
+         (binding_expr
+          (Enum
+           ((enum_attributes (((attribute_ident (Ident attr)))))
+            (enum_bindings
+             (((binding_name (Ident x))
+               (binding_expr
+                (Function
+                 ((function_attributes (((attribute_ident (Ident attr)))))
+                  (function_body
+                   ((function_stmt (CodeBlock ((Break (Expr (Bool true))))))))
+                  (function_def_span <opaque>))))))))))))
+       (Let
+        ((binding_name (Ident E1))
+         (binding_expr
+          (Enum ((enum_attributes (((attribute_ident (Ident attr))))))))))))) |}]

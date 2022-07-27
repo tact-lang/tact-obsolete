@@ -3,6 +3,7 @@
 %token <string> IDENT
 %token <string> STRING
 %token EOF
+%token AT
 %token DOUBLEDOT 
 %token LBRACE LPAREN LBRACKET
 %token RBRACE RPAREN RBRACKET

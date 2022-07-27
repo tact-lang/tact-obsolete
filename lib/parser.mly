@@ -53,6 +53,19 @@ let program :=
   | stmts = block_stmt; EOF; { make_program ~stmts: (remove_trailing_break stmts) () }
   | EOF; { make_program ~stmts: [] () }
 
+(*
+  Type, struct fields, impls and function definitions can have optional attributes:
+
+  @attr
+  @another_attr(<expr>[, ...])
+*)
+let attributes :=
+  | attributes = list(attribute); { attributes }
+
+let attribute :=
+  | AT; attribute_ident = located(ident); 
+        attribute_exprs = option(delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN));
+  { make_attribute ~attribute_ident ~attribute_exprs:(match attribute_exprs with None -> [] | Some attrs -> attrs) () }  
 
 (* Binding definition
 
@@ -195,12 +208,13 @@ let sugared_function_definition(funbody) ==
 
 *)
 let function_definition(name, funbody) :=
+  function_attributes = attributes;
   function_def_span = located(FN);
   n = name;
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   returns = option(preceded(RARROW, located(fexpr)));
   body = funbody;
-  { (n, Function (make_function_definition ~params:params ~function_def_span: function_def_span.span ?returns:returns 
+  { (n, Function (make_function_definition ~function_attributes ~params:params ~function_def_span: function_def_span.span ?returns:returns 
                     ?function_body:(Option.map (fun x -> make_function_body ~function_stmt: x ()) body)
                     ())) } 
 
@@ -417,29 +431,39 @@ let params ==
 
 *)
 let struct_definition(name) ==
+  struct_attributes = attributes;
   struct_span = located(STRUCT);
   n = name;
   LBRACE;
-  fields = list(struct_field);
-  bindings = list(sugared_function_definition(option(located(code_block))));
-  impls = list(impl);
+  items = list(struct_item);
   RBRACE;
-  { (n, Struct (make_struct_definition ~fields ~struct_bindings: bindings ~impls ~struct_span: struct_span.span  ())) }
+  { (n, Struct (make_struct_definition ~struct_attributes 
+                  ~fields:(List.filter_map (function `Field f -> Some f | _ -> None) items)
+                  ~struct_bindings: (List.filter_map (function `Binding b -> Some b | _ -> None) items)
+                  ~impls:(List.filter_map (function `Impl i -> Some i | _ -> None) items) ~struct_span: struct_span.span  ())) }
+
+let struct_item ==
+    | f = struct_field; { `Field f }
+    | b = sugared_function_definition(option(located(code_block))); { `Binding b }
+    | i = impl; { `Impl i }
 
 let impl == 
+  impl_attributes = attributes;
   IMPL; 
   interface = located(fexpr); 
   LBRACE;
   methods = list(sugared_function_definition(option(located(code_block))));
   RBRACE;
-  { make_impl ~interface ~methods () }
+  { make_impl ~impl_attributes ~interface ~methods () }
 
 (* Struct field
 
    val field_name: <type expression>
 *)
 let struct_field ==
-| located ( VAL ; name = located(ident); COLON; typ = located(expr); option(SEMICOLON); { make_struct_field ~field_name: name ~field_type: typ () } )
+| located ( 
+  field_attributes = attributes;
+  VAL ; name = located(ident); COLON; typ = located(expr); option(SEMICOLON); { make_struct_field ~field_attributes ~field_name: name ~field_type: typ () } )
 
 (* Struct constructor 
  *
@@ -470,10 +494,11 @@ let struct_constructor :=
 *) 
 
 let interface_definition(name) ==
+  interface_attributes = attributes;
   INTERFACE;
   n = name;
   bindings = delimited(LBRACE, list(located(function_signature_binding)), RBRACE);
-  { (n, Interface (make_interface_definition ~interface_members: bindings ())) }
+  { (n, Interface (make_interface_definition ~interface_attributes ~interface_members: bindings ())) }
 
 (* Identifier *)
 let ident ==
@@ -496,10 +521,11 @@ let ident ==
 
 *)
 let enum_definition(name) ==
+  enum_attributes = attributes;
   ENUM;
   n = name;
   (members, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, enum_member, COMMA, list(sugared_function_definition(option(located(code_block)))), RBRACE);
-  { (n, Enum (make_enum_definition ~enum_members: members ~enum_bindings: bindings ())) }
+  { (n, Enum (make_enum_definition ~enum_attributes ~enum_members: members ~enum_bindings: bindings ())) }
 
  (* Enum member
 
@@ -526,18 +552,22 @@ let enum_member ==
 
 *)
 let union_definition(name) ==
+  union_attributes = attributes;
   union_span = located(UNION);
   n = name;
   LBRACE;
-  (members, bindings) =
-    pair(
-      list(preceded(CASE, located(expr))), 
-      list(sugared_function_definition(option(located(code_block))))
-    );
-  impls = list(impl);
+  items = list(union_item);
   RBRACE;
-  { (n, Union (make_union_definition ~union_span: union_span.span ~union_members: members ~union_bindings: bindings ()
-                    ~union_impls: impls)) }
+  { (n, Union (make_union_definition ~union_attributes ~union_span: union_span.span
+                 ~union_members:(List.filter_map (function `Case c -> Some c | _ -> None) items)
+                 ~union_bindings:(List.filter_map (function `Binding b -> Some b | _ -> None) items)
+                 ~union_impls:(List.filter_map (function `Impl i -> Some i | _ -> None) items)
+                  ())) }
+
+let union_item ==
+    | case = preceded(CASE, located(expr)); { `Case case }
+    | b = sugared_function_definition(option(located(code_block))); { `Binding b }
+    | i = impl; { `Impl i }
 
 (* Delimited list, separated by a separator that may have a trailing separator *)
 let delimited_separated_trailing_list(opening, x, sep, closing) ==

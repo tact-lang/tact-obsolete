@@ -164,9 +164,12 @@ functor
       | InvalidExpr
 
     and mk_interface =
-      {mk_interface_methods : (string * function_signature) list}
+      { mk_interface_attributes : attribute list; [@sexp.list]
+        mk_interface_methods : (string * function_signature) list }
 
-    and interface = {interface_methods : (string * function_signature) list}
+    and interface =
+      { interface_attributes : attribute list; [@sexp.list]
+        interface_methods : (string * function_signature) list }
 
     and if_ = {if_condition : expr; if_then : stmt; if_else : stmt option}
 
@@ -199,6 +202,9 @@ functor
         destructuring_let_expr : expr;
         destructuring_let_rest : bool }
 
+    and attribute =
+      {attribute_ident : string located; attribute_exprs : expr list}
+
     and type_ =
       | TypeN of int
       | IntegerType
@@ -218,10 +224,14 @@ functor
       | ExprType of expr
       | ValueOf of type_
 
-    and mk_union = {mk_cases : expr list; mk_union_details : mk_details}
+    and mk_union =
+      { mk_union_attributes : attribute list; [@sexp.list]
+        mk_cases : expr list;
+        mk_union_details : mk_details }
 
     and mk_struct =
-      { mk_struct_fields : (string located * expr) list;
+      { mk_struct_attributes : attribute list; [@sexp.list]
+        mk_struct_fields : (string located * expr) list;
         mk_struct_details : mk_details }
 
     and mk_details =
@@ -239,23 +249,28 @@ functor
         uty_base_id : int }
 
     and union =
-      {cases : (type_ * discriminator) list; union_details : uty_details}
+      { union_attributes : attribute list; [@sexp.ident]
+        cases : (type_ * discriminator) list;
+        union_details : uty_details }
 
     and struct_ =
-      { struct_fields : (string located * struct_field) list;
+      { struct_attributes : attribute list; [@sexp.list]
+        struct_fields : (string located * struct_field) list;
         struct_details : uty_details;
         (* Used by codegen to determine if this is a tensor *)
         tensor : bool [@sexp.bool] }
 
     and struct_sig =
-      { st_sig_fields : (string located * expr) list;
+      { st_sig_attributes : attribute list; [@sexp.list]
+        st_sig_fields : (string located * expr) list;
         st_sig_methods : (string located * function_signature) list;
         (* ID of the base of the struct. *)
         st_sig_base_id : int;
         st_sig_id : int [@compare.ignore] [@equal.ignore] }
 
     and union_sig =
-      { un_sig_cases : type_ list;
+      { un_sig_attributes : attribute list; [@sexp.list]
+        un_sig_cases : type_ list;
         un_sig_methods : (string located * function_signature) list;
         (* ID of the base of the struct. *)
         un_sig_base_id : int }
@@ -265,10 +280,14 @@ functor
     and struct_field = {field_type : type_}
 
     and mk_impl =
-      {mk_impl_interface : expr; mk_impl_methods : (string located * expr) list}
+      { mk_impl_attributes : attribute list; [@sexp.list]
+        mk_impl_interface : expr;
+        mk_impl_methods : (string located * expr) list }
 
     and impl =
-      {impl_interface : int; impl_methods : (string located * function_) list}
+      { impl_attributes : attribute list; [@sexp.list]
+        impl_interface : int;
+        impl_methods : (string located * function_) list }
 
     and native_function =
       (program -> value list -> value
@@ -284,7 +303,9 @@ functor
     and function_signature = function_signature_kind located
 
     and function_signature_kind =
-      {function_params : (string located * type_) list; function_returns : type_}
+      { function_attributes : attribute list; [@sexp.list]
+        function_params : (string located * type_) list;
+        function_returns : type_ }
 
     and function_impl = Fn of stmt | BuiltinFn of builtin_fn
 
@@ -342,8 +363,10 @@ functor
       List.filter_map bindings ~f:(fun (name, scope) ->
           match scope with Comptime value -> Some (name, value) | _ -> None )
 
-    let sig_of_struct {struct_fields; struct_details; _} sid =
-      { st_sig_fields =
+    let sig_of_struct {struct_attributes; struct_fields; struct_details; _} sid
+        =
+      { st_sig_attributes = struct_attributes;
+        st_sig_fields =
           List.Assoc.map struct_fields ~f:(fun {field_type} ->
               match field_type with
               | ExprType ex ->
@@ -356,8 +379,9 @@ functor
         st_sig_base_id = struct_details.uty_base_id;
         st_sig_id = sid }
 
-    let sig_of_union {cases; union_details; _} =
-      { un_sig_cases = List.map cases ~f:fst;
+    let sig_of_union {union_attributes; cases; union_details; _} =
+      { un_sig_attributes = union_attributes;
+        un_sig_cases = List.map cases ~f:fst;
         un_sig_methods =
           List.Assoc.map union_details.uty_methods ~f:(fun x ->
               x.value.function_signature );
