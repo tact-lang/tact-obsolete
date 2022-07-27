@@ -8,19 +8,19 @@ struct Builder {
   val inner: builtin_Builder
 
   fn new() -> Self {
-    Self { inner: builtin_builder_new() }
+    Self { inner: builtin_begin_cell() }
   }
   fn build(self: Self) -> Cell {
-    Cell { c: builtin_builder_build(self.inner) }
+    Cell { c: builtin_end_cell(self.inner) }
   }
   fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
-    Self { inner: builtin_builder_store_int(self.inner, int, bits) }
+    Self { inner: builtin_store_int(self.inner, int, bits) }
   }
   fn serialize_uint(self: Self, uint: Integer, bits: Integer) -> Self {
-    Self { inner: builtin_builder_store_uint(self.inner, uint, bits) }
+    Self { inner: builtin_store_uint(self.inner, uint, bits) }
   }
   fn serialize_coins(self: Self, c: Integer) -> Self {
-    Self { inner: builtin_builder_store_coins(self.inner, c) }
+    Self { inner: builtin_store_coins(self.inner, c) }
   }
 }
 
@@ -28,22 +28,26 @@ struct Slice {
   val s: builtin_Slice
 
   fn parse(cell: Cell) -> Self {
-    Self { s: builtin_slice_begin_parse(cell.c) }
+    Self { s: builtin_begin_parse(cell.c) }
   }
 
   fn load_int(self: Self, bits: Integer) -> LoadResult[Integer] {
-    let output = builtin_slice_load_int(self.s, bits);
+    let output = builtin_load_int(self.s, bits);
     let slice = Self { s: output.value1 };
     let int = output.value2;
     LoadResult[Integer] { slice: slice, value: int }
   }
 
   fn load_uint(self: Self, bits: Integer) -> LoadResult[Integer] {
-    let output = builtin_slice_load_uint(self.s, bits);
+    let output = builtin_load_uint(self.s, bits);
     let slice = Self { s: output.value1 };
     let int = output.value2;
     LoadResult[Integer] { slice: slice, value: int }
   }
+}
+
+fn throw(n: Integer) {
+  builtin_throw(n);
 }
 
 struct Coins {

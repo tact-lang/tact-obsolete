@@ -90,50 +90,53 @@ let%expect_test "Int[bits] serializer codegen" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
        }
        builder f1(builder self, int int_, int bits) {
-         return builtin_builder_store_int(self, int_, bits);
+         return builtin_store_int(self, int_, bits);
        }
        builder f0(int self, builder builder_) {
          return f1(builder_, self, 32);
@@ -169,50 +172,53 @@ let%expect_test "demo struct serializer" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
        }
        builder f1(builder self, int int_, int bits) {
-         return builtin_builder_store_int(self, int_, bits);
+         return builtin_store_int(self, int_, bits);
        }
        builder f0(int self, builder builder_) {
          return f1(builder_, self, 32);
@@ -226,7 +232,7 @@ let%expect_test "demo struct serializer" =
          return b;
        }
        builder f3() {
-         return builtin_builder_new();
+         return builtin_begin_cell();
        }
        _ test() {
          builder b = f3();
@@ -259,50 +265,53 @@ let%expect_test "demo struct serializer 2" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
        }
        builder f1(builder self, int int_, int bits) {
-         return builtin_builder_store_int(self, int_, bits);
+         return builtin_store_int(self, int_, bits);
        }
        builder f0(int self, builder builder_) {
          return f1(builder_, self, 32);
@@ -316,7 +325,7 @@ let%expect_test "demo struct serializer 2" =
          return b;
        }
        builder f3() {
-         return builtin_builder_new();
+         return builtin_begin_cell();
        }
        builder test() {
          builder b = f3();
@@ -404,50 +413,53 @@ let%expect_test "serializer inner struct" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
        }
        builder f1(builder self, int int_, int bits) {
-         return builtin_builder_store_int(self, int_, bits);
+         return builtin_store_int(self, int_, bits);
        }
        builder f0(int self, builder builder_) {
          return f1(builder_, self, 32);
@@ -513,44 +525,47 @@ let%expect_test "switch statement" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
@@ -594,44 +609,47 @@ let%expect_test "tensor2" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
@@ -669,53 +687,56 @@ let%expect_test "serialization api" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
        }
        builder f0() {
-         return builtin_builder_new();
+         return builtin_begin_cell();
        }
        builder f3(builder self, int int_, int bits) {
-         return builtin_builder_store_int(self, int_, bits);
+         return builtin_store_int(self, int_, bits);
        }
        builder f10([] self, builder b) {
          return b;
@@ -737,7 +758,7 @@ let%expect_test "serialization api" =
        {
          [int, int] var = second(temp);
        {
-         int b = store_uint(b, 1, 1);
+         _ b = store_uint(b, 1, 1);
        builder b =
        f11(var, b);
        return
@@ -746,7 +767,7 @@ let%expect_test "serialization api" =
        {
          [] var = second(temp);
        {
-         int b = store_uint(b, 0, 1);
+         _ b = store_uint(b, 0, 1);
        builder b =
        f10(var, b);
        return
@@ -791,7 +812,7 @@ let%expect_test "serialization api" =
        {
          [int, int, int] var = second(temp);
        {
-         int b = store_uint(b, 1, 1);
+         _ b = store_uint(b, 1, 1);
        builder b =
        f19(var, b);
        return
@@ -800,7 +821,7 @@ let%expect_test "serialization api" =
        {
          [int, int] var = second(temp);
        {
-         int b = store_uint(b, 0, 1);
+         _ b = store_uint(b, 0, 1);
        builder b =
        f15(var, b);
        return
@@ -820,7 +841,7 @@ let%expect_test "serialization api" =
        {
          tuple var = second(temp);
        {
-         int b = store_uint(b, 1, 1);
+         _ b = store_uint(b, 1, 1);
        builder b =
        f13(var, b);
        return
@@ -829,7 +850,7 @@ let%expect_test "serialization api" =
        {
          tuple var = second(temp);
        {
-         int b = store_uint(b, 0, 1);
+         _ b = store_uint(b, 0, 1);
        builder b =
        f8(var, b);
        return
@@ -841,7 +862,7 @@ let%expect_test "serialization api" =
          return f7(self, b);
        }
        builder f22(builder self, int uint, int bits) {
-         return builtin_builder_store_uint(self, uint, bits);
+         return builtin_store_uint(self, uint, bits);
        }
        builder f21(int self, builder builder_) {
          return f22(builder_, self, 64);
@@ -880,7 +901,7 @@ let%expect_test "serialization api" =
          return f30(self, b);
        }
        builder f34(builder self, int c) {
-         return builtin_builder_store_coins(self, c);
+         return builtin_store_coins(self, c);
        }
        builder f33(int self, builder builder_) {
          return f34(builder_, self);
@@ -978,53 +999,56 @@ let%expect_test "deserialization api" =
          (_, Value2 value) = tensor;
          return value;
        }
-       _ throw(int n) {
-         return throw(n);
+       int builtin_equal(int i1, int i2) {
+         return __==__(i1, i2);
        }
-       int builtin_equal(int x, int y) {
-         return x == y;
+       _ builtin_throw(int e) {
+         return throw(e);
        }
-       _ builtin_send_raw_msg(cell msg, int flags) {
-         return send_raw_message(msg, flags);
+       _ builtin_send_raw_msg(cell c, int f) {
+         return send_raw_msg(c, f);
        }
-       (int, int) builtin_divmod(int x, int y) {
-         return divmod(x, y);
+       (int, int) builtin_divmod(int i1, int i2) {
+         return divmod(i1, i2);
        }
-       (slice, int) builtin_slice_load_uint(slice s, int bits) {
-         return load_uint(s, bits);
-       }
-       (slice, int) builtin_slice_load_int(slice s, int bits) {
-         return load_int(s, bits);
-       }
-       _ builtin_slice_end_parse(slice s) {
+       _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
-       slice builtin_slice_begin_parse(cell c) {
+       (slice, int) builtin_load_uint(slice s, int bs) {
+         return load_uint(s, bs);
+       }
+       (slice, int) builtin_load_int(slice s, int bs) {
+         return load_int(s, bs);
+       }
+       slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       int builtin_builder_store_coins(builder b, int c) {
-         return store_grams(b, c);
+       builder builtin_store_coins(builder b, int c) {
+         return store_coins(b, c);
        }
-       builder builtin_builder_store_uint(builder b, int int_, int bits) {
-         return store_uint(b, int_, bits);
+       builder builtin_store_uint(builder b, int i, int bs) {
+         return store_uint(b, i, bs);
        }
-       builder builtin_builder_store_int(builder b, int int_, int bits) {
-         return store_int(b, int_, bits);
+       builder builtin_store_int(builder b, int i, int bs) {
+         return store_int(b, i, bs);
        }
-       cell builtin_builder_build(builder b) {
+       cell builtin_end_cell(builder b) {
          return end_cell(b);
        }
-       builder builtin_builder_new() {
+       builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ throw(int n) {
+         return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
          return builtin_send_raw_msg(msg, flags);
        }
        slice f0(cell cell_) {
-         return builtin_slice_begin_parse(cell_);
+         return builtin_begin_parse(cell_);
        }
        [slice, int] f3(slice self, int bits) {
-         (slice, int) output = builtin_slice_load_int(self, bits);
+         (slice, int) output = builtin_load_int(self, bits);
          slice slice_ = tensor2_value1(output);
          int int_ = tensor2_value2(output);
          return [slice_, int_];
@@ -1159,7 +1183,7 @@ let%expect_test "deserialization api" =
          return f29(s);
        }
        [slice, int] f33(slice self, int bits) {
-         (slice, int) output = builtin_slice_load_uint(self, bits);
+         (slice, int) output = builtin_load_uint(self, bits);
          slice slice_ = tensor2_value1(output);
          int int_ = tensor2_value2(output);
          return [slice_, int_];
@@ -1326,50 +1350,53 @@ let%expect_test "deserializer" =
       (_, Value2 value) = tensor;
       return value;
     }
-    _ throw(int n) {
-      return throw(n);
+    int builtin_equal(int i1, int i2) {
+      return __==__(i1, i2);
     }
-    int builtin_equal(int x, int y) {
-      return x == y;
+    _ builtin_throw(int e) {
+      return throw(e);
     }
-    _ builtin_send_raw_msg(cell msg, int flags) {
-      return send_raw_message(msg, flags);
+    _ builtin_send_raw_msg(cell c, int f) {
+      return send_raw_msg(c, f);
     }
-    (int, int) builtin_divmod(int x, int y) {
-      return divmod(x, y);
+    (int, int) builtin_divmod(int i1, int i2) {
+      return divmod(i1, i2);
     }
-    (slice, int) builtin_slice_load_uint(slice s, int bits) {
-      return load_uint(s, bits);
-    }
-    (slice, int) builtin_slice_load_int(slice s, int bits) {
-      return load_int(s, bits);
-    }
-    _ builtin_slice_end_parse(slice s) {
+    _ builtin_end_parse(slice s) {
       return end_parse(s);
     }
-    slice builtin_slice_begin_parse(cell c) {
+    (slice, int) builtin_load_uint(slice s, int bs) {
+      return load_uint(s, bs);
+    }
+    (slice, int) builtin_load_int(slice s, int bs) {
+      return load_int(s, bs);
+    }
+    slice builtin_begin_parse(cell c) {
       return begin_parse(c);
     }
-    int builtin_builder_store_coins(builder b, int c) {
-      return store_grams(b, c);
+    builder builtin_store_coins(builder b, int c) {
+      return store_coins(b, c);
     }
-    builder builtin_builder_store_uint(builder b, int int_, int bits) {
-      return store_uint(b, int_, bits);
+    builder builtin_store_uint(builder b, int i, int bs) {
+      return store_uint(b, i, bs);
     }
-    builder builtin_builder_store_int(builder b, int int_, int bits) {
-      return store_int(b, int_, bits);
+    builder builtin_store_int(builder b, int i, int bs) {
+      return store_int(b, i, bs);
     }
-    cell builtin_builder_build(builder b) {
+    cell builtin_end_cell(builder b) {
       return end_cell(b);
     }
-    builder builtin_builder_new() {
+    builder builtin_begin_cell() {
       return begin_cell();
+    }
+    _ throw(int n) {
+      return builtin_throw(n);
     }
     _ send_raw_msg(cell msg, int flags) {
       return builtin_send_raw_msg(msg, flags);
     }
     [slice, int] f1(slice self, int bits) {
-      (slice, int) output = builtin_slice_load_int(self, bits);
+      (slice, int) output = builtin_load_int(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
       return [slice_, int_];

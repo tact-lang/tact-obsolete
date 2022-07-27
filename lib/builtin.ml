@@ -197,25 +197,26 @@ functor
                                      [ ( bl "b",
                                          bl
                                          @@ Primitive
-                                              (StoreInt
-                                                 { builder =
-                                                     bl
-                                                     @@ StructField
-                                                          ( bl
-                                                            @@ Reference
-                                                                 ( bl "b",
-                                                                   builder_struct
-                                                                 ),
-                                                            bl "b",
-                                                            BuiltinType
-                                                              "Builder" );
-                                                   length = bl discriminator_len;
-                                                   integer =
-                                                     bl
-                                                     @@ Value
-                                                          (Integer
-                                                             (Z.of_int discr) );
-                                                   signed = false } ) ) ];
+                                              (Prim
+                                                 { name = "store_uint";
+                                                   exprs =
+                                                     [ bl
+                                                       @@ StructField
+                                                            ( bl
+                                                              @@ Reference
+                                                                   ( bl "b",
+                                                                     builder_struct
+                                                                   ),
+                                                              bl "b",
+                                                              BuiltinType
+                                                                "Builder" );
+                                                       bl
+                                                       @@ Value
+                                                            (Integer
+                                                               (Z.of_int discr)
+                                                            );
+                                                       bl discriminator_len ] }
+                                              ) ) ];
                                 bl
                                 @@ Let
                                      [ ( bl "b",
@@ -436,15 +437,6 @@ functor
 
     let from_intf = bl from_intf_
 
-    let make_builtin_fn params ret_ty primitive =
-      Value
-        (Function
-           (bl
-              { function_signature =
-                  bl {function_params = params; function_returns = ret_ty};
-                function_impl = Fn (bl (Return (bl @@ Primitive primitive))) } )
-        )
-
     let tensor2_hashtbl =
       Hashtbl.create
         ( module struct
@@ -480,115 +472,65 @@ functor
         make_bindings
           [ ("builtin_Builder", Value (Type (BuiltinType "Builder")));
             ("builtin_Cell", Value (Type (BuiltinType "Cell")));
-            ("builtin_Slice", Value (Type (BuiltinType "Slice")));
-            ( "builtin_builder_new",
-              Value
-                (Function
-                   (bl
-                      { function_signature =
-                          bl
-                            { function_params = [];
-                              function_returns = BuiltinType "Builder" };
-                        function_impl =
-                          Fn (bl (Return (bl @@ Primitive EmptyBuilder))) } ) )
-            );
-            ( "builtin_builder_build",
-              make_builtin_fn
-                [(bl "b", BuiltinType "Builder")]
-                (BuiltinType "Cell")
-                (BuildCell
-                   {builder = bl @@ Reference (bl "b", BuiltinType "Builder")}
-                ) );
-            ( "builtin_builder_store_int",
-              make_builtin_fn
-                [ (bl "b", BuiltinType "Builder");
-                  (bl "int", IntegerType);
-                  (bl "bits", IntegerType) ]
-                (BuiltinType "Builder")
-                (StoreInt
-                   { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
-                     length = bl @@ Reference (bl "bits", IntegerType);
-                     integer = bl @@ Reference (bl "int", IntegerType);
-                     signed = true } ) );
-            ( "builtin_builder_store_uint",
-              make_builtin_fn
-                [ (bl "b", BuiltinType "Builder");
-                  (bl "int", IntegerType);
-                  (bl "bits", IntegerType) ]
-                (BuiltinType "Builder")
-                (StoreInt
-                   { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
-                     length = bl @@ Reference (bl "bits", IntegerType);
-                     integer = bl @@ Reference (bl "int", IntegerType);
-                     signed = false } ) );
-            ( "builtin_builder_store_coins",
-              make_builtin_fn
-                [(bl "b", BuiltinType "Builder"); (bl "c", IntegerType)]
-                BoolType
-                (StoreCoins
-                   { builder = bl @@ Reference (bl "b", BuiltinType "Builder");
-                     coins = bl @@ Reference (bl "c", IntegerType) } ) );
-            ( "builtin_slice_begin_parse",
-              make_builtin_fn
-                [(bl "c", BuiltinType "Cell")]
-                (BuiltinType "Slice")
-                (ParseCell {cell = bl @@ Reference (bl "c", BuiltinType "Cell")})
-            );
-            ( "builtin_slice_end_parse",
-              make_builtin_fn
-                [(bl "s", BuiltinType "Slice")]
-                VoidType
-                (SliceEndParse
-                   {slice = bl @@ Reference (bl "s", BuiltinType "Slice")} ) );
-            ( "builtin_slice_load_int",
-              make_builtin_fn
-                [(bl "s", BuiltinType "Slice"); (bl "bits", IntegerType)]
-                (StructType
-                   (tensor2 (BuiltinType "Slice") IntegerType).struct_details
-                     .uty_id )
-                (SliceLoadInt
-                   { slice = bl @@ Reference (bl "s", BuiltinType "Slice");
-                     bits = bl @@ Reference (bl "bits", IntegerType);
-                     signed = true } ) );
-            ( "builtin_slice_load_uint",
-              make_builtin_fn
-                [(bl "s", BuiltinType "Slice"); (bl "bits", IntegerType)]
-                (StructType
-                   (tensor2 (BuiltinType "Slice") IntegerType).struct_details
-                     .uty_id )
-                (SliceLoadInt
-                   { slice = bl @@ Reference (bl "s", BuiltinType "Slice");
-                     bits = bl @@ Reference (bl "bits", IntegerType);
-                     signed = false } ) );
-            ( "builtin_divmod",
-              make_builtin_fn
-                [(bl "x", IntegerType); (bl "y", IntegerType)]
-                (StructType
-                   (tensor2 IntegerType IntegerType).struct_details.uty_id )
-                (Divmod
-                   { x = bl @@ Reference (bl "x", IntegerType);
-                     y = bl @@ Reference (bl "y", IntegerType) } ) );
-            ( "builtin_send_raw_msg",
-              make_builtin_fn
-                [(bl "msg", BuiltinType "Cell"); (bl "flags", IntegerType)]
-                VoidType
-                (SendRawMsg
-                   { msg = bl @@ Reference (bl "msg", BuiltinType "Cell");
-                     flags = bl @@ Reference (bl "flags", IntegerType) } ) );
-            ( "builtin_equal",
-              make_builtin_fn
-                [(bl "x", IntegerType); (bl "y", IntegerType)]
-                BoolType
-                (Equality
-                   { x = bl @@ Reference (bl "x", IntegerType);
-                     y = bl @@ Reference (bl "y", IntegerType) } ) );
-            ( "throw",
-              make_builtin_fn
-                [(bl "n", IntegerType)]
-                VoidType
-                (Throw {n = bl @@ Reference (bl "n", IntegerType)}) ) ]
+            ("builtin_Slice", Value (Type (BuiltinType "Slice"))) ]
       in
       {p with bindings = p.bindings @ bs}
+
+    module MakeBuiltins = struct
+      open struct
+        let make_builtin_names name func_name args ret_ty =
+          let fn_name = name in
+          let args = List.map args ~f:(fun (n, t) -> (bl n, t)) in
+          let exprs = List.map args ~f:(fun x -> bl @@ Reference x) in
+          ( fn_name,
+            Value
+              (Function
+                 (bl
+                    { function_signature =
+                        bl {function_params = args; function_returns = ret_ty};
+                      function_impl =
+                        Fn
+                          (bl
+                             (Return
+                                ( bl
+                                @@ Primitive (Prim {name = func_name; exprs}) )
+                             ) ) } ) ) )
+
+        let make_builtin name args ret_ty =
+          make_builtin_names ("builtin_" ^ name) name args ret_ty
+
+        let b = BuiltinType "Builder"
+
+        let c = BuiltinType "Cell"
+
+        let s = BuiltinType "Slice"
+
+        let v = VoidType
+
+        let i = IntegerType
+
+        let t2 x y = StructType (tensor2 x y).struct_details.uty_id
+      end
+
+      let add_builtins p =
+        let builtins =
+          [ make_builtin "begin_cell" [] b;
+            make_builtin "end_cell" [("b", b)] c;
+            make_builtin "store_int" [("b", b); ("i", i); ("bs", i)] b;
+            make_builtin "store_uint" [("b", b); ("i", i); ("bs", i)] b;
+            make_builtin "store_coins" [("b", b); ("c", i)] b;
+            make_builtin "begin_parse" [("c", c)] s;
+            make_builtin "load_int" [("s", s); ("bs", i)] (t2 s i);
+            make_builtin "load_uint" [("s", s); ("bs", i)] (t2 s i);
+            make_builtin "end_parse" [("s", s)] v;
+            make_builtin "divmod" [("i1", i); ("i2", i)] (t2 i i);
+            make_builtin "send_raw_msg" [("c", c); ("f", i)] v;
+            make_builtin "throw" [("e", i)] v;
+            make_builtin_names "builtin_equal" "__==__" [("i1", i); ("i2", i)] i
+          ]
+        in
+        {p with bindings = p.bindings @ make_bindings builtins}
+    end
 
     let add_default_bindings p =
       let bs =
@@ -628,7 +570,8 @@ functor
        new program for each call, not one global mutable variable. *)
     let default_program () =
       empty_program () |> add_builtin_bindings |> add_default_bindings
-      |> add_default_structs |> add_default_intfs |> add_deserializer
+      |> MakeBuiltins.add_builtins |> add_default_structs |> add_default_intfs
+      |> add_deserializer
 
     let std = [%blob "std/std.tact"]
   end

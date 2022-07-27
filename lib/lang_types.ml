@@ -313,19 +313,7 @@ functor
     and branch =
       {branch_ty : type_; branch_var : string located; branch_stmt : stmt}
 
-    and primitive =
-      | Divmod of {x : expr; y : expr}
-      | Equality of {x : expr; y : expr}
-      | EmptyBuilder
-      | StoreInt of
-          {builder : expr; length : expr; integer : expr; signed : bool}
-      | StoreCoins of {builder : expr; coins : expr}
-      | BuildCell of {builder : expr}
-      | SendRawMsg of {msg : expr; flags : expr}
-      | ParseCell of {cell : expr}
-      | SliceEndParse of {slice : expr}
-      | SliceLoadInt of {slice : expr; bits : expr; signed : bool}
-      | Throw of {n : expr}
+    and primitive = Prim of {name : string; exprs : expr list}
     [@@deriving
       equal,
         compare,

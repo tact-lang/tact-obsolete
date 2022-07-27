@@ -309,60 +309,10 @@ functor
         method cg_ResolvedReference : 'a. 'a * T.expr -> F.expr =
           fun (_, expr) -> self#cg_expr expr
 
-        method cg_StoreInt builder length int_ is_signed =
-          let name =
-            match is_signed with true -> "store_int" | false -> "store_uint"
-          in
-          F.FunctionCall (name, [builder; int_; length], F.IntType)
-
         method cg_Primitive : T.primitive -> F.expr =
           function
-          | Divmod {x; y} ->
-              self#cg_Divmod x y
-          | EmptyBuilder ->
-              self#cg_EmptyBuilder
-          | BuildCell {builder} ->
-              self#cg_BuildCell builder
-          | StoreInt {builder; length; integer; signed} ->
-              self#cg_StoreInt (self#cg_expr builder) (self#cg_expr length)
-                (self#cg_expr integer) signed
-          | StoreCoins {builder; coins} ->
-              F.FunctionCall
-                ( "store_grams",
-                  [self#cg_expr builder; self#cg_expr coins],
-                  F.BuilderType )
-          | SendRawMsg {msg; flags} ->
-              F.FunctionCall
-                ( "send_raw_message",
-                  [self#cg_expr msg; self#cg_expr flags],
-                  F.InferType )
-          | ParseCell {cell} ->
-              F.FunctionCall ("begin_parse", [self#cg_expr cell], F.SliceType)
-          | SliceEndParse {slice} ->
-              F.FunctionCall ("end_parse", [self#cg_expr slice], F.InferType)
-          | SliceLoadInt {slice; bits; signed} ->
-              let fname =
-                match signed with true -> "load_int" | false -> "load_uint"
-              in
-              F.FunctionCall
-                ( fname,
-                  [self#cg_expr slice; self#cg_expr bits],
-                  F.TensorType [F.SliceType; F.IntType] )
-          | Equality {x; y} ->
-              Operator (self#cg_expr x, F.EqualityOperator, self#cg_expr y)
-          | Throw {n} ->
-              F.FunctionCall ("throw", [self#cg_expr n], F.InferType)
-
-        method cg_EmptyBuilder = F.FunctionCall ("begin_cell", [], F.BuilderType)
-
-        method cg_Divmod x y =
-          F.FunctionCall
-            ( "divmod",
-              [self#cg_expr x; self#cg_expr y],
-              F.TensorType [F.IntType; F.IntType] )
-
-        method cg_BuildCell builder_arg =
-          F.FunctionCall ("end_cell", [self#cg_expr builder_arg], F.CellType)
+          | Prim {name; exprs} ->
+              F.FunctionCall (name, List.map exprs ~f:self#cg_expr, F.InferType)
 
         method private lang_type_to_type : T.type_ -> F.type_ =
           function

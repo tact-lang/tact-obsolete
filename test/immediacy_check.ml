@@ -91,7 +91,7 @@ let%expect_test "Immediacy Checks Runtime Reference" =
 
 let%expect_test "Immediacy Checks Primitive" =
   let scope = [] in
-  let expr = bl @@ Primitive EmptyBuilder in
+  let expr = bl @@ Primitive (Prim {name = ""; exprs = []}) in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
@@ -215,7 +215,12 @@ let%expect_test "Immediacy Checks Function Call WITH Primitive" =
                         function_impl =
                           Fn
                             ( bl
-                            @@ Block [bl @@ Expr (bl @@ Primitive EmptyBuilder)]
+                            @@ Block
+                                 [ bl
+                                   @@ Expr
+                                        ( bl
+                                        @@ Primitive
+                                             (Prim {name = ""; exprs = []}) ) ]
                             ) } ) ),
            [] )
   in
@@ -230,8 +235,13 @@ let f_with_primitive =
           @@ { function_signature =
                  bl @@ {function_params = []; function_returns = VoidType};
                function_impl =
-                 Fn (bl @@ Block [bl @@ Expr (bl @@ Primitive EmptyBuilder)]) }
-          ) )
+                 Fn
+                   ( bl
+                   @@ Block
+                        [ bl
+                          @@ Expr
+                               (bl @@ Primitive (Prim {name = ""; exprs = []}))
+                        ] ) } ) )
 
 let%expect_test "Immediacy Checks Function Call that contains function with \
                  primitive" =
@@ -320,7 +330,7 @@ let%expect_test "Immediacy Checks MyInt Type" =
       struct Builder {
         val b: builtin_Builder
         fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
-          let b = builtin_builder_store_int(self.b, int, bits);
+          let b = builtin_store_int(self.b, int, bits);
           Self { b: b }
         }
       }
@@ -328,7 +338,7 @@ let%expect_test "Immediacy Checks MyInt Type" =
       struct Slice {
         val s: builtin_Slice
         fn load_int(self: Self, bits: Integer) -> LoadResult(Integer) {
-          let output = builtin_slice_load_int(self.s, bits);
+          let output = builtin_load_int(self.s, bits);
           let slice = Self { s: output.value1 };
           let int = output.value2;
           LoadResult(Integer) { slice: slice, value: int }
