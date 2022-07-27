@@ -44,6 +44,20 @@ struct Slice {
     let int = output.value2;
     LoadResult[Integer] { slice: slice, value: int }
   }
+
+  fn load_bits(self: Self, bits: Integer) -> LoadResult[Self] {
+    let output = builtin_load_bits(self.s, bits);
+    let slice = Self { s: output.value1 };
+    let slice2 = Self { s: output.value2 };
+    LoadResult[Self] { slice: slice, value: slice2 }
+  }
+
+  fn load_coins(self: Self) -> LoadResult[Integer] {
+    let output = builtin_load_coins(self.s);
+    let slice = Self { s: output.value1 };
+    let coins = Self { s: output.value2 };
+    LoadResult[Integer] { slice: slice, value: coins }
+  }
 }
 
 fn throw(n: Integer) {
@@ -65,7 +79,8 @@ struct Coins {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      LoadResult[Self].new(Self{value: 1}, s) // TODO
+      let {slice, value} = s.load_coins();
+      LoadResult[Self].new(Self { value: value }, slice)
     } 
   }
 }

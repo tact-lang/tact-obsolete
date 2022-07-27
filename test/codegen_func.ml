@@ -105,6 +105,12 @@ let%expect_test "Int[bits] serializer codegen" =
        _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
+       }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
        }
@@ -186,6 +192,12 @@ let%expect_test "demo struct serializer" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
        }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
@@ -279,6 +291,12 @@ let%expect_test "demo struct serializer 2" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
        }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
@@ -428,6 +446,12 @@ let%expect_test "serializer inner struct" =
        _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
+       }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
        }
@@ -540,6 +564,12 @@ let%expect_test "switch statement" =
        _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
+       }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
        }
@@ -624,6 +654,12 @@ let%expect_test "tensor2" =
        _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
+       }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
        }
@@ -701,6 +737,12 @@ let%expect_test "serialization api" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
        }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
@@ -1014,6 +1056,12 @@ let%expect_test "deserialization api" =
        _ builtin_end_parse(slice s) {
          return end_parse(s);
        }
+       (slice, int) builtin_load_coins(slice s) {
+         return load_coins(s);
+       }
+       (slice, slice) builtin_load_bits(slice s, int bs) {
+         return load_bits(s, bs);
+       }
        (slice, int) builtin_load_uint(slice s, int bs) {
          return load_uint(s, bs);
        }
@@ -1134,11 +1182,18 @@ let%expect_test "deserialization api" =
        return
        f14(first(res_addr), second(res_addr));
        }}
-       [slice, int] f19(slice s, int v) {
+       [slice, int] f19(slice self) {
+         (slice, int) output = builtin_load_coins(self);
+         slice slice_ = tensor2_value1(output);
+         int coins = tensor2_value2(output);
+         return [slice_, coins];
+       }
+       [slice, int] f20(slice s, int v) {
          return [s, v];
        }
        [slice, int] f18(slice s) {
-         return f19(1, s);
+         [slice slice_, int value] = f19(s);
+         return f20(value, slice_);
        }
        [slice, [tuple, tuple, int]] f5(slice slice_) {
          [slice slice_, tuple src] = f6(slice_);
@@ -1149,80 +1204,80 @@ let%expect_test "deserialization api" =
        [slice, [tuple, tuple, int]] f4(slice s) {
          return f5(s);
        }
-       [slice, tuple] f20(slice s, tuple v) {
+       [slice, tuple] f21(slice s, tuple v) {
          return [s, v];
        }
-       [slice, int] f25(slice s) {
+       [slice, int] f26(slice s) {
          [slice, int] res = f3(s, 1);
          [slice slice_, int value] = res;
          return [slice_, value];
        }
-       [slice, [int, int, int]] f24(slice slice_) {
-         [slice slice_, int ihr_disabled] = f25(slice_);
-         [slice slice_, int bounce] = f25(slice_);
-         [slice slice_, int bounced] = f25(slice_);
+       [slice, [int, int, int]] f25(slice slice_) {
+         [slice slice_, int ihr_disabled] = f26(slice_);
+         [slice slice_, int bounce] = f26(slice_);
+         [slice slice_, int bounced] = f26(slice_);
          return [[ihr_disabled, bounce, bounced], slice_];
        }
-       [slice, [int, int, int]] f23(slice s) {
-         return f24(s);
+       [slice, [int, int, int]] f24(slice s) {
+         return f25(s);
        }
-       [slice, [tuple, tuple]] f27(slice slice_) {
+       [slice, [tuple, tuple]] f28(slice slice_) {
          [slice slice_, tuple src] = f10(slice_);
          [slice slice_, tuple dst] = f10(slice_);
          return [[src, dst], slice_];
        }
-       [slice, [tuple, tuple]] f26(slice s) {
-         return f27(s);
+       [slice, [tuple, tuple]] f27(slice s) {
+         return f28(s);
        }
-       [slice, [int, int]] f29(slice slice_) {
+       [slice, [int, int]] f30(slice slice_) {
          [slice slice_, int ihr_fee] = f18(slice_);
          [slice slice_, int fwd_fee] = f18(slice_);
          return [[ihr_fee, fwd_fee], slice_];
        }
-       [slice, [int, int]] f28(slice s) {
-         return f29(s);
+       [slice, [int, int]] f29(slice s) {
+         return f30(s);
        }
-       [slice, int] f33(slice self, int bits) {
+       [slice, int] f34(slice self, int bits) {
          (slice, int) output = builtin_load_uint(self, bits);
          slice slice_ = tensor2_value1(output);
          int int_ = tensor2_value2(output);
          return [slice_, int_];
        }
-       [slice, int] f32(slice s) {
-         [slice, int] res = f33(s, 64);
+       [slice, int] f33(slice s) {
+         [slice, int] res = f34(s, 64);
          return [first(res), second(res)];
        }
-       [slice, int] f34(slice s) {
-         [slice, int] res = f33(s, 32);
+       [slice, int] f35(slice s) {
+         [slice, int] res = f34(s, 32);
          return [first(res), second(res)];
        }
-       [slice, [int, int]] f31(slice slice_) {
-         [slice slice_, int created_lt] = f32(slice_);
-         [slice slice_, int created_at] = f34(slice_);
+       [slice, [int, int]] f32(slice slice_) {
+         [slice slice_, int created_lt] = f33(slice_);
+         [slice slice_, int created_at] = f35(slice_);
          return [[created_lt, created_at], slice_];
        }
-       [slice, [int, int]] f30(slice s) {
-         return f31(s);
+       [slice, [int, int]] f31(slice s) {
+         return f32(s);
        }
-       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f22(slice
+       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f23(slice
            slice_) {
-         [slice slice_, [int, int, int] flags] = f23(slice_);
-         [slice slice_, [tuple, tuple] addresses] = f26(slice_);
-         [slice slice_, [int, int] coins] = f28(slice_);
-         [slice slice_, [int, int] timestamps] = f30(slice_);
+         [slice slice_, [int, int, int] flags] = f24(slice_);
+         [slice slice_, [tuple, tuple] addresses] = f27(slice_);
+         [slice slice_, [int, int] coins] = f29(slice_);
+         [slice slice_, [int, int] timestamps] = f31(slice_);
          return [[flags, addresses, coins, timestamps], slice_];
        }
-       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f21(slice s)
+       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f22(slice s)
            {
-         return f22(s);
+         return f23(s);
        }
        [slice, tuple] f2(slice s) {
          [slice, int] res_discr1 = f3(s, 1);
          if (builtin_equal(second(res_discr1), 0)) {
          [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] res_info =
-           f21(first(res_discr1));
+           f22(first(res_discr1));
        return
-       f20(first(res_info), second(res_info));
+       f21(first(res_info), second(res_info));
        } else
        {
          [slice, int] res_discr2 = f3(first(res_discr1), 1);
@@ -1230,18 +1285,18 @@ let%expect_test "deserialization api" =
        {
          [slice, [tuple, tuple, int]] res_info = f4(first(res_discr2));
        return
-       f20(first(res_info), second(res_info));
+       f21(first(res_info), second(res_info));
        } else
        {
          throw(0);
        }}}
-       [slice, []] f36(slice s, [] v) {
+       [slice, []] f37(slice s, [] v) {
          return [s, v];
        }
-       [slice, []] f35(slice s) {
-         return f36(s, []);
+       [slice, []] f36(slice s) {
+         return f37(s, []);
        }
-       [slice, [tuple, []]] f37(slice s, [tuple, []] v) {
+       [slice, [tuple, []]] f38(slice s, [tuple, []] v) {
          return [s, v];
        }
        [slice, [tuple, []]] f1(slice s) {
@@ -1251,11 +1306,11 @@ let%expect_test "deserialization api" =
          [slice, int] res_body_discr = f3(first(res_init), 1);
        if (builtin_equal(second(res_body_discr), 0))
        {
-         [slice, []] body = f35(first(res_body_discr));
+         [slice, []] body = f36(first(res_body_discr));
        [tuple, [tuple, []]] mes =
        [second(res_info), second(body)];
        return
-       f37(first(body), mes);
+       f38(first(body), mes);
        } else
        {
          }} else
@@ -1364,6 +1419,12 @@ let%expect_test "deserializer" =
     }
     _ builtin_end_parse(slice s) {
       return end_parse(s);
+    }
+    (slice, int) builtin_load_coins(slice s) {
+      return load_coins(s);
+    }
+    (slice, slice) builtin_load_bits(slice s, int bs) {
+      return load_bits(s, bs);
     }
     (slice, int) builtin_load_uint(slice s, int bs) {
       return load_uint(s, bs);

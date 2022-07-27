@@ -522,6 +522,8 @@ functor
             make_builtin "begin_parse" [("c", c)] s;
             make_builtin "load_int" [("s", s); ("bs", i)] (t2 s i);
             make_builtin "load_uint" [("s", s); ("bs", i)] (t2 s i);
+            make_builtin "load_bits" [("s", s); ("bs", i)] (t2 s s);
+            make_builtin "load_coins" [("s", s)] (t2 s i);
             make_builtin "end_parse" [("s", s)] v;
             make_builtin "divmod" [("i1", i); ("i2", i)] (t2 i i);
             make_builtin "send_raw_msg" [("c", c); ("f", i)] v;
