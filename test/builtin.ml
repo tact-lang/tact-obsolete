@@ -758,7 +758,7 @@ let%expect_test "demo struct serializer" =
           (((st_sig_fields
              ((a (Value (Type (StructType 102))))
               (b (Value (Type (StructType 104))))))
-            (st_sig_methods ()) (st_sig_base_id 106) (st_sig_id 136)))))
+            (st_sig_methods ()) (st_sig_base_id 106) (st_sig_id 94)))))
         (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "from interface" =
@@ -831,8 +831,8 @@ let%expect_test "from interface" =
             (st_sig_methods
              ((from
                ((function_params ((x IntegerType)))
-                (function_returns (ExprType (Reference (Self (StructSig 136)))))))))
-            (st_sig_base_id 102) (st_sig_id 136)))))
+                (function_returns (ExprType (Reference (Self (StructSig 94)))))))))
+            (st_sig_base_id 102) (st_sig_id 94)))))
         (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "tensor2" =
@@ -1069,7 +1069,7 @@ let%expect_test "deserializer" =
         (((st_sig_fields
            ((value1 (Value (Type (StructType 17))))
             (value2 (Value (Type (StructType 30))))))
-          (st_sig_methods ()) (st_sig_base_id 102) (st_sig_id 136)))))
+          (st_sig_methods ()) (st_sig_base_id 102) (st_sig_id 94)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "derive Serialize" =
@@ -1195,8 +1195,8 @@ let%expect_test "derive Serialize" =
           (st_sig_methods
            ((serialize
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 136)))))
+               ((self (ExprType (Reference (Self (StructSig 94)))))
                 (b (StructType 3))))
               (function_returns (StructType 3))))))
-          (st_sig_base_id 102) (st_sig_id 136)))))
+          (st_sig_base_id 102) (st_sig_id 94)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]

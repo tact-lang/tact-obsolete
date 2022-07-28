@@ -337,11 +337,8 @@ struct Timestamps {
   @derive
   impl Serialize {}
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfoFlags {
@@ -352,22 +349,16 @@ struct IntMsgInfoFlags {
   @derive
   impl Serialize {}
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfoAddresses {
   val src: MsgAddressInt
   val dst: MsgAddressInt
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfoCoins {
@@ -377,11 +368,8 @@ struct IntMsgInfoCoins {
   @derive
   impl Serialize {}
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfo {
@@ -406,11 +394,8 @@ struct IntMsgInfo {
     }
   }
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct ExtInMsgInfo {
@@ -418,11 +403,8 @@ struct ExtInMsgInfo {
   val dest: MsgAddressInt
   val import_fee: Coins
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 union CommonMsgInfo {
