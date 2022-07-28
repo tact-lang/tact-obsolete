@@ -815,10 +815,16 @@ functor
                     (s#visit_located s#visit_binding)
                     env syn_struct_def.struct_bindings )
             in
+            let self_ty =
+              ExprType
+                { value = Reference (self_name, StructSig sign_id);
+                  span = syn_struct_def.struct_span }
+            in
             let impls =
               s#with_bindings
                 [make_runtime (self_name, StructSig sign_id)]
                 (fun _ -> s#visit_list s#visit_impl env syn_struct_def.impls)
+              |> List.map ~f:(s#execute_impl_attrs self_ty)
             in
             let mk_struct =
               s#make_struct_definition attributes fields
@@ -872,10 +878,16 @@ functor
                    | _ ->
                        raise InternalCompilerError )
           in
+          let self_ty =
+            ExprType
+              { value = Reference (self_name, UnionSig sign_id);
+                span = def.union_span }
+          in
           let impls =
             s#with_bindings
               [make_runtime (self_name, UnionSig sign_id)]
               (fun _ -> s#visit_list s#visit_impl env def.union_impls)
+            |> List.map ~f:(s#execute_impl_attrs self_ty)
           in
           let impl_methods =
             List.concat
@@ -900,6 +912,35 @@ functor
           in
           functions <- prev_functions ;
           mk_union
+
+        method private execute_impl_attrs self_ty impl =
+          let remove_attr attr impl =
+            let new_attrs =
+              List.filter impl.mk_impl_attributes ~f:(fun attr2 ->
+                  not
+                    (String.equal attr.attribute_ident.value
+                       attr2.attribute_ident.value ) )
+            in
+            {impl with mk_impl_attributes = new_attrs}
+          in
+          List.fold impl.mk_impl_attributes ~init:impl ~f:(fun impl attr ->
+              let impl_after_attr =
+                match
+                  List.Assoc.find program.attr_executors
+                    attr.attribute_ident.value ~equal:equal_string
+                with
+                | Some executor -> (
+                    let x =
+                      executor program !current_bindings attr.attribute_exprs
+                        (ImplInput {impl; self_ty})
+                    in
+                    match x with
+                    | ImplInput {impl; _} ->
+                        impl |> remove_attr attr )
+                | None ->
+                    impl
+              in
+              impl_after_attr )
 
         method bindings =
           extract_comptime_bindings (List.concat !current_bindings)

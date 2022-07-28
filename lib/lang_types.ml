@@ -341,7 +341,7 @@ functor
     and attr_input = ImplInput of {impl : mk_impl; self_ty : type_}
 
     and attr_executor =
-      (program -> expr list -> attr_input -> attr_input
+      (program -> tbinding list list -> expr list -> attr_input -> attr_input
       [@visitors.opaque] [@equal.ignore] [@compare.ignore] )
     [@@deriving
       equal,
