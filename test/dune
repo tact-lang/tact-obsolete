@@ -1,4 +1,5 @@
 (library
+ (package tact)
  (preprocess
   (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
  (name shared)
@@ -7,6 +8,7 @@
  (libraries tact core sexplib))
 
 (library
+ (package tact)
  (preprocess
   (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
  (name tact_tests)
@@ -15,6 +17,7 @@
  (libraries tact core sexplib shared))
 
 (library
+ (package tact)
  (preprocess
   (staged_pps ppx_matches ppx_sexp_conv ppx_inline_alcotest))
  (name tact_tests_)
