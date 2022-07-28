@@ -169,7 +169,7 @@ let%expect_test "Int[bits] constructor" =
                            ((value (Reference (i IntegerType)))))))))))))))))
               (uty_id 102) (uty_base_id 12)))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-        (union_signs (0 ())))) |}]
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "Int[bits] serializer" =
   let source =
@@ -351,7 +351,7 @@ let%expect_test "Int[bits] serializer" =
                            ((value (Reference (i IntegerType)))))))))))))))))
               (uty_id 102) (uty_base_id 12)))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-        (union_signs (0 ())))) |}]
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -759,7 +759,7 @@ let%expect_test "demo struct serializer" =
              ((a (Value (Type (StructType 102))))
               (b (Value (Type (StructType 104))))))
             (st_sig_methods ()) (st_sig_base_id 106) (st_sig_id 136)))))
-        (union_signs (0 ())))) |}]
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "from interface" =
   let source =
@@ -833,7 +833,7 @@ let%expect_test "from interface" =
                ((function_params ((x IntegerType)))
                 (function_returns (ExprType (Reference (Self (StructSig 136)))))))))
             (st_sig_base_id 102) (st_sig_id 136)))))
-        (union_signs (0 ())))) |}]
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "tensor2" =
   let source =
@@ -861,7 +861,7 @@ let%expect_test "tensor2" =
                     ((ResolvedReference (builtin_divmod <opaque>))
                      ((Value (Integer 10)) (Value (Integer 2))))))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-        (struct_signs (0 ())) (union_signs (0 ())))) |}]
+        (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "slice api" =
   let source =
@@ -929,7 +929,7 @@ let%expect_test "slice api" =
                        ((StructField
                          ((Reference (result (StructType 5))) value IntegerType))))))))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-        (struct_signs (0 ())) (union_signs (0 ())))) |}]
+        (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "deserializer" =
   let source =
@@ -1070,4 +1070,4 @@ let%expect_test "deserializer" =
            ((value1 (Value (Type (StructType 17))))
             (value2 (Value (Type (StructType 30))))))
           (st_sig_methods ()) (st_sig_base_id 102) (st_sig_id 136)))))
-      (union_signs (0 ())))) |}]
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
