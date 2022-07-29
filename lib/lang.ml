@@ -932,10 +932,10 @@ functor
                 | Some executor -> (
                     let x =
                       executor program !current_bindings attr.attribute_exprs
-                        (ImplInput {impl; self_ty})
+                        (ImplAttrTarget {impl; self_ty})
                     in
                     match x with
-                    | ImplInput {impl; _} ->
+                    | ImplAttrTarget {impl; _} ->
                         impl |> remove_attr attr )
                 | None ->
                     impl

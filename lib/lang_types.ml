@@ -338,10 +338,11 @@ functor
 
     and primitive = Prim of {name : string; exprs : expr list}
 
-    and attr_input = ImplInput of {impl : mk_impl; self_ty : type_}
+    (* This type will be extended in the future *)
+    and attr_target = ImplAttrTarget of {impl : mk_impl; self_ty : type_}
 
     and attr_executor =
-      (program -> tbinding list list -> expr list -> attr_input -> attr_input
+      (program -> tbinding list list -> expr list -> attr_target -> attr_target
       [@visitors.opaque] [@equal.ignore] [@compare.ignore] )
     [@@deriving
       equal,

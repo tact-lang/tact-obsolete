@@ -11,7 +11,7 @@ functor
       let bl = Config.builtin_located
 
       let derive_executor p binds _exprs = function
-        | ImplInput {impl; self_ty} -> (
+        | ImplAttrTarget {impl; self_ty} -> (
           match impl.mk_impl_interface.value with
           (* Serialize intf *)
           | ResolvedReference (_, {value = Value (Type (InterfaceType -1)); _})
@@ -52,7 +52,7 @@ functor
                   mk_impl_attributes = [];
                   mk_impl_methods = [(bl "serialize", method_)] }
               in
-              ImplInput {impl; self_ty}
+              ImplAttrTarget {impl; self_ty}
           (* Deserialize intf *)
           | ResolvedReference (_, {value = Value (Type (InterfaceType -2)); _})
           | Value (Type (InterfaceType -2)) ->
@@ -100,7 +100,7 @@ functor
                   mk_impl_attributes = [];
                   mk_impl_methods = [(bl "deserialize", method_)] }
               in
-              ImplInput {impl; self_ty}
+              ImplAttrTarget {impl; self_ty}
           | _ ->
               raise Errors.InternalCompilerError )
     end
