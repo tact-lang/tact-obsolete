@@ -1477,3 +1477,116 @@ let%expect_test "deserializer" =
       [slice slice_, int value2] = f2(slice_);
       return [[value1, value2], slice_];
     } |}]
+
+let%expect_test "deserializer unions" =
+  let source =
+    {|
+      union TestUnion {
+        case Int[8]
+        case Int[9]
+      }
+      let deserialize_union = deserializer[TestUnion];
+    |}
+  in
+  pp_codegen source ; [%expect{|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int builtin_equal(int i1, int i2) {
+      return __==__(i1, i2);
+    }
+    _ builtin_throw(int e) {
+      return throw(e);
+    }
+    _ builtin_send_raw_msg(cell c, int f) {
+      return send_raw_msg(c, f);
+    }
+    (int, int) builtin_divmod(int i1, int i2) {
+      return divmod(i1, i2);
+    }
+    _ builtin_end_parse(slice s) {
+      return end_parse(s);
+    }
+    (slice, int) builtin_load_coins(slice s) {
+      return load_coins(s);
+    }
+    (slice, slice) builtin_load_bits(slice s, int bs) {
+      return load_bits(s, bs);
+    }
+    (slice, int) builtin_load_uint(slice s, int bs) {
+      return load_uint(s, bs);
+    }
+    (slice, int) builtin_load_int(slice s, int bs) {
+      return load_int(s, bs);
+    }
+    slice builtin_begin_parse(cell c) {
+      return begin_parse(c);
+    }
+    builder builtin_store_coins(builder b, int c) {
+      return store_coins(b, c);
+    }
+    builder builtin_store_uint(builder b, int i, int bs) {
+      return store_uint(b, i, bs);
+    }
+    builder builtin_store_int(builder b, int i, int bs) {
+      return store_int(b, i, bs);
+    }
+    cell builtin_end_cell(builder b) {
+      return end_cell(b);
+    }
+    builder builtin_begin_cell() {
+      return begin_cell();
+    }
+    _ throw(int n) {
+      return builtin_throw(n);
+    }
+    _ send_raw_msg(cell msg, int flags) {
+      return builtin_send_raw_msg(msg, flags);
+    }
+    [slice, int] f0(slice self, int bits) {
+      (slice, int) output = builtin_load_uint(self, bits);
+      slice slice_ = tensor2_value1(output);
+      int int_ = tensor2_value2(output);
+      return [slice_, int_];
+    }
+    [slice, int] f2(slice self, int bits) {
+      (slice, int) output = builtin_load_int(self, bits);
+      slice slice_ = tensor2_value1(output);
+      int int_ = tensor2_value2(output);
+      return [slice_, int_];
+    }
+    [slice, int] f1(slice s) {
+      [slice, int] res = f2(s, 9);
+      [slice slice_, int value] = res;
+      return [slice_, value];
+    }
+    [slice, tuple] f3(slice s, tuple v) {
+      return [s, v];
+    }
+    [slice, int] f4(slice s) {
+      [slice, int] res = f2(s, 8);
+      [slice slice_, int value] = res;
+      return [slice_, value];
+    }
+    [slice, tuple] deserialize_union(slice slice_) {
+      [slice, int] res_discr = f0(slice_, 1);
+      if (builtin_equal(second(res_discr), 0)) {
+      [slice, int] res = f4(first(res_discr));
+    return
+    f3(first(res), second(res));
+    } else
+    {
+      [slice, int] res_discr = f0(first(res_discr), 1);
+    if (builtin_equal(second(res_discr), 1))
+    {
+      [slice, int] res = f1(first(res_discr));
+    return
+    f3(first(res), second(res));
+    } else
+    throw(0);
+    }} |}]

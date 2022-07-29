@@ -1200,3 +1200,352 @@ let%expect_test "derive Serialize" =
               (function_returns (StructType 3))))))
           (st_sig_base_id 102) (st_sig_id 94)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "Deserialize Unions" =
+  let source =
+    {|
+      union TestUnion {
+        case Int[8]
+        case Int[9]
+      }
+      let deserialize_union = deserializer[TestUnion];
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((deserialize_union
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((slice (StructType 6))))
+              (function_returns (StructType 106))))
+            (function_impl
+             (Fn
+              (Block
+               ((Let
+                 ((res_discr
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params
+                           ((self (StructType 6)) (bits IntegerType)))
+                          (function_returns (StructType 5))))
+                        (function_impl
+                         (Fn
+                          (Block
+                           ((Let
+                             ((output
+                               (FunctionCall
+                                ((ResolvedReference (builtin_load_uint <opaque>))
+                                 ((StructField
+                                   ((Reference (self (StructType 6))) s
+                                    (BuiltinType Slice)))
+                                  (Reference (bits IntegerType))))))))
+                            (Let
+                             ((slice
+                               (Value
+                                (Struct
+                                 ((Value (Type (StructType 6)))
+                                  ((s
+                                    (StructField
+                                     ((Reference (output (StructType -4))) value1
+                                      (BuiltinType Slice)))))))))))
+                            (Let
+                             ((int
+                               (StructField
+                                ((Reference (output (StructType -4))) value2
+                                 IntegerType)))))
+                            (Return
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 5)))
+                                ((slice (Reference (slice (StructType 6))))
+                                 (value (Reference (int IntegerType)))))))))))))))
+                     ((Reference (slice (StructType 6))) (Value (Integer 1))))))))
+                (If
+                 ((if_condition
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params ((i1 IntegerType) (i2 IntegerType)))
+                          (function_returns IntegerType)))
+                        (function_impl
+                         (Fn
+                          (Return
+                           (Primitive
+                            (Prim (name __==__)
+                             (exprs
+                              ((Reference (i1 IntegerType))
+                               (Reference (i2 IntegerType))))))))))))
+                     ((StructField
+                       ((Reference (res_discr (StructType 5))) value IntegerType))
+                      (Value (Integer 0))))))
+                  (if_then
+                   (Block
+                    ((Let
+                      ((res
+                        (FunctionCall
+                         ((Value
+                           (Function
+                            ((function_signature
+                              ((function_params ((s (StructType 6))))
+                               (function_returns (StructType 29))))
+                             (function_impl
+                              (Fn
+                               (Block
+                                ((Let
+                                  ((res
+                                    (FunctionCall
+                                     ((ResolvedReference (load_int <opaque>))
+                                      ((Reference (s (StructType 6)))
+                                       (Value (Integer 8))))))))
+                                 (DestructuringLet
+                                  ((destructuring_let
+                                    ((slice slice) (value value)))
+                                   (destructuring_let_expr
+                                    (Reference (res (StructType 5))))
+                                   (destructuring_let_rest false)))
+                                 (Return
+                                  (Value
+                                   (Struct
+                                    ((Value (Type (StructType 29)))
+                                     ((slice (Reference (slice (StructType 6))))
+                                      (value
+                                       (Value
+                                        (Struct
+                                         ((Value (Type (StructType 28)))
+                                          ((value
+                                            (Reference (value IntegerType))))))))))))))))))))
+                          ((StructField
+                            ((Reference (res_discr (StructType 5))) slice
+                             (StructType 6)))))))))
+                     (Return
+                      (FunctionCall
+                       ((Value
+                         (Function
+                          ((function_signature
+                            ((function_params
+                              ((s (StructType 6)) (v (UnionType 103))))
+                             (function_returns (StructType 106))))
+                           (function_impl
+                            (Fn
+                             (Return
+                              (Value
+                               (Struct
+                                ((Value (Type (StructType 106)))
+                                 ((slice (Reference (s (StructType 6))))
+                                  (value (Reference (v (UnionType 103))))))))))))))
+                        ((StructField
+                          ((Reference (res (StructType 106))) slice
+                           (StructType 6)))
+                         (StructField
+                          ((Reference (res (StructType 106))) value
+                           (StructType 28))))))))))
+                  (if_else
+                   ((Block
+                     ((Let
+                       ((res_discr
+                         (FunctionCall
+                          ((Value
+                            (Function
+                             ((function_signature
+                               ((function_params
+                                 ((self (StructType 6)) (bits IntegerType)))
+                                (function_returns (StructType 5))))
+                              (function_impl
+                               (Fn
+                                (Block
+                                 ((Let
+                                   ((output
+                                     (FunctionCall
+                                      ((ResolvedReference
+                                        (builtin_load_uint <opaque>))
+                                       ((StructField
+                                         ((Reference (self (StructType 6))) s
+                                          (BuiltinType Slice)))
+                                        (Reference (bits IntegerType))))))))
+                                  (Let
+                                   ((slice
+                                     (Value
+                                      (Struct
+                                       ((Value (Type (StructType 6)))
+                                        ((s
+                                          (StructField
+                                           ((Reference (output (StructType -4)))
+                                            value1 (BuiltinType Slice)))))))))))
+                                  (Let
+                                   ((int
+                                     (StructField
+                                      ((Reference (output (StructType -4)))
+                                       value2 IntegerType)))))
+                                  (Return
+                                   (Value
+                                    (Struct
+                                     ((Value (Type (StructType 5)))
+                                      ((slice (Reference (slice (StructType 6))))
+                                       (value (Reference (int IntegerType)))))))))))))))
+                           ((StructField
+                             ((Reference (res_discr (StructType 5))) slice
+                              (StructType 6)))
+                            (Value (Integer 1))))))))
+                      (If
+                       ((if_condition
+                         (FunctionCall
+                          ((Value
+                            (Function
+                             ((function_signature
+                               ((function_params
+                                 ((i1 IntegerType) (i2 IntegerType)))
+                                (function_returns IntegerType)))
+                              (function_impl
+                               (Fn
+                                (Return
+                                 (Primitive
+                                  (Prim (name __==__)
+                                   (exprs
+                                    ((Reference (i1 IntegerType))
+                                     (Reference (i2 IntegerType))))))))))))
+                           ((StructField
+                             ((Reference (res_discr (StructType 5))) value
+                              IntegerType))
+                            (Value (Integer 1))))))
+                        (if_then
+                         (Block
+                          ((Let
+                            ((res
+                              (FunctionCall
+                               ((Value
+                                 (Function
+                                  ((function_signature
+                                    ((function_params ((s (StructType 6))))
+                                     (function_returns (StructType 18))))
+                                   (function_impl
+                                    (Fn
+                                     (Block
+                                      ((Let
+                                        ((res
+                                          (FunctionCall
+                                           ((ResolvedReference
+                                             (load_int <opaque>))
+                                            ((Reference (s (StructType 6)))
+                                             (Value (Integer 9))))))))
+                                       (DestructuringLet
+                                        ((destructuring_let
+                                          ((slice slice) (value value)))
+                                         (destructuring_let_expr
+                                          (Reference (res (StructType 5))))
+                                         (destructuring_let_rest false)))
+                                       (Return
+                                        (Value
+                                         (Struct
+                                          ((Value (Type (StructType 18)))
+                                           ((slice
+                                             (Reference (slice (StructType 6))))
+                                            (value
+                                             (Value
+                                              (Struct
+                                               ((Value (Type (StructType 17)))
+                                                ((value
+                                                  (Reference (value IntegerType))))))))))))))))))))
+                                ((StructField
+                                  ((Reference (res_discr (StructType 5))) slice
+                                   (StructType 6)))))))))
+                           (Return
+                            (FunctionCall
+                             ((Value
+                               (Function
+                                ((function_signature
+                                  ((function_params
+                                    ((s (StructType 6)) (v (UnionType 103))))
+                                   (function_returns (StructType 106))))
+                                 (function_impl
+                                  (Fn
+                                   (Return
+                                    (Value
+                                     (Struct
+                                      ((Value (Type (StructType 106)))
+                                       ((slice (Reference (s (StructType 6))))
+                                        (value (Reference (v (UnionType 103))))))))))))))
+                              ((StructField
+                                ((Reference (res (StructType 106))) slice
+                                 (StructType 6)))
+                               (StructField
+                                ((Reference (res (StructType 106))) value
+                                 (StructType 17))))))))))
+                        (if_else
+                         ((Expr
+                           (Primitive
+                            (Prim (name throw) (exprs ((Value (Integer 0)))))))))))))))))))))))))
+        (TestUnion (Value (Type (UnionType 103))))))
+      (structs
+       ((106
+         ((struct_fields
+           ((slice ((field_type (StructType 6))))
+            (value ((field_type (UnionType 103))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((s (StructType 6)) (v (UnionType 103))))
+                  (function_returns (StructType 106))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 106)))
+                      ((slice (Reference (s (StructType 6))))
+                       (value (Reference (v (UnionType 103)))))))))))))))
+            (uty_impls ()) (uty_id 106) (uty_base_id -500)))))))
+      (unions
+       ((103
+         ((union_attributes ())
+          (cases
+           (((StructType 17) (Discriminator 1))
+            ((StructType 28) (Discriminator 0))))
+          (union_details
+           ((uty_methods ())
+            (uty_impls
+             (((impl_interface 104)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((v (StructType 28))))
+                     (function_returns (UnionType 102))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (MakeUnionVariant ((Reference (v (StructType 28))) 103))))))))))
+              ((impl_interface 105)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((v (StructType 17))))
+                     (function_returns (UnionType 102))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (MakeUnionVariant ((Reference (v (StructType 17))) 103))))))))))))
+            (uty_id 103) (uty_base_id 102)))))))
+      (interfaces
+       ((105
+         ((interface_methods
+           ((from
+             ((function_params ((from (StructType 17))))
+              (function_returns SelfType)))))))
+        (104
+         ((interface_methods
+           ((from
+             ((function_params ((from (StructType 28))))
+              (function_returns SelfType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (1
+        (((un_sig_cases ((StructType 28) (StructType 17))) (un_sig_methods ())
+          (un_sig_base_id 102)))))
+      (attr_executors <opaque>))) |}]
