@@ -141,8 +141,10 @@ functor
             [@hash.ignore]
         mutable struct_signs : struct_sig Arena.t;
             [@hash.ignore] [@visitors.name "arena"]
-        mutable union_signs : union_sig Arena.t
-            [@hash.ignore] [@visitors.name "arena"] }
+        mutable union_signs : union_sig Arena.t;
+            [@hash.ignore] [@visitors.name "arena"]
+        attr_executors : ((string * attr_executor) list[@sexp.opaque])
+            [@visitors.opaque] [@equal.ignore] [@compare.ignore] }
 
     and expr = expr_kind located
 
@@ -335,6 +337,13 @@ functor
       {branch_ty : type_; branch_var : string located; branch_stmt : stmt}
 
     and primitive = Prim of {name : string; exprs : expr list}
+
+    (* This type will be extended in the future *)
+    and attr_target = ImplAttrTarget of {impl : mk_impl; self_ty : type_}
+
+    and attr_executor =
+      (program -> tbinding list list -> expr list -> attr_target -> attr_target
+      [@visitors.opaque] [@equal.ignore] [@compare.ignore] )
     [@@deriving
       equal,
         compare,

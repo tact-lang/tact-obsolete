@@ -169,7 +169,7 @@ let%expect_test "Int[bits] constructor" =
                            ((value (Reference (i IntegerType)))))))))))))))))
               (uty_id 102) (uty_base_id 12)))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-        (union_signs (0 ())))) |}]
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "Int[bits] serializer" =
   let source =
@@ -351,7 +351,7 @@ let%expect_test "Int[bits] serializer" =
                            ((value (Reference (i IntegerType)))))))))))))))))
               (uty_id 102) (uty_base_id 12)))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-        (union_signs (0 ())))) |}]
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "demo struct serializer" =
   let source =
@@ -758,8 +758,8 @@ let%expect_test "demo struct serializer" =
           (((st_sig_fields
              ((a (Value (Type (StructType 102))))
               (b (Value (Type (StructType 104))))))
-            (st_sig_methods ()) (st_sig_base_id 106) (st_sig_id 136)))))
-        (union_signs (0 ())))) |}]
+            (st_sig_methods ()) (st_sig_base_id 106) (st_sig_id 94)))))
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "from interface" =
   let source =
@@ -831,9 +831,9 @@ let%expect_test "from interface" =
             (st_sig_methods
              ((from
                ((function_params ((x IntegerType)))
-                (function_returns (ExprType (Reference (Self (StructSig 136)))))))))
-            (st_sig_base_id 102) (st_sig_id 136)))))
-        (union_signs (0 ())))) |}]
+                (function_returns (ExprType (Reference (Self (StructSig 94)))))))))
+            (st_sig_base_id 102) (st_sig_id 94)))))
+        (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "tensor2" =
   let source =
@@ -861,7 +861,7 @@ let%expect_test "tensor2" =
                     ((ResolvedReference (builtin_divmod <opaque>))
                      ((Value (Integer 10)) (Value (Integer 2))))))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-        (struct_signs (0 ())) (union_signs (0 ())))) |}]
+        (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "slice api" =
   let source =
@@ -929,7 +929,7 @@ let%expect_test "slice api" =
                        ((StructField
                          ((Reference (result (StructType 5))) value IntegerType))))))))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-        (struct_signs (0 ())) (union_signs (0 ())))) |}]
+        (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "deserializer" =
   let source =
@@ -1069,5 +1069,134 @@ let%expect_test "deserializer" =
         (((st_sig_fields
            ((value1 (Value (Type (StructType 17))))
             (value2 (Value (Type (StructType 30))))))
-          (st_sig_methods ()) (st_sig_base_id 102) (st_sig_id 136)))))
-      (union_signs (0 ())))) |}]
+          (st_sig_methods ()) (st_sig_base_id 102) (st_sig_id 94)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "derive Serialize" =
+  let source =
+    {|
+      struct Something {
+        val value1: Int[9]
+        
+        @derive
+        impl Serialize {}
+      }
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((Something (Value (Type (StructType 103))))))
+      (structs
+       ((103
+         ((struct_fields ((value1 ((field_type (StructType 17))))))
+          (struct_details
+           ((uty_methods
+             ((serialize
+               ((function_signature
+                 ((function_params ((self (StructType 103)) (b (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((Value
+                      (Function
+                       ((function_signature
+                         ((function_params
+                           ((self (StructType 103)) (b (StructType 3))))
+                          (function_returns (StructType 3))))
+                        (function_impl
+                         (Fn
+                          (Block
+                           ((Let
+                             ((b
+                               (FunctionCall
+                                ((Value
+                                  (Function
+                                   ((function_signature
+                                     ((function_params
+                                       ((self (StructType 17))
+                                        (builder (StructType 3))))
+                                      (function_returns (StructType 3))))
+                                    (function_impl
+                                     (Fn
+                                      (Return
+                                       (FunctionCall
+                                        ((ResolvedReference
+                                          (serialize_int <opaque>))
+                                         ((Reference (builder (StructType 3)))
+                                          (StructField
+                                           ((Reference (self (StructType 17)))
+                                            value IntegerType))
+                                          (Value (Integer 9)))))))))))
+                                 ((StructField
+                                   ((Reference (self (StructType 103))) value1
+                                    (StructType 17)))
+                                  (Reference (b (StructType 3)))))))))
+                            (Return (Reference (b (StructType 3)))))))))))
+                     ((Reference (self (StructType 103)))
+                      (Reference (b (StructType 3)))))))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 103)) (b (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((Value
+                         (Function
+                          ((function_signature
+                            ((function_params
+                              ((self (StructType 103)) (b (StructType 3))))
+                             (function_returns (StructType 3))))
+                           (function_impl
+                            (Fn
+                             (Block
+                              ((Let
+                                ((b
+                                  (FunctionCall
+                                   ((Value
+                                     (Function
+                                      ((function_signature
+                                        ((function_params
+                                          ((self (StructType 17))
+                                           (builder (StructType 3))))
+                                         (function_returns (StructType 3))))
+                                       (function_impl
+                                        (Fn
+                                         (Return
+                                          (FunctionCall
+                                           ((ResolvedReference
+                                             (serialize_int <opaque>))
+                                            ((Reference (builder (StructType 3)))
+                                             (StructField
+                                              ((Reference (self (StructType 17)))
+                                               value IntegerType))
+                                             (Value (Integer 9)))))))))))
+                                    ((StructField
+                                      ((Reference (self (StructType 103))) value1
+                                       (StructType 17)))
+                                     (Reference (b (StructType 3)))))))))
+                               (Return (Reference (b (StructType 3)))))))))))
+                        ((Reference (self (StructType 103)))
+                         (Reference (b (StructType 3))))))))))))))))
+            (uty_id 103) (uty_base_id 102)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ((value1 (Value (Type (StructType 17))))))
+          (st_sig_methods
+           ((serialize
+             ((function_params
+               ((self (ExprType (Reference (Self (StructSig 94)))))
+                (b (StructType 3))))
+              (function_returns (StructType 3))))))
+          (st_sig_base_id 102) (st_sig_id 94)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]

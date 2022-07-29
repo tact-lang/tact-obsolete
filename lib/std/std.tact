@@ -191,11 +191,8 @@ union MsgAddressExt {
   case AddrNone
   case AddrExtern
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
@@ -279,11 +276,8 @@ union MsgAddressInt {
   case AddressStd
   case AddressVar
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
@@ -302,11 +296,8 @@ union MsgAddress {
   case MsgAddressExt
   case MsgAddressInt
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
@@ -328,11 +319,8 @@ struct ExtOutMsgInfoRelaxed {
   val created_lt: Uint[64]
   val created_at: Uint[32]
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      return serializer[Self](self, b);
-    }
-  }
+  @derive
+  impl Serialize {}
 }
 
 struct Timestamps {
@@ -346,17 +334,11 @@ struct Timestamps {
     }
   }
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfoFlags {
@@ -364,45 +346,30 @@ struct IntMsgInfoFlags {
   val bounce: Int[1]
   val bounced: Int[1]
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfoAddresses {
   val src: MsgAddressInt
   val dst: MsgAddressInt
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfoCoins {
   val ihr_fee: Coins
   val fwd_fee: Coins
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct IntMsgInfo {
@@ -427,11 +394,8 @@ struct IntMsgInfo {
     }
   }
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 struct ExtInMsgInfo {
@@ -439,11 +403,8 @@ struct ExtInMsgInfo {
   val dest: MsgAddressInt
   val import_fee: Coins
 
-  impl Deserialize {
-    fn deserialize(s: Slice) -> LoadResult[Self] {
-      deserializer[Self](s)
-    }
-  }
+  @derive
+  impl Deserialize {}
 }
 
 union CommonMsgInfo {
@@ -473,11 +434,8 @@ struct IntMsgInfoRelaxedAddresses {
   val src: MsgAddress
   val dst: MsgAddressInt
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 }
 
 struct IntMsgInfoRelaxed {
@@ -502,11 +460,8 @@ struct IntMsgInfoRelaxed {
     }
   }
 
-  impl Serialize {
-    fn serialize(self: Self, b: Builder) -> Builder {
-      serializer[Self](self, b)
-    }
-  }
+  @derive
+  impl Serialize {}
 }
 
 union CommonMsgInfoRelaxed {

@@ -8,6 +8,7 @@ functor
     open Lang_types.Make (Config)
 
     open Config
+    module Attributes = Attributes.Make (Config)
 
     let builder = BuiltinType "Builder"
 
@@ -485,7 +486,8 @@ functor
         memoized_fcalls = [];
         interfaces = [];
         struct_signs = Arena.default ();
-        union_signs = Arena.default () }
+        union_signs = Arena.default ();
+        attr_executors = Attributes.attr_executors }
 
     let make_bindings = List.map ~f:(fun (x, y) -> (bl x, bl y))
 
