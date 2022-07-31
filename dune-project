@@ -36,6 +36,7 @@
    (zarith_stubs_js (>= 0.15.0))
    (dune (and :build (>= 3.1.1)))
    (js_of_ocaml (>= 4.0.0))
+   (mparser (>= 1.3))
    (menhirLib (= 20220210))
    (menhir (= 20220210))
    (menhirSdk (= 20220210))
