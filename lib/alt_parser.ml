@@ -182,6 +182,7 @@ module Make (Config : Config.T) = struct
     ( (* any statement can have leading whitespace *) whitespace
     >> ( (* `let` statement *)
          let_ <|> (* `struct` statement *) attempt struct_stmt
+       <|> (* `struct` statement *) struct_stmt
        <|> (* any expression is also a statement *)
        (locate expr <<< (skip_char ';' <|> eof) |>> fun e -> Expr e) ) )
       state
