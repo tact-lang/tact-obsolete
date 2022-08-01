@@ -2161,7 +2161,7 @@ let%expect_test "type check error" =
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((StructType 106) (StructType 104))))
+    (((TypeError ((StructType 106) (StructType 104) <opaque>)))
      ((bindings
        ((foo
          (Value
@@ -2596,7 +2596,8 @@ let%expect_test "type check error" =
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((StructType 104) (StructType 106))))
+    (((TypeError ((StructType 104) (StructType 106) <opaque>))
+      (ArgumentNumberMismatch (1 1 <opaque>)))
      ((bindings ())
       (structs
        ((107
@@ -3329,7 +3330,8 @@ let%expect_test "TypeN" =
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((TypeN 0) (TypeN 1))))
+    (((TypeError ((TypeN 0) (TypeN 1) <opaque>))
+      (ArgumentNumberMismatch (1 1 <opaque>)))
      ((bindings
        ((must_fail (Value Void))
         (id
@@ -4922,7 +4924,9 @@ let%expect_test "let binding with a non-matching type" =
   pp_compile source ;
   [%expect
     {|
-    (((TypeError (BoolType IntegerType)) (TypeError (BoolType IntegerType)))
+    (((TypeError (BoolType IntegerType <opaque>))
+      (TypeError (BoolType IntegerType <opaque>))
+      (ArgumentNumberMismatch (1 1 <opaque>)))
      ((bindings ((a (Value Void)))) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
       (attr_executors <opaque>))) |}]
@@ -5107,7 +5111,8 @@ let%expect_test "destructuring let with missing fields" =
   pp_compile source ;
   [%expect
     {|
-    (((MissingField ((StructType 105) x)) (MissingField ((StructType 105) z)))
+    (((MissingField ((StructType 105) x <opaque>))
+      (MissingField ((StructType 105) z <opaque>)))
      ((bindings
        ((test
          (Value
@@ -5205,7 +5210,8 @@ let%expect_test "type that does not implement interface passed to the \
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((InterfaceType 104) (TypeN 0))))
+    (((TypeError ((InterfaceType 104) (TypeN 0) <opaque>))
+      (ArgumentNumberMismatch (1 1 <opaque>)))
      ((bindings
        ((a (Value Void)) (Foo (Value (Type (StructType 106))))
         (ExpectedIntf

@@ -14,8 +14,7 @@ functor
         inherit ['s] Zint.map
 
         method visit_located
-            : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
-            =
+            : 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located =
           fun f env l -> {value = f env l.value; span = l.span}
 
         method visit_span _ span = span

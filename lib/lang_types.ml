@@ -27,8 +27,7 @@ functor
 
       class ['s] visitor =
         object (_self : 's)
-          method visit_arena
-              : 'env 'a. ('env -> 'a -> 'a) -> 'env -> 'a t -> 'a t =
+          method visit_arena : 'a. ('env -> 'a -> 'a) -> 'env -> 'a t -> 'a t =
             fun _ _ a -> a
         end
 
@@ -77,11 +76,10 @@ functor
         inherit ['s] Arena.visitor
 
         method visit_located
-            : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
-            =
+            : 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located =
           fun f env l -> {value = f env l.value; span = l.span}
 
-        method visit_span : 'env. 'env -> _ -> _ = fun _ span -> span
+        method visit_span : 'env -> _ -> _ = fun _ span -> span
       end
 
     class virtual ['s] base_reduce =
@@ -93,13 +91,13 @@ functor
         method virtual zero : _
 
         method visit_located
-            : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b =
+            : 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b =
           fun f env l -> f env (value l)
 
         method virtual visit_arena
-            : 'env 'a. ('env -> 'a -> _) -> 'env -> 'a Arena.t -> _
+            : 'a. ('env -> 'a -> _) -> 'env -> 'a Arena.t -> _
 
-        method visit_span : 'env. 'env -> _ -> _ = fun _ _ -> self#zero
+        method visit_span : 'env -> _ -> _ = fun _ _ -> self#zero
       end
 
     class virtual ['s] base_visitor =
@@ -113,11 +111,10 @@ functor
         inherit ['s] Arena.visitor
 
         method visit_located
-            : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
-            =
+            : 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located =
           fun f env l -> {value = f env l.value; span = l.span}
 
-        method visit_span : 'env. 'env -> _ -> _ = fun _ span -> span
+        method visit_span : 'env -> _ -> _ = fun _ span -> span
       end
 
     type comptime_counter = (int[@sexp.opaque])
@@ -349,7 +346,7 @@ functor
         compare,
         hash,
         sexp_of,
-        visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
+        visitors {variety = "map"; ancestors = ["base_map"]},
         visitors {variety = "reduce"; ancestors = ["base_reduce"]},
         visitors
           {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]

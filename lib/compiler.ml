@@ -117,9 +117,11 @@ and eval_stmt ~(constructor : _ Lang.constructor) ~filename text =
   match Parser.just_stmt Lexer.token lexbuf with
   | stx -> (
       let errors = constructor#get_errors in
-      let stmt = constructor#visit_located constructor#visit_stmt () stx in
+      let stmt =
+        constructor#visit_located constructor#visit_stmt Lang.default_ctx stx
+      in
       let result =
-        constructor#make_interpreter#interpret_stmt
+        (constructor#make_interpreter stmt.span)#interpret_stmt
           (Syntax.map_located
              ~f:(function Lang.Expr e -> Lang.Return e | stmt -> stmt)
              stmt )
@@ -146,7 +148,7 @@ and construct ?(prev_program = Lang.default_program ()) ~filename text =
 and compile_to_ir' ?(prev_program = Lang.default_program ()) ~filename text =
   match construct ~prev_program ~filename text with
   | stx, constructor -> (
-      let program = constructor#visit_program () stx in
+      let program = constructor#visit_program Lang.default_ctx stx in
       let errors = constructor#get_errors in
       match errors#to_result () with
       | Error _ ->

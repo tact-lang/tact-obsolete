@@ -26,7 +26,7 @@ let compile_std ?(errors = make_errors Show.show_error)
     ?(prev_program = Lang.default_program ()) () =
   let std =
     let c = new Lang.constructor ~program:prev_program errors in
-    let p' = c#visit_program () (parse_program Builtin.std) in
+    let p' = c#visit_program Lang.default_ctx (parse_program Builtin.std) in
     p'
   in
   (errors, std)

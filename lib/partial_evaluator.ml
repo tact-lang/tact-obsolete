@@ -29,7 +29,7 @@ functor
           match find_in_scope ref.value !(ctx.scope) with
           | Some (Comptime ex) ->
               Value
-                (self#with_interpreter env (fun inter ->
+                (self#with_interpreter env ref.span (fun inter ->
                      inter#interpret_expr ex ) )
           | Some (Runtime _) ->
               Reference (ref, self#visit_type_ env ty)
@@ -44,7 +44,9 @@ functor
           if
             is_immediate_expr !(ctx.scope) ctx.program
               (builtin_located @@ Value (Type ty))
-          then self#with_interpreter env (fun inter -> inter#interpret_type ty)
+          then
+            self#with_interpreter env (builtin_located ()).span (fun inter ->
+                inter#interpret_type ty )
           else self#unwrap_expr_types ty
 
         method private unwrap_expr_types =
@@ -161,7 +163,7 @@ functor
           | true -> (
               let intf_ty =
                 match
-                  self#with_interpreter env (fun inter ->
+                  self#with_interpreter env call.intf_loc (fun inter ->
                       inter#interpret_expr intf_instance )
                 with
                 | Type t ->
@@ -253,7 +255,7 @@ functor
               {value = FunctionCall (f, args); span = f.span}
           then
             Value
-              (self#with_interpreter env (fun inter ->
+              (self#with_interpreter env f.span (fun inter ->
                    inter#interpret_fc (f, args) ) )
           else FunctionCall (f, args)
 
@@ -268,7 +270,7 @@ functor
           | true ->
               let st_sig_ty =
                 match
-                  self#with_interpreter env (fun inter ->
+                  self#with_interpreter env call.st_sig_call_span (fun inter ->
                       inter#interpret_expr st_sig_instance )
                 with
                 | Type t ->
@@ -305,10 +307,10 @@ functor
            and call new_instance#visit_function_ but there is some problems with
            generics I can not solve yet. *)
         method private with_interpreter
-            : 'env 'a. 'env -> (interpreter -> 'a) -> 'a =
-          fun env f ->
+            : 'a. 'env -> span -> (interpreter -> 'a) -> 'a =
+          fun env span f ->
             let inter =
-              new interpreter ctx errors (fun ctx f ->
+              new interpreter ctx errors span (fun ctx f ->
                   self#with_new_ctx ctx (fun _ -> self#visit_function_ env f) )
             in
             f inter

@@ -169,7 +169,7 @@ functor
               let from_intf_ =
                 let inter =
                   new interpreter (make_ctx program current_bindings functions)
-                    errors (fun _ f -> f)
+                    errors actual_value.span (fun _ f -> f)
                 in
                 Value
                   (inter#interpret_fc
