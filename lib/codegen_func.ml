@@ -165,7 +165,7 @@ functor
             | UnionType u ->
                 List.Assoc.find_exn program.unions u ~equal:equal_int
             | _ ->
-                raise InternalCompilerError
+                ice "Type-check error"
           in
           let branches =
             List.fold (List.rev switch.branches) ~init:(F.Block [])

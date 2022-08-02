@@ -130,14 +130,190 @@ let%expect_test "duplicate variant" =
     |}
   in
   pp source ;
-  (* FIXME: wrong positioning of the highlight *)
   [%expect
     {|
     Error[1]: Duplicate variant with type Integer
-    File: <unknown>
-
-    Error[1]: Duplicate variant with type Integer
-    File: "":5:7
+    File: "":1:0
       |
-    5 |       }...
-      |        ^^^ Duplicated variant in this union |}]
+    1 | ...
+      | ^^^ Duplicated variant in this union
+    Error[1]: Duplicate variant with type Integer
+    File: "":11:14
+       |
+    11 |       let _ = Test2(Integer);
+       |               ^^^^^^^^^^^^^ Duplicated variant in this union |}]
+
+let%expect_test "type errors" =
+  let source =
+    {|
+      struct Test {}
+
+      fn test1() -> Test {
+        123
+      }
+
+      fn test2() -> Test {
+        return 123;
+      }
+
+      fn expect_test(t: Test) {}
+      expect_test(123);
+    |}
+  in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+    Error[1]: Expected type `<struct 1>` but found `Integer`
+    File: "":5:8
+      |
+    5 |         123
+      |         ^^^ This has type `Integer`
+    Error[1]: Expected type `<struct 1>` but found `Integer`
+    File: "":9:15
+      |
+    9 |         return 123;
+      |                ^^^ This has type `Integer`
+    Error[1]: Expected type `<struct 1>` but found `Integer`
+    File: "":13:18
+       |
+    13 |       expect_test(123);
+       |                   ^^^ This has type `Integer`
+    Error[1]: Expected 1 arguments but found 1.
+    File: "":13:6
+       |
+    13 |       expect_test(123);
+       |       ^^^^^^^^^^^ When calling this function |}]
+
+let%expect_test "is not a struct error" =
+  let source =
+    {|
+      fn test() { 123 }
+      let a = test() { field: 123 };
+    |}
+  in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+    Error[1]: Expression is not struct type, so it cannot be used in such context.
+    File: "":3:14
+      |
+    3 |       let a = test() { field: 123 };
+      |               ^^^^^^ This is not struct type |}]
+
+let%expect_test "cannot have methods error" =
+  let source = {|
+      123.test();
+    |} in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+    Error[1]: Type `Integer` cannot have methods.
+    File: "":2:6
+      |
+    2 |       123.test();
+      |       ^^^ This cannot have methods |}]
+
+let%expect_test "this cannot be called error" =
+  let source = {|
+      123();
+    |} in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+    Error[1]: Expected function but got value with `Integer` type.
+    File: "":2:6
+      |
+    2 |       123();
+      |       ^^^ This cannot be called |}]
+
+let%expect_test "argument number mismatch" =
+  let source = {|
+      fn test(x: Integer) {}
+      test(10, 20, 30);
+    |} in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+        Error[1]: Expected 1 arguments but found 3.
+        File: "":3:6
+          |
+        3 |       test(10, 20, 30);
+          |       ^^^^ When calling this function |}]
+
+(* FIXME: this should print error. *)
+let%expect_test "uninterpretable statement" =
+  let source =
+    {|
+      fn test() { builtin_begin_cell(); }
+      test();
+    |}
+  in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+        (Ok
+         ((bindings
+           ((((span (pos pos)) (value test))
+             ((span (pos pos))
+              (value
+               (Value
+                (Function
+                 ((span (pos pos))
+                  (value
+                   ((function_signature
+                     ((span (pos pos))
+                      (value ((function_params ()) (function_returns HoleType)))))
+                    (function_impl
+                     (Fn
+                      ((span (pos pos))
+                       (value
+                        (Return
+                         ((span (pos pos))
+                          (value
+                           (FunctionCall
+                            (((span (pos pos))
+                              (value
+                               (ResolvedReference
+                                (((span (pos pos)) (value builtin_begin_cell))
+                                 <opaque>))))
+                             ())))))))))))))))))))
+          (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+          (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "field not found" =
+  let source =
+    {|
+      struct Empty {}
+      let _ = Empty{}.field;
+      let {field} = Empty{};
+    |}
+  in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+    Error[1]: Field `field` not found.
+    File: "":3:22
+      |
+    3 |       let _ = Empty{}.field;
+      |                       ^^^^^ This field not found
+    Error[1]: Field `field` not found.
+    File: "":4:11
+      |
+    4 |       let {field} = Empty{};
+      |            ^^^^^ This field not found |}]
+
+let%expect_test "missing field error" =
+  let source =
+    {|
+      struct Test { val field: Integer }
+      let {} = Test{field: 10};
+    |}
+  in
+  pp source ~include_std:false ;
+  [%expect
+    {|
+    Error[1]: Field `field` missing in destructuring statement.
+    File: "":3:6
+      |
+    3 |       let {} = Test{field: 10};
+      |       ^^^^^^^^^^^^^^^^^^^^^^^^ In this binding |}]

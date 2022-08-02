@@ -102,7 +102,10 @@ functor
               in
               ImplAttrTarget {impl; self_ty}
           | _ ->
-              raise Errors.InternalCompilerError )
+              raise
+                (Errors.InternalCompilerError
+                   "Currently, only `Serialize` and `Deserialize` interfaces \
+                    are supported" ) )
     end
 
     let attr_executors = [("derive", derive_executor)]

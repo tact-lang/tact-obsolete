@@ -45,7 +45,7 @@ let strip : program:Lang.program -> previous:Lang.program -> Lang.program =
 
 let compile_pass p prev_program errors =
   let c = new Lang.constructor ~program:prev_program errors in
-  let p' = c#visit_program () p in
+  let p' = c#visit_program Lang.default_ctx p in
   p'
 
 let build_program ?(errors = make_errors Show.show_error)

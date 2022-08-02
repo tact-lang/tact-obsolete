@@ -213,14 +213,15 @@ functor
               let line_num_size = int_digits_count pos1.pos_lnum + 1 in
               show_place_one_span f (span_to_concrete s) sm code line_num_size
           | _ ->
-              raise Errors.InternalCompilerError
+              Errors.ice "There are should be only one span in the list"
     end
 
     let show_error : string -> error -> string =
-     fun code -> function
+     fun code e ->
+      format_to_string ()
+      @@ fun f _ ->
+      match e with
       | `DuplicateField (field, _) ->
-          format_to_string ()
-          @@ fun f _ ->
           DiagnosticMsg.show f
             { severity = `Error;
               diagnostic_id = 1;
@@ -229,8 +230,6 @@ functor
               additional_msg = [] }
             code
       | `DuplicateVariant (ty, span) ->
-          format_to_string ()
-          @@ fun f _ ->
           DiagnosticMsg.show f
             { severity = `Error;
               diagnostic_id = 1;
@@ -240,8 +239,6 @@ functor
               additional_msg = [] }
             code
       | `UnresolvedIdentifier id ->
-          format_to_string ()
-          @@ fun f _ ->
           DiagnosticMsg.show f
             { severity = `Error;
               diagnostic_id = 1;
@@ -250,8 +247,6 @@ functor
               additional_msg = [] }
             code
       | `MethodNotFound (e, m) ->
-          format_to_string ()
-          @@ fun f _ ->
           DiagnosticMsg.show f
             { severity = `Error;
               diagnostic_id = 1;
@@ -261,25 +256,91 @@ functor
               spans = [(m.span, "Method not found")];
               additional_msg = [] }
             code
-      | `UnexpectedType t ->
-          Printf.sprintf "Unexpected type `%s`." (format_to_string t pp_type)
-      | `TypeError (expected, actual) ->
-          Printf.sprintf "Type error: expected `%s` but found `%s`."
-            (format_to_string expected pp_type)
-            (format_to_string actual pp_type)
-      | `ExpectedFunction got ->
-          Printf.sprintf "Expected function but got `%s`."
-            (format_to_string got pp_type)
-      | `UnallowedReturn _ ->
-          Printf.sprintf "Unallowed return statement at top-level."
-      | `OnlyFunctionIsAllowed ->
-          Printf.sprintf "Expected function."
-      | `ArgumentNumberMismatch ->
-          Printf.sprintf "Argument number mismatch."
-      | `UninterpretableStatement _ ->
-          Printf.sprintf "Uninterpretable statement."
+      | `TypeError (expected, actual, span) ->
+          let expected = format_to_string expected pp_type in
+          let actual = format_to_string actual pp_type in
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Expected type `" ^ expected ^ "` but found `" ^ actual ^ "`";
+              spans = [(span, "This has type `" ^ actual ^ "`")];
+              additional_msg = [] }
+            code
+      | `ExpectedFunction (got, span) ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Expected function but got value with `"
+                ^ format_to_string got pp_type
+                ^ "` type.";
+              spans = [(span, "This cannot be called")];
+              additional_msg = [] }
+            code
+      | `OnlyFunctionIsAllowed span ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg = "Only function is allowed ";
+              spans = [(span, "Only function is allowed here")];
+              additional_msg = [] }
+            code
+      | `ArgumentNumberMismatch (expected, actual, span) ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Expected " ^ string_of_int expected ^ " arguments but found "
+                ^ string_of_int actual ^ ".";
+              spans = [(span, "When calling this function")];
+              additional_msg = [] }
+            code
+      | `UninterpretableStatement (_, span) ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg = "Uninterpretable statement.";
+              spans = [(span, "This statement cannot be interpreted")];
+              additional_msg = [] }
+            code
       | `FieldNotFoundF field | `FieldNotFound (_, field) ->
-          Printf.sprintf "Field `%s` not found." field.value
-      | `MissingField (_, field) ->
-          Printf.sprintf "Field '%s' is missing in destructuring." field.value
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg = "Field `" ^ field.value ^ "` not found.";
+              spans = [(field.span, "This field not found")];
+              additional_msg = [] }
+            code
+      | `MissingField (_, field, span) ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Field `" ^ field.value
+                ^ "` missing in destructuring statement.";
+              spans = [(span, "In this binding")];
+              additional_msg = [] }
+            code
+      | `CannotHaveMethods (expr, ty) ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Type `"
+                ^ format_to_string ty pp_type
+                ^ "` cannot have methods.";
+              spans = [(expr.span, "This cannot have methods")];
+              additional_msg = [] }
+            code
+      | `IsNotStruct expr ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Expression is not struct type, so it cannot be used in such \
+                 context.";
+              spans = [(expr.span, "This is not struct type")];
+              additional_msg = [] }
+            code
   end

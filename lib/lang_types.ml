@@ -15,9 +15,9 @@ functor
       type 'a t = {mutable items : 'a Vec.vector [@hash.ignore]}
       [@@deriving hash]
 
-      let equal _ _ _ = raise Errors.InternalCompilerError
+      let equal _ _ _ = Errors.unreachable ()
 
-      let compare _ _ _ = raise Errors.InternalCompilerError
+      let compare _ _ _ = Errors.unreachable ()
 
       let sexp_of_t : ('a -> Sexplib.Type.t) -> 'a t -> _ =
        fun f a ->
@@ -27,8 +27,7 @@ functor
 
       class ['s] visitor =
         object (_self : 's)
-          method visit_arena
-              : 'env 'a. ('env -> 'a -> 'a) -> 'env -> 'a t -> 'a t =
+          method visit_arena : 'a. ('env -> 'a -> 'a) -> 'env -> 'a t -> 'a t =
             fun _ _ a -> a
         end
 
@@ -77,11 +76,10 @@ functor
         inherit ['s] Arena.visitor
 
         method visit_located
-            : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
-            =
+            : 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located =
           fun f env l -> {value = f env l.value; span = l.span}
 
-        method visit_span : 'env. 'env -> _ -> _ = fun _ span -> span
+        method visit_span : 'env -> _ -> _ = fun _ span -> span
       end
 
     class virtual ['s] base_reduce =
@@ -93,13 +91,13 @@ functor
         method virtual zero : _
 
         method visit_located
-            : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b =
+            : 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b =
           fun f env l -> f env (value l)
 
         method virtual visit_arena
-            : 'env 'a. ('env -> 'a -> _) -> 'env -> 'a Arena.t -> _
+            : 'a. ('env -> 'a -> _) -> 'env -> 'a Arena.t -> _
 
-        method visit_span : 'env. 'env -> _ -> _ = fun _ _ -> self#zero
+        method visit_span : 'env -> _ -> _ = fun _ _ -> self#zero
       end
 
     class virtual ['s] base_visitor =
@@ -113,11 +111,10 @@ functor
         inherit ['s] Arena.visitor
 
         method visit_located
-            : 'env 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located
-            =
+            : 'a 'b. ('env -> 'a -> 'b) -> 'env -> 'a located -> 'b located =
           fun f env l -> {value = f env l.value; span = l.span}
 
-        method visit_span : 'env. 'env -> _ -> _ = fun _ span -> span
+        method visit_span : 'env -> _ -> _ = fun _ span -> span
       end
 
     type comptime_counter = (int[@sexp.opaque])
@@ -349,7 +346,7 @@ functor
         compare,
         hash,
         sexp_of,
-        visitors {variety = "map"; polymorphic = true; ancestors = ["base_map"]},
+        visitors {variety = "map"; ancestors = ["base_map"]},
         visitors {variety = "reduce"; ancestors = ["base_reduce"]},
         visitors
           {variety = "fold"; name = "visitor"; ancestors = ["base_visitor"]}]
@@ -437,7 +434,7 @@ functor
                 program args sign.value.function_params
                 sign.value.function_returns
           | _ ->
-              raise Errors.InternalCompilerError )
+              Errors.unreachable () )
       | Reference (_, t) ->
           t
       | ResolvedReference (_, e) ->
@@ -482,13 +479,7 @@ functor
         | Ok t ->
             t
         | _ ->
-            print_sexp
-            @@ sexp_of_list
-                 (Sexplib.Conv.sexp_of_pair
-                    (sexp_of_located sexp_of_string)
-                    sexp_of_type_ )
-                 arg_types ;
-            raise Errors.InternalCompilerError
+            raise (Errors.InternalCompilerError "Unexpected count of arguments")
       in
       let dependent_types_monomophizer (program : program)
           ?(self_sig : int option = None) (associated : (string * expr) list) =
@@ -624,9 +615,9 @@ functor
 
         method visit_z _ _ = Immediate
 
-        method visit_instr _ _ = raise Errors.InternalCompilerError
+        method visit_instr _ _ = Errors.unreachable ()
 
-        method visit_arena _ _ = raise Errors.InternalCompilerError
+        method visit_arena _ _ = Errors.unreachable ()
 
         val mutable arguments : string list list = []
 
@@ -643,9 +634,9 @@ functor
             | Some (Error _) ->
                 NonImmediate NonImmediateRef
             | None ->
-                print_sexp @@ sexp_of_string ref.value ;
-                print_sexp @@ sexp_of_list (sexp_of_list sexp_of_tbinding) scope ;
-                raise Errors.InternalCompilerError )
+                raise
+                  (Errors.InternalCompilerError
+                     "Unresolved reference when it should be resolved." ) )
 
         method! visit_Primitive _ _ = NonImmediate NonImmediatePrimitive
 
@@ -792,13 +783,13 @@ functor
         | Function f ->
             f
         | _ ->
-            raise Errors.InternalCompilerError
+            raise (Errors.InternalCompilerError "unwrap on unexpected value")
 
       let unwrap_intf_id = function
         | Type (InterfaceType intf_id) ->
             intf_id
         | _ ->
-            raise Errors.InternalCompilerError
+            raise (Errors.InternalCompilerError "unwrap on unexpected value")
     end
 
     module Program = struct
@@ -844,7 +835,7 @@ functor
 
       let rec update_list id new_s = function
         | [] ->
-            raise Errors.InternalCompilerError
+            Errors.unreachable ()
         | (xid, old_s) :: xs ->
             if equal_int xid id then
               match new_s with Ok new_s -> (id, new_s) :: xs | Error _ -> xs

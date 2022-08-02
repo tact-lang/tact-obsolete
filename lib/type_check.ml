@@ -70,14 +70,14 @@ functor
             | v ->
                 v )
           | None ->
-              raise InternalCompilerError
+              ice "Caller should guarantee this"
 
         method get_fn_returns =
           match fn_returns with
           | Some x ->
               x
           | None ->
-              raise InternalCompilerError
+              ice "Caller should guarantee this"
 
         method with_fn_returns
             : 'env 'a. 'env -> type_ -> ('env -> 'a) -> 'a * type_ =
@@ -169,7 +169,7 @@ functor
               let from_intf_ =
                 let inter =
                   new interpreter (make_ctx program current_bindings functions)
-                    errors (fun _ f -> f)
+                    errors actual_value.span (fun _ f -> f)
                 in
                 Value
                   (inter#interpret_fc

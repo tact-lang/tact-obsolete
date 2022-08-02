@@ -12,11 +12,7 @@ functor
     module Discriminator = Discriminator.Make (Config)
 
     type error =
-      [ `UnresolvedIdentifier of string located
-      | `UninterpretableStatement of stmt
-      | `UnexpectedType of type_
-      | `FieldNotFound of expr * string located
-      | `ArgumentNumberMismatch
+      [ `UninterpretableStatement of stmt * (span[@equal.ignore] [@sexp.opaque])
       | `DuplicateVariant of type_ * (span[@equal.ignore] [@sexp.opaque]) ]
     [@@deriving equal, sexp_of]
 
@@ -44,7 +40,7 @@ functor
       {program; scope; updated_items = []; updated_unions = []; functions}
 
     (*TODO: type checks for arguments*)
-    class interpreter (ctx : ctx) (errors : _ errors)
+    class interpreter (ctx : ctx) (errors : _ errors) (call_span : span)
       (partial_evaluate : ctx -> function_ -> function_) =
       object (self)
         val mutable ctx = ctx
@@ -79,8 +75,7 @@ functor
                          (name, Comptime v) ) )
                     (fun _ -> self#interpret_stmt_list rest)
               | _ ->
-                  errors#report `Error `ArgumentNumberMismatch () ;
-                  Void )
+                  unreachable () )
           | DestructuringLet let_ ->
               let struct_expr =
                 self#interpret_expr let_.destructuring_let_expr
@@ -121,13 +116,8 @@ functor
                       self#interpret_stmt stmt rest )
                   |> Option.value_or_thunk ~default:(fun _ ->
                          self#interpret_stmt_list rest )
-              | value ->
-                  errors#report `Error
-                    (`UnexpectedType
-                      (type_of ctx.program
-                         {value = Value value; span = if_condition.span} ) )
-                    () ;
-                  Void )
+              | _ ->
+                  ice "Type-check error?" )
           | Switch {switch_condition; branches} -> (
               let cond = self#interpret_expr switch_condition in
               match cond with
@@ -173,7 +163,7 @@ functor
                   | Type t ->
                       t
                   | _ ->
-                      raise InternalCompilerError
+                      ice "Type-check bug?"
                 in
                 match Program.find_impl_intf ctx.program intf_def ty with
                 | Some impl ->
@@ -187,7 +177,7 @@ functor
                       ( {value = Value (Function method_); span = intf_loc},
                         intf_args )
                 | None ->
-                    raise InternalCompilerError )
+                    ice "Interface implementation is not found" )
             | StructSigMethodCall
                 { st_sig_call_instance;
                   st_sig_call_def;
@@ -200,7 +190,7 @@ functor
                   | Type t ->
                       t
                   | _ ->
-                      raise InternalCompilerError
+                      ice "Type-check bug?"
                 in
                 match Program.find_impl_intf ctx.program st_sig_call_def ty with
                 | Some impl ->
@@ -215,7 +205,7 @@ functor
                           span = st_sig_call_span },
                         st_sig_call_args )
                 | None ->
-                    raise InternalCompilerError )
+                    ice "Interface implementation is not found" )
             | ResolvedReference (_, expr') ->
                 self#interpret_expr expr'
             | Reference (name, _) -> (
@@ -223,26 +213,19 @@ functor
               | Some expr' ->
                   self#interpret_expr expr'
               | None ->
-                  errors#report `Error (`UnresolvedIdentifier name) () ;
-                  Void )
+                  ice "Reference resolver bug" )
             | StructField (struct_, field, _) -> (
               match self#interpret_expr struct_ with
-              | Struct (struct_, struct') -> (
+              | Struct (_, struct') -> (
                 match
                   List.Assoc.find struct' ~equal:String.equal field.value
                 with
                 | Some field ->
                     self#interpret_expr field
                 | None ->
-                    errors#report `Error (`FieldNotFound (struct_, field)) () ;
-                    Void )
-              | other ->
-                  errors#report `Error
-                    (`UnexpectedType
-                      (type_of ctx.program
-                         {value = Value other; span = struct_.span} ) )
-                    () ;
-                  Void )
+                    ice "Type-check bug" )
+              | _ ->
+                  ice "Type-check bug" )
             | Value value ->
                 self#interpret_value value
             | MakeUnionVariant (expr, union) ->
@@ -288,7 +271,7 @@ functor
                   List.map mk_cases ~f:(fun ex ->
                       let ty = self#interpret_expr ex in
                       expr_to_type ctx.program {value = Value ty; span = ex.span} )
-                  |> self#check_unions_for_doubled_types expr.span
+                  |> self#check_unions_for_doubled_types
                 in
                 let u =
                   Program.with_union_id ctx.program
@@ -350,7 +333,7 @@ functor
             | Primitive _ | InvalidExpr | Hole ->
                 errors#report `Error
                   (`UninterpretableStatement
-                    {value = Expr expr; span = expr.span} )
+                    ({value = Expr expr; span = expr.span}, call_span) )
                   () ;
                 Void
 
@@ -369,7 +352,7 @@ functor
                       | Function f ->
                           f
                       | _ ->
-                          raise InternalCompilerError )
+                          ice "Type-check bug" )
                 in
                 (name, output) )
           in
@@ -415,7 +398,7 @@ functor
                 VoidType
             | ex2 ->
                 print_sexp (sexp_of_value ex2) ;
-                raise InternalCompilerError )
+                ice "Type-check bug" )
           | StructSig sign ->
               self#interpret_struct_sig sign
           | UnionSig sign ->
@@ -491,20 +474,18 @@ functor
             match find_in_scope ref !(ctx.scope) with
             | Some (Comptime ex) ->
                 Some ex
-            | Some (Runtime ty) ->
-                print_sexp (sexp_of_string ref) ;
-                print_sexp (sexp_of_type_ ty) ;
-                raise Errors.InternalCompilerError
+            | Some (Runtime _) ->
+                ice "Immediacy checker bug"
             | None ->
-                raise Errors.InternalCompilerError
+                ice "Resolver bug"
 
-        method private check_unions_for_doubled_types
-            : span -> type_ list -> type_ list =
-          fun span xs ->
+        method private check_unions_for_doubled_types : type_ list -> type_ list
+            =
+          fun xs ->
             List.fold xs ~init:[] ~f:(fun acc x ->
                 match List.exists acc ~f:(equal_type_ x) with
                 | true ->
-                    errors#report `Error (`DuplicateVariant (x, span)) () ;
+                    errors#report `Error (`DuplicateVariant (x, call_span)) () ;
                     acc
                 | false ->
                     x :: acc )

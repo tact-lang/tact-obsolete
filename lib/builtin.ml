@@ -371,7 +371,11 @@ functor
                 | Some m ->
                     m
                 | None ->
-                    raise Errors.InternalCompilerError
+                    raise
+                      (Errors.InternalCompilerError
+                         ( "Field " ^ name.value
+                         ^ " should implement Deserialize interface. TODO: \
+                            make this as compile-time error." ) )
               in
               let deserialize_field_expr =
                 FunctionCall
@@ -443,7 +447,11 @@ functor
           | Some m ->
               bl @@ Value (Function m)
           | None ->
-              raise Errors.InternalCompilerError
+              raise
+                (Errors.InternalCompilerError
+                   "Trying to get method that do not exists. If you change a \
+                    compiler, this means you rename some of the bindings, or \
+                    move them. If you a user, it is a bug." )
         in
         let initial_slice = bl @@ Reference (bl "slice", slice_ty) in
         let res_discr_slice =

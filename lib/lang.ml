@@ -23,13 +23,17 @@ functor
       [ `DuplicateField of string located * mk_struct
       | `UnresolvedIdentifier of string located
       | `MethodNotFound of expr * string located
-      | `UnexpectedType of type_
-      | `TypeError of type_ * type_
-      | `ExpectedFunction of type_
-      | `UnallowedReturn of expr
-      | `OnlyFunctionIsAllowed
-      | `MissingField of type_ * string located
-      | `FieldNotFoundF of string located ]
+      | `IsNotStruct of expr
+      | `CannotHaveMethods of expr * type_
+      | `TypeError of type_ * type_ * (span[@equal.ignore] [@sexp.opaque])
+      | `ExpectedFunction of type_ * (span[@equal.ignore] [@sexp.opaque])
+      | `OnlyFunctionIsAllowed of (span[@equal.ignore] [@sexp.opaque])
+      | `MissingField of
+        type_ * string located * (span[@equal.ignore] [@sexp.opaque])
+      | `FieldNotFoundF of string located
+      | `FieldNotFound of expr * string located
+      | `ArgumentNumberMismatch of
+        int * int * (span[@equal.ignore] [@sexp.opaque]) ]
     [@@deriving equal, sexp_of]
 
     include Builtin
@@ -57,6 +61,14 @@ functor
           | ty ->
               super#visit_type_ env ty
       end
+
+    (* Span that is passed from the `located` type. *)
+    type constr_ctx = {expr_span : span option}
+
+    let default_ctx = {expr_span = None}
+
+    (* Skip statements that can be invalid because of reported errors. *)
+    exception Skip
 
     class ['s] constructor ?(program = default_program ()) (errors : _ errors) =
       object (s : 's)
@@ -88,6 +100,10 @@ functor
 
         method build_FieldAccess _env fieldaccess = StructField fieldaccess
 
+        method! visit_FieldAccess env fa =
+          try s#visit_field_access env fa |> fun f -> s#build_FieldAccess env f
+          with Skip -> Value Void
+
         method build_Function _env fn = MkFunction fn
 
         method build_FunctionCall _env (f, args) =
@@ -108,7 +124,8 @@ functor
                         {value = s; span = expr.span}
                     | _ ->
                         errors#report `Error
-                          (`TypeError (expected, type_of program expr))
+                          (`TypeError
+                            (expected, type_of program expr, expr.span) )
                           () ;
                         no_errors := false ;
                         {value = Value Void; span = expr.span} )
@@ -121,20 +138,21 @@ functor
                       {value = FunctionCall (f, args'); span}
                   then
                     let fc =
-                      let inter =
-                        new interpreter
-                          (make_ctx program current_bindings functions)
-                          errors s#partial_evaluate_fn
-                      in
+                      let inter = s#make_interpreter span in
                       let fc = inter#interpret_fc fc in
                       fc
                     in
                     Value fc
                   else FunctionCall fc
               | _ ->
+                  let expected = List.length sign.value.function_params in
+                  let actual = List.length args in
+                  errors#report `Error
+                    (`ArgumentNumberMismatch (expected, actual, f.span))
+                    () ;
                   Value Void )
           | ty ->
-              errors#report `Error (`ExpectedFunction ty) () ;
+              errors#report `Error (`ExpectedFunction (ty, f.span)) () ;
               Value Void
 
         method build_MethodCall _env mc = mc
@@ -178,6 +196,7 @@ functor
             | bindings :: rest ->
                 (binding :: bindings) :: rest
           in
+          let initial_span = let_.span in
           let let_ = Syntax.value let_ in
           let st_ty = type_of program let_.destructuring_let_expr in
           let fields =
@@ -192,9 +211,11 @@ functor
                   |> List.map ~f:(fun (n, exty) ->
                          (n, expr_to_type program exty) )
               | _ ->
-                  raise InternalCompilerError )
+                  ice
+                    "Expected struct type. TODO: make this compile-time error."
+              )
             | _ ->
-                raise InternalCompilerError
+                ice "Expected struct type. TODO: make this compile-time error."
           in
           (* Check if field names are correct *)
           List.iter let_.destructuring_let ~f:(fun (name, name2) ->
@@ -220,7 +241,10 @@ functor
                     name
                   |> Option.is_some
                 then ()
-                else errors#report `Error (`MissingField (st_ty, name)) () ) ;
+                else
+                  errors#report `Error
+                    (`MissingField (st_ty, name, initial_span))
+                    () ) ;
           DestructuringLet let_
 
         method build_MutRef _env _mutref = InvalidExpr
@@ -249,7 +273,7 @@ functor
               Return {value = FunctionCall (func, [return]); span = return.span}
           | Error (TypeError fn_returns) ->
               errors#report `Error
-                (`TypeError (fn_returns, type_of program return))
+                (`TypeError (fn_returns, type_of program return, return.span))
                 () ;
               Return return
 
@@ -258,7 +282,7 @@ functor
           | Expr ex -> (
             match functions with
             | 0 ->
-                raise InternalCompilerError
+                unreachable ()
             | _ -> (
               match
                 type_checker#check_return_type ex ~program ~current_bindings
@@ -273,7 +297,7 @@ functor
                       span = stmt.span }
               | Error (TypeError fn_returns) ->
                   errors#report `Error
-                    (`TypeError (fn_returns, type_of program ex))
+                    (`TypeError (fn_returns, type_of program ex, ex.span))
                     () ;
                   Break stmt ) )
           | _ ->
@@ -281,7 +305,7 @@ functor
 
         method build_Switch _ s = Switch s
 
-        method build_switch_branch _env _ _ _ = raise InternalCompilerError
+        method build_switch_branch _env _ _ _ = unreachable ()
 
         method! visit_switch_branch env b =
           let ty =
@@ -313,18 +337,25 @@ functor
             mk_impl_interface = intf;
             mk_impl_methods = s#of_located_list bindings }
 
+        method! visit_located
+            : 'a 'b.
+              (constr_ctx -> 'a -> 'b) -> constr_ctx -> 'a located -> 'b located
+            =
+          fun f _env {value; span} ->
+            {value = f {expr_span = Some span} value; span}
+
         method! visit_expr env syntax_expr =
           let expr' = super#visit_expr env syntax_expr in
-          let expr_dummy = builtin_located expr' in
+          let expr_dummy =
+            {value = expr'; span = env.expr_span |> Option.value_exn}
+          in
           match
             is_immediate_expr !current_bindings program expr_dummy
             && equal functions 0
           with
           | true ->
               let inter =
-                new interpreter
-                  (make_ctx program current_bindings functions)
-                  errors s#partial_evaluate_fn
+                s#make_interpreter (env.expr_span |> Option.value_exn)
               in
               let value' = inter#interpret_expr expr_dummy in
               Value value'
@@ -345,9 +376,8 @@ functor
 
         method build_field_access _env expr field =
           let mk_err () =
-            print_sexp (sexp_of_expr expr) ;
             errors#report `Error (`FieldNotFoundF field) () ;
-            ({value = Value Void; span = expr.span}, field, VoidType)
+            raise Skip
           in
           match type_of program expr with
           | StructType s -> (
@@ -564,10 +594,14 @@ functor
                     errors#report `Error (`MethodNotFound (in_receiver, fn)) () ;
                     dummy )
             | _ ->
-                errors#report `Error (`UnexpectedType (ExprType ex)) () ;
+                errors#report `Error
+                  (`CannotHaveMethods (in_receiver, ExprType ex))
+                  () ;
                 dummy )
           | receiver_ty ->
-              errors#report `Error (`UnexpectedType receiver_ty) () ;
+              errors#report `Error
+                (`CannotHaveMethods (in_receiver, receiver_ty))
+                () ;
               dummy
 
         method! visit_function_definition env f =
@@ -661,7 +695,7 @@ functor
 
         method build_function_body _env stmt = stmt.value
 
-        method build_function_definition _ _ _ _ _ = raise InternalCompilerError
+        method build_function_definition _ _ _ _ _ = unreachable ()
 
         method build_if_ _env if_condition if_then if_else =
           {if_condition; if_then; if_else}
@@ -673,7 +707,7 @@ functor
                 | Value (Function f) | MkFunction f ->
                     Some (name.value, f.value.function_signature)
                 | _ ->
-                    errors#report `Error `OnlyFunctionIsAllowed () ;
+                    errors#report `Error (`OnlyFunctionIsAllowed name.span) () ;
                     None )
           in
           { mk_interface_attributes = attributes;
@@ -712,12 +746,10 @@ functor
                   List.map fields ~f:(fun (name, expr) ->
                       (Syntax.value name, expr) ) )
             | _ ->
-                errors#report `Error
-                  (`UnexpectedType (expr_to_type program id))
-                  () ;
+                errors#report `Error (`IsNotStruct id) () ;
                 ({value = Value Void; span = id.span}, []) )
 
-        method build_struct_definition _ _ _ _ = raise InternalCompilerError
+        method build_struct_definition _ _ _ _ = unreachable ()
 
         method make_struct_definition
             : attribute list ->
@@ -755,7 +787,7 @@ functor
                           | Value (Function f) | MkFunction f ->
                               f.value.function_signature
                           | _ ->
-                              raise InternalCompilerError );
+                              unreachable () );
                     st_sig_base_id = mk_struct_id;
                     st_sig_id = sign.st_sig_id } )
             in
@@ -842,7 +874,7 @@ functor
         method build_struct_field : _ -> _ -> _ -> _ -> string located * expr =
           fun _env _attributes field_name field_type -> (field_name, field_type)
 
-        method build_union_definition _ _ _ = raise InternalCompilerError
+        method build_union_definition _ _ _ = unreachable ()
 
         method! visit_union_definition env def =
           let prev_functions = functions in
@@ -876,7 +908,7 @@ functor
                    | Value (Function _) | MkFunction _ ->
                        (name, e)
                    | _ ->
-                       raise InternalCompilerError )
+                       unreachable () )
           in
           let self_ty =
             ExprType
@@ -945,10 +977,10 @@ functor
         method bindings =
           extract_comptime_bindings (List.concat !current_bindings)
 
-        method make_interpreter =
+        method make_interpreter call_span =
           new interpreter
             (make_ctx program current_bindings functions)
-            errors s#partial_evaluate_fn
+            errors call_span s#partial_evaluate_fn
 
         method private of_located_list : 'a. 'a Syntax.located list -> 'a list =
           List.map ~f:Syntax.value
