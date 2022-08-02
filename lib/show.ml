@@ -213,7 +213,7 @@ functor
               let line_num_size = int_digits_count pos1.pos_lnum + 1 in
               show_place_one_span f (span_to_concrete s) sm code line_num_size
           | _ ->
-              raise Errors.InternalCompilerError
+              Errors.ice "There are should be only one span in the list"
     end
 
     let show_error : string -> error -> string =

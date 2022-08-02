@@ -75,7 +75,7 @@ functor
                          (name, Comptime v) ) )
                     (fun _ -> self#interpret_stmt_list rest)
               | _ ->
-                  raise InternalCompilerError )
+                  unreachable () )
           | DestructuringLet let_ ->
               let struct_expr =
                 self#interpret_expr let_.destructuring_let_expr
@@ -117,7 +117,7 @@ functor
                   |> Option.value_or_thunk ~default:(fun _ ->
                          self#interpret_stmt_list rest )
               | _ ->
-                  raise InternalCompilerError )
+                  ice "Type-check error?" )
           | Switch {switch_condition; branches} -> (
               let cond = self#interpret_expr switch_condition in
               match cond with
@@ -163,7 +163,7 @@ functor
                   | Type t ->
                       t
                   | _ ->
-                      raise InternalCompilerError
+                      ice "Type-check bug?"
                 in
                 match Program.find_impl_intf ctx.program intf_def ty with
                 | Some impl ->
@@ -177,7 +177,7 @@ functor
                       ( {value = Value (Function method_); span = intf_loc},
                         intf_args )
                 | None ->
-                    raise InternalCompilerError )
+                    ice "Interface implementation is not found" )
             | StructSigMethodCall
                 { st_sig_call_instance;
                   st_sig_call_def;
@@ -190,7 +190,7 @@ functor
                   | Type t ->
                       t
                   | _ ->
-                      raise InternalCompilerError
+                      ice "Type-check bug?"
                 in
                 match Program.find_impl_intf ctx.program st_sig_call_def ty with
                 | Some impl ->
@@ -205,7 +205,7 @@ functor
                           span = st_sig_call_span },
                         st_sig_call_args )
                 | None ->
-                    raise InternalCompilerError )
+                    ice "Interface implementation is not found" )
             | ResolvedReference (_, expr') ->
                 self#interpret_expr expr'
             | Reference (name, _) -> (
@@ -213,7 +213,7 @@ functor
               | Some expr' ->
                   self#interpret_expr expr'
               | None ->
-                  raise InternalCompilerError )
+                  ice "Reference resolver bug" )
             | StructField (struct_, field, _) -> (
               match self#interpret_expr struct_ with
               | Struct (_, struct') -> (
@@ -223,9 +223,9 @@ functor
                 | Some field ->
                     self#interpret_expr field
                 | None ->
-                    raise InternalCompilerError )
+                    ice "Type-check bug" )
               | _ ->
-                  raise InternalCompilerError )
+                  ice "Type-check bug" )
             | Value value ->
                 self#interpret_value value
             | MakeUnionVariant (expr, union) ->
@@ -352,7 +352,7 @@ functor
                       | Function f ->
                           f
                       | _ ->
-                          raise InternalCompilerError )
+                          ice "Type-check bug" )
                 in
                 (name, output) )
           in
@@ -398,7 +398,7 @@ functor
                 VoidType
             | ex2 ->
                 print_sexp (sexp_of_value ex2) ;
-                raise InternalCompilerError )
+                ice "Type-check bug" )
           | StructSig sign ->
               self#interpret_struct_sig sign
           | UnionSig sign ->
@@ -474,12 +474,10 @@ functor
             match find_in_scope ref !(ctx.scope) with
             | Some (Comptime ex) ->
                 Some ex
-            | Some (Runtime ty) ->
-                print_sexp (sexp_of_string ref) ;
-                print_sexp (sexp_of_type_ ty) ;
-                raise Errors.InternalCompilerError
+            | Some (Runtime _) ->
+                ice "Immediacy checker bug"
             | None ->
-                raise Errors.InternalCompilerError
+                ice "Resolver bug"
 
         method private check_unions_for_doubled_types : type_ list -> type_ list
             =

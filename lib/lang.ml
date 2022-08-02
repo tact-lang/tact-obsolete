@@ -211,9 +211,11 @@ functor
                   |> List.map ~f:(fun (n, exty) ->
                          (n, expr_to_type program exty) )
               | _ ->
-                  raise InternalCompilerError )
+                  ice
+                    "Expected struct type. TODO: make this compile-time error."
+              )
             | _ ->
-                raise InternalCompilerError
+                ice "Expected struct type. TODO: make this compile-time error."
           in
           (* Check if field names are correct *)
           List.iter let_.destructuring_let ~f:(fun (name, name2) ->
@@ -280,7 +282,7 @@ functor
           | Expr ex -> (
             match functions with
             | 0 ->
-                raise InternalCompilerError
+                unreachable ()
             | _ -> (
               match
                 type_checker#check_return_type ex ~program ~current_bindings
@@ -303,7 +305,7 @@ functor
 
         method build_Switch _ s = Switch s
 
-        method build_switch_branch _env _ _ _ = raise InternalCompilerError
+        method build_switch_branch _env _ _ _ = unreachable ()
 
         method! visit_switch_branch env b =
           let ty =
@@ -693,7 +695,7 @@ functor
 
         method build_function_body _env stmt = stmt.value
 
-        method build_function_definition _ _ _ _ _ = raise InternalCompilerError
+        method build_function_definition _ _ _ _ _ = unreachable ()
 
         method build_if_ _env if_condition if_then if_else =
           {if_condition; if_then; if_else}
@@ -747,7 +749,7 @@ functor
                 errors#report `Error (`IsNotStruct id) () ;
                 ({value = Value Void; span = id.span}, []) )
 
-        method build_struct_definition _ _ _ _ = raise InternalCompilerError
+        method build_struct_definition _ _ _ _ = unreachable ()
 
         method make_struct_definition
             : attribute list ->
@@ -785,7 +787,7 @@ functor
                           | Value (Function f) | MkFunction f ->
                               f.value.function_signature
                           | _ ->
-                              raise InternalCompilerError );
+                              unreachable () );
                     st_sig_base_id = mk_struct_id;
                     st_sig_id = sign.st_sig_id } )
             in
@@ -872,7 +874,7 @@ functor
         method build_struct_field : _ -> _ -> _ -> _ -> string located * expr =
           fun _env _attributes field_name field_type -> (field_name, field_type)
 
-        method build_union_definition _ _ _ = raise InternalCompilerError
+        method build_union_definition _ _ _ = unreachable ()
 
         method! visit_union_definition env def =
           let prev_functions = functions in
@@ -906,7 +908,7 @@ functor
                    | Value (Function _) | MkFunction _ ->
                        (name, e)
                    | _ ->
-                       raise InternalCompilerError )
+                       unreachable () )
           in
           let self_ty =
             ExprType

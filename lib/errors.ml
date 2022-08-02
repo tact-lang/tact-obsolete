@@ -1,6 +1,10 @@
 open Base
 
-exception InternalCompilerError
+exception InternalCompilerError of string
+
+let unreachable () = raise (InternalCompilerError "unreachable")
+
+let ice msg = raise (InternalCompilerError msg)
 
 class ['a, 's, 'e, 'm] errors (show_error : string -> 'e -> string) =
   object (s : _)

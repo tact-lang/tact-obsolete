@@ -20,10 +20,7 @@ functor
            code that call partial_evaluator. *)
         val mutable ctx = {ctx with program = ctx.program}
 
-        method! visit_InvalidType _ ex =
-          print_sexp (sexp_of_string "invalid type") ;
-          print_sexp (sexp_of_expr ex) ;
-          raise InternalCompilerError
+        method! visit_InvalidType _ _ = unreachable ()
 
         method! visit_Reference env (ref, ty) =
           match find_in_scope ref.value !(ctx.scope) with
@@ -34,10 +31,7 @@ functor
           | Some (Runtime _) ->
               Reference (ref, self#visit_type_ env ty)
           | None ->
-              print_sexp (sexp_of_string ref.value) ;
-              print_sexp
-                (sexp_of_list (sexp_of_list sexp_of_tbinding) !(ctx.scope)) ;
-              raise InternalCompilerError
+              ice "Resolver bug"
 
         method! visit_type_ env ty =
           let ty = super#visit_type_ env ty in
@@ -106,9 +100,9 @@ functor
                 ctx.scope := vars :: !(ctx.scope) ;
                 DestructuringLet {let_ with destructuring_let_expr = expr}
             | _ ->
-                raise InternalCompilerError )
+                ice "Type-check bug" )
           | _ ->
-              raise InternalCompilerError
+              ice "Type-check bug"
 
         method! visit_switch env switch =
           let cond = self#visit_expr env switch.switch_condition in
@@ -169,7 +163,7 @@ functor
                 | Type t ->
                     t
                 | _ ->
-                    raise InternalCompilerError
+                    ice "Type-check bug"
               in
               match
                 Program.find_impl_intf ctx.program call.intf_def intf_ty
@@ -185,7 +179,7 @@ functor
                     ( {value = Value (Function method_); span = call.intf_loc},
                       args )
               | None ->
-                  raise InternalCompilerError )
+                  ice "Type-check bug" )
           | false ->
               IntfMethodCall {call with intf_instance; intf_args = args}
 
@@ -276,7 +270,7 @@ functor
                 | Type t ->
                     t
                 | _ ->
-                    raise InternalCompilerError
+                    ice "Type-check bug"
               in
               let methods = Program.methods_of ctx.program st_sig_ty in
               let method_ =

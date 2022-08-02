@@ -15,9 +15,9 @@ functor
       type 'a t = {mutable items : 'a Vec.vector [@hash.ignore]}
       [@@deriving hash]
 
-      let equal _ _ _ = raise Errors.InternalCompilerError
+      let equal _ _ _ = Errors.unreachable ()
 
-      let compare _ _ _ = raise Errors.InternalCompilerError
+      let compare _ _ _ = Errors.unreachable ()
 
       let sexp_of_t : ('a -> Sexplib.Type.t) -> 'a t -> _ =
        fun f a ->
@@ -434,7 +434,7 @@ functor
                 program args sign.value.function_params
                 sign.value.function_returns
           | _ ->
-              raise Errors.InternalCompilerError )
+              Errors.unreachable () )
       | Reference (_, t) ->
           t
       | ResolvedReference (_, e) ->
@@ -479,13 +479,7 @@ functor
         | Ok t ->
             t
         | _ ->
-            print_sexp
-            @@ sexp_of_list
-                 (Sexplib.Conv.sexp_of_pair
-                    (sexp_of_located sexp_of_string)
-                    sexp_of_type_ )
-                 arg_types ;
-            raise Errors.InternalCompilerError
+            raise (Errors.InternalCompilerError "Unexpected count of arguments")
       in
       let dependent_types_monomophizer (program : program)
           ?(self_sig : int option = None) (associated : (string * expr) list) =
@@ -621,9 +615,9 @@ functor
 
         method visit_z _ _ = Immediate
 
-        method visit_instr _ _ = raise Errors.InternalCompilerError
+        method visit_instr _ _ = Errors.unreachable ()
 
-        method visit_arena _ _ = raise Errors.InternalCompilerError
+        method visit_arena _ _ = Errors.unreachable ()
 
         val mutable arguments : string list list = []
 
@@ -640,9 +634,9 @@ functor
             | Some (Error _) ->
                 NonImmediate NonImmediateRef
             | None ->
-                print_sexp @@ sexp_of_string ref.value ;
-                print_sexp @@ sexp_of_list (sexp_of_list sexp_of_tbinding) scope ;
-                raise Errors.InternalCompilerError )
+                raise
+                  (Errors.InternalCompilerError
+                     "Unresolved reference when it should be resolved." ) )
 
         method! visit_Primitive _ _ = NonImmediate NonImmediatePrimitive
 
@@ -789,13 +783,13 @@ functor
         | Function f ->
             f
         | _ ->
-            raise Errors.InternalCompilerError
+            raise (Errors.InternalCompilerError "unwrap on unexpected value")
 
       let unwrap_intf_id = function
         | Type (InterfaceType intf_id) ->
             intf_id
         | _ ->
-            raise Errors.InternalCompilerError
+            raise (Errors.InternalCompilerError "unwrap on unexpected value")
     end
 
     module Program = struct
@@ -841,7 +835,7 @@ functor
 
       let rec update_list id new_s = function
         | [] ->
-            raise Errors.InternalCompilerError
+            Errors.unreachable ()
         | (xid, old_s) :: xs ->
             if equal_int xid id then
               match new_s with Ok new_s -> (id, new_s) :: xs | Error _ -> xs

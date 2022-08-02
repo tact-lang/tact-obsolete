@@ -70,14 +70,14 @@ functor
             | v ->
                 v )
           | None ->
-              raise InternalCompilerError
+              ice "Caller should guarantee this"
 
         method get_fn_returns =
           match fn_returns with
           | Some x ->
               x
           | None ->
-              raise InternalCompilerError
+              ice "Caller should guarantee this"
 
         method with_fn_returns
             : 'env 'a. 'env -> type_ -> ('env -> 'a) -> 'a * type_ =
