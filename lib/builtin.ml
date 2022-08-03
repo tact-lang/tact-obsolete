@@ -703,6 +703,9 @@ functor
             make_builtin "divmod" [("i1", i); ("i2", i)] (t2 i i);
             make_builtin "send_raw_msg" [("c", c); ("f", i)] v;
             make_builtin "throw" [("e", i)] v;
+            make_builtin "load_data" [] c;
+            make_builtin "set_data" [("d", c)] v;
+            make_builtin "throw" [("e", i)] v;
             make_builtin_names "builtin_equal" "__==__" [("i1", i); ("i2", i)] i
           ]
         in
