@@ -5541,7 +5541,8 @@ let%expect_test "Deserilize intf with constraints" =
           (st_sig_methods ()) (st_sig_base_id 0) (st_sig_id 2))
          ((st_sig_fields ((x (Reference (X (TypeN 0)))))) (st_sig_methods ())
           (st_sig_base_id 0) (st_sig_id 1)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+      (union_signs (0 ())) (attr_executors <opaque>)))
+      |}]
 
 let%expect_test "Interface inner constraints" =
   let source =
@@ -5780,6 +5781,29 @@ let%expect_test "Interface inner constraints" =
           (st_sig_base_id 1) (st_sig_id 1)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
+let%expect_test "compile-time assignment" =
+  let source =
+    {|
+      fn test() { 2 }
+      let a = 1;
+      a = test();
+  |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((a (Value (Integer 2)))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns IntegerType)))
+            (function_impl (Fn (Return (Value (Integer 2)))))))))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
 let%expect_test "attributes" =
   let source =
     {|
@@ -5835,166 +5859,253 @@ let%expect_test "attributes" =
   pp_compile source ;
   [%expect
     {|
+    (Ok
+     ((bindings
+       ((Ti (Value (Type (StructType 116)))) (U1 (Value (Type (UnionType 114))))
+        (U (Value (Type (UnionType 111)))) (I (Value (Type (InterfaceType 109))))
+        (x1
+         (Value
+          (Function
+           ((function_signature
+             ((function_attributes
+               (((attribute_ident attr) (attribute_exprs ()))))
+              (function_params ()) (function_returns HoleType)))
+            (function_impl (Fn (Block ())))))))
+        (x
+         (Value
+          (Function
+           ((function_signature
+             ((function_attributes
+               (((attribute_ident attr) (attribute_exprs ()))))
+              (function_params ()) (function_returns HoleType)))
+            (function_impl (Fn (Block ())))))))
+        (T1 (Value (Type (StructType 108))))
+        (Ta
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((X IntegerType)))
+              (function_returns (StructSig 60))))
+            (function_impl
+             (Fn
+              (Return
+               (MkStructDef
+                ((mk_struct_attributes
+                  (((attribute_ident attr) (attribute_exprs ()))))
+                 (mk_struct_fields ())
+                 (mk_struct_details
+                  ((mk_methods ()) (mk_impls ()) (mk_id 106) (mk_sig 60)
+                   (mk_span <opaque>))))))))))))
+        (T (Value (Type (StructType 105))))))
+      (structs
+       ((116
+         ((struct_fields ())
+          (struct_details
+           ((uty_methods
+             ((x
+               ((function_signature
+                 ((function_attributes
+                   (((attribute_ident attr) (attribute_exprs ()))))
+                  (function_params ()) (function_returns BoolType)))
+                (function_impl (Fn (Return (Value (Bool true)))))))))
+            (uty_impls
+             (((impl_attributes (((attribute_ident attr) (attribute_exprs ()))))
+               (impl_interface 109)
+               (impl_methods
+                ((x
+                  ((function_signature
+                    ((function_attributes
+                      (((attribute_ident attr) (attribute_exprs ()))))
+                     (function_params ()) (function_returns BoolType)))
+                   (function_impl (Fn (Return (Value (Bool true))))))))))))
+            (uty_id 116) (uty_base_id 115)))))
+        (108
+         ((struct_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (struct_fields ())
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 108) (uty_base_id 107)))))
+        (105
+         ((struct_attributes
+           (((attribute_ident attr) (attribute_exprs ()))
+            ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
+            ((attribute_ident attr)
+             (attribute_exprs ((Value (Integer 1)) (Value (Integer 2)))))))
+          (struct_fields ((a ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((x
+               ((function_signature
+                 ((function_attributes
+                   (((attribute_ident attr) (attribute_exprs ()))))
+                  (function_params ()) (function_returns BoolType)))
+                (function_impl (Fn (Return (Value (Bool true)))))))))
+            (uty_impls ()) (uty_id 105) (uty_base_id 104)))))))
+      (unions
+       ((114
+         ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (cases (((ExprType (Value Void)) (Discriminator 0))))
+          (union_details
+           ((uty_methods ())
+            (uty_impls
+             (((impl_interface 112)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((v VoidType)))
+                     (function_returns (UnionType 113))))
+                   (function_impl
+                    (Fn
+                     (Return (MakeUnionVariant ((Reference (v VoidType)) 114))))))))))))
+            (uty_id 114) (uty_base_id 113)))))
+        (111
+         ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (cases (((ExprType (Value Void)) (Discriminator 0))))
+          (union_details
+           ((uty_methods ())
+            (uty_impls
+             (((impl_interface 112)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((v VoidType)))
+                     (function_returns (UnionType 110))))
+                   (function_impl
+                    (Fn
+                     (Return (MakeUnionVariant ((Reference (v VoidType)) 111))))))))))))
+            (uty_id 111) (uty_base_id 110)))))))
+      (interfaces
+       ((112
+         ((interface_methods
+           ((from
+             ((function_params ((from VoidType))) (function_returns SelfType)))))))
+        (109
+         ((interface_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (interface_methods
+           ((x
+             ((function_attributes
+               (((attribute_ident attr) (attribute_exprs ()))))
+              (function_params ()) (function_returns BoolType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (4
+        (((st_sig_fields ())
+          (st_sig_methods
+           ((x
+             ((function_attributes
+               (((attribute_ident attr) (attribute_exprs ()))))
+              (function_params ()) (function_returns BoolType)))))
+          (st_sig_base_id 115) (st_sig_id 62))
+         ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 107)
+          (st_sig_id 61))
+         ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 106)
+          (st_sig_id 60))
+         ((st_sig_attributes
+           (((attribute_ident attr) (attribute_exprs ()))
+            ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
+            ((attribute_ident attr)
+             (attribute_exprs ((Value (Integer 1)) (Value (Integer 2)))))))
+          (st_sig_fields ((a (ResolvedReference (Integer <opaque>)))))
+          (st_sig_methods
+           ((x
+             ((function_attributes
+               (((attribute_ident attr) (attribute_exprs ()))))
+              (function_params ()) (function_returns BoolType)))))
+          (st_sig_base_id 104) (st_sig_id 59)))))
+      (union_signs
+       (2
+        (((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
+          (un_sig_base_id 113))
+         ((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
+          (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
+          (un_sig_base_id 110)))))
+      (attr_executors <opaque>))) |}]
+
+let%expect_test "runtime assignment" =
+  let source =
+    {|
+      fn test(n: Integer) {
+        let a = 1;
+        a = n;
+        a
+      }
+  |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
       (Ok
        ((bindings
-         ((Ti (Value (Type (StructType 116)))) (U1 (Value (Type (UnionType 114))))
-          (U (Value (Type (UnionType 111)))) (I (Value (Type (InterfaceType 109))))
-          (x1
+         ((test
            (Value
             (Function
              ((function_signature
-               ((function_attributes
-                 (((attribute_ident attr) (attribute_exprs ()))))
-                (function_params ()) (function_returns HoleType)))
-              (function_impl (Fn (Block ())))))))
-          (x
-           (Value
-            (Function
-             ((function_signature
-               ((function_attributes
-                 (((attribute_ident attr) (attribute_exprs ()))))
-                (function_params ()) (function_returns HoleType)))
-              (function_impl (Fn (Block ())))))))
-          (T1 (Value (Type (StructType 108))))
-          (Ta
-           (Value
-            (Function
-             ((function_signature
-               ((function_params ((X IntegerType)))
-                (function_returns (StructSig 60))))
+               ((function_params ((n IntegerType))) (function_returns IntegerType)))
               (function_impl
                (Fn
-                (Return
-                 (MkStructDef
-                  ((mk_struct_attributes
-                    (((attribute_ident attr) (attribute_exprs ()))))
-                   (mk_struct_fields ())
-                   (mk_struct_details
-                    ((mk_methods ()) (mk_impls ()) (mk_id 106) (mk_sig 60)
-                     (mk_span <opaque>))))))))))))
-          (T (Value (Type (StructType 105))))))
-        (structs
-         ((116
-           ((struct_fields ())
-            (struct_details
-             ((uty_methods
-               ((x
-                 ((function_signature
-                   ((function_attributes
-                     (((attribute_ident attr) (attribute_exprs ()))))
-                    (function_params ()) (function_returns BoolType)))
-                  (function_impl (Fn (Return (Value (Bool true)))))))))
-              (uty_impls
-               (((impl_attributes (((attribute_ident attr) (attribute_exprs ()))))
-                 (impl_interface 109)
-                 (impl_methods
-                  ((x
-                    ((function_signature
-                      ((function_attributes
-                        (((attribute_ident attr) (attribute_exprs ()))))
-                       (function_params ()) (function_returns BoolType)))
-                     (function_impl (Fn (Return (Value (Bool true))))))))))))
-              (uty_id 116) (uty_base_id 115)))))
-          (108
-           ((struct_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (struct_fields ())
-            (struct_details
-             ((uty_methods ()) (uty_impls ()) (uty_id 108) (uty_base_id 107)))))
-          (105
-           ((struct_attributes
-             (((attribute_ident attr) (attribute_exprs ()))
-              ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
-              ((attribute_ident attr)
-               (attribute_exprs ((Value (Integer 1)) (Value (Integer 2)))))))
-            (struct_fields ((a ((field_type IntegerType)))))
-            (struct_details
-             ((uty_methods
-               ((x
-                 ((function_signature
-                   ((function_attributes
-                     (((attribute_ident attr) (attribute_exprs ()))))
-                    (function_params ()) (function_returns BoolType)))
-                  (function_impl (Fn (Return (Value (Bool true)))))))))
-              (uty_impls ()) (uty_id 105) (uty_base_id 104)))))))
-        (unions
-         ((114
-           ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (cases (((ExprType (Value Void)) (Discriminator 0))))
-            (union_details
-             ((uty_methods ())
-              (uty_impls
-               (((impl_interface 112)
-                 (impl_methods
-                  ((from
-                    ((function_signature
-                      ((function_params ((v VoidType)))
-                       (function_returns (UnionType 113))))
-                     (function_impl
-                      (Fn
-                       (Return (MakeUnionVariant ((Reference (v VoidType)) 114))))))))))))
-              (uty_id 114) (uty_base_id 113)))))
-          (111
-           ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (cases (((ExprType (Value Void)) (Discriminator 0))))
-            (union_details
-             ((uty_methods ())
-              (uty_impls
-               (((impl_interface 112)
-                 (impl_methods
-                  ((from
-                    ((function_signature
-                      ((function_params ((v VoidType)))
-                       (function_returns (UnionType 110))))
-                     (function_impl
-                      (Fn
-                       (Return (MakeUnionVariant ((Reference (v VoidType)) 111))))))))))))
-              (uty_id 111) (uty_base_id 110)))))))
-        (interfaces
-         ((112
-           ((interface_methods
-             ((from
-               ((function_params ((from VoidType))) (function_returns SelfType)))))))
-          (109
-           ((interface_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (interface_methods
-             ((x
-               ((function_attributes
-                 (((attribute_ident attr) (attribute_exprs ()))))
-                (function_params ()) (function_returns BoolType)))))))))
-        (type_counter <opaque>) (memoized_fcalls <opaque>)
-        (struct_signs
-         (4
-          (((st_sig_fields ())
-            (st_sig_methods
-             ((x
-               ((function_attributes
-                 (((attribute_ident attr) (attribute_exprs ()))))
-                (function_params ()) (function_returns BoolType)))))
-            (st_sig_base_id 115) (st_sig_id 62))
-           ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 107)
-            (st_sig_id 61))
-           ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 106)
-            (st_sig_id 60))
-           ((st_sig_attributes
-             (((attribute_ident attr) (attribute_exprs ()))
-              ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
-              ((attribute_ident attr)
-               (attribute_exprs ((Value (Integer 1)) (Value (Integer 2)))))))
-            (st_sig_fields ((a (ResolvedReference (Integer <opaque>)))))
-            (st_sig_methods
-             ((x
-               ((function_attributes
-                 (((attribute_ident attr) (attribute_exprs ()))))
-                (function_params ()) (function_returns BoolType)))))
-            (st_sig_base_id 104) (st_sig_id 59)))))
-        (union_signs
-         (2
-          (((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
-            (un_sig_base_id 113))
-           ((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
-            (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
-            (un_sig_base_id 110)))))
-        (attr_executors <opaque>))) |}]
+                (Block
+                 ((Let ((a (Value (Integer 1)))))
+                  (Assignment
+                   ((assignment_ident a)
+                    (assignment_expr (Reference (n IntegerType)))))
+                  (Return (Reference (a IntegerType)))))))))))))
+        (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+        (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "assignment without initial declaration" =
+  let source = {|
+      a = 2;
+  |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (((UnresolvedIdentifier a))
+     ((bindings ()) (structs ()) (type_counter <opaque>)
+      (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
+      (attr_executors <opaque>))) |}]
+
+let%expect_test "assignment with condition block" =
+  let source =
+    {|
+      fn test() {
+        let a = 1;
+        if (true) {
+          a = 10;
+        } else {
+          a = 20;
+        }
+        return a;
+      }
+    |}
+  in
+  pp_compile source ~include_std:false ~strip_defaults:true ;
+  [%expect
+    {|
+      (Ok
+       ((bindings
+         ((test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ()) (function_returns IntegerType)))
+              (function_impl
+               (Fn
+                (Block
+                 ((Let ((a (Value (Integer 1)))))
+                  (If
+                   ((if_condition (Value (Bool true)))
+                    (if_then
+                     (Block
+                      ((Assignment
+                        ((assignment_ident a)
+                         (assignment_expr (Value (Integer 10))))))))
+                    (if_else
+                     ((Block
+                       ((Assignment
+                         ((assignment_ident a)
+                          (assignment_expr (Value (Integer 20)))))))))))
+                  (Return (Reference (a IntegerType)))))))))))))
+        (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+        (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]

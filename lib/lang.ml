@@ -63,9 +63,11 @@ functor
       end
 
     (* Span that is passed from the `located` type. *)
-    type constr_ctx = {expr_span : span option}
+    type constr_ctx =
+      {expr_span : (span[@sexp.opaque]) option; is_inside_condition_block : bool}
+    [@@deriving sexp_of]
 
-    let default_ctx = {expr_span = None}
+    let default_ctx = {expr_span = None; is_inside_condition_block = false}
 
     (* Skip statements that can be invalid because of reported errors. *)
     exception Skip
@@ -78,6 +80,8 @@ functor
 
         (* Bindings in scope *)
         val current_bindings = ref [List.map program.bindings ~f:make_comptime]
+
+        (* method get_bindings = current_bindings *)
 
         val type_checker = new type_checker errors 0
 
@@ -158,8 +162,6 @@ functor
         method build_MethodCall _env mc = mc
 
         method build_Ident _env string_ = string_
-
-        method build_If _env if_ = If if_
 
         method build_Int _env i = Value (Integer i)
 
@@ -247,6 +249,47 @@ functor
                     () ) ;
           DestructuringLet let_
 
+        method build_Assignment env assignment =
+          let {assignment_ident; assignment_expr; _} = assignment in
+          let make name expr =
+            match
+              is_immediate_expr !current_bindings program expr
+              && not env.is_inside_condition_block
+            with
+            | true ->
+                make_comptime (name, expr)
+            | false ->
+                make_runtime (name, type_of program expr)
+          in
+          (* Update individual bindings *)
+          let rec update' = function
+            | [] ->
+                None
+            | (name, _) :: rest
+              when equal_located String.equal name assignment_ident ->
+                Some (make name assignment_expr :: rest)
+            | binding :: rest -> (
+              match update' rest with
+              | Some updated ->
+                  Some (binding :: updated)
+              | None ->
+                  None )
+          in
+          (* Update binding sets *)
+          let rec update = function
+            | [] ->
+                errors#report `Error (`UnresolvedIdentifier assignment_ident) () ;
+                []
+            | binding_set :: bindings -> (
+              match update' binding_set with
+              | Some binding_set' ->
+                  binding_set' :: bindings
+              | None ->
+                  binding_set :: update bindings )
+          in
+          current_bindings := update !current_bindings ;
+          Assignment assignment
+
         method build_MutRef _env _mutref = InvalidExpr
 
         method build_Reference : _ -> string located -> _ =
@@ -316,7 +359,11 @@ functor
             s#with_bindings
               [make_runtime (ref, ty)]
               (fun _ ->
-                let stmt = s#visit_located s#visit_stmt env b.stmt in
+                let stmt =
+                  s#visit_located s#visit_stmt
+                    {env with is_inside_condition_block = true}
+                    b.stmt
+                in
                 stmt )
           in
           {branch_ty = ty; branch_var = ref; branch_stmt = stmt}
@@ -341,8 +388,8 @@ functor
             : 'a 'b.
               (constr_ctx -> 'a -> 'b) -> constr_ctx -> 'a located -> 'b located
             =
-          fun f _env {value; span} ->
-            {value = f {expr_span = Some span} value; span}
+          fun f env {value; span} ->
+            {value = f {env with expr_span = Some span} value; span}
 
         method! visit_expr env syntax_expr =
           let expr' = super#visit_expr env syntax_expr in
@@ -370,7 +417,10 @@ functor
             destructuring_let_expr;
             destructuring_let_rest }
 
-        method build_enum_definition _env _attributes _members _bindings = ()
+        method build_assignment _env assignment_ident assignment_expr =
+          {assignment_ident; assignment_expr}
+
+        method build_enum_definition _env _ _ _ = ()
 
         method build_enum_member _env _name _value = ()
 
@@ -697,8 +747,23 @@ functor
 
         method build_function_definition _ _ _ _ _ = unreachable ()
 
+        method! visit_if_ env x =
+          let new_env = {env with is_inside_condition_block = true} in
+          let cond = s#visit_located s#visit_expr env x.condition in
+          let body = s#visit_located s#visit_stmt new_env x.body in
+          let else_ =
+            s#visit_option (s#visit_located s#visit_stmt) new_env x.else_
+          in
+          s#build_if_ new_env cond body else_
+
         method build_if_ _env if_condition if_then if_else =
           {if_condition; if_then; if_else}
+
+        method! visit_If env x =
+          let visited = s#visit_if_ env x in
+          s#build_If env visited
+
+        method build_If _env if_ = If if_
 
         method build_interface_definition _env attributes members =
           let signatures =
@@ -990,10 +1055,10 @@ functor
 
         method private with_bindings : 'a. tbinding list -> (unit -> 'a) -> 'a =
           fun added_bindings f ->
-            let current_bindings' = !current_bindings in
-            current_bindings := added_bindings :: current_bindings' ;
+            current_bindings := added_bindings :: !current_bindings ;
             let result = f () in
-            current_bindings := current_bindings' ;
+            (* We can mutate bindings so we should just pop last scope *)
+            current_bindings := List.tl_exn !current_bindings ;
             result
 
         method private make_from_impls : expr list -> int -> mk_impl list =
