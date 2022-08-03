@@ -6065,3 +6065,47 @@ let%expect_test "assignment without initial declaration" =
      ((bindings ()) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
       (attr_executors <opaque>))) |}]
+
+let%expect_test "assignment with condition block" =
+  let source =
+    {|
+      fn test() {
+        let a = 1;
+        if (true) {
+          a = 10;
+        } else {
+          a = 20;
+        }
+        return a;
+      }
+    |}
+  in
+  pp_compile source ~include_std:false ~strip_defaults:true ;
+  [%expect
+    {|
+      (Ok
+       ((bindings
+         ((test
+           (Value
+            (Function
+             ((function_signature
+               ((function_params ()) (function_returns IntegerType)))
+              (function_impl
+               (Fn
+                (Block
+                 ((Let ((a (Value (Integer 1)))))
+                  (If
+                   ((if_condition (Value (Bool true)))
+                    (if_then
+                     (Block
+                      ((Assignment
+                        ((assignment_ident a)
+                         (assignment_expr (Value (Integer 10))))))))
+                    (if_else
+                     ((Block
+                       ((Assignment
+                         ((assignment_ident a)
+                          (assignment_expr (Value (Integer 20)))))))))))
+                  (Return (Reference (a IntegerType)))))))))))))
+        (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+        (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]

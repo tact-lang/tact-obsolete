@@ -1642,3 +1642,38 @@ let%expect_test "assignment" =
       a = x;
       return a;
     } |}]
+
+let%expect_test "assignment with condition block" =
+  let source =
+    {|
+      fn test(x: Int[257]) {
+        let a = 1;
+        if (true) {
+          a = 10;
+        } else {
+          a = 20;
+        }
+        return a;
+      }
+    |}
+  in
+  pp_codegen source ~strip_defaults:true ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int test(int x) {
+      int a = 1;
+      if (-1) {
+      a = 10;
+    } else
+    {
+      a = 20;
+    }  return a;
+    } |}]
