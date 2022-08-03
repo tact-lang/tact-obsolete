@@ -66,8 +66,12 @@ struct Slice {
     LoadResult[Cell] { slice: slice, value: ref }
   }
 
-  /* Developer notes: if you add `load_*` method, don't forget to
+  /* Developer notes: if you add `LoadResult[...]` type, don't forget to
      increment Slice id in the `builtins.ml` */
+
+  fn refs_count(self: Self) -> Integer {
+    builtin_slice_refs(self.s)
+  }
 }
 
 struct RefCell {
@@ -576,6 +580,18 @@ struct Signature {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let {value as sig, slice} = SliceBits[512].deserialize(s);
       LoadResult[Self].new(Self{_sig: sig, _rest: slice}, slice)
+    }
+  }
+}
+
+/* Deserialize rest of the slice into this struct */
+struct RestSlice {
+  val inner: Slice
+  
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let empty_slice = builtin_slice_last(s.s, 0);
+      LoadResult[Self].new(Self{inner: s}, empty_slice)
     }
   }
 }

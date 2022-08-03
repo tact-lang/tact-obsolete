@@ -702,6 +702,8 @@ functor
             make_builtin "load_bits" [("s", s); ("bs", i)] (t2 s s);
             make_builtin "load_coins" [("s", s)] (t2 s i);
             make_builtin "load_ref" [("s", s)] (t2 s c);
+            make_builtin "slice_last" [("s", s); ("l", i)] s;
+            make_builtin "slice_refs" [("s", s)] i;
             make_builtin "end_parse" [("s", s)] v;
             make_builtin "divmod" [("i1", i); ("i2", i)] (t2 i i);
             make_builtin "send_raw_msg" [("c", c); ("f", i)] v;
@@ -712,7 +714,11 @@ functor
             make_builtin "slice_hash" [("s", s)] i;
             make_builtin "now" [] i;
             make_builtin "accept_message" [] v;
+            make_builtin_names "builtin_add" "_+_" [("i1", i); ("i2", i)] i;
             make_builtin_names "builtin_equal" "__==__" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_not_equal" "_!=_"
+              [("i1", i); ("i2", i)]
+              i;
             make_builtin_names "builtin_less_or_equal" "__<=__"
               [("i1", i); ("i2", i)]
               i ]

@@ -93,8 +93,14 @@ let%expect_test "Int[bits] serializer codegen" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -125,6 +131,12 @@ let%expect_test "Int[bits] serializer codegen" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -214,8 +226,14 @@ let%expect_test "demo struct serializer" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -246,6 +264,12 @@ let%expect_test "demo struct serializer" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -346,8 +370,14 @@ let%expect_test "demo struct serializer 2" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -378,6 +408,12 @@ let%expect_test "demo struct serializer 2" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -533,8 +569,14 @@ let%expect_test "serializer inner struct" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -565,6 +607,12 @@ let%expect_test "serializer inner struct" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -684,8 +732,14 @@ let%expect_test "switch statement" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -716,6 +770,12 @@ let%expect_test "switch statement" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -807,8 +867,14 @@ let%expect_test "tensor2" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -839,6 +905,12 @@ let%expect_test "tensor2" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -924,8 +996,14 @@ let%expect_test "serialization api" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -956,6 +1034,12 @@ let%expect_test "serialization api" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -1275,8 +1359,14 @@ let%expect_test "deserialization api" =
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
+       int builtin_not_equal(int i1, int i2) {
+         return _!=_(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       int builtin_add(int i1, int i2) {
+         return _+_(i1, i2);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -1307,6 +1397,12 @@ let%expect_test "deserialization api" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       int builtin_slice_refs(slice s) {
+         return slice_refs(s);
+       }
+       slice builtin_slice_last(slice s, int l) {
+         return slice_last(s, l);
        }
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
@@ -1695,8 +1791,14 @@ let%expect_test "deserializer" =
     int builtin_less_or_equal(int i1, int i2) {
       return __<=__(i1, i2);
     }
+    int builtin_not_equal(int i1, int i2) {
+      return _!=_(i1, i2);
+    }
     int builtin_equal(int i1, int i2) {
       return __==__(i1, i2);
+    }
+    int builtin_add(int i1, int i2) {
+      return _+_(i1, i2);
     }
     _ builtin_accept_message() {
       return accept_message();
@@ -1727,6 +1829,12 @@ let%expect_test "deserializer" =
     }
     _ builtin_end_parse(slice s) {
       return end_parse(s);
+    }
+    int builtin_slice_refs(slice s) {
+      return slice_refs(s);
+    }
+    slice builtin_slice_last(slice s, int l) {
+      return slice_last(s, l);
     }
     (slice, cell) builtin_load_ref(slice s) {
       return load_ref(s);
@@ -1822,8 +1930,14 @@ let%expect_test "deserializer unions" =
     int builtin_less_or_equal(int i1, int i2) {
       return __<=__(i1, i2);
     }
+    int builtin_not_equal(int i1, int i2) {
+      return _!=_(i1, i2);
+    }
     int builtin_equal(int i1, int i2) {
       return __==__(i1, i2);
+    }
+    int builtin_add(int i1, int i2) {
+      return _+_(i1, i2);
     }
     _ builtin_accept_message() {
       return accept_message();
@@ -1854,6 +1968,12 @@ let%expect_test "deserializer unions" =
     }
     _ builtin_end_parse(slice s) {
       return end_parse(s);
+    }
+    int builtin_slice_refs(slice s) {
+      return slice_refs(s);
+    }
+    slice builtin_slice_last(slice s, int l) {
+      return slice_last(s, l);
     }
     (slice, cell) builtin_load_ref(slice s) {
       return load_ref(s);
@@ -2035,3 +2155,336 @@ let%expect_test "codegen while block" =
       while (-1) {
       a = 20;
     }} |}]
+
+let%expect_test "codegen while block" =
+  let source =
+    {|
+    // TODO: remove this type.
+    struct MsgBodyData {
+      val subwallet: Uint[32]
+      val valid_until: Uint[32]
+      val seqno: Uint[32]
+
+      @derive impl Deserialize {}
+    }
+    struct MsgBody {
+      val signature: Signature
+      val data: MsgBodyData
+      val rest: RestSlice
+    
+      @derive impl Deserialize {}
+    }
+    
+    struct WalletState {
+      val seqno: Uint[32]
+      val subwallet: Uint[32]
+      val public_key: Uint[256]
+    
+      @derive impl Deserialize {}
+      @derive impl Serialize {}
+    }
+    
+    struct NextMessage {
+      val cell: RefCell
+      val flags: SendRawMsgFlags
+      
+      @derive impl Deserialize {}
+    }
+    
+    fn recv_internal(_: Slice) {}
+    
+    fn recv_external(input: Slice) {
+      let body = MsgBody.deserialize(input).value;
+      let data = body.data;
+      let state = WalletState.deserialize(Slice.parse(builtin_load_data())).value;
+      if (builtin_less_or_equal(data.valid_until.value, builtin_now())) { throw(35) }
+      if (builtin_not_equal(data.seqno.value, state.seqno.value)) { throw(33) }
+      if (builtin_not_equal(data.subwallet.value, state.subwallet.value)) { throw(34) }
+    
+      builtin_accept_message();
+    
+      let slice = body.rest.inner;
+      while (builtin_not_equal(slice.refs_count(), 0)) {
+        let {value as next, slice as new_slice} = NextMessage.deserialize(slice);
+        slice = new_slice;
+        send_raw_msg(next.cell.inner, next.flags);
+      }
+    
+      let new_state = WalletState {
+        seqno: builtin_add(state.seqno.value, 1),
+        subwallet: state.subwallet,
+        public_key: state.public_key
+      };
+      let new_state = new_state.serialize(Builder.new()).build();
+      builtin_set_data(new_state.c);
+    }
+    |}
+  in
+  pp_codegen source ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int builtin_less_or_equal(int i1, int i2) {
+      return __<=__(i1, i2);
+    }
+    int builtin_not_equal(int i1, int i2) {
+      return _!=_(i1, i2);
+    }
+    int builtin_equal(int i1, int i2) {
+      return __==__(i1, i2);
+    }
+    int builtin_add(int i1, int i2) {
+      return _+_(i1, i2);
+    }
+    _ builtin_accept_message() {
+      return accept_message();
+    }
+    int builtin_now() {
+      return now();
+    }
+    int builtin_slice_hash(slice s) {
+      return slice_hash(s);
+    }
+    int builtin_check_signature(int h, slice s, int k) {
+      return check_signature(h, s, k);
+    }
+    _ builtin_set_data(cell d) {
+      return set_data(d);
+    }
+    cell builtin_load_data() {
+      return load_data();
+    }
+    _ builtin_throw(int e) {
+      return throw(e);
+    }
+    _ builtin_send_raw_msg(cell c, int f) {
+      return send_raw_msg(c, f);
+    }
+    (int, int) builtin_divmod(int i1, int i2) {
+      return divmod(i1, i2);
+    }
+    _ builtin_end_parse(slice s) {
+      return end_parse(s);
+    }
+    int builtin_slice_refs(slice s) {
+      return slice_refs(s);
+    }
+    slice builtin_slice_last(slice s, int l) {
+      return slice_last(s, l);
+    }
+    (slice, cell) builtin_load_ref(slice s) {
+      return load_ref(s);
+    }
+    (slice, int) builtin_load_coins(slice s) {
+      return load_coins(s);
+    }
+    (slice, slice) builtin_load_bits(slice s, int bs) {
+      return load_bits(s, bs);
+    }
+    (slice, int) builtin_load_uint(slice s, int bs) {
+      return load_uint(s, bs);
+    }
+    (slice, int) builtin_load_int(slice s, int bs) {
+      return load_int(s, bs);
+    }
+    slice builtin_begin_parse(cell c) {
+      return begin_parse(c);
+    }
+    builder builtin_store_coins(builder b, int c) {
+      return store_coins(b, c);
+    }
+    builder builtin_store_uint(builder b, int i, int bs) {
+      return store_uint(b, i, bs);
+    }
+    builder builtin_store_int(builder b, int i, int bs) {
+      return store_int(b, i, bs);
+    }
+    cell builtin_end_cell(builder b) {
+      return end_cell(b);
+    }
+    builder builtin_begin_cell() {
+      return begin_cell();
+    }
+    _ throw(int n) {
+      return builtin_throw(n);
+    }
+    _ send_raw_msg(cell msg, int flags) {
+      return builtin_send_raw_msg(msg, flags);
+    }
+    int f0(int i) {
+      return i;
+    }
+    int hash_of_slice(slice s) {
+      return f0(builtin_slice_hash(s));
+    }
+    int is_signature_valid(int hash, slice sign, int pubkey) {
+      return builtin_check_signature(hash, sign, pubkey);
+    }
+    _ recv_internal(slice _) {
+    }
+    [slice, slice] f5(slice self, int bits) {
+      (slice, slice) output = builtin_load_bits(self, bits);
+      slice slice_ = tensor2_value1(output);
+      slice slice2 = tensor2_value2(output);
+      return [slice_, slice2];
+    }
+    [slice, slice] f6(slice s, slice v) {
+      return [s, v];
+    }
+    [slice, slice] f4(slice s) {
+      [slice slice_, slice value] = f5(s, 512);
+      return f6(value, slice_);
+    }
+    [slice, [slice, slice]] f7(slice s, [slice, slice] v) {
+      return [s, v];
+    }
+    [slice, [slice, slice]] f3(slice s) {
+      [slice slice_, slice sig] = f4(s);
+      return f7([sig, slice_], slice_);
+    }
+    [slice, int] f11(slice self, int bits) {
+      (slice, int) output = builtin_load_uint(self, bits);
+      slice slice_ = tensor2_value1(output);
+      int int_ = tensor2_value2(output);
+      return [slice_, int_];
+    }
+    [slice, int] f10(slice s) {
+      [slice, int] res = f11(s, 32);
+      return [first(res), second(res)];
+    }
+    [slice, [int, int, int]] f9(slice slice_) {
+      [slice slice_, int subwallet] = f10(slice_);
+      [slice slice_, int valid_until] = f10(slice_);
+      [slice slice_, int seqno] = f10(slice_);
+      return [[subwallet, valid_until, seqno], slice_];
+    }
+    [slice, [int, int, int]] f8(slice s) {
+      return f9(s);
+    }
+    [slice, slice] f13(slice s, slice v) {
+      return [s, v];
+    }
+    [slice, slice] f12(slice s) {
+      slice empty_slice = builtin_slice_last(s, 0);
+      return f13(s, empty_slice);
+    }
+    [slice, [[slice, slice], [int, int, int], slice]] f2(slice slice_) {
+      [slice slice_, [slice, slice] signature] = f3(slice_);
+      [slice slice_, [int, int, int] data] = f8(slice_);
+      [slice slice_, slice rest] = f12(slice_);
+      return [[signature, data, rest], slice_];
+    }
+    [slice, [[slice, slice], [int, int, int], slice]] f1(slice s) {
+      return f2(s);
+    }
+    slice f14(cell cell_) {
+      return builtin_begin_parse(cell_);
+    }
+    [slice, int] f17(slice s) {
+      [slice, int] res = f11(s, 256);
+      return [first(res), second(res)];
+    }
+    [slice, [int, int, int]] f16(slice slice_) {
+      [slice slice_, int seqno] = f10(slice_);
+      [slice slice_, int subwallet] = f10(slice_);
+      [slice slice_, int public_key] = f17(slice_);
+      return [[seqno, subwallet, public_key], slice_];
+    }
+    [slice, [int, int, int]] f15(slice s) {
+      return f16(s);
+    }
+    [slice, cell] f21(slice self) {
+      (slice, cell) output = builtin_load_ref(self);
+      slice slice_ = tensor2_value1(output);
+      cell ref = tensor2_value2(output);
+      return [slice_, ref];
+    }
+    [slice, cell] f22(slice s, cell v) {
+      return [s, v];
+    }
+    [slice, cell] f20(slice s) {
+      [slice slice_, cell value] = f21(s);
+      return f22(value, slice_);
+    }
+    [slice, int] f26(slice self, int bits) {
+      (slice, int) output = builtin_load_int(self, bits);
+      slice slice_ = tensor2_value1(output);
+      int int_ = tensor2_value2(output);
+      return [slice_, int_];
+    }
+    [slice, int] f25(slice s) {
+      [slice, int] res = f26(s, 8);
+      [slice slice_, int value] = res;
+      return [slice_, value];
+    }
+    [slice, int] f24(slice slice_) {
+      [slice slice_, int value] = f25(slice_);
+      return [value, slice_];
+    }
+    [slice, int] f23(slice s) {
+      return f24(s);
+    }
+    [slice, [cell, int]] f19(slice slice_) {
+      [slice slice_, cell cell_] = f20(slice_);
+      [slice slice_, int flags] = f23(slice_);
+      return [[cell_, flags], slice_];
+    }
+    [slice, [cell, int]] f18(slice s) {
+      return f19(s);
+    }
+    int f27(slice self) {
+      return builtin_slice_refs(self);
+    }
+    builder f28() {
+      return builtin_begin_cell();
+    }
+    builder f32(builder self, int uint, int bits) {
+      return builtin_store_uint(self, uint, bits);
+    }
+    builder f31(int self, builder builder_) {
+      return f32(builder_, self, 32);
+    }
+    builder f33(int self, builder builder_) {
+      return f32(builder_, self, 256);
+    }
+    builder f30([int, int, int] self, builder b) {
+      builder b = f31(first(self), b);
+      builder b = f31(second(self), b);
+      builder b = f33(third(self), b);
+      return b;
+    }
+    builder f29([int, int, int] self, builder b) {
+      return f30(self, b);
+    }
+    cell f34(builder self) {
+      return builtin_end_cell(self);
+    }
+    _ recv_external(slice input) {
+      [[slice, slice], [int, int, int], slice] body = second(f1(input));
+      [int, int, int] data = second(body);
+      [int, int, int] state = second(f15(f14(builtin_load_data())));
+      if (builtin_less_or_equal(second(data), builtin_now())) {
+      throw(35);
+    }  if (builtin_not_equal(third(data), first(state))) {
+      throw(33);
+    }  if (builtin_not_equal(first(data), second(state))) {
+      throw(34);
+    }  builtin_accept_message();
+      slice slice_ = third(body);
+      while (builtin_not_equal(f27(slice_), 0)) {
+      [slice new_slice, [cell, int] next] = f18(slice_);
+    slice_ =
+    new_slice;
+    send_raw_msg(first(next), second(next));
+    }  [int, int, int] new_state =
+         [builtin_add(first(state), 1), second(state), third(state)];
+      cell new_state = f34(f29(new_state, f28()));
+      return builtin_set_data(new_state);
+    } |}]
