@@ -1283,3 +1283,18 @@ let%expect_test "assignment" =
     ((stmts
       ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
        (Assignment ((assignment_ident (Ident a)) (assignment_expr (Int 2))))))) |}]
+
+let%expect_test "while loop syntax" =
+  let source = {|
+    while (true) {
+      do_stuff();
+    }
+  |} in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((WhileLoop
+        ((while_cond (Bool true))
+         (while_body
+          (CodeBlock ((Expr (FunctionCall ((fn (Reference (Ident do_stuff)))))))))))))) |}]

@@ -765,6 +765,10 @@ functor
 
         method build_If _env if_ = If if_
 
+        method build_while_loop _ _ _ = unreachable ()
+
+        method build_WhileLoop _ _ = unreachable ()
+
         method build_interface_definition _env attributes members =
           let signatures =
             List.filter_map (s#of_located_list members) ~f:(fun (name, x) ->

@@ -93,6 +93,9 @@ functor
       | Break of stmt located
       | Expr of expr located
       | Switch of switch
+      | WhileLoop of while_loop
+
+    and while_loop = {while_cond : expr located; while_body : stmt located}
 
     and switch =
       { switch_condition : expr located;

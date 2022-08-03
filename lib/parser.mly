@@ -308,6 +308,11 @@ let default_branch :=
     stmt = code_block;
     { stmt } 
 
+let while_loop :=
+  | WHILE;
+    while_cond = delimited(LPAREN, located(expr), RPAREN);
+    while_body = located(code_block);
+    {WhileLoop (make_while_loop ~while_cond ~while_body ())}
 
 let block_stmt :=
   | left = located(non_semicolon_stmt); right = block_stmt;
@@ -339,6 +344,7 @@ let non_semicolon_stmt :=
   | if_
   | code_block
   | switch
+  | while_loop
 
 (* Type expression
   
