@@ -96,6 +96,12 @@ let%expect_test "Int[bits] serializer codegen" =
        _ builtin_throw(int e) {
          return throw(e);
        }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
+       }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
        }
@@ -183,6 +189,12 @@ let%expect_test "demo struct serializer" =
        }
        _ builtin_throw(int e) {
          return throw(e);
+       }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
        }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
@@ -282,6 +294,12 @@ let%expect_test "demo struct serializer 2" =
        }
        _ builtin_throw(int e) {
          return throw(e);
+       }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
        }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
@@ -437,6 +455,12 @@ let%expect_test "serializer inner struct" =
        _ builtin_throw(int e) {
          return throw(e);
        }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
+       }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
        }
@@ -555,6 +579,12 @@ let%expect_test "switch statement" =
        _ builtin_throw(int e) {
          return throw(e);
        }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
+       }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
        }
@@ -645,6 +675,12 @@ let%expect_test "tensor2" =
        _ builtin_throw(int e) {
          return throw(e);
        }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
+       }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
        }
@@ -728,6 +764,12 @@ let%expect_test "serialization api" =
        }
        _ builtin_throw(int e) {
          return throw(e);
+       }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
        }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
@@ -1046,6 +1088,12 @@ let%expect_test "deserialization api" =
        }
        _ builtin_throw(int e) {
          return throw(e);
+       }
+       _ builtin_set_data(cell d) {
+         return set_data(d);
+       }
+       cell builtin_load_data() {
+         return load_data();
        }
        _ builtin_send_raw_msg(cell c, int f) {
          return send_raw_msg(c, f);
@@ -1434,6 +1482,12 @@ let%expect_test "deserializer" =
     _ builtin_throw(int e) {
       return throw(e);
     }
+    _ builtin_set_data(cell d) {
+      return set_data(d);
+    }
+    cell builtin_load_data() {
+      return load_data();
+    }
     _ builtin_send_raw_msg(cell c, int f) {
       return send_raw_msg(c, f);
     }
@@ -1527,6 +1581,12 @@ let%expect_test "deserializer unions" =
     }
     _ builtin_throw(int e) {
       return throw(e);
+    }
+    _ builtin_set_data(cell d) {
+      return set_data(d);
+    }
+    cell builtin_load_data() {
+      return load_data();
     }
     _ builtin_send_raw_msg(cell c, int f) {
       return send_raw_msg(c, f);

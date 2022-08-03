@@ -60,6 +60,17 @@ struct Slice {
   }
 }
 
+struct SliceBits[N: Integer] {
+  val inner: Slice
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let {slice, value} = s.load_bits(N);
+      LoadResult[Self].new(Self { inner: value }, slice)
+    } 
+  }
+}
+
 fn throw(n: Integer) {
   builtin_throw(n);
 }
