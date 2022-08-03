@@ -765,9 +765,10 @@ functor
 
         method build_If _env if_ = If if_
 
-        method build_while_loop _ _ _ = unreachable ()
+        method build_while_loop _env while_cond while_body =
+          {while_cond; while_body}
 
-        method build_WhileLoop _ _ = unreachable ()
+        method build_WhileLoop _env w = WhileLoop w
 
         method build_interface_definition _env attributes members =
           let signatures =

@@ -182,6 +182,8 @@ functor
                       Void )
               | _ ->
                   Void )
+          | WhileLoop _ ->
+              ice "Loops is not supported in comptime yet."
           | Invalid ->
               Void
 

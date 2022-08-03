@@ -23,6 +23,7 @@ and stmt =
   | Expr of expr
   | Block of stmt list
   | If of (expr * stmt * stmt option)
+  | While of {cond : expr; body : stmt}
 
 and expr =
   | Integer of Zint.t
@@ -217,6 +218,14 @@ and pp_stmt f = function
           pp_print_string f "else" ;
           pp_print_space f () ;
           pp_stmt f e )
+  | While {cond; body} ->
+      pp_print_string f "while" ;
+      pp_print_space f () ;
+      pp_print_string f "(" ;
+      pp_expr f cond ;
+      pp_print_string f ")" ;
+      pp_print_space f () ;
+      pp_stmt f body
 
 and pp_expr f = function
   | Integer i ->

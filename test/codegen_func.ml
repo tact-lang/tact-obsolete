@@ -1677,3 +1677,31 @@ let%expect_test "assignment with condition block" =
       a = 20;
     }  return a;
     } |}]
+
+let%expect_test "codegen while block" =
+  let source =
+    {|
+      fn test() {
+        let a = 10;
+        while (true) {
+          a = 20
+        }
+      }
+    |}
+  in
+  pp_codegen source ~strip_defaults:true ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    _ test() {
+      int a = 10;
+      while (-1) {
+      a = 20;
+    }} |}]

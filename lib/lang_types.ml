@@ -195,7 +195,10 @@ functor
       | Expr of expr
       | Block of stmt list
       | Switch of switch
+      | WhileLoop of while_loop
       | Invalid
+
+    and while_loop = {while_cond : expr; while_body : stmt}
 
     and destructuring_let =
       { destructuring_let : (string located * string located) list;

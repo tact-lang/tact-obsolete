@@ -150,6 +150,10 @@ functor
                 self#cg_stmt stmt (* FIXME: this is unlikely to be correct *)
             | Switch s ->
                 self#cg_switch s
+            | WhileLoop {while_cond; while_body} ->
+                F.While
+                  { cond = self#cg_expr while_cond;
+                    body = self#cg_stmt while_body }
             | _ ->
                 raise Unsupported
 
