@@ -528,3 +528,27 @@ fn send_external[X: Serialize](header: ExtOutMsgInfoRelaxed, body: X, flags: Sen
   let ce = msg.serialize(Builder.new()).build();
   send_raw_msg(ce, flags);
 }
+
+fn hash_of_slice(s: Slice) -> Uint[256] {
+  return Uint[256].new(builtin_slice_hash(s.s));
+}
+
+fn is_signature_valid(hash: Uint[256], sign: SliceBits[512], pubkey: Uint[256]) -> Bool {
+  return builtin_check_signature(hash.value, sign.inner.s, pubkey.value);
+}
+
+struct Signature {
+  val _sig: SliceBits[512]
+  val _rest: Slice
+
+  fn is_valid(self: Self, public_key: Uint[256]) -> Bool {
+    return is_signature_valid(hash_of_slice(self._rest), self._sig, public_key);
+  }
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let {value as sig, slice} = SliceBits[512].deserialize(s);
+      LoadResult[Self].new(Self{_sig: sig, _rest: slice}, slice)
+    }
+  }
+}

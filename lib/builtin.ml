@@ -684,6 +684,8 @@ functor
 
         let i = IntegerType
 
+        let bool_ = BoolType
+
         let t2 x y = StructType (tensor2 x y).struct_details.uty_id
       end
 
@@ -705,7 +707,8 @@ functor
             make_builtin "throw" [("e", i)] v;
             make_builtin "load_data" [] c;
             make_builtin "set_data" [("d", c)] v;
-            make_builtin "throw" [("e", i)] v;
+            make_builtin "check_signature" [("h", i); ("s", s); ("k", i)] bool_;
+            make_builtin "slice_hash" [("s", s)] i;
             make_builtin_names "builtin_equal" "__==__" [("i1", i); ("i2", i)] i
           ]
         in
