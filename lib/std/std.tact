@@ -58,6 +58,27 @@ struct Slice {
     let coins = Self { s: output.value2 };
     LoadResult[Integer] { slice: slice, value: coins }
   }
+
+  fn load_ref(self: Self) -> LoadResult[Cell] {
+    let output = builtin_load_ref(self.s);
+    let slice = Self { s: output.value1 };
+    let ref = Cell { c: output.value2 };
+    LoadResult[Cell] { slice: slice, value: ref }
+  }
+
+  /* Developer notes: if you add `load_*` method, don't forget to
+     increment Slice id in the `builtins.ml` */
+}
+
+struct RefCell {
+  val inner: Cell
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let {slice, value} = s.load_ref();
+      LoadResult[Self].new(Self { inner: value }, slice)
+    } 
+  }
 }
 
 struct SliceBits[N: Integer] {
@@ -496,7 +517,7 @@ struct Message[X: Deserialize] {
 }
 
 struct SendRawMsgFlags {
-  val value: Integer
+  val value: Int[8]
 
   fn default() -> Self {
     Self { value: 0 }
@@ -509,10 +530,16 @@ struct SendRawMsgFlags {
   fn carry_rest_from_transaction_input() -> Self {
     Self { value: 64 }
   }
+
+  @derive
+  impl Deserialize {}
+
+  @derive
+  impl Serialize {}
 }
 
 fn send_raw_msg(msg: Cell, flags: SendRawMsgFlags) -> VoidType {
-  builtin_send_raw_msg(msg.c, flags.value);
+  builtin_send_raw_msg(msg.c, flags.value.value);
 }
 
 fn send_internal[X: Serialize](header: IntMsgInfoRelaxed, body: X, flags: SendRawMsgFlags) -> VoidType {

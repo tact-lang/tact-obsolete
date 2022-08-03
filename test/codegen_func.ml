@@ -90,8 +90,17 @@ let%expect_test "Int[bits] serializer codegen" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -116,6 +125,9 @@ let%expect_test "Int[bits] serializer codegen" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -199,8 +211,17 @@ let%expect_test "demo struct serializer" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -225,6 +246,9 @@ let%expect_test "demo struct serializer" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -319,8 +343,17 @@ let%expect_test "demo struct serializer 2" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -345,6 +378,9 @@ let%expect_test "demo struct serializer 2" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -494,8 +530,17 @@ let%expect_test "serializer inner struct" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -520,6 +565,9 @@ let%expect_test "serializer inner struct" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -633,8 +681,17 @@ let%expect_test "switch statement" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -659,6 +716,9 @@ let%expect_test "switch statement" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -744,8 +804,17 @@ let%expect_test "tensor2" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -770,6 +839,9 @@ let%expect_test "tensor2" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -849,8 +921,17 @@ let%expect_test "serialization api" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -875,6 +956,9 @@ let%expect_test "serialization api" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -1188,8 +1272,17 @@ let%expect_test "deserialization api" =
          (_, Value2 value) = tensor;
          return value;
        }
+       int builtin_less_or_equal(int i1, int i2) {
+         return __<=__(i1, i2);
+       }
        int builtin_equal(int i1, int i2) {
          return __==__(i1, i2);
+       }
+       _ builtin_accept_message() {
+         return accept_message();
+       }
+       int builtin_now() {
+         return now();
        }
        int builtin_slice_hash(slice s) {
          return slice_hash(s);
@@ -1214,6 +1307,9 @@ let%expect_test "deserialization api" =
        }
        _ builtin_end_parse(slice s) {
          return end_parse(s);
+       }
+       (slice, cell) builtin_load_ref(slice s) {
+         return load_ref(s);
        }
        (slice, int) builtin_load_coins(slice s) {
          return load_coins(s);
@@ -1596,8 +1692,17 @@ let%expect_test "deserializer" =
       (_, Value2 value) = tensor;
       return value;
     }
+    int builtin_less_or_equal(int i1, int i2) {
+      return __<=__(i1, i2);
+    }
     int builtin_equal(int i1, int i2) {
       return __==__(i1, i2);
+    }
+    _ builtin_accept_message() {
+      return accept_message();
+    }
+    int builtin_now() {
+      return now();
     }
     int builtin_slice_hash(slice s) {
       return slice_hash(s);
@@ -1622,6 +1727,9 @@ let%expect_test "deserializer" =
     }
     _ builtin_end_parse(slice s) {
       return end_parse(s);
+    }
+    (slice, cell) builtin_load_ref(slice s) {
+      return load_ref(s);
     }
     (slice, int) builtin_load_coins(slice s) {
       return load_coins(s);
@@ -1711,8 +1819,17 @@ let%expect_test "deserializer unions" =
       (_, Value2 value) = tensor;
       return value;
     }
+    int builtin_less_or_equal(int i1, int i2) {
+      return __<=__(i1, i2);
+    }
     int builtin_equal(int i1, int i2) {
       return __==__(i1, i2);
+    }
+    _ builtin_accept_message() {
+      return accept_message();
+    }
+    int builtin_now() {
+      return now();
     }
     int builtin_slice_hash(slice s) {
       return slice_hash(s);
@@ -1737,6 +1854,9 @@ let%expect_test "deserializer unions" =
     }
     _ builtin_end_parse(slice s) {
       return end_parse(s);
+    }
+    (slice, cell) builtin_load_ref(slice s) {
+      return load_ref(s);
     }
     (slice, int) builtin_load_coins(slice s) {
       return load_coins(s);

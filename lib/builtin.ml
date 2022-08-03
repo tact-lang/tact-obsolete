@@ -15,7 +15,7 @@ functor
     (* Builder is second struct in the std, so its ID will be 3 *)
     let builder_struct = StructType 3
 
-    let slice_struct = StructType 6
+    let slice_struct = StructType 7
 
     let cell = Value (Type (BuiltinType "Cell"))
 
@@ -701,6 +701,7 @@ functor
             make_builtin "load_uint" [("s", s); ("bs", i)] (t2 s i);
             make_builtin "load_bits" [("s", s); ("bs", i)] (t2 s s);
             make_builtin "load_coins" [("s", s)] (t2 s i);
+            make_builtin "load_ref" [("s", s)] (t2 s c);
             make_builtin "end_parse" [("s", s)] v;
             make_builtin "divmod" [("i1", i); ("i2", i)] (t2 i i);
             make_builtin "send_raw_msg" [("c", c); ("f", i)] v;
@@ -709,8 +710,12 @@ functor
             make_builtin "set_data" [("d", c)] v;
             make_builtin "check_signature" [("h", i); ("s", s); ("k", i)] bool_;
             make_builtin "slice_hash" [("s", s)] i;
-            make_builtin_names "builtin_equal" "__==__" [("i1", i); ("i2", i)] i
-          ]
+            make_builtin "now" [] i;
+            make_builtin "accept_message" [] v;
+            make_builtin_names "builtin_equal" "__==__" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_less_or_equal" "__<=__"
+              [("i1", i); ("i2", i)]
+              i ]
         in
         {p with bindings = p.bindings @ make_bindings builtins}
     end
