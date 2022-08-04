@@ -102,6 +102,9 @@ let%expect_test "Int[bits] serializer codegen" =
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
+       int builtin_not(int c) {
+         return _~_(c);
+       }
        _ builtin_accept_message() {
          return accept_message();
        }
@@ -234,6 +237,9 @@ let%expect_test "demo struct serializer" =
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
+       }
+       int builtin_not(int c) {
+         return _~_(c);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -378,6 +384,9 @@ let%expect_test "demo struct serializer 2" =
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
+       }
+       int builtin_not(int c) {
+         return _~_(c);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -578,6 +587,9 @@ let%expect_test "serializer inner struct" =
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
+       int builtin_not(int c) {
+         return _~_(c);
+       }
        _ builtin_accept_message() {
          return accept_message();
        }
@@ -741,6 +753,9 @@ let%expect_test "switch statement" =
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
+       int builtin_not(int c) {
+         return _~_(c);
+       }
        _ builtin_accept_message() {
          return accept_message();
        }
@@ -876,6 +891,9 @@ let%expect_test "tensor2" =
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
+       int builtin_not(int c) {
+         return _~_(c);
+       }
        _ builtin_accept_message() {
          return accept_message();
        }
@@ -1004,6 +1022,9 @@ let%expect_test "serialization api" =
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
+       }
+       int builtin_not(int c) {
+         return _~_(c);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -1367,6 +1388,9 @@ let%expect_test "deserialization api" =
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
+       }
+       int builtin_not(int c) {
+         return _~_(c);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -1800,6 +1824,9 @@ let%expect_test "deserializer" =
     int builtin_add(int i1, int i2) {
       return _+_(i1, i2);
     }
+    int builtin_not(int c) {
+      return _~_(c);
+    }
     _ builtin_accept_message() {
       return accept_message();
     }
@@ -1938,6 +1965,9 @@ let%expect_test "deserializer unions" =
     }
     int builtin_add(int i1, int i2) {
       return _+_(i1, i2);
+    }
+    int builtin_not(int c) {
+      return _~_(c);
     }
     _ builtin_accept_message() {
       return accept_message();
@@ -2200,6 +2230,7 @@ let%expect_test "codegen while block" =
       if (builtin_less_or_equal(data.valid_until.value, builtin_now())) { throw(35) }
       if (builtin_not_equal(data.seqno.value, state.seqno.value)) { throw(33) }
       if (builtin_not_equal(data.subwallet.value, state.subwallet.value)) { throw(34) }
+      if (builtin_not(body.signature.is_valid(state.public_key))) { throw(35) }
     
       builtin_accept_message();
     
@@ -2242,6 +2273,9 @@ let%expect_test "codegen while block" =
     }
     int builtin_add(int i1, int i2) {
       return _+_(i1, i2);
+    }
+    int builtin_not(int c) {
+      return _~_(c);
     }
     _ builtin_accept_message() {
       return accept_message();
@@ -2400,70 +2434,74 @@ let%expect_test "codegen while block" =
     [slice, [int, int, int]] f15(slice s) {
       return f16(s);
     }
-    [slice, cell] f21(slice self) {
+    int f18([slice, slice] self, int public_key) {
+      return
+        is_signature_valid(hash_of_slice(second(self)), first(self), public_key);
+    }
+    [slice, cell] f22(slice self) {
       (slice, cell) output = builtin_load_ref(self);
       slice slice_ = tensor2_value1(output);
       cell ref = tensor2_value2(output);
       return [slice_, ref];
     }
-    [slice, cell] f22(slice s, cell v) {
+    [slice, cell] f23(slice s, cell v) {
       return [s, v];
     }
-    [slice, cell] f20(slice s) {
-      [slice slice_, cell value] = f21(s);
-      return f22(value, slice_);
+    [slice, cell] f21(slice s) {
+      [slice slice_, cell value] = f22(s);
+      return f23(value, slice_);
     }
-    [slice, int] f26(slice self, int bits) {
+    [slice, int] f27(slice self, int bits) {
       (slice, int) output = builtin_load_int(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
       return [slice_, int_];
     }
-    [slice, int] f25(slice s) {
-      [slice, int] res = f26(s, 8);
+    [slice, int] f26(slice s) {
+      [slice, int] res = f27(s, 8);
       [slice slice_, int value] = res;
       return [slice_, value];
     }
-    [slice, int] f24(slice slice_) {
-      [slice slice_, int value] = f25(slice_);
+    [slice, int] f25(slice slice_) {
+      [slice slice_, int value] = f26(slice_);
       return [value, slice_];
     }
-    [slice, int] f23(slice s) {
-      return f24(s);
+    [slice, int] f24(slice s) {
+      return f25(s);
     }
-    [slice, [cell, int]] f19(slice slice_) {
-      [slice slice_, cell cell_] = f20(slice_);
-      [slice slice_, int flags] = f23(slice_);
+    [slice, [cell, int]] f20(slice slice_) {
+      [slice slice_, cell cell_] = f21(slice_);
+      [slice slice_, int flags] = f24(slice_);
       return [[cell_, flags], slice_];
     }
-    [slice, [cell, int]] f18(slice s) {
-      return f19(s);
+    [slice, [cell, int]] f19(slice s) {
+      return f20(s);
     }
-    int f27(slice self) {
+    int f28(slice self) {
       return builtin_slice_refs(self);
     }
-    builder f28() {
+    builder f29() {
       return builtin_begin_cell();
     }
-    builder f32(builder self, int uint, int bits) {
+    builder f33(builder self, int uint, int bits) {
       return builtin_store_uint(self, uint, bits);
     }
-    builder f31(int self, builder builder_) {
-      return f32(builder_, self, 32);
+    builder f32(int self, builder builder_) {
+      return f33(builder_, self, 32);
     }
-    builder f33(int self, builder builder_) {
-      return f32(builder_, self, 256);
+    builder f34(int self, builder builder_) {
+      return f33(builder_, self, 256);
     }
-    builder f30([int, int, int] self, builder b) {
-      builder b = f31(first(self), b);
-      builder b = f31(second(self), b);
-      builder b = f33(third(self), b);
+    builder f31([int, int, int] self, builder b) {
+      builder b = f32(first(self), b);
+      builder b = f32(second(self), b);
+      builder b = f34(third(self), b);
       return b;
     }
-    builder f29([int, int, int] self, builder b) {
-      return f30(self, b);
+    builder f30([int, int, int] self, builder b) {
+      return f31(self, b);
     }
-    cell f34(builder self) {
+    cell f35(builder self) {
       return builtin_end_cell(self);
     }
     _ recv_external(slice input) {
@@ -2476,15 +2514,17 @@ let%expect_test "codegen while block" =
       throw(33);
     }  if (builtin_not_equal(first(data), second(state))) {
       throw(34);
+    }  if (builtin_not(f18(first(body), third(state)))) {
+      throw(35);
     }  builtin_accept_message();
       slice slice_ = third(body);
-      while (builtin_not_equal(f27(slice_), 0)) {
-      [slice new_slice, [cell, int] next] = f18(slice_);
+      while (builtin_not_equal(f28(slice_), 0)) {
+      [slice new_slice, [cell, int] next] = f19(slice_);
     slice_ =
     new_slice;
     send_raw_msg(first(next), second(next));
     }  [int, int, int] new_state =
          [builtin_add(first(state), 1), second(state), third(state)];
-      cell new_state = f34(f29(new_state, f28()));
+      cell new_state = f35(f30(new_state, f29()));
       return builtin_set_data(new_state);
     } |}]
