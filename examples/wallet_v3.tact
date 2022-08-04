@@ -36,6 +36,7 @@ fn recv_external(input: Slice) {
   let body = MsgBody.deserialize(input).value;
   let data = body.data;
   let state = WalletState.deserialize(Slice.parse(builtin_load_data())).value;
+
   if (builtin_less_or_equal(data.valid_until.value, builtin_now())) { throw(35) }
   if (builtin_not_equal(data.seqno.value, state.seqno.value)) { throw(33) }
   if (builtin_not_equal(data.subwallet.value, state.subwallet.value)) { throw(34) }
@@ -45,15 +46,15 @@ fn recv_external(input: Slice) {
 
   let slice = body.rest.inner;
   while (builtin_not_equal(slice.refs_count(), 0)) {
-  let {value as next, slice as new_slice} = NextMessage.deserialize(slice);
-  slice = new_slice;
-  send_raw_msg(next.cell.inner, next.flags);
+    let {value as next, slice as new_slice} = NextMessage.deserialize(slice);
+    slice = new_slice;
+    send_raw_msg(next.cell.inner, next.flags);
   }
 
   let new_state = WalletState {
-  seqno: builtin_add(state.seqno.value, 1),
-  subwallet: state.subwallet,
-  public_key: state.public_key
+    seqno: builtin_add(state.seqno.value, 1),
+    subwallet: state.subwallet,
+    public_key: state.public_key
   };
   let new_state = new_state.serialize(Builder.new()).build();
   builtin_set_data(new_state.c);
