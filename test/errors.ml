@@ -317,3 +317,27 @@ let%expect_test "missing field error" =
       |
     3 |       let {} = Test{field: 10};
       |       ^^^^^^^^^^^^^^^^^^^^^^^^ In this binding |}]
+
+let%expect_test "Case Not Found Error" =
+  let source =
+    {|
+      union Test { 
+        case Int[10] 
+        case Int[20]
+      }
+      fn test(value: Test) {
+        switch (value) {
+          case Int[10] _ => { return 10; }
+          case Int[123] _ => { return 123; }
+        }
+      }
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    Error[1]: Case type not found in union.
+    File: "":9:24
+      |
+    9 |           case Int[123] _ => { return 123; }
+      |                         ^ Type of this variable is not found in the condition union |}]

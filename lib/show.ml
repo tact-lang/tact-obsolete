@@ -343,4 +343,25 @@ functor
               spans = [(expr.span, "This is not struct type")];
               additional_msg = [] }
             code
+      | `IsNotUnion expr ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg =
+                "Expression is not union type, so it cannot be used in such \
+                 context.";
+              spans = [(expr.span, "This is not union type")];
+              additional_msg = [] }
+            code
+      | `CaseNotFound span ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg = "Case type not found in union.";
+              spans =
+                [ ( span,
+                    "Type of this variable is not found in the condition union"
+                  ) ];
+              additional_msg = [] }
+            code
   end

@@ -903,5 +903,19 @@ functor
       let find_binding p name =
         List.Assoc.find p.bindings (builtin_located name)
           ~equal:(equal_located equal_string)
+
+      let get_union_cases p = function
+        | UnionType u ->
+            let u = get_union p u in
+            Some (List.map u.cases ~f:fst)
+        | ExprType ex -> (
+          match type_of p ex with
+          | UnionSig usig ->
+              let usig = Arena.get p.union_signs usig in
+              Some usig.un_sig_cases
+          | _ ->
+              None )
+        | _ ->
+            None
     end
   end

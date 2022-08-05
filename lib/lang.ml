@@ -24,6 +24,7 @@ functor
       | `UnresolvedIdentifier of string located
       | `MethodNotFound of expr * string located
       | `IsNotStruct of expr
+      | `IsNotUnion of expr
       | `CannotHaveMethods of expr * type_
       | `TypeError of type_ * type_ * (span[@equal.ignore] [@sexp.opaque])
       | `ExpectedFunction of type_ * (span[@equal.ignore] [@sexp.opaque])
@@ -32,6 +33,7 @@ functor
         type_ * string located * (span[@equal.ignore] [@sexp.opaque])
       | `FieldNotFoundF of string located
       | `FieldNotFound of expr * string located
+      | `CaseNotFound of (span[@equal.ignore] [@sexp.opaque])
       | `ArgumentNumberMismatch of
         int * int * (span[@equal.ignore] [@sexp.opaque]) ]
     [@@deriving equal, sexp_of]
@@ -397,7 +399,18 @@ functor
           {branch_ty = ty; branch_var = ref; branch_stmt = stmt}
 
         method build_switch _env cond branches _default =
-          {switch_condition = cond; branches}
+          let cond_type = type_of program cond in
+          match Program.get_union_cases program cond_type with
+          | Some cases ->
+              List.iter branches ~f:(fun b ->
+                  let actual_ty = b.value.branch_ty in
+                  if not @@ List.exists cases ~f:(equal_type_ actual_ty) then
+                    errors#report `Error (`CaseNotFound b.value.branch_var.span)
+                      () ) ;
+              {switch_condition = cond; branches}
+          | _ ->
+              errors#report `Error (`IsNotUnion cond) () ;
+              {switch_condition = cond; branches}
 
         method build_Struct _env s = MkStructDef s
 
