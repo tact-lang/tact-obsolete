@@ -1276,7 +1276,7 @@ let%expect_test "Deserialize Unions" =
                       (Function
                        ((function_signature
                          ((function_params ((i1 IntegerType) (i2 IntegerType)))
-                          (function_returns IntegerType)))
+                          (function_returns BoolType)))
                         (function_impl
                          (Fn
                           (Return
@@ -1408,7 +1408,7 @@ let%expect_test "Deserialize Unions" =
                              ((function_signature
                                ((function_params
                                  ((i1 IntegerType) (i2 IntegerType)))
-                                (function_returns IntegerType)))
+                                (function_returns BoolType)))
                               (function_impl
                                (Fn
                                 (Return

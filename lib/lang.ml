@@ -785,7 +785,15 @@ functor
           s#build_if_ new_env cond body else_
 
         method build_if_ _env if_condition if_then if_else =
-          {if_condition; if_then; if_else}
+          match type_of program if_condition with
+          | BoolType ->
+              {if_condition; if_then; if_else}
+          | _ ->
+              errors#report `Error
+                (`TypeError
+                  (BoolType, type_of program if_condition, if_condition.span) )
+                () ;
+              {if_condition; if_then; if_else}
 
         method! visit_If env x =
           let visited = s#visit_if_ env x in

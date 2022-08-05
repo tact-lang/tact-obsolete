@@ -716,13 +716,15 @@ functor
             make_builtin "accept_message" [] v;
             make_builtin_names "builtin_not" "_~_" [("c", bool_)] bool_;
             make_builtin_names "builtin_add" "_+_" [("i1", i); ("i2", i)] i;
-            make_builtin_names "builtin_equal" "__==__" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_equal" "__==__"
+              [("i1", i); ("i2", i)]
+              bool_;
             make_builtin_names "builtin_not_equal" "_!=_"
               [("i1", i); ("i2", i)]
-              i;
+              bool_;
             make_builtin_names "builtin_less_or_equal" "__<=__"
               [("i1", i); ("i2", i)]
-              i ]
+              bool_ ]
         in
         {p with bindings = p.bindings @ make_bindings builtins}
     end
