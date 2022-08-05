@@ -802,7 +802,15 @@ functor
         method build_If _env if_ = If if_
 
         method build_while_loop _env while_cond while_body =
-          {while_cond; while_body}
+          match type_of program while_cond with
+          | BoolType ->
+              {while_cond; while_body}
+          | _ ->
+              errors#report `Error
+                (`TypeError
+                  (BoolType, type_of program while_cond, while_cond.span) )
+                () ;
+              {while_cond; while_body}
 
         method build_WhileLoop _env w = WhileLoop w
 
