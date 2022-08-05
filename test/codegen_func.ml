@@ -2189,7 +2189,7 @@ let%expect_test "deserializer unions" =
 let%expect_test "assignment" =
   let source =
     {|
-      fn test(x: Int(257)) {
+      fn test(x: Integer) {
         let a = 1;
         a = x;
         a

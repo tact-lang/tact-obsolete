@@ -288,8 +288,35 @@ functor
               | None ->
                   binding_set :: update bindings )
           in
+          let right =
+            match find_in_scope assignment_ident.value !current_bindings with
+            | Some bind -> (
+                let expected =
+                  match bind with
+                  | Comptime ex ->
+                      type_of program ex
+                  | Runtime rt ->
+                      rt
+                in
+                match s#check_type ~expected assignment_expr with
+                | Ok _ ->
+                    assignment_expr
+                | Error (NeedFromCall func) ->
+                    let s = FunctionCall (func, [assignment_expr]) in
+                    {value = s; span = assignment_expr.span}
+                | _ ->
+                    errors#report `Error
+                      (`TypeError
+                        ( expected,
+                          type_of program assignment_expr,
+                          assignment_expr.span ) )
+                      () ;
+                    {value = Value Void; span = assignment_expr.span} )
+            | None ->
+                assignment_expr
+          in
           current_bindings := update !current_bindings ;
-          Assignment assignment
+          Assignment {assignment_ident; assignment_expr = right}
 
         method build_MutRef _env _mutref = InvalidExpr
 
