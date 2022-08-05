@@ -345,57 +345,57 @@ let%expect_test "Immediacy Checks Self Type" =
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
-let%expect_test "Immediacy Checks MyInt Type" =
-  let source =
-    {|
-      struct Cell {
-        val c: builtin_Cell
-      }
-      struct Builder {
-        val b: builtin_Builder
-        fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
-          let b = builtin_store_int(self.b, int, bits);
-          Self { b: b }
-        }
-      }
+(* let%expect_test "Immediacy Checks MyInt Type" =
+   let source =
+     {|
+       struct Cell {
+         val c: builtin_Cell
+       }
+       struct Builder {
+         val b: builtin_Builder
+         fn serialize_int(self: Self, int: Integer, bits: Integer) -> Self {
+           let b = builtin_store_int(self.b, int, bits);
+           Self { b: b }
+         }
+       }
 
-      struct Slice {
-        val s: builtin_Slice
-        fn load_int(self: Self, bits: Integer) -> LoadResult(Integer) {
-          let output = builtin_load_int(self.s, bits);
-          let slice = Self { s: output.value1 };
-          let int = output.value2;
-          LoadResult(Integer) { slice: slice, value: int }
-        }
-      }
-      struct MyInt[bits: Integer] {
-        val value: Integer
-        impl Deserialize {
-          fn deserialize(s: Slice) -> LoadResult(Self) {
-            let res = s.load_int(bits);
+       struct Slice {
+         val s: builtin_Slice
+         fn load_int(self: Self, bits: Integer) -> LoadResult(Integer) {
+           let output = builtin_load_int(self.s, bits);
+           let slice = Self { s: output.value1 };
+           let int = output.value2;
+           LoadResult(Integer) { slice: slice, value: int }
+         }
+       }
+       struct MyInt[bits: Integer] {
+         val value: Integer
+         impl Deserialize {
+           fn deserialize(s: Slice) -> LoadResult(Self) {
+             let res = s.load_int(bits);
 
-            LoadResult(Self) {
-              slice: res.slice,
-              value: Self { value: res.value }
-            }
-          }
-        }
-      }
-    |}
-  in
-  let p = Option.value_exn @@ Result.ok @@ compile source in
-  let res =
-    is_immediate_expr
-      [List.map p.bindings ~f:make_comptime]
-      p
-      ( bl
-      @@ FunctionCall
-           ( List.Assoc.find_exn p.bindings (bl @@ "MyInt")
-               ~equal:(Config.equal_located equal_string),
-             [bl @@ Value (Integer (Z.of_int 123))] ) )
-  in
-  pp_sexp @@ sexp_of_bool res ;
-  [%expect {| true |}]
+             LoadResult(Self) {
+               slice: res.slice,
+               value: Self { value: res.value }
+             }
+           }
+         }
+       }
+     |}
+   in
+   let p = Option.value_exn @@ Result.ok @@ compile source in
+   let res =
+     is_immediate_expr
+       [List.map p.bindings ~f:make_comptime]
+       p
+       ( bl
+       @@ FunctionCall
+            ( List.Assoc.find_exn p.bindings (bl @@ "MyInt")
+                ~equal:(Config.equal_located equal_string),
+              [bl @@ Value (Integer (Z.of_int 123))] ) )
+   in
+   pp_sexp @@ sexp_of_bool res ;
+   [%expect {| true |}] *)
 
 let%expect_test "Immediacy Checks Unions Functions" =
   let source =

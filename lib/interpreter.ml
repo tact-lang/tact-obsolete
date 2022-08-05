@@ -515,6 +515,7 @@ functor
             | Some (Comptime ex) ->
                 Some ex
             | Some (Runtime _) ->
+                print_sexp @@ sexp_of_string ref ;
                 ice "Immediacy checker bug"
             | None ->
                 ice "Resolver bug"

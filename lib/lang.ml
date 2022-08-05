@@ -217,6 +217,7 @@ functor
                     "Expected struct type. TODO: make this compile-time error."
               )
             | _ ->
+                print_sexp @@ sexp_of_type_ st_ty ;
                 ice "Expected struct type. TODO: make this compile-time error."
           in
           (* Check if field names are correct *)
@@ -796,25 +797,61 @@ functor
         method build_program _env _stmts = {program with bindings = s#bindings}
 
         method build_struct_constructor _env id fields =
+          let check_fields st_ty fields_expected fields_actual =
+            List.filter_map fields_expected
+              ~f:(fun (n1, {field_type = expected_type}) ->
+                match
+                  List.find fields_actual ~f:(fun (n2, _) ->
+                      String.equal n1.value n2.value )
+                with
+                | Some (_, actual_expr) -> (
+                  match s#check_type ~expected:expected_type actual_expr with
+                  | Ok _ ->
+                      Some (n1, actual_expr)
+                  | Error (NeedFromCall func) ->
+                      let s = FunctionCall (func, [actual_expr]) in
+                      Some (n1, {value = s; span = actual_expr.span})
+                  | _ ->
+                      errors#report `Error
+                        (`TypeError
+                          ( expected_type,
+                            type_of program actual_expr,
+                            actual_expr.span ) )
+                        () ;
+                      None )
+                | None ->
+                    errors#report `Error (`MissingField (st_ty, n1, n1.span)) () ;
+                    None )
+          in
           match id.value with
           | ResolvedReference
-              (_, ({value = Value (Type (StructType _)); _} as ty)) ->
-              (ty, List.map fields ~f:(fun (name, expr) -> (name.value, expr)))
-          | Value (Type (StructType _)) ->
-              ( id,
-                List.map fields ~f:(fun (name, expr) ->
-                    (Syntax.value name, expr) ) )
-          | ResolvedReference
-              (_, ({value = Value (Type (StructSig _)); _} as ty)) ->
-              ( ty,
-                List.map fields ~f:(fun (name, expr) ->
-                    (Syntax.value name, expr) ) )
+              (_, ({value = Value (Type (StructType s as st_ty)); _} as ty)) ->
+              let struct_ = Program.get_struct program s in
+              let fields =
+                check_fields st_ty struct_.struct_fields fields
+                |> List.map ~f:(fun (name, expr) -> (name.value, expr))
+              in
+              (ty, fields)
+          | Value (Type (StructType s as st_ty)) ->
+              let struct_ = Program.get_struct program s in
+              let fields =
+                check_fields st_ty struct_.struct_fields fields
+                |> List.map ~f:(fun (name, expr) -> (name.value, expr))
+              in
+              (id, fields)
           | _ -> (
             match type_of program id with
-            | StructSig _ ->
-                ( id,
-                  List.map fields ~f:(fun (name, expr) ->
-                      (Syntax.value name, expr) ) )
+            | StructSig sign ->
+                let struct_sign = Arena.get program.struct_signs sign in
+                let expected_fields =
+                  List.Assoc.map struct_sign.st_sig_fields ~f:(fun x ->
+                      {field_type = expr_to_type program x} )
+                in
+                let fields =
+                  check_fields (ExprType id) expected_fields fields
+                  |> List.map ~f:(fun (name, expr) -> (name.value, expr))
+                in
+                (id, fields)
             | _ ->
                 errors#report `Error (`IsNotStruct id) () ;
                 ({value = Value Void; span = id.span}, []) )

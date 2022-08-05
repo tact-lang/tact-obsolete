@@ -35,35 +35,28 @@ struct Slice {
     let output = builtin_load_int(self.s, bits);
     let slice = Self { s: output.value1 };
     let int = output.value2;
-    LoadResult[Integer] { slice: slice, value: int }
+    LoadResult[Integer] { slice: believe_me(slice), value: int }
   }
 
   fn load_uint(self: Self, bits: Integer) -> LoadResult[Integer] {
     let output = builtin_load_uint(self.s, bits);
     let slice = Self { s: output.value1 };
     let int = output.value2;
-    LoadResult[Integer] { slice: slice, value: int }
-  }
-
-  fn load_bits(self: Self, bits: Integer) -> LoadResult[Self] {
-    let output = builtin_load_bits(self.s, bits);
-    let slice = Self { s: output.value1 };
-    let slice2 = Self { s: output.value2 };
-    LoadResult[Self] { slice: slice, value: slice2 }
+    LoadResult[Integer] { slice: believe_me(slice), value: int }
   }
 
   fn load_coins(self: Self) -> LoadResult[Integer] {
     let output = builtin_load_coins(self.s);
     let slice = Self { s: output.value1 };
-    let coins = Self { s: output.value2 };
-    LoadResult[Integer] { slice: slice, value: coins }
+    let coins = output.value2 ;
+    LoadResult[Integer] { slice: believe_me(slice), value: coins }
   }
 
   fn load_ref(self: Self) -> LoadResult[Cell] {
     let output = builtin_load_ref(self.s);
     let slice = Self { s: output.value1 };
     let ref = Cell { c: output.value2 };
-    LoadResult[Cell] { slice: slice, value: ref }
+    LoadResult[Cell] { slice: believe_me(slice), value: ref }
   }
 
   /* Developer notes: if you add `LoadResult[...]` type, don't forget to
@@ -72,6 +65,14 @@ struct Slice {
   fn refs_count(self: Self) -> Integer {
     builtin_slice_refs(self.s)
   }
+}
+
+/* TODO: make this as method. */
+fn slice_load_bits(slice: Slice, bits: Integer) -> LoadResult[Slice] {
+  let output = builtin_load_bits(slice.s, bits);
+  let slice = Slice { s: output.value1 };
+  let slice2 = Slice { s: output.value2 };
+  LoadResult[Slice] { slice: slice, value: slice2 }
 }
 
 struct RefCell {
@@ -90,7 +91,7 @@ struct SliceBits[N: Integer] {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      let {slice, value} = s.load_bits(N);
+      let {slice, value} = slice_load_bits(s, N);
       LoadResult[Self].new(Self { inner: value }, slice)
     } 
   }
@@ -445,10 +446,11 @@ struct IntMsgInfoRelaxed {
     dst: MsgAddressInt,
     coins: IntMsgInfoCoins,
   ) -> Self {
+    let src: MsgAddressExt = AddrNone{};
     Self {
       flags: flags,
       addresses: IntMsgInfoRelaxedAddresses {
-        src: AddressStd.new(0, 0), // it will be replaced by smartcontract address by TVM
+        src: src, // it will be replaced by smartcontract address by TVM
         dst: dst,
       },
       coins: coins,
@@ -501,15 +503,16 @@ struct Message[X: Deserialize] {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      let res_info = CommonMsgInfo.deserialize(s);
-      let res_init = res_info.slice.load_int(1);
+      let {slice, value as info} = CommonMsgInfo.deserialize(s);
+      let {slice, value as init} = slice.load_int(1);
 
-      if (builtin_equal(res_init.value, 0)) {
-        let res_body_discr = res_init.slice.load_int(1);
-        if (builtin_equal(res_body_discr.value, 0)) {
-          let body = X.deserialize(res_body_discr.slice);
-          let mes = Self { info: res_info.value, body: body.value };
-          return LoadResult[Self].new(body.slice, mes);
+      if (builtin_equal(init, 0)) {
+        let {slice, value as discr} = slice.load_int(1);
+        if (builtin_equal(discr, 0)) {
+          let {slice, value as body} = X.deserialize(slice);
+          // FIXME: weird bug
+          let mes = Self { info: info, body: believe_me(body) };
+          return LoadResult[Self].new(mes, slice);
         } else {
           /* TODO: cells */
         }

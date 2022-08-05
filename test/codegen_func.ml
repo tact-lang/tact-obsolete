@@ -174,6 +174,15 @@ let%expect_test "Int[bits] serializer codegen" =
        builder builtin_begin_cell() {
          return begin_cell();
        }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
+       }
        _ throw(int n) {
          return builtin_throw(n);
        }
@@ -309,6 +318,15 @@ let%expect_test "demo struct serializer" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
        }
        _ throw(int n) {
          return builtin_throw(n);
@@ -456,6 +474,15 @@ let%expect_test "demo struct serializer 2" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
        }
        _ throw(int n) {
          return builtin_throw(n);
@@ -659,6 +686,15 @@ let%expect_test "serializer inner struct" =
        builder builtin_begin_cell() {
          return begin_cell();
        }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
+       }
        _ throw(int n) {
          return builtin_throw(n);
        }
@@ -825,6 +861,15 @@ let%expect_test "switch statement" =
        builder builtin_begin_cell() {
          return begin_cell();
        }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
+       }
        _ throw(int n) {
          return builtin_throw(n);
        }
@@ -963,6 +1008,15 @@ let%expect_test "tensor2" =
        builder builtin_begin_cell() {
          return begin_cell();
        }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
+       }
        _ throw(int n) {
          return builtin_throw(n);
        }
@@ -1094,6 +1148,15 @@ let%expect_test "serialization api" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
+       }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
        }
        _ throw(int n) {
          return builtin_throw(n);
@@ -1461,6 +1524,15 @@ let%expect_test "deserialization api" =
        builder builtin_begin_cell() {
          return begin_cell();
        }
+       _ believe_me(_ x) {
+         return x;
+       }
+       [slice, slice] slice_load_bits(slice slice_, int bits) {
+         (slice, slice) output = builtin_load_bits(slice_, bits);
+         slice slice_ = tensor2_value1(output);
+         slice slice2 = tensor2_value2(output);
+         return [slice_, slice2];
+       }
        _ throw(int n) {
          return builtin_throw(n);
        }
@@ -1483,13 +1555,13 @@ let%expect_test "deserialization api" =
          (slice, int) output = builtin_load_uint(self, bits);
          slice slice_ = tensor2_value1(output);
          int int_ = tensor2_value2(output);
-         return [slice_, int_];
+         return [believe_me(slice_), int_];
        }
        [slice, int] f12(slice self, int bits) {
          (slice, int) output = builtin_load_int(self, bits);
          slice slice_ = tensor2_value1(output);
          int int_ = tensor2_value2(output);
-         return [slice_, int_];
+         return [believe_me(slice_), int_];
        }
        [slice, int] f11(slice s) {
          [slice, int] res = f12(s, 9);
@@ -1597,7 +1669,7 @@ let%expect_test "deserialization api" =
          (slice, int) output = builtin_load_coins(self);
          slice slice_ = tensor2_value1(output);
          int coins = tensor2_value2(output);
-         return [slice_, coins];
+         return [believe_me(slice_), coins];
        }
        [slice, int] f27(slice s, int v) {
          return [s, v];
@@ -1707,17 +1779,17 @@ let%expect_test "deserialization api" =
          return [s, v];
        }
        [slice, [tuple, []]] f2(slice s) {
-         [slice, tuple] res_info = f3(s);
-         [slice, int] res_init = f12(first(res_info), 1);
-         if (builtin_equal(second(res_init), 0)) {
-         [slice, int] res_body_discr = f12(first(res_init), 1);
-       if (builtin_equal(second(res_body_discr), 0))
+         [slice slice_, tuple info] = f3(s);
+         [slice slice_, int init] = f12(slice_, 1);
+         if (builtin_equal(init, 0)) {
+         [slice slice_, int discr] = f12(slice_, 1);
+       if (builtin_equal(discr, 0))
        {
-         [slice, []] body = f42(first(res_body_discr));
-       [tuple, [tuple, []]] mes =
-       [second(res_info), second(body)];
+         [slice slice_, [] body] = f42(slice_);
+       [tuple, _] mes =
+       [info, believe_me(body)];
        return
-       f44(first(body), mes);
+       f44(mes, slice_);
        } else
        {
          }} else
@@ -1896,6 +1968,15 @@ let%expect_test "deserializer" =
     builder builtin_begin_cell() {
       return begin_cell();
     }
+    _ believe_me(_ x) {
+      return x;
+    }
+    [slice, slice] slice_load_bits(slice slice_, int bits) {
+      (slice, slice) output = builtin_load_bits(slice_, bits);
+      slice slice_ = tensor2_value1(output);
+      slice slice2 = tensor2_value2(output);
+      return [slice_, slice2];
+    }
     _ throw(int n) {
       return builtin_throw(n);
     }
@@ -1915,7 +1996,7 @@ let%expect_test "deserializer" =
       (slice, int) output = builtin_load_int(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
-      return [slice_, int_];
+      return [believe_me(slice_), int_];
     }
     [slice, int] f1(slice s) {
       [slice, int] res = f2(s, 9);
@@ -2038,6 +2119,15 @@ let%expect_test "deserializer unions" =
     builder builtin_begin_cell() {
       return begin_cell();
     }
+    _ believe_me(_ x) {
+      return x;
+    }
+    [slice, slice] slice_load_bits(slice slice_, int bits) {
+      (slice, slice) output = builtin_load_bits(slice_, bits);
+      slice slice_ = tensor2_value1(output);
+      slice slice2 = tensor2_value2(output);
+      return [slice_, slice2];
+    }
     _ throw(int n) {
       return builtin_throw(n);
     }
@@ -2057,13 +2147,13 @@ let%expect_test "deserializer unions" =
       (slice, int) output = builtin_load_uint(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
-      return [slice_, int_];
+      return [believe_me(slice_), int_];
     }
     [slice, int] f3(slice self, int bits) {
       (slice, int) output = builtin_load_int(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
-      return [slice_, int_];
+      return [believe_me(slice_), int_];
     }
     [slice, int] f2(slice s) {
       [slice, int] res = f3(s, 9);
@@ -2346,6 +2436,15 @@ let%expect_test "codegen while block" =
     builder builtin_begin_cell() {
       return begin_cell();
     }
+    _ believe_me(_ x) {
+      return x;
+    }
+    [slice, slice] slice_load_bits(slice slice_, int bits) {
+      (slice, slice) output = builtin_load_bits(slice_, bits);
+      slice slice_ = tensor2_value1(output);
+      slice slice2 = tensor2_value2(output);
+      return [slice_, slice2];
+    }
     _ throw(int n) {
       return builtin_throw(n);
     }
@@ -2363,122 +2462,119 @@ let%expect_test "codegen while block" =
     }
     _ recv_internal(slice _) {
     }
-    [slice, slice] f5(slice self, int bits) {
-      (slice, slice) output = builtin_load_bits(self, bits);
-      slice slice_ = tensor2_value1(output);
-      slice slice2 = tensor2_value2(output);
-      return [slice_, slice2];
-    }
-    [slice, slice] f6(slice s, slice v) {
+    [slice, slice] f5(slice s, slice v) {
       return [s, v];
     }
     [slice, slice] f4(slice s) {
-      [slice slice_, slice value] = f5(s, 512);
-      return f6(value, slice_);
+      [slice slice_, slice value] = slice_load_bits(s, 512);
+      return f5(value, slice_);
     }
-    [slice, [slice, slice]] f7(slice s, [slice, slice] v) {
+    [slice, [slice, slice]] f6(slice s, [slice, slice] v) {
       return [s, v];
     }
     [slice, [slice, slice]] f3(slice s) {
       [slice slice_, slice sig] = f4(s);
-      return f7([sig, slice_], slice_);
+      return f6([sig, slice_], slice_);
     }
-    [slice, int] f11(slice self, int bits) {
+    [slice, int] f10(slice self, int bits) {
       (slice, int) output = builtin_load_uint(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
-      return [slice_, int_];
+      return [believe_me(slice_), int_];
     }
-    [slice, int] f10(slice s) {
-      [slice, int] res = f11(s, 32);
+    [slice, int] f9(slice s) {
+      [slice, int] res = f10(s, 32);
       return [first(res), second(res)];
     }
-    [slice, [int, int, int]] f9(slice slice_) {
-      [slice slice_, int subwallet] = f10(slice_);
-      [slice slice_, int valid_until] = f10(slice_);
-      [slice slice_, int seqno] = f10(slice_);
+    [slice, [int, int, int]] f8(slice slice_) {
+      [slice slice_, int subwallet] = f9(slice_);
+      [slice slice_, int valid_until] = f9(slice_);
+      [slice slice_, int seqno] = f9(slice_);
       return [[subwallet, valid_until, seqno], slice_];
     }
-    [slice, [int, int, int]] f8(slice s) {
-      return f9(s);
+    [slice, [int, int, int]] f7(slice s) {
+      return f8(s);
     }
-    [slice, slice] f13(slice s, slice v) {
+    [slice, slice] f12(slice s, slice v) {
       return [s, v];
     }
-    [slice, slice] f12(slice s) {
+    [slice, slice] f11(slice s) {
       slice empty_slice = builtin_slice_last(s, 0);
-      return f13(s, empty_slice);
+      return f12(s, empty_slice);
     }
     [slice, [[slice, slice], [int, int, int], slice]] f2(slice slice_) {
       [slice slice_, [slice, slice] signature] = f3(slice_);
-      [slice slice_, [int, int, int] data] = f8(slice_);
-      [slice slice_, slice rest] = f12(slice_);
+      [slice slice_, [int, int, int] data] = f7(slice_);
+      [slice slice_, slice rest] = f11(slice_);
       return [[signature, data, rest], slice_];
     }
     [slice, [[slice, slice], [int, int, int], slice]] f1(slice s) {
       return f2(s);
     }
-    slice f14(cell cell_) {
+    slice f13(cell cell_) {
       return builtin_begin_parse(cell_);
     }
-    [slice, int] f17(slice s) {
-      [slice, int] res = f11(s, 256);
+    [slice, int] f16(slice s) {
+      [slice, int] res = f10(s, 256);
       return [first(res), second(res)];
     }
-    [slice, [int, int, int]] f16(slice slice_) {
-      [slice slice_, int seqno] = f10(slice_);
-      [slice slice_, int subwallet] = f10(slice_);
-      [slice slice_, int public_key] = f17(slice_);
+    [slice, [int, int, int]] f15(slice slice_) {
+      [slice slice_, int seqno] = f9(slice_);
+      [slice slice_, int subwallet] = f9(slice_);
+      [slice slice_, int public_key] = f16(slice_);
       return [[seqno, subwallet, public_key], slice_];
     }
-    [slice, [int, int, int]] f15(slice s) {
-      return f16(s);
+    [slice, [int, int, int]] f14(slice s) {
+      return f15(s);
     }
-    int f18([slice, slice] self, int public_key) {
+    int f17([slice, slice] self, int public_key) {
       return
         is_signature_valid(hash_of_slice(second(self)), first(self), public_key);
     }
-    [slice, cell] f22(slice self) {
+    [slice, cell] f21(slice self) {
       (slice, cell) output = builtin_load_ref(self);
       slice slice_ = tensor2_value1(output);
       cell ref = tensor2_value2(output);
-      return [slice_, ref];
+      return [believe_me(slice_), ref];
     }
-    [slice, cell] f23(slice s, cell v) {
+    [slice, cell] f22(slice s, cell v) {
       return [s, v];
     }
-    [slice, cell] f21(slice s) {
-      [slice slice_, cell value] = f22(s);
-      return f23(value, slice_);
+    [slice, cell] f20(slice s) {
+      [slice slice_, cell value] = f21(s);
+      return f22(value, slice_);
     }
-    [slice, int] f27(slice self, int bits) {
+    [slice, int] f26(slice self, int bits) {
       (slice, int) output = builtin_load_int(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
-      return [slice_, int_];
+      return [believe_me(slice_), int_];
     }
-    [slice, int] f26(slice s) {
-      [slice, int] res = f27(s, 8);
+    [slice, int] f25(slice s) {
+      [slice, int] res = f26(s, 8);
       [slice slice_, int value] = res;
       return [slice_, value];
     }
-    [slice, int] f25(slice slice_) {
-      [slice slice_, int value] = f26(slice_);
+    [slice, int] f24(slice slice_) {
+      [slice slice_, int value] = f25(slice_);
       return [value, slice_];
     }
-    [slice, int] f24(slice s) {
-      return f25(s);
+    [slice, int] f23(slice s) {
+      return f24(s);
     }
-    [slice, [cell, int]] f20(slice slice_) {
-      [slice slice_, cell cell_] = f21(slice_);
-      [slice slice_, int flags] = f24(slice_);
+    [slice, [cell, int]] f19(slice slice_) {
+      [slice slice_, cell cell_] = f20(slice_);
+      [slice slice_, int flags] = f23(slice_);
       return [[cell_, flags], slice_];
     }
-    [slice, [cell, int]] f19(slice s) {
-      return f20(s);
+    [slice, [cell, int]] f18(slice s) {
+      return f19(s);
     }
-    int f28(slice self) {
+    int f27(slice self) {
       return builtin_slice_refs(self);
+    }
+    int f28(int i) {
+      return i;
     }
     builder f29() {
       return builtin_begin_cell();
@@ -2507,24 +2603,24 @@ let%expect_test "codegen while block" =
     _ recv_external(slice input) {
       [[slice, slice], [int, int, int], slice] body = second(f1(input));
       [int, int, int] data = second(body);
-      [int, int, int] state = second(f15(f14(builtin_load_data())));
+      [int, int, int] state = second(f14(f13(builtin_load_data())));
       if (builtin_less_or_equal(second(data), builtin_now())) {
       throw(35);
     }  if (builtin_not_equal(third(data), first(state))) {
       throw(33);
     }  if (builtin_not_equal(first(data), second(state))) {
       throw(34);
-    }  if (builtin_not(f18(first(body), third(state)))) {
+    }  if (builtin_not(f17(first(body), third(state)))) {
       throw(35);
     }  builtin_accept_message();
       slice slice_ = third(body);
-      while (builtin_not_equal(f28(slice_), 0)) {
-      [slice new_slice, [cell, int] next] = f19(slice_);
+      while (builtin_not_equal(f27(slice_), 0)) {
+      [slice new_slice, [cell, int] next] = f18(slice_);
     slice_ =
     new_slice;
     send_raw_msg(first(next), second(next));
     }  [int, int, int] new_state =
-         [builtin_add(first(state), 1), second(state), third(state)];
+         [f28(builtin_add(first(state), 1)), second(state), third(state)];
       cell new_state = f35(f30(new_state, f29()));
       return builtin_set_data(new_state);
     } |}]

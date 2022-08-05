@@ -1263,7 +1263,10 @@ let%expect_test "Deserialize Unions" =
                              (Value
                               (Struct
                                ((Value (Type (StructType 5)))
-                                ((slice (Reference (slice (StructType 7))))
+                                ((slice
+                                  (FunctionCall
+                                   ((ResolvedReference (believe_me <opaque>))
+                                    ((Reference (slice (StructType 7)))))))
                                  (value (Reference (int IntegerType)))))))))))))))
                      ((Reference (slice (StructType 7))) (Value (Integer 1))))))))
                 (If
@@ -1387,7 +1390,11 @@ let%expect_test "Deserialize Unions" =
                                    (Value
                                     (Struct
                                      ((Value (Type (StructType 5)))
-                                      ((slice (Reference (slice (StructType 7))))
+                                      ((slice
+                                        (FunctionCall
+                                         ((ResolvedReference
+                                           (believe_me <opaque>))
+                                          ((Reference (slice (StructType 7)))))))
                                        (value (Reference (int IntegerType)))))))))))))))
                            ((StructField
                              ((Reference (res_discr (StructType 5))) slice

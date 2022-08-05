@@ -727,6 +727,20 @@ functor
         {p with bindings = p.bindings @ make_bindings builtins}
     end
 
+    let believe_me_fn =
+      let function_signature =
+        bl
+          { function_attributes = [];
+            function_params = [(bl "x", HoleType)];
+            function_returns = HoleType }
+      in
+      Value
+        (Function
+           (bl
+              { function_signature;
+                function_impl =
+                  Fn (bl @@ Return (bl @@ Reference (bl "x", HoleType))) } ) )
+
     let add_default_bindings p =
       let bs =
         make_bindings
@@ -742,7 +756,8 @@ functor
             ("Serialize", Value (Type (InterfaceType serialize_intf_id)));
             ("Deserialize", Value (Type (InterfaceType deserialize_intf_id)));
             ("LoadResult", load_result_func p.struct_signs);
-            ("From", from_intf_) ]
+            ("From", from_intf_);
+            ("believe_me", believe_me_fn) ]
       in
       {p with bindings = p.bindings @ bs}
 
