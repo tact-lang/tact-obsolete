@@ -177,13 +177,113 @@ module Make (Config : Config.T) = struct
     |>> fun x -> Let x )
       state
 
+  (* TODO: let {x, ..} = 123; does not work *)
+  and destructing_let_stmt state =
+    let destructung_binding state =
+      let bind state =
+        pipe2 (locate ident)
+          (option (skip_keyword "as" >>> locate ident))
+          (fun id1 id2 ->
+            match id2 with Some id2 -> (id1, id2) | None -> (id1, id1) )
+          state
+      in
+      ( char '{'
+      >>> ( attempt (locate (comma_sep !!bind) |>> fun x -> (x, false))
+          <|> pipe2
+                (locate (comma_sep !!bind))
+                !!(string "..")
+                (fun x _ -> (x, true)) )
+      <<< char '}' )
+        state
+    in
+    ( locate
+        ( skip_keyword "let"
+        >>> pipe2
+              (destructung_binding <<< char '=')
+              (locate expr)
+              (fun (destructuring_binding, destructuring_binding_rest)
+                   destructuring_binding_expr ->
+                { destructuring_binding;
+                  destructuring_binding_rest;
+                  destructuring_binding_expr } ) )
+    |>> fun x -> DestructuringLet x )
+      state
+
+  and block_stmt state = (char '{' >>> many (locate stmt) <<< char '}') state
+
+  and code_block state = (block_stmt |>> fun stmts -> CodeBlock stmts) state
+
+  (* SWITCH stmt *)
+  and switch_branch state =
+    ( skip_keyword "case"
+    >>> pipe3 (locate expr)
+          (locate ident <<< skip_string "=>")
+          (locate code_block)
+          (fun ty var stmt -> {ty; var; stmt}) )
+      state
+
+  and default_branch state =
+    (skip_keyword "else" >>> skip_string "=>" >>> code_block) state
+
+  and switch state =
+    ( skip_keyword "switch"
+    >>> pipe2
+          (char '(' >>> locate expr <<< char ')')
+          ( char '{'
+          >>> pipe2
+                (many (locate switch_branch))
+                (option default_branch)
+                (fun x y -> (x, y))
+          <<< char '}' )
+          (fun switch_condition (branches, default) ->
+            Switch {switch_condition; branches; default} ) )
+      state
+
+  (* WHILE expr *)
+  and while_loop state =
+    ( skip_keyword "while"
+    >>> pipe2
+          (char '(' >>> locate expr <<< char ')')
+          (locate code_block)
+          (fun while_cond while_body -> WhileLoop {while_cond; while_body}) )
+      state
+
+  (* IF-ELSE expr *)
+  and if_expr state =
+    ( skip_keyword "if"
+    >>> pipe3
+          (char '(' >>> locate expr <<< char ')')
+          (locate code_block)
+          (option (skip_keyword "else" >>> locate code_block))
+          (fun condition body else_ -> {condition; body; else_}) )
+      state
+
+  and if_stmt state = (if_expr |>> fun x -> If x) state
+
+  (* RETURN expr *)
+  and return_expr state =
+    (skip_keyword "return" >>> locate expr |>> fun x -> Return x) state
+
+  (* ASSIGNMENT expr *)
+  and assignment_stmt state =
+    (pipe3 (locate ident)
+       !!(char '=')
+       (locate expr)
+       (fun assignment_ident _ assignment_expr ->
+         Assignment {assignment_ident; assignment_expr} ) )
+      state
+
+  and stmt_expr state = (locate expr |>> fun e -> Expr e) state
+
+  and semicolon_stmt state =
+    ( destructing_let_stmt <|> return_expr <|> attempt assignment_stmt
+    <|> stmt_expr <<< char ';' )
+      state
+
   and stmt state =
-    ( (* any statement can have leading whitespace *) whitespace
-    >> ( (* `let` statement *)
-         let_ <|> (* `struct` statement *) attempt struct_stmt
-       <|> (* `struct` statement *) struct_stmt
-       <|> (* any expression is also a statement *)
-       (locate expr <<< (skip_char ';' <|> eof) |>> fun e -> Expr e) ) )
+    ( whitespace
+    >> ( attempt let_ <|> attempt struct_stmt <|> switch <|> while_loop
+       <|> semicolon_stmt <|> if_stmt <|> code_block ) )
       state
 
   and program state = (many !!stmt << eof) state
