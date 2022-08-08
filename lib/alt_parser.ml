@@ -4,7 +4,6 @@ module Make (Config : Config.T) = struct
   module Syntax = Syntax.Make (Config)
   open Syntax
 
-  (* TODO: review for correctness *)
   let locate value =
     pipe3 get_pos value get_pos
       (fun (_index0, _line0, _column0) value (_index, _line, _column) ->
@@ -13,11 +12,11 @@ module Make (Config : Config.T) = struct
             ( { pos_fname = "";
                 pos_lnum = _line0;
                 pos_bol = _column0;
-                pos_cnum = _column0 },
+                pos_cnum = _index0 },
               { pos_fname = "";
                 pos_lnum = _line;
                 pos_bol = _column;
-                pos_cnum = _column } )
+                pos_cnum = _index } )
           () )
 
   let many_chars_starting_with lead p =
