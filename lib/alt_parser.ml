@@ -35,7 +35,8 @@ module Make (Config : Config.T) = struct
     ( skip_string "/*"
     >> skip_many_until
          (comment_block <|> skip any_char_or_nl)
-         (skip_string "*/") )
+         (skip_string "*/") 
+         <?> "block comment")
       state
 
   let whitespace = skip_many (comment_line <|> comment_block <|> spaces1)
