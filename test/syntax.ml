@@ -112,11 +112,13 @@ let%expect_test "struct construction" =
                (((field_name (Ident a))
                  (field_type
                   (FunctionCall
-                   ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
+                   ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                    (is_type_func_call)))))
                 ((field_name (Ident b))
                  (field_type
                   (FunctionCall
-                   ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))
+                   ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                    (is_type_func_call)))))))
               (struct_span <opaque>))))))
          (Let
           ((binding_name (Ident my))
@@ -163,7 +165,8 @@ let%expect_test "struct fields" =
              (((field_name (Ident a))
                (field_type
                 (FunctionCall
-                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
+                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                  (is_type_func_call)))))
               ((field_name (Ident f))
                (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))
             (struct_span <opaque>))))))))) |}]
@@ -184,7 +187,8 @@ let%expect_test "struct fields with semicolons" =
              (((field_name (Ident a))
                (field_type
                 (FunctionCall
-                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))
+                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                  (is_type_func_call)))))
               ((field_name (Ident f))
                (field_type (FunctionCall ((fn (Reference (Ident get_type)))))))))
             (struct_span <opaque>))))))))) |}]
@@ -218,7 +222,8 @@ let%expect_test "struct methods" =
                 (Function
                  ((returns
                    (FunctionCall
-                    ((fn (Reference (Ident Int))) (arguments ((Int 257))))))
+                    ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                     (is_type_func_call))))
                   (function_def_span <opaque>)))))))
             (struct_span <opaque>))))))))) |}]
 
@@ -243,7 +248,8 @@ let%expect_test "struct with fields and methods" =
              (((field_name (Ident a))
                (field_type
                 (FunctionCall
-                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))
+                 ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                  (is_type_func_call)))))))
             (struct_bindings
              (((binding_name (Ident test))
                (binding_expr
@@ -308,7 +314,8 @@ let%expect_test "function without a return type" =
            ((params
              (((Ident t)
                (FunctionCall
-                ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
+                ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                 (is_type_func_call))))))
             (function_def_span <opaque>))))))
        (Let
         ((binding_name (Ident f2))
@@ -317,7 +324,8 @@ let%expect_test "function without a return type" =
            ((params
              (((Ident t)
                (FunctionCall
-                ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
+                ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                 (is_type_func_call))))))
             (function_body ((function_stmt (CodeBlock ()))))
             (function_def_span <opaque>))))))
        (Let
@@ -327,7 +335,8 @@ let%expect_test "function without a return type" =
            ((params
              (((Ident t)
                (FunctionCall
-                ((fn (Reference (Ident Int))) (arguments ((Int 257))))))))
+                ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                 (is_type_func_call))))))
             (function_body ((function_stmt (CodeBlock ()))))
             (function_def_span <opaque>))))))))) |}]
 
@@ -586,7 +595,8 @@ let%expect_test "struct construction over an anonymous type" =
                 (((field_name (Ident field))
                   (field_type
                    (FunctionCall
-                    ((fn (Reference (Ident Int))) (arguments ((Int 257)))))))))
+                    ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                     (is_type_func_call)))))))
                (struct_span <opaque>))))
             (fields_construction (((Ident field) (Reference (Ident value))))))))))))) |}]
 
@@ -733,7 +743,8 @@ let%expect_test "union definition" =
           (Union
            ((union_members
              ((FunctionCall
-               ((fn (Reference (Ident Int))) (arguments ((Int 257)))))
+               ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                (is_type_func_call)))
               (Reference (Ident Bool))))
             (union_span <opaque>))))))))) |}]
 
@@ -756,7 +767,8 @@ let%expect_test "union definition using let binding" =
           (Union
            ((union_members
              ((FunctionCall
-               ((fn (Reference (Ident Int))) (arguments ((Int 257)))))
+               ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                (is_type_func_call)))
               (Reference (Ident Bool))))
             (union_span <opaque>))))))))) |}]
 
@@ -997,7 +1009,8 @@ let%expect_test "switch statement with a default case" =
                        (((ty
                           (FunctionCall
                            ((fn (Reference (Ident Type)))
-                            (arguments ((Reference (Ident T)))))))
+                            (arguments ((Reference (Ident T))))
+                            (is_type_func_call))))
                          (var (Ident vax))
                          (stmt
                           (CodeBlock

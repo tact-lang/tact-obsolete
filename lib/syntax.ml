@@ -39,7 +39,9 @@ functor
         interface_members : binding located list [@sexp.list] }
 
     and function_call =
-      {fn : expr located; arguments : expr located list [@sexp.list]}
+      { fn : expr located;
+        arguments : expr located list; [@sexp.list]
+        is_type_func_call : bool [@sexp.bool] }
 
     and method_call =
       { receiver : expr located;

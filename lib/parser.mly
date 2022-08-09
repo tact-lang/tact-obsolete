@@ -43,7 +43,8 @@
                               ~function_body: (make_function_body ~function_stmt:({value=Return (expr); span = expr.span}) ()) 
                               ()
                     )) ();
-      arguments = [expr]
+      arguments = [expr];
+      is_type_func_call = false
     }) ()
 
 %}
@@ -250,10 +251,10 @@ let function_param ==
 let function_call :=
   | fn = located(fexpr);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
-  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments () ~is_type_func_call:false) }
   | fn = located(fexpr);
   arguments = delimited_separated_trailing_list(LBRACKET, located(expr), COMMA, RBRACKET);
-  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments () ~is_type_func_call:true) }
 
 
 let else_ :=

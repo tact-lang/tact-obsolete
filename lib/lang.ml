@@ -112,7 +112,7 @@ functor
 
         method build_Function _env fn = MkFunction fn
 
-        method build_FunctionCall _env (f, args) =
+        method build_FunctionCall _env (f, args, _is_type_fn) =
           let span =
             merge_spans f.span (merge_spans_list @@ List.map args ~f:span)
           in
@@ -498,7 +498,7 @@ functor
           | _ ->
               mk_err ()
 
-        method build_function_call _env fn args = (fn, args)
+        method build_function_call _env fn args is_ty = (fn, args, is_ty)
 
         method build_method_call _env in_receiver fn args =
           let dummy : expr_kind =
