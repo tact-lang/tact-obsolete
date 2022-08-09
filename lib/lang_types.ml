@@ -319,7 +319,7 @@ functor
 
     and function_impl = Fn of stmt | BuiltinFn of builtin_fn
 
-    and function_call = expr * expr list
+    and function_call = expr * expr list * (bool[@sexp.bool])
 
     and intf_method_call =
       { intf_instance : expr;
@@ -433,14 +433,15 @@ functor
           type_of_type program t
       | Hole ->
           HoleType
-      | FunctionCall (f, args) -> (
+      | FunctionCall (f, args, is_ty) -> (
           let f' = type_of program f in
           match f' with
           | FunctionType sign ->
               type_of_call
                 ~self_ty:
                   (Some
-                     (ExprType {value = FunctionCall (f, args); span = expr.span}
+                     (ExprType
+                        {value = FunctionCall (f, args, is_ty); span = expr.span}
                      ) )
                 program args sign.value.function_params
                 sign.value.function_returns
@@ -699,7 +700,7 @@ functor
           self#with_arguments [branch_var.value] (fun _ ->
               self#visit_stmt env branch_stmt )
 
-        method! visit_function_call ctx (f, args) =
+        method! visit_function_call ctx (f, args, _) =
           let is_args_immediate = self#visit_list self#visit_expr ctx args in
           let is_f_immediate =
             match self#visit_expr ctx f with

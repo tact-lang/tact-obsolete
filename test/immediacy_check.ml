@@ -212,7 +212,8 @@ let%expect_test "Immediacy Checks Function Call WITHOUT Primitive" =
                                    bl
                                    @@ Expr (bl @@ Reference (bl "arg", VoidType))
                                  ] ) } ) ),
-           [] )
+           [],
+           false )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -242,7 +243,8 @@ let%expect_test "Immediacy Checks Function Call WITH Primitive" =
                                         @@ Primitive
                                              (Prim {name = ""; exprs = []}) ) ]
                             ) } ) ),
-           [] )
+           [],
+           false )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
@@ -288,7 +290,8 @@ let%expect_test "Immediacy Checks Function Call that contains function with \
                             ( bl
                             @@ Block [bl @@ Let [(bl "_", f_with_primitive)]] )
                       } ) ),
-           [] )
+           [],
+           false )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| true |}]
@@ -316,9 +319,11 @@ let%expect_test "Immediacy Checks Function Call that Call function with \
                                  [ bl
                                    @@ Expr
                                         ( bl
-                                        @@ FunctionCall (f_with_primitive, [])
-                                        ) ] ) } ) ),
-           [] )
+                                        @@ FunctionCall
+                                             (f_with_primitive, [], false) ) ]
+                            ) } ) ),
+           [],
+           false )
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
@@ -350,7 +355,7 @@ let%expect_test "Immediacy Checks Struct Sig" =
 let%expect_test "Immediacy Checks Self Type" =
   let scope = [] in
   let expr =
-    bl @@ FunctionCall (bl @@ Value Void, [bl @@ Value (Type SelfType)])
+    bl @@ FunctionCall (bl @@ Value Void, [bl @@ Value (Type SelfType)], false)
   in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]

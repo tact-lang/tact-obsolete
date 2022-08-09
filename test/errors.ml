@@ -276,7 +276,7 @@ let%expect_test "uninterpretable statement" =
                                (ResolvedReference
                                 (((span (pos pos)) (value builtin_begin_cell))
                                  <opaque>))))
-                             ())))))))))))))))))))
+                             () false)))))))))))))))))))
           (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
           (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 

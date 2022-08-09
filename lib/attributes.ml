@@ -24,7 +24,8 @@ functor
               let self_serializer =
                 FunctionCall
                   ( bl @@ Reference (bl "serializer", HoleType),
-                    [bl @@ Value (Type self_ty)] )
+                    [bl @@ Value (Type self_ty)],
+                    false )
               in
               let fun_body =
                 bl
@@ -33,7 +34,8 @@ functor
                      @@ FunctionCall
                           ( bl @@ self_serializer,
                             [ bl @@ Reference (bl "self", self_ty);
-                              bl @@ Reference (bl "b", builder_ty) ] ) )
+                              bl @@ Reference (bl "b", builder_ty) ],
+                            false ) )
               in
               let function_signature =
                 bl
@@ -69,7 +71,8 @@ functor
               let self_deserializer =
                 FunctionCall
                   ( bl @@ Reference (bl "deserializer", HoleType),
-                    [bl @@ Value (Type self_ty)] )
+                    [bl @@ Value (Type self_ty)],
+                    false )
               in
               let fun_body =
                 bl
@@ -77,13 +80,14 @@ functor
                      ( bl
                      @@ FunctionCall
                           ( bl @@ self_deserializer,
-                            [bl @@ Reference (bl "s", slice_ty)] ) )
+                            [bl @@ Reference (bl "s", slice_ty)],
+                            false ) )
               in
               let ret_ty =
                 ExprType
                   ( bl
-                  @@ FunctionCall (load_result_f, [bl @@ Value (Type self_ty)])
-                  )
+                  @@ FunctionCall
+                       (load_result_f, [bl @@ Value (Type self_ty)], false) )
               in
               let function_signature =
                 bl

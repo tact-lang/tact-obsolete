@@ -154,8 +154,8 @@ functor
                         ( bl
                         @@ FunctionCall
                              ( load_result_f,
-                               [bl @@ Reference (bl "Self", SelfType)] ) ) } )
-            ] }
+                               [bl @@ Reference (bl "Self", SelfType)],
+                               true ) ) } ) ] }
       in
       intf
 
@@ -246,7 +246,8 @@ functor
                                                   bl
                                                   @@ Reference
                                                        (bl "b", builder_struct)
-                                                ] ) ) ];
+                                                ],
+                                                false ) ) ];
                                 bl
                                 @@ Return
                                      (bl @@ Reference (bl "b", builder_struct))
@@ -301,8 +302,8 @@ functor
                                                   s.struct_details.uty_id ),
                                          name,
                                          f ) )
-                                  :: [bl @@ Reference (bl "b", builder_struct)]
-                                ) ) ]
+                                  :: [bl @@ Reference (bl "b", builder_struct)],
+                                  false ) ) ]
                      |> bl ) )
         in
         let body =
@@ -355,8 +356,9 @@ functor
                        ExprType
                          ( bl
                          @@ FunctionCall
-                              (load_result_fn, [bl @@ Reference (bl "t", type0)])
-                         ) } ) }
+                              ( load_result_fn,
+                                [bl @@ Reference (bl "t", type0)],
+                                true ) ) } ) }
       in
       let deserializer_struct_ty sid p =
         let s = Program.get_struct p sid in
@@ -391,7 +393,8 @@ functor
               let deserialize_field_expr =
                 FunctionCall
                   ( bl @@ Value (Function field_deserialize_fn),
-                    [bl @@ Reference (bl "slice", slice_ty)] )
+                    [bl @@ Reference (bl "slice", slice_ty)],
+                    false )
               in
               let deserialize_field =
                 bl
@@ -471,7 +474,9 @@ functor
           (* This is a hack to get LoadResult[Integer] type *)
           let res_discr_ty =
             type_of p
-              (bl @@ FunctionCall (m, [bl @@ Value Void; bl @@ Value Void]))
+              ( bl
+              @@ FunctionCall (m, [bl @@ Value Void; bl @@ Value Void], false)
+              )
           in
           bl
           @@ StructField
@@ -499,7 +504,9 @@ functor
                 let fcall =
                   bl
                   @@ FunctionCall
-                       (load_uint_fn, [slice_expr; bl @@ discriminator_len])
+                       ( load_uint_fn,
+                         [slice_expr; bl @@ discriminator_len],
+                         false )
                 in
                 bl @@ Let [(bl "res_discr", fcall)]
               in
@@ -514,7 +521,8 @@ functor
                     ( bl
                     @@ FunctionCall
                          ( get_method slice_ty "load_uint",
-                           [bl @@ Value Void; bl @@ Value Void] ) )
+                           [bl @@ Value Void; bl @@ Value Void],
+                           false ) )
                 in
                 let get_discr =
                   bl
@@ -525,7 +533,9 @@ functor
                 in
                 bl
                 @@ FunctionCall
-                     (eq_fn, [get_discr; bl @@ Value (Integer (Z.of_int disc))])
+                     ( eq_fn,
+                       [get_discr; bl @@ Value (Integer (Z.of_int disc))],
+                       false )
               in
               (* Stmt 3: let res = <CaseTy>.deserialize(res_discr.slice); *)
               let deserialize_stmt =
@@ -533,8 +543,9 @@ functor
                 @@ Let
                      [ ( bl "res",
                          bl
-                         @@ FunctionCall (case_deserialize_fn, [res_discr_slice])
-                       ) ]
+                         @@ FunctionCall
+                              (case_deserialize_fn, [res_discr_slice], false) )
+                     ]
               in
               (* Stmt 4: return <load_result_ty>.new(res.slice, res.value); *)
               let deserialize_out =
@@ -551,7 +562,8 @@ functor
                         @@ StructField
                              ( bl @@ Reference (bl "res", load_result_ty),
                                bl "value",
-                               case_ty ) ] )
+                               case_ty ) ],
+                      true )
                 in
                 bl @@ Return (bl fcall)
               in

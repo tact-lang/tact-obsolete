@@ -112,7 +112,7 @@ functor
 
         method build_Function _env fn = MkFunction fn
 
-        method build_FunctionCall _env (f, args, _is_type_fn) =
+        method build_FunctionCall _env (f, args, is_type_fn) =
           let span =
             merge_spans f.span (merge_spans_list @@ List.map args ~f:span)
           in
@@ -126,7 +126,7 @@ functor
                     | Ok _ ->
                         expr
                     | Error (NeedFromCall func) ->
-                        let s = FunctionCall (func, [expr]) in
+                        let s = FunctionCall (func, [expr], false) in
                         {value = s; span = expr.span}
                     | _ ->
                         errors#report `Error
@@ -138,10 +138,10 @@ functor
               in
               match types_satisfying with
               | Ok args' when !no_errors ->
-                  let fc = (f, args') in
+                  let fc = (f, args', is_type_fn) in
                   if
                     is_immediate_expr !current_bindings program
-                      {value = FunctionCall (f, args'); span}
+                      {value = FunctionCall (f, args', is_type_fn); span}
                   then
                     let fc =
                       let inter = s#make_interpreter span in
@@ -304,7 +304,7 @@ functor
                 | Ok _ ->
                     assignment_expr
                 | Error (NeedFromCall func) ->
-                    let s = FunctionCall (func, [assignment_expr]) in
+                    let s = FunctionCall (func, [assignment_expr], false) in
                     {value = s; span = assignment_expr.span}
                 | _ ->
                     errors#report `Error
@@ -343,7 +343,9 @@ functor
           | Ok _ ->
               Return return
           | Error (NeedFromCall func) ->
-              Return {value = FunctionCall (func, [return]); span = return.span}
+              Return
+                { value = FunctionCall (func, [return], false);
+                  span = return.span }
           | Error (TypeError fn_returns) ->
               errors#report `Error
                 (`TypeError (fn_returns, type_of program return, return.span))
@@ -366,7 +368,8 @@ functor
                   Break
                     { value =
                         Expr
-                          {value = FunctionCall (func, [ex]); span = stmt.span};
+                          { value = FunctionCall (func, [ex], false);
+                            span = stmt.span };
                       span = stmt.span }
               | Error (TypeError fn_returns) ->
                   errors#report `Error
@@ -518,7 +521,8 @@ functor
                                  BuiltinFn (builtin_fun (fun _ _ -> Void)) };
                            span = fn.span } );
                   span = fn.span },
-                [] )
+                [],
+                false )
           in
           let make_call receiver ~mk_args =
             match
@@ -534,7 +538,8 @@ functor
                         ResolvedReference
                           (fn, {value = Value (Function fn'); span});
                       span = fn.span },
-                    mk_args args )
+                    mk_args args,
+                    false (* FIXME: add is_type for methods *) )
             | None ->
                 errors#report `Error (`MethodNotFound (in_receiver, fn)) () ;
                 dummy
@@ -867,7 +872,7 @@ functor
                   | Ok _ ->
                       Some (n1, actual_expr)
                   | Error (NeedFromCall func) ->
-                      let s = FunctionCall (func, [actual_expr]) in
+                      let s = FunctionCall (func, [actual_expr], false) in
                       Some (n1, {value = s; span = actual_expr.span})
                   | _ ->
                       errors#report `Error
@@ -1197,7 +1202,8 @@ functor
                       FunctionCall
                         ( from_intf,
                           [ { value = Value (Type (ExprType case));
-                              span = case.span } ] );
+                              span = case.span } ],
+                          false );
                     span = case.span }
                 in
                 { mk_impl_attributes = [];
