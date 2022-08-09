@@ -120,6 +120,7 @@ functor
     and function_definition =
       { function_attributes : attribute list; [@sexp.list]
         name : ident located option; [@sexp.option]
+        is_type_function : bool; [@sexp.bool]
         params : function_param located list; [@sexp.list]
         returns : expr located option; [@sexp.option]
         function_body : function_body option; [@sexp.option]

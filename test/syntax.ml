@@ -137,7 +137,7 @@ let%expect_test "parameterized struct shorthand" =
         ((binding_name (Ident MyType))
          (binding_expr
           (Function
-           ((params (((Ident T) (Reference (Ident Type)))))
+           ((is_type_function) (params (((Ident T) (Reference (Ident Type)))))
             (function_body
              ((function_stmt (Expr (Struct ((struct_span <opaque>)))))))
             (function_def_span <opaque>))))))))) |}]
@@ -608,7 +608,8 @@ let%expect_test "struct construction over an anonymous type's function call" =
              (FunctionCall
               ((fn
                 (Function
-                 ((params (((Ident T) (Reference (Ident Type)))))
+                 ((is_type_function)
+                  (params (((Ident T) (Reference (Ident Type)))))
                   (function_body
                    ((function_stmt
                      (Expr
@@ -776,7 +777,7 @@ let%expect_test "parameterized union definition" =
         ((binding_name (Ident Option))
          (binding_expr
           (Function
-           ((params (((Ident T) (Reference (Ident Type)))))
+           ((is_type_function) (params (((Ident T) (Reference (Ident Type)))))
             (function_body
              ((function_stmt
                (Expr
@@ -1185,7 +1186,7 @@ let%expect_test "attributes" =
         ((binding_name (Ident Ta))
          (binding_expr
           (Function
-           ((params (((Ident X) (Reference (Ident Integer)))))
+           ((is_type_function) (params (((Ident X) (Reference (Ident Integer)))))
             (function_body
              ((function_stmt
                (Expr
