@@ -299,6 +299,14 @@ functor
                       let details =
                         self#interpret_uty_details mk_struct_details
                           (StructType id) id expr.span
+                          ~add_method:(fun method_ ->
+                            Program.update_struct ctx.program id ~f:(fun s ->
+                                { s with
+                                  struct_details =
+                                    { s.struct_details with
+                                      uty_methods =
+                                        method_ :: s.struct_details.uty_methods
+                                    } } ) )
                       in
                       { struct_attributes = mk_struct_attributes;
                         struct_fields;
@@ -330,6 +338,14 @@ functor
                       let details =
                         self#interpret_uty_details mk_union_details
                           (UnionType id) id expr.span
+                          ~add_method:(fun method_ ->
+                            Program.update_union ctx.program id ~f:(fun s ->
+                                { s with
+                                  union_details =
+                                    { s.union_details with
+                                      uty_methods =
+                                        method_ :: s.union_details.uty_methods
+                                    } } ) )
                       in
                       { union_attributes = mk_union_attributes;
                         cases =
@@ -377,19 +393,21 @@ functor
                   () ;
                 Void
 
-        method interpret_uty_details (mk : mk_details) ty uty_id span =
+        method interpret_uty_details ~add_method (mk : mk_details) ty uty_id
+            span =
           let uty_expr = {value = Value (Type ty); span} in
           let prev_updated_items = ctx.updated_items in
           ctx.updated_items <- (mk.mk_id, uty_id) :: ctx.updated_items ;
           let self_name = {value = "Self"; span = mk.mk_span} in
           let uty_methods =
-            List.map mk.mk_methods ~f:(fun (name, fn) ->
+            List.map (List.rev mk.mk_methods) ~f:(fun (name, fn) ->
                 let output =
                   self#with_vars
                     [(self_name, Comptime uty_expr)]
                     (fun _ ->
                       match self#interpret_expr fn with
                       | Function f ->
+                          add_method (name, f) ;
                           f
                       | _ ->
                           ice "Type-check bug" )

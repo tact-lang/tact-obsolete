@@ -1006,9 +1006,25 @@ functor
               s#with_bindings
                 [make_runtime (self_name, StructSig sign_id)]
                 (fun _ ->
-                  s#visit_list
-                    (s#visit_located s#visit_binding)
-                    env syn_struct_def.struct_bindings )
+                  List.fold syn_struct_def.struct_bindings ~init:[]
+                    ~f:(fun methods item ->
+                      let name, func = s#visit_binding env item.value in
+                      let func' =
+                        match func.value with
+                        | Value (Function f) | MkFunction f ->
+                            f
+                        | _ ->
+                            ice "Non-function when function expected"
+                      in
+                      let _ =
+                        Arena.update program.struct_signs sign_id
+                          ~f:(fun item ->
+                            { item with
+                              st_sig_methods =
+                                (name, func'.value.function_signature)
+                                :: item.st_sig_methods } )
+                      in
+                      (name, func) :: methods ) )
             in
             let self_ty =
               ExprType
@@ -1022,9 +1038,8 @@ functor
               |> List.map ~f:(s#execute_impl_attrs self_ty)
             in
             let mk_struct =
-              s#make_struct_definition attributes fields
-                (s#of_located_list methods)
-                impls mk_id sign_id syn_struct_def.struct_span
+              s#make_struct_definition attributes fields methods impls mk_id
+                sign_id syn_struct_def.struct_span
             in
             { mk_struct with
               mk_struct_details =
@@ -1062,10 +1077,23 @@ functor
             s#with_bindings
               [make_runtime (self_name, UnionSig sign_id)]
               (fun _ ->
-                s#visit_list
-                  (s#visit_located s#visit_binding)
-                  env def.union_bindings )
-            |> s#of_located_list
+                List.fold def.union_bindings ~init:[] ~f:(fun methods item ->
+                    let name, func = s#visit_binding env item.value in
+                    let func' =
+                      match func.value with
+                      | Value (Function f) | MkFunction f ->
+                          f
+                      | _ ->
+                          ice "Non-function when function expected"
+                    in
+                    let _ =
+                      Arena.update program.union_signs sign_id ~f:(fun item ->
+                          { item with
+                            un_sig_methods =
+                              (name, func'.value.function_signature)
+                              :: item.un_sig_methods } )
+                    in
+                    (name, func) :: methods ) )
             |> List.map ~f:(fun (name, e) ->
                    match e.value with
                    | Value (Function _) | MkFunction _ ->

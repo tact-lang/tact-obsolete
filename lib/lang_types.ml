@@ -847,6 +847,11 @@ functor
               match new_s with Ok new_s -> (id, new_s) :: xs | Error _ -> xs
             else (xid, old_s) :: update_list id new_s xs
 
+      let update_struct ~f p id =
+        let item = get_struct p id in
+        let new_item = f item in
+        p.structs <- update_list id (Ok new_item) p.structs
+
       let with_struct p s f =
         p.structs <- (s.struct_details.uty_id, s) :: p.structs ;
         let new_s = f () in
@@ -869,6 +874,12 @@ functor
         let new_u = f () in
         p.unions <- update_list u.union_details.uty_id new_u p.unions ;
         new_u
+
+      let update_union ~f p id =
+        let item = get_union p id in
+        let new_item = f item in
+        p.unions <- update_list id (Ok new_item) p.unions ;
+        ()
 
       (* Creates new struct id, calls function with this new id and then
          places returning union to the program.unions *)
