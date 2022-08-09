@@ -59,7 +59,9 @@ module Make (Config : Config.T) = struct
 
   let infix sym f assoc = Infix (sym |>> f, assoc)
 
-  let prefix sym f = Prefix (skip_string sym >>> return f)
+  let postfix sym f = Postfix (sym |>> f)
+
+  let prefix sym f = Prefix (sym |>> f)
 
   let rec keyword state =
     ( string "as" <|> string "let" <|> string "interface" <|> string "impl"
@@ -105,15 +107,18 @@ module Make (Config : Config.T) = struct
     ( locate
         !!(pipe3 attributes
              (skip_keyword "val" >>> locate ident <<< char ':')
-             (locate opless_expr)
+             (locate expr)
              (fun field_attributes field_name field_type ->
                make_struct_field ~field_attributes ~field_name ~field_type () ) )
     |>> fun x -> `Field x )
       state
 
   and struct_item state =
-    (struct_field <<< (skip_char ';' <|> look_ahead (skip_char '}'))) state
+    ( struct_field
+    <<< (whitespace <|> skip_char ';' <|> look_ahead (skip_char '}')) )
+      state
 
+  (* FIXME: semicolon between or after items doesn't work yet *)
   and gen_struct :
         'a. ('a, 's) t -> 's state -> ('a * struct_definition, 's) reply =
    fun name state ->
@@ -147,27 +152,34 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
-  and operators =
-    let op name _operator l r =
-      Syntax.map_located _operator ~f:(fun _ ->
-          MethodCall
-            (make_method_call ~receiver:l
-               ~receiver_fn:(Syntax.builtin_located (Ident name))
-               ~receiver_arguments:[r] () ) )
-    in
-    [ [ infix (locate (string "*")) (op "mul") Assoc_left;
-        infix (locate (string "/")) (op "div") Assoc_left ];
-      [ infix (locate (string "+")) (op "add") Assoc_left;
-        infix (locate (string "-")) (op "subtract") Assoc_left ] ]
+  and type_index state = (brackets (comma_sep (locate expr))) state
 
-  and opless_expr state =
-    ( integer
-    <|> (struct_ |>> fun x -> Struct x)
-    <|> (locate ident |>> fun x -> Reference x)
-    <|> parens expr )
-      state
+  and function_index state = (parens (comma_sep (locate expr))) state
 
   and expr state =
+    let opless_expr =
+      integer
+      <|> (struct_ |>> fun x -> Struct x)
+      <|> (locate ident |>> fun x -> Reference x)
+      <|> parens expr
+    and operators =
+      let op name _operator l r =
+        Syntax.map_located _operator ~f:(fun _ ->
+            MethodCall
+              (make_method_call ~receiver:l
+                 ~receiver_fn:(Syntax.builtin_located (Ident name))
+                 ~receiver_arguments:[r] () ) )
+      and fun_call arguments fn =
+        Syntax.map_located fn ~f:(fun _ ->
+            FunctionCall (make_function_call ~fn ~arguments ()) )
+      in
+      [ [postfix type_index fun_call];
+        [postfix function_index fun_call];
+        [ infix (locate (string "*")) (op "mul") Assoc_left;
+          infix (locate (string "/")) (op "div") Assoc_left ];
+        [ infix (locate (string "+")) (op "add") Assoc_left;
+          infix (locate (string "-")) (op "subtract") Assoc_left ] ]
+    in
     (expression operators (locate !!opless_expr) |>> Syntax.value) state
 
   and let_ state =
