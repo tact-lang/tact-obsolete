@@ -35,8 +35,8 @@ module Make (Config : Config.T) = struct
     ( skip_string "/*"
     >> skip_many_until
          (comment_block <|> skip any_char_or_nl)
-         (skip_string "*/") 
-         <?> "block comment")
+         (skip_string "*/")
+    <?> "block comment" )
       state
 
   let whitespace = skip_many (comment_line <|> comment_block <|> spaces1)
@@ -46,6 +46,8 @@ module Make (Config : Config.T) = struct
   let ( !! ) p = whitespace >> p << whitespace
 
   let parens p = between (char '(') (char ')') p
+
+  let brackets p = between (char '[') (char ']') p
 
   let comma s = char ',' s
 
@@ -210,7 +212,19 @@ module Make (Config : Config.T) = struct
     |>> fun x -> DestructuringLet x )
       state
 
-  and block_stmt state = (char '{' >>> many (locate stmt) <<< char '}') state
+  (* Sequence of statements that may end with a non-semicolon terminated result *)
+  and stmt_seq ?(f = fun s -> Break s) state =
+    (pipe2
+       !!(many (attempt (locate stmt)))
+       !!(option
+            ( locate expr
+            |>> fun e ->
+            Syntax.map_located e ~f:(fun _ ->
+                f (Syntax.map_located e ~f:(fun _ -> Expr e)) ) ) )
+       (fun stmts -> function None -> stmts | Some return -> stmts @ [return]) )
+      state
+
+  and block_stmt state = (char '{' >>> stmt_seq <<< char '}') state
 
   and code_block state = (block_stmt |>> fun stmts -> CodeBlock stmts) state
 
@@ -287,7 +301,9 @@ module Make (Config : Config.T) = struct
        <|> semicolon_stmt <|> if_stmt <|> code_block ) )
       state
 
-  and program state = (many !!stmt << eof) state
+  and program state =
+    (stmt_seq ~f:Syntax.value << eof |>> fun s -> List.map ~f:Syntax.value s)
+      state
 
   let parse (s : string) : stmt list =
     match parse_string program s () with
