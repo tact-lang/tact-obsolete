@@ -9,6 +9,7 @@ let add_bin_op_intf p =
         [ ( "op",
             bl
               { function_attributes = [];
+                function_is_type = false;
                 function_params =
                   [(bl "left", IntegerType); (bl "right", IntegerType)];
                 function_returns = IntegerType } ) ] }
@@ -1284,7 +1285,7 @@ let%expect_test "parametric struct instantiation" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((A (TypeN 0))))
+             ((function_is_type) (function_params ((A (TypeN 0))))
               (function_returns (StructSig 83))))
             (function_impl
              (Fn
@@ -3630,7 +3631,8 @@ let%expect_test "unions duplicate variant" =
                         ((Value
                           (Function
                            ((function_signature
-                             ((function_params ((T (TypeN 0))))
+                             ((function_is_type)
+                              (function_params ((T (TypeN 0))))
                               (function_returns HoleType)))
                             (function_impl (BuiltinFn (<fun> <opaque>))))))
                          ((Value (Type (ExprType (Reference (T (TypeN 0))))))))))
@@ -5279,7 +5281,7 @@ let%expect_test "struct signatures" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((n IntegerType)))
+             ((function_is_type) (function_params ((n IntegerType)))
               (function_returns
                (FunctionType
                 ((function_params
@@ -5316,7 +5318,7 @@ let%expect_test "struct signatures" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((bits IntegerType)))
+             ((function_is_type) (function_params ((bits IntegerType)))
               (function_returns (StructSig 83))))
             (function_impl
              (Fn
@@ -5436,7 +5438,8 @@ let%expect_test "Deserilize intf with constraints" =
                            ((Value
                              (Function
                               ((function_signature
-                                ((function_params ((X (TypeN 0))))
+                                ((function_is_type)
+                                 (function_params ((X (TypeN 0))))
                                  (function_returns (StructSig 1))))
                                (function_impl
                                 (Fn
@@ -5458,7 +5461,7 @@ let%expect_test "Deserilize intf with constraints" =
                        ((Value
                          (Function
                           ((function_signature
-                            ((function_params ((X (TypeN 0))))
+                            ((function_is_type) (function_params ((X (TypeN 0))))
                              (function_returns (StructSig 1))))
                            (function_impl
                             (Fn
@@ -5476,7 +5479,8 @@ let%expect_test "Deserilize intf with constraints" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((X (TypeN 0)))) (function_returns (StructSig 1))))
+             ((function_is_type) (function_params ((X (TypeN 0))))
+              (function_returns (StructSig 1))))
             (function_impl
              (Fn
               (Return
@@ -5529,7 +5533,7 @@ let%expect_test "Deserilize intf with constraints" =
                  ((Value
                    (Function
                     ((function_signature
-                      ((function_params ((X (TypeN 0))))
+                      ((function_is_type) (function_params ((X (TypeN 0))))
                        (function_returns (StructSig 1))))
                      (function_impl
                       (Fn
@@ -5598,7 +5602,7 @@ let%expect_test "Interface inner constraints" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((X (InterfaceType 0))))
+             ((function_is_type) (function_params ((X (InterfaceType 0))))
               (function_returns
                (FunctionType
                 ((function_params
@@ -5655,7 +5659,7 @@ let%expect_test "Interface inner constraints" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((X (InterfaceType 0))))
+             ((function_is_type) (function_params ((X (InterfaceType 0))))
               (function_returns (StructSig 1))))
             (function_impl
              (Fn
@@ -5902,7 +5906,7 @@ let%expect_test "attributes" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((X IntegerType)))
+             ((function_is_type) (function_params ((X IntegerType)))
               (function_returns (StructSig 84))))
             (function_impl
              (Fn

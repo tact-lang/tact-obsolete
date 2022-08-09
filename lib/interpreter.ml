@@ -372,6 +372,7 @@ functor
                           ( name,
                             { function_attributes =
                                 sign.value.function_attributes;
+                              function_is_type = sign.value.function_is_type;
                               function_params =
                                 List.map sign.value.function_params
                                   ~f:(fun (pname, ty) ->

@@ -69,6 +69,7 @@ let%test "builtin function equality" =
     { function_signature =
         bl
           { function_attributes = [];
+            function_is_type = false;
             function_params = [];
             function_returns = VoidType };
       function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }
@@ -76,6 +77,7 @@ let%test "builtin function equality" =
     { function_signature =
         bl
           { function_attributes = [];
+            function_is_type = false;
             function_params = [];
             function_returns = VoidType };
       function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }

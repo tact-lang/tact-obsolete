@@ -510,6 +510,7 @@ functor
                              { function_signature =
                                  { value =
                                      { function_attributes = [];
+                                       function_is_type = false;
                                        function_params = [];
                                        function_returns = VoidType };
                                    span = fn.span };
@@ -729,6 +730,7 @@ functor
             let sign =
               { value =
                   { function_attributes;
+                    function_is_type = f.is_type_function;
                     function_params = param_bindings;
                     function_returns = fn_returns };
                 span = f.function_def_span }
@@ -1212,6 +1214,7 @@ functor
                        { function_signature =
                            { value =
                                { function_attributes = [];
+                                 function_is_type = false;
                                  function_params =
                                    [ ( builtin_located "v",
                                        expr_to_type program case ) ];

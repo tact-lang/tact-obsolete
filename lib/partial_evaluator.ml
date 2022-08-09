@@ -119,7 +119,11 @@ functor
           {switch_condition = cond; branches}
 
         method! visit_function_signature env
-            { value = {function_attributes; function_params; function_returns};
+            { value =
+                { function_attributes;
+                  function_params;
+                  function_returns;
+                  function_is_type };
               span } =
           let function_params =
             self#visit_list
@@ -130,7 +134,11 @@ functor
           let function_returns =
             self#with_vars vars (fun _ -> self#visit_type_ env function_returns)
           in
-          { value = {function_attributes; function_params; function_returns};
+          { value =
+              { function_attributes;
+                function_params;
+                function_returns;
+                function_is_type };
             span }
 
         method! visit_function_ env f =

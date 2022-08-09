@@ -39,6 +39,7 @@ functor
                 bl
                 @@ { function_params =
                        [(bl "self", self_ty); (bl "b", builder_ty)];
+                     function_is_type = false;
                      function_returns = builder_ty;
                      function_attributes = [] }
               in
@@ -87,6 +88,7 @@ functor
               let function_signature =
                 bl
                 @@ { function_params = [(bl "s", slice_ty)];
+                     function_is_type = false;
                      function_returns = ret_ty;
                      function_attributes = [] }
               in

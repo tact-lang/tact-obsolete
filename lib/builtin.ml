@@ -40,6 +40,7 @@ functor
                     { function_signature =
                         bl
                           { function_attributes = [];
+                            function_is_type = false;
                             function_params =
                               [(bl "s", slice_struct); (bl "v", t)];
                             function_returns = StructType id };
@@ -68,6 +69,7 @@ functor
       let function_signature =
         bl
           { function_attributes = [];
+            function_is_type = true;
             function_params = [(bl "T", type0)];
             function_returns =
               (let id, _ =
@@ -85,6 +87,7 @@ functor
                          [ ( bl "new",
                              bl
                                { function_attributes = [];
+                                 function_is_type = false;
                                  function_params =
                                    [ (bl "s", slice_struct);
                                      ( bl "v",
@@ -124,6 +127,7 @@ functor
             [ ( "serialize",
                 bl
                   { function_attributes = [];
+                    function_is_type = false;
                     function_params =
                       [(bl "self", SelfType); (bl "b", builder_struct)];
                     function_returns = builder_struct } ) ] }
@@ -143,6 +147,7 @@ functor
             [ ( "deserialize",
                 bl
                   { function_attributes = [];
+                    function_is_type = false;
                     function_params = [(bl "b", builder_struct)];
                     function_returns =
                       ExprType
@@ -160,11 +165,13 @@ functor
       let function_signature =
         bl
           { function_attributes = [];
+            function_is_type = true;
             function_params = [(bl "t", type0)];
             function_returns =
               FunctionType
                 (bl
                    { function_attributes = [];
+                     function_is_type = false;
                      function_params =
                        [(bl "t", HoleType); (bl "b", builder_struct)];
                      function_returns = builder_struct } ) }
@@ -255,6 +262,7 @@ functor
         { function_signature =
             bl
               { function_attributes = [];
+                function_is_type = false;
                 function_params =
                   [ (bl "self", UnionType union.union_details.uty_id);
                     (bl "b", builder_struct) ];
@@ -304,6 +312,7 @@ functor
         { function_signature =
             bl
               { function_attributes = [];
+                function_is_type = false;
                 function_params =
                   [ (bl "self", StructType s.struct_details.uty_id);
                     (bl "b", builder_struct) ];
@@ -334,11 +343,13 @@ functor
       let function_signature =
         bl
           { function_attributes = [];
+            function_is_type = true;
             function_params = [(bl "t", type0)];
             function_returns =
               FunctionType
                 (bl
                    { function_attributes = [];
+                     function_is_type = false;
                      function_params = [(bl "slice", slice_ty)];
                      function_returns =
                        ExprType
@@ -413,6 +424,7 @@ functor
         { function_signature =
             bl
               { function_attributes = [];
+                function_is_type = false;
                 function_params = [(bl "slice", slice_ty)];
                 function_returns = load_result_ty };
           function_impl = Fn (bl body) }
@@ -557,6 +569,7 @@ functor
         { function_signature =
             bl
               { function_attributes = [];
+                function_is_type = false;
                 function_params = [(bl "slice", slice_ty)];
                 function_returns = load_result_ty };
           function_impl = Fn body }
@@ -582,6 +595,7 @@ functor
       let function_signature =
         bl
           { function_attributes = [];
+            function_is_type = true;
             function_params = [(bl "T", type0)];
             function_returns = HoleType }
       in
@@ -592,6 +606,7 @@ functor
               [ ( "from",
                   bl
                     { function_attributes = [];
+                      function_is_type = false;
                       function_params = [(bl "from", t)];
                       function_returns = SelfType } ) ] }
         in
@@ -661,6 +676,7 @@ functor
                     { function_signature =
                         bl
                           { function_attributes = [];
+                            function_is_type = false;
                             function_params = args;
                             function_returns = ret_ty };
                       function_impl =
@@ -733,6 +749,7 @@ functor
       let function_signature =
         bl
           { function_attributes = [];
+            function_is_type = false;
             function_params = [(bl "x", HoleType)];
             function_returns = HoleType }
       in

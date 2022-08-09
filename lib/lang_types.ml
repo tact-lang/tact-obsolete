@@ -175,6 +175,10 @@ functor
     and value =
       | Void
       | Struct of (expr * (string * expr) list)
+      | TypedCall of
+          { func : function_;
+            args : value list;
+            out : value [@equal.ignore] [@compare.ignore] }
       | UnionVariant of (value * int)
       | Function of function_
       | Integer of (Zint.t[@visitors.name "z"])
@@ -309,6 +313,7 @@ functor
 
     and function_signature_kind =
       { function_attributes : attribute list; [@sexp.list]
+        function_is_type : bool; [@sexp.bool]
         function_params : (string located * type_) list;
         function_returns : type_ }
 
