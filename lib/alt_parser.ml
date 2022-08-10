@@ -178,12 +178,14 @@ module Make (Config : Config.T) = struct
     let chain p op = p >>= fun x -> many_fold_left (fun x f -> f x) x op in
     (* handle type and function indices *)
     let exp =
+      let funcall is_type_func_call arguments l =
+        Syntax.map_located l ~f:(fun _ ->
+            FunctionCall
+              (make_function_call ~fn:l ~arguments ~is_type_func_call ()) )
+      in
       chain
         (expression operators (locate !!opless_expr))
-        ( type_index <|> function_index
-        |>> fun arguments l ->
-        Syntax.map_located l ~f:(fun _ ->
-            FunctionCall (make_function_call ~fn:l ~arguments ()) ) )
+        (type_index |>> funcall true <|> (function_index |>> funcall false))
     in
     (* handle operators *)
     (expression operators exp |>> Syntax.value) state
