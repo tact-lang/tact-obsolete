@@ -147,7 +147,7 @@ struct Int[bits: Integer] {
     }
   }
 
-  impl From(Integer) {
+  impl From[Integer] {
     fn from(i: Integer) -> Self {
       Self { value: i }
     }
@@ -178,7 +178,7 @@ struct Uint[bits: Integer] {
     }
   }
 
-  impl From(Integer) {
+  impl From[Integer] {
     fn from(i: Integer) -> Self {
       Self { value: i }
     }

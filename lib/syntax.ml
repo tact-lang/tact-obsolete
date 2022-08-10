@@ -39,7 +39,9 @@ functor
         interface_members : binding located list [@sexp.list] }
 
     and function_call =
-      {fn : expr located; arguments : expr located list [@sexp.list]}
+      { fn : expr located;
+        arguments : expr located list; [@sexp.list]
+        is_type_func_call : bool [@sexp.bool] }
 
     and method_call =
       { receiver : expr located;
@@ -120,6 +122,7 @@ functor
     and function_definition =
       { function_attributes : attribute list; [@sexp.list]
         name : ident located option; [@sexp.option]
+        is_type_function : bool; [@sexp.bool]
         params : function_param located list; [@sexp.list]
         returns : expr located option; [@sexp.option]
         function_body : function_body option; [@sexp.option]

@@ -28,13 +28,13 @@ functor
       match ex.value with
       | Value v ->
           pp_value f v
-      | FunctionCall (fname, args) ->
+      | FunctionCall (fname, args, is_ty) ->
           pp_expr f fname ;
-          pp_print_string f "(" ;
+          pp_print_string f (if is_ty then "[" else "(") ;
           list_iter args
             ~f:(fun e -> pp_expr f e ; pp_print_string f ", ")
             ~flast:(fun e -> pp_expr f e) ;
-          pp_print_string f ")"
+          pp_print_string f (if is_ty then "]" else ")")
       | Reference (name, _) | ResolvedReference (name, _) ->
           pp_print_string f name.value
       | StructField (s, field, _) ->
@@ -362,6 +362,22 @@ functor
                 [ ( span,
                     "Type of this variable is not found in the condition union"
                   ) ];
+              additional_msg = [] }
+            code
+      | `ExpectedTypeFunction (is_type_fn, span) ->
+          let diagnostic_msg =
+            if is_type_fn then
+              "Function should be called using `[]` brackets but called with \
+               `()` parens."
+            else
+              "Function should be called using `()` brackets but called with \
+               `[]` parens."
+          in
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg;
+              spans = [(span, "When calling this function")];
               additional_msg = [] }
             code
   end

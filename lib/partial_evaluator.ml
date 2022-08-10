@@ -119,7 +119,11 @@ functor
           {switch_condition = cond; branches}
 
         method! visit_function_signature env
-            { value = {function_attributes; function_params; function_returns};
+            { value =
+                { function_attributes;
+                  function_params;
+                  function_returns;
+                  function_is_type };
               span } =
           let function_params =
             self#visit_list
@@ -130,7 +134,11 @@ functor
           let function_returns =
             self#with_vars vars (fun _ -> self#visit_type_ env function_returns)
           in
-          { value = {function_attributes; function_params; function_returns};
+          { value =
+              { function_attributes;
+                function_params;
+                function_returns;
+                function_is_type };
             span }
 
         method! visit_function_ env f =
@@ -177,7 +185,8 @@ functor
                   in
                   FunctionCall
                     ( {value = Value (Function method_); span = call.intf_loc},
-                      args )
+                      args,
+                      method_.value.function_signature.value.function_is_type )
               | None ->
                   ice "Type-check bug" )
           | false ->
@@ -241,17 +250,17 @@ functor
           in
           UnionVariant (expr, new_id)
 
-        method! visit_FunctionCall env (f, args) =
+        method! visit_FunctionCall env (f, args, is_ty) =
           let f = self#visit_expr env f in
           let args = self#visit_list self#visit_expr env args in
           if
             is_immediate_expr !(ctx.scope) ctx.program
-              {value = FunctionCall (f, args); span = f.span}
+              {value = FunctionCall (f, args, is_ty); span = f.span}
           then
             Value
               (self#with_interpreter env f.span (fun inter ->
-                   inter#interpret_fc (f, args) ) )
-          else FunctionCall (f, args)
+                   inter#interpret_fc (f, args, is_ty) ) )
+          else FunctionCall (f, args, is_ty)
 
         method! visit_StructSigMethodCall env call =
           let st_sig_instance = self#visit_expr env call.st_sig_call_instance in
@@ -281,7 +290,8 @@ functor
               FunctionCall
                 ( { value = Value (Function method_);
                     span = call.st_sig_call_span },
-                  args )
+                  args,
+                  method_.value.function_signature.value.function_is_type )
           | false ->
               StructSigMethodCall
                 { call with
