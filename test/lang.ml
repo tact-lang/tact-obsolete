@@ -412,7 +412,7 @@ let%expect_test "failed scope resolution" =
   [%expect
     {|
     (((UnresolvedIdentifier Int256))
-     ((bindings ((T (Value Void)))) (structs ()) (type_counter <opaque>)
+     ((bindings ()) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
       (attr_executors <opaque>))) |}]
 
@@ -2662,7 +2662,14 @@ let%expect_test "type check error" =
     {|
     (((TypeError ((StructType 125) (StructType 127) <opaque>))
       (ArgumentNumberMismatch (1 1 <opaque>)))
-     ((bindings ())
+     ((bindings
+       ((foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((x (StructType 125))))
+              (function_returns (StructType 125))))
+            (function_impl (Fn (Return (Reference (x (StructType 125))))))))))))
       (structs
        ((128
          ((struct_fields
@@ -3411,8 +3418,7 @@ let%expect_test "TypeN" =
     (((TypeError ((TypeN 0) (TypeN 1) <opaque>))
       (ArgumentNumberMismatch (1 1 <opaque>)))
      ((bindings
-       ((must_fail (Value Void))
-        (id
+       ((id
          (Value
           (Function
            ((function_signature
@@ -5040,7 +5046,7 @@ let%expect_test "let binding with a non-matching type" =
     (((TypeError (BoolType IntegerType <opaque>))
       (TypeError (BoolType IntegerType <opaque>))
       (ArgumentNumberMismatch (1 1 <opaque>)))
-     ((bindings ((a (Value Void)))) (structs ()) (type_counter <opaque>)
+     ((bindings ()) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
       (attr_executors <opaque>))) |}]
 
@@ -5326,7 +5332,7 @@ let%expect_test "type that does not implement interface passed to the \
     (((TypeError ((InterfaceType 125) (TypeN 0) <opaque>))
       (ArgumentNumberMismatch (1 1 <opaque>)))
      ((bindings
-       ((a (Value Void)) (Foo (Value (Type (StructType 127))))
+       ((Foo (Value (Type (StructType 127))))
         (ExpectedIntf
          (Value
           (Function
