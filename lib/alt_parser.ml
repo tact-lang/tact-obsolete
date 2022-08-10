@@ -169,18 +169,24 @@ module Make (Config : Config.T) = struct
               (make_method_call ~receiver:l
                  ~receiver_fn:(Syntax.builtin_located (Ident name))
                  ~receiver_arguments:[r] () ) )
-      and fun_call arguments fn =
-        Syntax.map_located fn ~f:(fun _ ->
-            FunctionCall (make_function_call ~fn ~arguments ()) )
       in
-      [ [postfix type_index fun_call];
-        [postfix function_index fun_call];
-        [ infix (locate (string "*")) (op "mul") Assoc_left;
+      [ [ infix (locate (string "*")) (op "mul") Assoc_left;
           infix (locate (string "/")) (op "div") Assoc_left ];
         [ infix (locate (string "+")) (op "add") Assoc_left;
           infix (locate (string "-")) (op "subtract") Assoc_left ] ]
     in
-    (expression operators (locate !!opless_expr) |>> Syntax.value) state
+    let chain p op = p >>= fun x -> many_fold_left (fun x f -> f x) x op in
+    (* handle type and function indices *)
+    let exp =
+      chain
+        (expression operators (locate !!opless_expr))
+        ( type_index <|> function_index
+        |>> fun arguments l ->
+        Syntax.map_located l ~f:(fun _ ->
+            FunctionCall (make_function_call ~fn:l ~arguments ()) ) )
+    in
+    (* handle operators *)
+    (expression operators exp |>> Syntax.value) state
 
   and let_ state =
     ( locate
