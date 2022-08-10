@@ -155,10 +155,9 @@ functor
               | _ ->
                   Error (TypeError expected) )
           | TypeN 0 -> (
-            match actual_value.value with
-            | ResolvedReference (_, {value = Value (Type (StructSig s)); _})
-            | Value (Type (StructSig s)) ->
-                Ok (StructSig s)
+            match actual with
+            | StructSig _ | Type0 _ ->
+                Ok actual
             | _ -> (
               match type_of program actual_value with
               | (StructSig _ as ty) | (UnionSig _ as ty) ->

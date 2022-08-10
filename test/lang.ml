@@ -5329,7 +5329,7 @@ let%expect_test "type that does not implement interface passed to the \
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((InterfaceType 125) (TypeN 0) <opaque>))
+    (((TypeError ((InterfaceType 125) (Type0 (StructType 127)) <opaque>))
       (ArgumentNumberMismatch (1 1 <opaque>)))
      ((bindings
        ((Foo (Value (Type (StructType 127))))

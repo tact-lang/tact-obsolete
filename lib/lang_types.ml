@@ -216,6 +216,7 @@ functor
 
     and type_ =
       | TypeN of int
+      | Type0 of type_
       | IntegerType
       | BoolType
       | StringType
@@ -474,14 +475,14 @@ functor
     and type_of_type program = function
       | TypeN x ->
           TypeN (x + 1)
-      | StructSig _ | UnionSig _ ->
+      | Type0 _ | StructSig _ | UnionSig _ ->
           TypeN 1
       | ValueOf ty ->
           ty
       | ExprType ex ->
           type_of program ex
-      | _otherwise ->
-          TypeN 0
+      | other_ty ->
+          Type0 other_ty
 
     and type_of_call ?(self_ty = None) program args arg_types returns =
       let associated =
