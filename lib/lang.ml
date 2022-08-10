@@ -35,7 +35,8 @@ functor
       | `FieldNotFound of expr * string located
       | `CaseNotFound of (span[@equal.ignore] [@sexp.opaque])
       | `ArgumentNumberMismatch of
-        int * int * (span[@equal.ignore] [@sexp.opaque]) ]
+        int * int * (span[@equal.ignore] [@sexp.opaque])
+      | `ExpectedTypeFunction of bool * (span[@equal.ignore] [@sexp.opaque]) ]
     [@@deriving equal, sexp_of]
 
     include Builtin
@@ -112,51 +113,57 @@ functor
 
         method build_Function _env fn = MkFunction fn
 
-        method build_FunctionCall _env (f, args) =
+        method build_FunctionCall _env (f, args, is_type_fn) =
           let span =
             merge_spans f.span (merge_spans_list @@ List.map args ~f:span)
           in
           match type_of program f with
           | FunctionType sign -> (
-              let no_errors = ref true in
-              let types_satisfying =
-                List.map2 sign.value.function_params args
-                  ~f:(fun (_, expected) expr ->
-                    match s#check_type ~expected expr with
-                    | Ok _ ->
-                        expr
-                    | Error (NeedFromCall func) ->
-                        let s = FunctionCall (func, [expr]) in
-                        {value = s; span = expr.span}
-                    | _ ->
-                        errors#report `Error
-                          (`TypeError
-                            (expected, type_of program expr, expr.span) )
-                          () ;
-                        no_errors := false ;
-                        {value = Value Void; span = expr.span} )
-              in
-              match types_satisfying with
-              | Ok args' when !no_errors ->
-                  let fc = (f, args') in
-                  if
-                    is_immediate_expr !current_bindings program
-                      {value = FunctionCall (f, args'); span}
-                  then
-                    let fc =
-                      let inter = s#make_interpreter span in
-                      let fc = inter#interpret_fc fc in
-                      fc
-                    in
-                    Value fc
-                  else FunctionCall fc
-              | _ ->
-                  let expected = List.length sign.value.function_params in
-                  let actual = List.length args in
-                  errors#report `Error
-                    (`ArgumentNumberMismatch (expected, actual, f.span))
-                    () ;
-                  Value Void )
+              if not @@ Bool.equal is_type_fn sign.value.function_is_type then (
+                errors#report `Error
+                  (`ExpectedTypeFunction (sign.value.function_is_type, span))
+                  () ;
+                Value Void )
+              else
+                let no_errors = ref true in
+                let types_satisfying =
+                  List.map2 sign.value.function_params args
+                    ~f:(fun (_, expected) expr ->
+                      match s#check_type ~expected expr with
+                      | Ok _ ->
+                          expr
+                      | Error (NeedFromCall func) ->
+                          let s = FunctionCall (func, [expr], false) in
+                          {value = s; span = expr.span}
+                      | _ ->
+                          errors#report `Error
+                            (`TypeError
+                              (expected, type_of program expr, expr.span) )
+                            () ;
+                          no_errors := false ;
+                          {value = Value Void; span = expr.span} )
+                in
+                match types_satisfying with
+                | Ok args' when !no_errors ->
+                    let fc = (f, args', is_type_fn) in
+                    if
+                      is_immediate_expr !current_bindings program
+                        {value = FunctionCall (f, args', is_type_fn); span}
+                    then
+                      let fc =
+                        let inter = s#make_interpreter span in
+                        let fc = inter#interpret_fc fc in
+                        fc
+                      in
+                      Value fc
+                    else FunctionCall fc
+                | _ ->
+                    let expected = List.length sign.value.function_params in
+                    let actual = List.length args in
+                    errors#report `Error
+                      (`ArgumentNumberMismatch (expected, actual, f.span))
+                      () ;
+                    Value Void )
           | ty ->
               errors#report `Error (`ExpectedFunction (ty, f.span)) () ;
               Value Void
@@ -304,7 +311,7 @@ functor
                 | Ok _ ->
                     assignment_expr
                 | Error (NeedFromCall func) ->
-                    let s = FunctionCall (func, [assignment_expr]) in
+                    let s = FunctionCall (func, [assignment_expr], false) in
                     {value = s; span = assignment_expr.span}
                 | _ ->
                     errors#report `Error
@@ -343,7 +350,9 @@ functor
           | Ok _ ->
               Return return
           | Error (NeedFromCall func) ->
-              Return {value = FunctionCall (func, [return]); span = return.span}
+              Return
+                { value = FunctionCall (func, [return], false);
+                  span = return.span }
           | Error (TypeError fn_returns) ->
               errors#report `Error
                 (`TypeError (fn_returns, type_of program return, return.span))
@@ -366,7 +375,8 @@ functor
                   Break
                     { value =
                         Expr
-                          {value = FunctionCall (func, [ex]); span = stmt.span};
+                          { value = FunctionCall (func, [ex], false);
+                            span = stmt.span };
                       span = stmt.span }
               | Error (TypeError fn_returns) ->
                   errors#report `Error
@@ -498,7 +508,7 @@ functor
           | _ ->
               mk_err ()
 
-        method build_function_call _env fn args = (fn, args)
+        method build_function_call _env fn args is_ty = (fn, args, is_ty)
 
         method build_method_call _env in_receiver fn args =
           let dummy : expr_kind =
@@ -510,6 +520,7 @@ functor
                              { function_signature =
                                  { value =
                                      { function_attributes = [];
+                                       function_is_type = false;
                                        function_params = [];
                                        function_returns = VoidType };
                                    span = fn.span };
@@ -517,7 +528,8 @@ functor
                                  BuiltinFn (builtin_fun (fun _ _ -> Void)) };
                            span = fn.span } );
                   span = fn.span },
-                [] )
+                [],
+                false )
           in
           let make_call receiver ~mk_args =
             match
@@ -533,7 +545,8 @@ functor
                         ResolvedReference
                           (fn, {value = Value (Function fn'); span});
                       span = fn.span },
-                    mk_args args )
+                    mk_args args,
+                    false (* FIXME: add is_type for methods *) )
             | None ->
                 errors#report `Error (`MethodNotFound (in_receiver, fn)) () ;
                 dummy
@@ -729,6 +742,7 @@ functor
             let sign =
               { value =
                   { function_attributes;
+                    function_is_type = f.is_type_function;
                     function_params = param_bindings;
                     function_returns = fn_returns };
                 span = f.function_def_span }
@@ -865,7 +879,7 @@ functor
                   | Ok _ ->
                       Some (n1, actual_expr)
                   | Error (NeedFromCall func) ->
-                      let s = FunctionCall (func, [actual_expr]) in
+                      let s = FunctionCall (func, [actual_expr], false) in
                       Some (n1, {value = s; span = actual_expr.span})
                   | _ ->
                       errors#report `Error
@@ -1195,7 +1209,8 @@ functor
                       FunctionCall
                         ( from_intf,
                           [ { value = Value (Type (ExprType case));
-                              span = case.span } ] );
+                              span = case.span } ],
+                          false );
                     span = case.span }
                 in
                 { mk_impl_attributes = [];
@@ -1212,6 +1227,7 @@ functor
                        { function_signature =
                            { value =
                                { function_attributes = [];
+                                 function_is_type = false;
                                  function_params =
                                    [ ( builtin_located "v",
                                        expr_to_type program case ) ];

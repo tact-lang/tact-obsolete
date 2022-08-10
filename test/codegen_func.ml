@@ -216,11 +216,11 @@ let%expect_test "demo struct serializer" =
         val a: Int[32]
         val b: Int[16]
       }
-      let T_serializer = serializer(T);
+      let T_serializer = serializer[T];
 
       fn test() {
         let b = Builder.new();
-        T_serializer(T{a: Int(32).new(0), b: Int(16).new(1)}, b);
+        T_serializer(T{a: Int[32].new(0), b: Int[16].new(1)}, b);
       }
     |}
   in
@@ -372,7 +372,7 @@ let%expect_test "demo struct serializer 2" =
         val a: Int[32]
         val b: Int[16]
       }
-      let serialize_foo = serializer(Foo);
+      let serialize_foo = serializer[Foo];
 
       fn test() -> Builder {
         let b = Builder.new();
@@ -536,21 +536,21 @@ let%expect_test "true and false" =
   pp_codegen source ~strip_defaults:true ;
   [%expect
     {|
-         forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-           (Value1 value, _) = tensor;
-           return value;
-         }
-         forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-           (_, Value2 value) = tensor;
-           return value;
-         }
-         int test(int flag) {
-           if (flag) {
-           return 0;
-         } else
-         {
-           return -1;
-         }} |}]
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    int test(int flag) {
+      if (flag) {
+      return 0;
+    } else
+    {
+      return -1;
+    }} |}]
 
 let%expect_test "if/then/else" =
   let source =

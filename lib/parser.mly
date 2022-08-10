@@ -14,8 +14,9 @@
 %}
 
 %{
-  let expand_fn_sugar params expr fn_span =
-    Function (make_function_definition ~function_def_span: fn_span ~params: params
+  let expand_fn_sugar params expr fn_span ~is_type =
+    Function (make_function_definition ~function_def_span: fn_span 
+                  ~params: params ~is_type_function:is_type
                   ~function_body:(make_function_body ~function_stmt:({value = (Expr expr); span = expr.span}) ())
                                            ())
 
@@ -35,13 +36,15 @@
       fn = make_located ~span ~value:
           (Function (make_function_definition 
                               ~function_def_span: (span_of_concrete span)
+                              ~is_type_function:false
                               ~params: [make_located ~span ~value: (make_located ~span ~value: (Ident "v") (), 
                                                                    make_located ~span ~value: typ ()) ()]
                               ~returns: (make_located ~span ~value: typ ())
                               ~function_body: (make_function_body ~function_stmt:({value=Return (expr); span = expr.span}) ()) 
                               ()
                     )) ();
-      arguments = [expr]
+      arguments = [expr];
+      is_type_func_call = false
     }) ()
 
 %}
@@ -114,7 +117,7 @@ let let_binding ==
   expr = located(expr);
   { make_binding ~binding_name: name
       ~binding_expr:
-      (make_located ~span: $loc ~value: (expand_fn_sugar params expr name.span) ()) 
+      (make_located ~span: $loc ~value: (expand_fn_sugar params expr name.span ~is_type:false) ()) 
       ()
   }
 )
@@ -170,22 +173,22 @@ let shorthand_binding(funbody) ==
 | located( (name, expr) = struct_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~span: $loc ~value: expr ())  () })
 | located( ((name, params), expr) = struct_definition(located_ident_with_params); {
   make_binding ~binding_name: name ~binding_expr: (
-    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span) ()
+    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span ~is_type:true) ()
   ) () })
 | located( (name, expr) = interface_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~span: $loc ~value: expr ()) () })
 | located( ((name, params), expr) = interface_definition(located_ident_with_params); {
   make_binding ~binding_name: name ~binding_expr: (
-    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span) ()
+    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span ~is_type:true) ()
   ) () })
 | located( (name, expr) = enum_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~span: $loc ~value: expr ()) () })
 | located( ((name, params), expr) = enum_definition(located_ident_with_params); {
   make_binding ~binding_name: name ~binding_expr: ( 
-    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span) ()
+    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span ~is_type:true) ()
   ) () })
 | located( (name, expr) = union_definition(located(ident)); { make_binding ~binding_name: name ~binding_expr: (make_located ~span: $loc ~value: expr ()) () })
 | located( ((name, params), expr) = union_definition(located_ident_with_params); {
   make_binding ~binding_name: name ~binding_expr: (
-    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span) ()
+    make_located ~span: $loc ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span ~is_type:true) ()
   ) () })
 
 let located_ident_with_params ==
@@ -198,7 +201,7 @@ let sugared_function_definition(funbody) ==
    | located( ((name, params), expr) = function_definition(located_ident_with_params, funbody); {
      make_binding ~binding_name: name ~binding_expr: 
        (make_located ~span: $loc
-                     ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span)
+                     ~value: (expand_fn_sugar params (make_located ~span: $loc ~value: expr ()) name.span ~is_type:true)
                      () (* FIXME: Function type is a temp punt *)
        ) () })
 
@@ -219,7 +222,9 @@ let function_definition(name, funbody) :=
   params = delimited_separated_trailing_list(LPAREN, function_param, COMMA, RPAREN);
   returns = option(preceded(RARROW, located(fexpr)));
   body = funbody;
-  { (n, Function (make_function_definition ~function_attributes ~params:params ~function_def_span: function_def_span.span ?returns:returns 
+  { (n, Function (make_function_definition 
+                    ~function_attributes ~params:params ~is_type_function:false
+                    ~function_def_span: function_def_span.span ?returns:returns 
                     ?function_body:(Option.map (fun x -> make_function_body ~function_stmt: x ()) body)
                     ())) } 
 
@@ -246,10 +251,10 @@ let function_param ==
 let function_call :=
   | fn = located(fexpr);
   arguments = delimited_separated_trailing_list(LPAREN, located(expr), COMMA, RPAREN);
-  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments () ~is_type_func_call:false) }
   | fn = located(fexpr);
   arguments = delimited_separated_trailing_list(LBRACKET, located(expr), COMMA, RBRACKET);
-  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments ()) }
+  { FunctionCall (make_function_call ~fn: fn ~arguments: arguments () ~is_type_func_call:true) }
 
 
 let else_ :=
@@ -406,7 +411,8 @@ let fexpr :=
     | Some(params) -> (
         expand_fn_sugar params 
         (make_located ~value: s ~span: $loc ())
-        (span_of_concrete $loc)) }
+        (span_of_concrete $loc)
+        ~is_type:true) }
   (* can be an `interface` definition *)
  | (_, i) = interface_definition(nothing); { i }
  (* can be an `enum` definition *)

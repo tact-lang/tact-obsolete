@@ -126,7 +126,7 @@ let%expect_test "duplicate variant" =
         case Integer
         case T
       }
-      let _ = Test2(Integer);
+      let _ = Test2[Integer];
     |}
   in
   pp source ;
@@ -140,7 +140,7 @@ let%expect_test "duplicate variant" =
     Error[1]: Duplicate variant with type Integer
     File: "":11:14
        |
-    11 |       let _ = Test2(Integer);
+    11 |       let _ = Test2[Integer];
        |               ^^^^^^^^^^^^^ Duplicated variant in this union |}]
 
 let%expect_test "type errors" =
@@ -276,7 +276,7 @@ let%expect_test "uninterpretable statement" =
                                (ResolvedReference
                                 (((span (pos pos)) (value builtin_begin_cell))
                                  <opaque>))))
-                             ())))))))))))))))))))
+                             () false)))))))))))))))))))
           (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
           (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
@@ -341,3 +341,20 @@ let%expect_test "Case Not Found Error" =
       |
     9 |           case Int[123] _ => { return 123; }
       |                         ^ Type of this variable is not found in the condition union |}]
+
+let%expect_test "Expected Type Function" =
+  let source =
+    {|
+      union Test[X: Type] {}
+
+      let _ = Test(Integer);
+    |}
+  in
+  pp source ;
+  [%expect
+    {|
+    Error[1]: Function should be called using `[]` brackets but called with `()` parens.
+    File: "":4:14
+      |
+    4 |       let _ = Test(Integer);
+      |               ^^^^^^^^^^^^ When calling this function |}]

@@ -174,8 +174,8 @@ functor
                 Value
                   (inter#interpret_fc
                      ( from_intf,
-                       [{value = Value (Type actual); span = actual_value.span}]
-                     ) )
+                       [{value = Value (Type actual); span = actual_value.span}],
+                       true ) )
               in
               let impl =
                 Program.get_uty_details program ty

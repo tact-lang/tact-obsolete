@@ -93,7 +93,8 @@ functor
             | Value (Function f) ->
                 let f' = self#add_function f in
                 F.Reference (f'.function_name, F.FunctionType f')
-            | FunctionCall (func, args) -> (
+            | FunctionCall (func, args, _is_ty) -> (
+                (* TODO: if is_ty then ice "Type function in runtime context." ;*)
                 let args = List.map args ~f:self#cg_expr in
                 match self#cg_expr func with
                 | Reference (name, F.FunctionType f) ->

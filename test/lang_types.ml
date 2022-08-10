@@ -9,7 +9,7 @@ let find scope name =
 
 let%test "aliased structures equality" =
   let source = {|
-  struct T { val a: Int(257) }
+  struct T { val a: Int[257] }
   let T1 = T; 
   |} in
   Alcotest.(check bool)
@@ -24,8 +24,8 @@ let%test "aliased structures equality" =
 let%test "carbon copy structure equality" =
   let source =
     {|
-  struct T { val a: Int(257) }
-  struct T1 { val a: Int(257) }
+  struct T { val a: Int[257] }
+  struct T1 { val a: Int[257] }
   |}
   in
   Alcotest.(check bool)
@@ -41,9 +41,9 @@ let%test "parameterized structure equality" =
   let source =
     {|
   struct T[X: Type] { val a: X }
-  let T1 = T(Int(257));
-  let T2 = T(Bool);
-  let T3 = T(Int(257));
+  let T1 = T[Int[257]];
+  let T2 = T[Bool];
+  let T3 = T[Int[257]];
   |}
   in
   Alcotest.(check bool)
@@ -69,6 +69,7 @@ let%test "builtin function equality" =
     { function_signature =
         bl
           { function_attributes = [];
+            function_is_type = false;
             function_params = [];
             function_returns = VoidType };
       function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }
@@ -76,6 +77,7 @@ let%test "builtin function equality" =
     { function_signature =
         bl
           { function_attributes = [];
+            function_is_type = false;
             function_params = [];
             function_returns = VoidType };
       function_impl = BuiltinFn (builtin_fun (fun _ _ -> Void)) }

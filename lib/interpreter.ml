@@ -215,7 +215,8 @@ functor
                     in
                     self#interpret_fc
                       ( {value = Value (Function method_); span = intf_loc},
-                        intf_args )
+                        intf_args,
+                        false )
                 | None ->
                     ice "Interface implementation is not found" )
             | StructSigMethodCall
@@ -243,7 +244,8 @@ functor
                     self#interpret_fc
                       ( { value = Value (Function method_);
                           span = st_sig_call_span },
-                        st_sig_call_args )
+                        st_sig_call_args,
+                        false )
                 | None ->
                     ice "Interface implementation is not found" )
             | ResolvedReference (_, expr') ->
@@ -372,6 +374,7 @@ functor
                           ( name,
                             { function_attributes =
                                 sign.value.function_attributes;
+                              function_is_type = sign.value.function_is_type;
                               function_params =
                                 List.map sign.value.function_params
                                   ~f:(fun (pname, ty) ->
@@ -486,11 +489,11 @@ functor
         method interpret_function = partial_evaluate ctx
 
         method interpret_fc : function_call -> value =
-          fun (func, args) ->
+          fun (func, args, is_ty) ->
             let f = self#interpret_expr func in
             let args' = List.map args ~f:(fun arg -> self#interpret_expr arg) in
             let mk_err =
-              Expr {value = FunctionCall (func, args); span = func.span}
+              Expr {value = FunctionCall (func, args, is_ty); span = func.span}
             in
             let args_to_list params values =
               match

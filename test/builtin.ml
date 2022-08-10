@@ -67,7 +67,8 @@ let%expect_test "Int[bits] constructor" =
                        ((res
                          (FunctionCall
                           ((ResolvedReference (load_int <opaque>))
-                           ((Reference (s (StructType 7))) (Value (Integer 257))))))))
+                           ((Reference (s (StructType 7))) (Value (Integer 257)))
+                           false)))))
                       (DestructuringLet
                        ((destructuring_let ((slice slice) (value value)))
                         (destructuring_let_expr (Reference (res (StructType 5))))
@@ -95,7 +96,8 @@ let%expect_test "Int[bits] constructor" =
                        ((Reference (builder (StructType 3)))
                         (StructField
                          ((Reference (self (StructType 125))) value IntegerType))
-                        (Value (Integer 257))))))))))
+                        (Value (Integer 257)))
+                       false)))))))
                 (new
                  ((function_signature
                    ((function_params ((i IntegerType)))
@@ -123,7 +125,8 @@ let%expect_test "Int[bits] constructor" =
                           ((Reference (builder (StructType 3)))
                            (StructField
                             ((Reference (self (StructType 125))) value IntegerType))
-                           (Value (Integer 257)))))))))))))
+                           (Value (Integer 257)))
+                          false))))))))))
                 ((impl_interface -2)
                  (impl_methods
                   ((deserialize
@@ -138,7 +141,8 @@ let%expect_test "Int[bits] constructor" =
                             (FunctionCall
                              ((ResolvedReference (load_int <opaque>))
                               ((Reference (s (StructType 7)))
-                               (Value (Integer 257))))))))
+                               (Value (Integer 257)))
+                              false)))))
                          (DestructuringLet
                           ((destructuring_let ((slice slice) (value value)))
                            (destructuring_let_expr
@@ -203,7 +207,8 @@ let%expect_test "Int[bits] serializer" =
                    (FunctionCall
                     ((ResolvedReference (serialize <opaque>))
                      ((ResolvedReference (i <opaque>))
-                      (Reference (b (StructType 3)))))))))))))))))
+                      (Reference (b (StructType 3))))
+                     false)))))))))))))
         (structs
          ((126
            ((struct_fields
@@ -250,7 +255,8 @@ let%expect_test "Int[bits] serializer" =
                        ((res
                          (FunctionCall
                           ((ResolvedReference (load_int <opaque>))
-                           ((Reference (s (StructType 7))) (Value (Integer 32))))))))
+                           ((Reference (s (StructType 7))) (Value (Integer 32)))
+                           false)))))
                       (DestructuringLet
                        ((destructuring_let ((slice slice) (value value)))
                         (destructuring_let_expr (Reference (res (StructType 5))))
@@ -278,7 +284,8 @@ let%expect_test "Int[bits] serializer" =
                        ((Reference (builder (StructType 3)))
                         (StructField
                          ((Reference (self (StructType 125))) value IntegerType))
-                        (Value (Integer 32))))))))))
+                        (Value (Integer 32)))
+                       false)))))))
                 (new
                  ((function_signature
                    ((function_params ((i IntegerType)))
@@ -306,7 +313,8 @@ let%expect_test "Int[bits] serializer" =
                           ((Reference (builder (StructType 3)))
                            (StructField
                             ((Reference (self (StructType 125))) value IntegerType))
-                           (Value (Integer 32)))))))))))))
+                           (Value (Integer 32)))
+                          false))))))))))
                 ((impl_interface -2)
                  (impl_methods
                   ((deserialize
@@ -320,7 +328,8 @@ let%expect_test "Int[bits] serializer" =
                           ((res
                             (FunctionCall
                              ((ResolvedReference (load_int <opaque>))
-                              ((Reference (s (StructType 7))) (Value (Integer 32))))))))
+                              ((Reference (s (StructType 7))) (Value (Integer 32)))
+                              false)))))
                          (DestructuringLet
                           ((destructuring_let ((slice slice) (value value)))
                            (destructuring_let_expr
@@ -360,7 +369,7 @@ let%expect_test "demo struct serializer" =
         val a: Int[32]
         val b: Int[16]
       }
-      let T_serializer = serializer(T);
+      let T_serializer = serializer[T];
 
       fn test() {
         let b = Builder.new();
@@ -382,7 +391,8 @@ let%expect_test "demo struct serializer" =
                (Fn
                 (Block
                  ((Let
-                   ((b (FunctionCall ((ResolvedReference (new <opaque>)) ())))))
+                   ((b
+                     (FunctionCall ((ResolvedReference (new <opaque>)) () false)))))
                   (Return
                    (FunctionCall
                     ((ResolvedReference (T_serializer <opaque>))
@@ -399,7 +409,8 @@ let%expect_test "demo struct serializer" =
                             (Struct
                              ((Value (Type (StructType 127)))
                               ((value (Value (Integer 1))))))))))))
-                      (Reference (b (StructType 3)))))))))))))))
+                      (Reference (b (StructType 3))))
+                     false)))))))))))
           (T_serializer
            (Value
             (Function
@@ -427,10 +438,12 @@ let%expect_test "demo struct serializer" =
                                 (StructField
                                  ((Reference (self (StructType 125))) value
                                   IntegerType))
-                                (Value (Integer 32)))))))))))
+                                (Value (Integer 32)))
+                               false))))))))
                        ((StructField
                          ((Reference (self (StructType 130))) a (StructType 125)))
-                        (Reference (b (StructType 3)))))))))
+                        (Reference (b (StructType 3))))
+                       false)))))
                   (Let
                    ((b
                      (FunctionCall
@@ -449,10 +462,12 @@ let%expect_test "demo struct serializer" =
                                 (StructField
                                  ((Reference (self (StructType 127))) value
                                   IntegerType))
-                                (Value (Integer 16)))))))))))
+                                (Value (Integer 16)))
+                               false))))))))
                        ((StructField
                          ((Reference (self (StructType 130))) b (StructType 127)))
-                        (Reference (b (StructType 3)))))))))
+                        (Reference (b (StructType 3))))
+                       false)))))
                   (Return (Reference (b (StructType 3))))))))))))
           (T (Value (Type (StructType 130))))))
         (structs
@@ -507,7 +522,8 @@ let%expect_test "demo struct serializer" =
                        ((res
                          (FunctionCall
                           ((ResolvedReference (load_int <opaque>))
-                           ((Reference (s (StructType 7))) (Value (Integer 16))))))))
+                           ((Reference (s (StructType 7))) (Value (Integer 16)))
+                           false)))))
                       (DestructuringLet
                        ((destructuring_let ((slice slice) (value value)))
                         (destructuring_let_expr (Reference (res (StructType 5))))
@@ -535,7 +551,8 @@ let%expect_test "demo struct serializer" =
                        ((Reference (builder (StructType 3)))
                         (StructField
                          ((Reference (self (StructType 127))) value IntegerType))
-                        (Value (Integer 16))))))))))
+                        (Value (Integer 16)))
+                       false)))))))
                 (new
                  ((function_signature
                    ((function_params ((i IntegerType)))
@@ -563,7 +580,8 @@ let%expect_test "demo struct serializer" =
                           ((Reference (builder (StructType 3)))
                            (StructField
                             ((Reference (self (StructType 127))) value IntegerType))
-                           (Value (Integer 16)))))))))))))
+                           (Value (Integer 16)))
+                          false))))))))))
                 ((impl_interface -2)
                  (impl_methods
                   ((deserialize
@@ -577,7 +595,8 @@ let%expect_test "demo struct serializer" =
                           ((res
                             (FunctionCall
                              ((ResolvedReference (load_int <opaque>))
-                              ((Reference (s (StructType 7))) (Value (Integer 16))))))))
+                              ((Reference (s (StructType 7))) (Value (Integer 16)))
+                              false)))))
                          (DestructuringLet
                           ((destructuring_let ((slice slice) (value value)))
                            (destructuring_let_expr
@@ -652,7 +671,8 @@ let%expect_test "demo struct serializer" =
                        ((res
                          (FunctionCall
                           ((ResolvedReference (load_int <opaque>))
-                           ((Reference (s (StructType 7))) (Value (Integer 32))))))))
+                           ((Reference (s (StructType 7))) (Value (Integer 32)))
+                           false)))))
                       (DestructuringLet
                        ((destructuring_let ((slice slice) (value value)))
                         (destructuring_let_expr (Reference (res (StructType 5))))
@@ -680,7 +700,8 @@ let%expect_test "demo struct serializer" =
                        ((Reference (builder (StructType 3)))
                         (StructField
                          ((Reference (self (StructType 125))) value IntegerType))
-                        (Value (Integer 32))))))))))
+                        (Value (Integer 32)))
+                       false)))))))
                 (new
                  ((function_signature
                    ((function_params ((i IntegerType)))
@@ -708,7 +729,8 @@ let%expect_test "demo struct serializer" =
                           ((Reference (builder (StructType 3)))
                            (StructField
                             ((Reference (self (StructType 125))) value IntegerType))
-                           (Value (Integer 32)))))))))))))
+                           (Value (Integer 32)))
+                          false))))))))))
                 ((impl_interface -2)
                  (impl_methods
                   ((deserialize
@@ -722,7 +744,8 @@ let%expect_test "demo struct serializer" =
                           ((res
                             (FunctionCall
                              ((ResolvedReference (load_int <opaque>))
-                              ((Reference (s (StructType 7))) (Value (Integer 32))))))))
+                              ((Reference (s (StructType 7))) (Value (Integer 32)))
+                              false)))))
                          (DestructuringLet
                           ((destructuring_let ((slice slice) (value value)))
                            (destructuring_let_expr
@@ -766,7 +789,7 @@ let%expect_test "from interface" =
     {|
       struct Value {
         val a: Integer
-        impl From(Integer) {
+        impl From[Integer] {
           fn from(x: Integer) -> Self {
             Self{a: x}
           }
@@ -859,7 +882,7 @@ let%expect_test "tensor2" =
                  ((x
                    (FunctionCall
                     ((ResolvedReference (builtin_divmod <opaque>))
-                     ((Value (Integer 10)) (Value (Integer 2))))))))))))))))
+                     ((Value (Integer 10)) (Value (Integer 2))) false)))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
         (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
@@ -892,12 +915,13 @@ let%expect_test "slice api" =
                    ((slice
                      (FunctionCall
                       ((ResolvedReference (parse <opaque>))
-                       ((Reference (cell (StructType 1)))))))))
+                       ((Reference (cell (StructType 1)))) false)))))
                   (Let
                    ((result
                      (FunctionCall
                       ((ResolvedReference (load_int <opaque>))
-                       ((Reference (slice (StructType 7))) (Value (Integer 10))))))))
+                       ((Reference (slice (StructType 7))) (Value (Integer 10)))
+                       false)))))
                   (Let
                    ((slice2
                      (FunctionCall
@@ -912,7 +936,8 @@ let%expect_test "slice api" =
                              ((Reference (result (StructType 5))) slice
                               (StructType 7))))))))
                        ((StructField
-                         ((Reference (result (StructType 5))) slice (StructType 7)))))))))
+                         ((Reference (result (StructType 5))) slice (StructType 7))))
+                       false)))))
                   (Let
                    ((int
                      (FunctionCall
@@ -927,7 +952,8 @@ let%expect_test "slice api" =
                              ((Reference (result (StructType 5))) value
                               IntegerType)))))))
                        ((StructField
-                         ((Reference (result (StructType 5))) value IntegerType))))))))))))))))))
+                         ((Reference (result (StructType 5))) value IntegerType)))
+                       false)))))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
         (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
@@ -972,7 +998,8 @@ let%expect_test "deserializer" =
                                (FunctionCall
                                 ((ResolvedReference (load_int <opaque>))
                                  ((Reference (s (StructType 7)))
-                                  (Value (Integer 9))))))))
+                                  (Value (Integer 9)))
+                                 false)))))
                             (DestructuringLet
                              ((destructuring_let ((slice slice) (value value)))
                               (destructuring_let_expr
@@ -988,7 +1015,7 @@ let%expect_test "deserializer" =
                                    (Struct
                                     ((Value (Type (StructType 25)))
                                      ((value (Reference (value IntegerType))))))))))))))))))))
-                     ((Reference (slice (StructType 7)))))))
+                     ((Reference (slice (StructType 7)))) false)))
                   (destructuring_let_rest false)))
                 (DestructuringLet
                  ((destructuring_let ((slice slice) (value value2)))
@@ -1007,7 +1034,8 @@ let%expect_test "deserializer" =
                                (FunctionCall
                                 ((ResolvedReference (load_int <opaque>))
                                  ((Reference (s (StructType 7)))
-                                  (Value (Integer 256))))))))
+                                  (Value (Integer 256)))
+                                 false)))))
                             (DestructuringLet
                              ((destructuring_let ((slice slice) (value value)))
                               (destructuring_let_expr
@@ -1023,7 +1051,7 @@ let%expect_test "deserializer" =
                                    (Struct
                                     ((Value (Type (StructType 38)))
                                      ((value (Reference (value IntegerType))))))))))))))))))))
-                     ((Reference (slice (StructType 7)))))))
+                     ((Reference (slice (StructType 7)))) false)))
                   (destructuring_let_rest false)))
                 (Return
                  (Value
@@ -1130,14 +1158,17 @@ let%expect_test "derive Serialize" =
                                           (StructField
                                            ((Reference (self (StructType 25)))
                                             value IntegerType))
-                                          (Value (Integer 9)))))))))))
+                                          (Value (Integer 9)))
+                                         false))))))))
                                  ((StructField
                                    ((Reference (self (StructType 126))) value1
                                     (StructType 25)))
-                                  (Reference (b (StructType 3)))))))))
+                                  (Reference (b (StructType 3))))
+                                 false)))))
                             (Return (Reference (b (StructType 3)))))))))))
                      ((Reference (self (StructType 126)))
-                      (Reference (b (StructType 3)))))))))))))
+                      (Reference (b (StructType 3))))
+                     false)))))))))
             (uty_impls
              (((impl_interface -1)
                (impl_methods
@@ -1179,14 +1210,17 @@ let%expect_test "derive Serialize" =
                                              (StructField
                                               ((Reference (self (StructType 25)))
                                                value IntegerType))
-                                             (Value (Integer 9)))))))))))
+                                             (Value (Integer 9)))
+                                            false))))))))
                                     ((StructField
                                       ((Reference (self (StructType 126))) value1
                                        (StructType 25)))
-                                     (Reference (b (StructType 3)))))))))
+                                     (Reference (b (StructType 3))))
+                                    false)))))
                                (Return (Reference (b (StructType 3)))))))))))
                         ((Reference (self (StructType 126)))
-                         (Reference (b (StructType 3))))))))))))))))
+                         (Reference (b (StructType 3))))
+                        false))))))))))))
             (uty_id 126) (uty_base_id 125)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
@@ -1244,7 +1278,8 @@ let%expect_test "Deserialize Unions" =
                                  ((StructField
                                    ((Reference (self (StructType 7))) s
                                     (BuiltinType Slice)))
-                                  (Reference (bits IntegerType))))))))
+                                  (Reference (bits IntegerType)))
+                                 false)))))
                             (Let
                              ((slice
                                (Value
@@ -1266,9 +1301,10 @@ let%expect_test "Deserialize Unions" =
                                 ((slice
                                   (FunctionCall
                                    ((ResolvedReference (believe_me <opaque>))
-                                    ((Reference (slice (StructType 7)))))))
+                                    ((Reference (slice (StructType 7)))) false)))
                                  (value (Reference (int IntegerType)))))))))))))))
-                     ((Reference (slice (StructType 7))) (Value (Integer 1))))))))
+                     ((Reference (slice (StructType 7))) (Value (Integer 1)))
+                     false)))))
                 (If
                  ((if_condition
                    (FunctionCall
@@ -1287,7 +1323,8 @@ let%expect_test "Deserialize Unions" =
                                (Reference (i2 IntegerType))))))))))))
                      ((StructField
                        ((Reference (res_discr (StructType 5))) value IntegerType))
-                      (Value (Integer 0))))))
+                      (Value (Integer 0)))
+                     false)))
                   (if_then
                    (Block
                     ((Let
@@ -1306,7 +1343,8 @@ let%expect_test "Deserialize Unions" =
                                     (FunctionCall
                                      ((ResolvedReference (load_int <opaque>))
                                       ((Reference (s (StructType 7)))
-                                       (Value (Integer 8))))))))
+                                       (Value (Integer 8)))
+                                      false)))))
                                  (DestructuringLet
                                   ((destructuring_let
                                     ((slice slice) (value value)))
@@ -1326,7 +1364,8 @@ let%expect_test "Deserialize Unions" =
                                             (Reference (value IntegerType))))))))))))))))))))
                           ((StructField
                             ((Reference (res_discr (StructType 5))) slice
-                             (StructType 7)))))))))
+                             (StructType 7))))
+                          false)))))
                      (Return
                       (FunctionCall
                        ((Value
@@ -1348,7 +1387,8 @@ let%expect_test "Deserialize Unions" =
                            (StructType 7)))
                          (StructField
                           ((Reference (res (StructType 129))) value
-                           (StructType 36))))))))))
+                           (StructType 36))))
+                        true))))))
                   (if_else
                    ((Block
                      ((Let
@@ -1371,7 +1411,8 @@ let%expect_test "Deserialize Unions" =
                                        ((StructField
                                          ((Reference (self (StructType 7))) s
                                           (BuiltinType Slice)))
-                                        (Reference (bits IntegerType))))))))
+                                        (Reference (bits IntegerType)))
+                                       false)))))
                                   (Let
                                    ((slice
                                      (Value
@@ -1394,12 +1435,14 @@ let%expect_test "Deserialize Unions" =
                                         (FunctionCall
                                          ((ResolvedReference
                                            (believe_me <opaque>))
-                                          ((Reference (slice (StructType 7)))))))
+                                          ((Reference (slice (StructType 7))))
+                                          false)))
                                        (value (Reference (int IntegerType)))))))))))))))
                            ((StructField
                              ((Reference (res_discr (StructType 5))) slice
                               (StructType 7)))
-                            (Value (Integer 1))))))))
+                            (Value (Integer 1)))
+                           false)))))
                       (If
                        ((if_condition
                          (FunctionCall
@@ -1420,7 +1463,8 @@ let%expect_test "Deserialize Unions" =
                            ((StructField
                              ((Reference (res_discr (StructType 5))) value
                               IntegerType))
-                            (Value (Integer 1))))))
+                            (Value (Integer 1)))
+                           false)))
                         (if_then
                          (Block
                           ((Let
@@ -1440,7 +1484,8 @@ let%expect_test "Deserialize Unions" =
                                            ((ResolvedReference
                                              (load_int <opaque>))
                                             ((Reference (s (StructType 7)))
-                                             (Value (Integer 9))))))))
+                                             (Value (Integer 9)))
+                                            false)))))
                                        (DestructuringLet
                                         ((destructuring_let
                                           ((slice slice) (value value)))
@@ -1461,7 +1506,8 @@ let%expect_test "Deserialize Unions" =
                                                   (Reference (value IntegerType))))))))))))))))))))
                                 ((StructField
                                   ((Reference (res_discr (StructType 5))) slice
-                                   (StructType 7)))))))))
+                                   (StructType 7))))
+                                false)))))
                            (Return
                             (FunctionCall
                              ((Value
@@ -1483,7 +1529,8 @@ let%expect_test "Deserialize Unions" =
                                  (StructType 7)))
                                (StructField
                                 ((Reference (res (StructType 129))) value
-                                 (StructType 25))))))))))
+                                 (StructType 25))))
+                              true))))))
                         (if_else
                          ((Expr
                            (Primitive
