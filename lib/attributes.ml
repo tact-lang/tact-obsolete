@@ -25,7 +25,7 @@ functor
                 FunctionCall
                   ( bl @@ Reference (bl "serializer", HoleType),
                     [bl @@ Value (Type self_ty)],
-                    false )
+                    true )
               in
               let fun_body =
                 bl
@@ -72,7 +72,7 @@ functor
                 FunctionCall
                   ( bl @@ Reference (bl "deserializer", HoleType),
                     [bl @@ Value (Type self_ty)],
-                    false )
+                    true )
               in
               let fun_body =
                 bl
@@ -87,7 +87,7 @@ functor
                 ExprType
                   ( bl
                   @@ FunctionCall
-                       (load_result_f, [bl @@ Value (Type self_ty)], false) )
+                       (load_result_f, [bl @@ Value (Type self_ty)], true) )
               in
               let function_signature =
                 bl

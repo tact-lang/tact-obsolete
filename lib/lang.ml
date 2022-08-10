@@ -35,7 +35,8 @@ functor
       | `FieldNotFound of expr * string located
       | `CaseNotFound of (span[@equal.ignore] [@sexp.opaque])
       | `ArgumentNumberMismatch of
-        int * int * (span[@equal.ignore] [@sexp.opaque]) ]
+        int * int * (span[@equal.ignore] [@sexp.opaque])
+      | `ExpectedTypeFunction of bool * (span[@equal.ignore] [@sexp.opaque]) ]
     [@@deriving equal, sexp_of]
 
     include Builtin
@@ -118,45 +119,51 @@ functor
           in
           match type_of program f with
           | FunctionType sign -> (
-              let no_errors = ref true in
-              let types_satisfying =
-                List.map2 sign.value.function_params args
-                  ~f:(fun (_, expected) expr ->
-                    match s#check_type ~expected expr with
-                    | Ok _ ->
-                        expr
-                    | Error (NeedFromCall func) ->
-                        let s = FunctionCall (func, [expr], false) in
-                        {value = s; span = expr.span}
-                    | _ ->
-                        errors#report `Error
-                          (`TypeError
-                            (expected, type_of program expr, expr.span) )
-                          () ;
-                        no_errors := false ;
-                        {value = Value Void; span = expr.span} )
-              in
-              match types_satisfying with
-              | Ok args' when !no_errors ->
-                  let fc = (f, args', is_type_fn) in
-                  if
-                    is_immediate_expr !current_bindings program
-                      {value = FunctionCall (f, args', is_type_fn); span}
-                  then
-                    let fc =
-                      let inter = s#make_interpreter span in
-                      let fc = inter#interpret_fc fc in
-                      fc
-                    in
-                    Value fc
-                  else FunctionCall fc
-              | _ ->
-                  let expected = List.length sign.value.function_params in
-                  let actual = List.length args in
-                  errors#report `Error
-                    (`ArgumentNumberMismatch (expected, actual, f.span))
-                    () ;
-                  Value Void )
+              if not @@ Bool.equal is_type_fn sign.value.function_is_type then (
+                errors#report `Error
+                  (`ExpectedTypeFunction (sign.value.function_is_type, span))
+                  () ;
+                Value Void )
+              else
+                let no_errors = ref true in
+                let types_satisfying =
+                  List.map2 sign.value.function_params args
+                    ~f:(fun (_, expected) expr ->
+                      match s#check_type ~expected expr with
+                      | Ok _ ->
+                          expr
+                      | Error (NeedFromCall func) ->
+                          let s = FunctionCall (func, [expr], false) in
+                          {value = s; span = expr.span}
+                      | _ ->
+                          errors#report `Error
+                            (`TypeError
+                              (expected, type_of program expr, expr.span) )
+                            () ;
+                          no_errors := false ;
+                          {value = Value Void; span = expr.span} )
+                in
+                match types_satisfying with
+                | Ok args' when !no_errors ->
+                    let fc = (f, args', is_type_fn) in
+                    if
+                      is_immediate_expr !current_bindings program
+                        {value = FunctionCall (f, args', is_type_fn); span}
+                    then
+                      let fc =
+                        let inter = s#make_interpreter span in
+                        let fc = inter#interpret_fc fc in
+                        fc
+                      in
+                      Value fc
+                    else FunctionCall fc
+                | _ ->
+                    let expected = List.length sign.value.function_params in
+                    let actual = List.length args in
+                    errors#report `Error
+                      (`ArgumentNumberMismatch (expected, actual, f.span))
+                      () ;
+                    Value Void )
           | ty ->
               errors#report `Error (`ExpectedFunction (ty, f.span)) () ;
               Value Void

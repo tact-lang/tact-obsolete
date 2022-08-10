@@ -364,4 +364,20 @@ functor
                   ) ];
               additional_msg = [] }
             code
+      | `ExpectedTypeFunction (is_type_fn, span) ->
+          let diagnostic_msg =
+            if is_type_fn then
+              "Function should be called using `[]` brackets but called with \
+               `()` parens."
+            else
+              "Function should be called using `()` brackets but called with \
+               `[]` parens."
+          in
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg;
+              spans = [(span, "When calling this function")];
+              additional_msg = [] }
+            code
   end

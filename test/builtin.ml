@@ -369,7 +369,7 @@ let%expect_test "demo struct serializer" =
         val a: Int[32]
         val b: Int[16]
       }
-      let T_serializer = serializer(T);
+      let T_serializer = serializer[T];
 
       fn test() {
         let b = Builder.new();
@@ -789,7 +789,7 @@ let%expect_test "from interface" =
     {|
       struct Value {
         val a: Integer
-        impl From(Integer) {
+        impl From[Integer] {
           fn from(x: Integer) -> Self {
             Self{a: x}
           }

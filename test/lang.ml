@@ -2651,9 +2651,9 @@ let%expect_test "type check error" =
   let source =
     {|
       {
-        fn foo(x: Int(99)) { return x; }
+        fn foo(x: Int[99]) { return x; }
 
-        let a = foo(Int(10).new(1))
+        let a = foo(Int[10].new(1))
       }
     |}
   in
@@ -3080,8 +3080,8 @@ let%expect_test "implement interface op" =
 let%expect_test "serializer inner struct" =
   let source =
     {|
-      struct Inner { val x: Int(32) }
-      struct Outer { val y: Int(32) val z: Inner }
+      struct Inner { val x: Int[32] }
+      struct Outer { val y: Int[32] val z: Inner }
       let serialize_outer = serializer[Outer];
     |}
   in
@@ -3342,7 +3342,7 @@ let%expect_test "dependent types" =
         f
       }
       fn test(Y: Type) {
-        identity[Y]
+        identity(Y)
       }
     |}
   in
@@ -3365,7 +3365,7 @@ let%expect_test "dependent types" =
               (Return
                (FunctionCall
                 ((ResolvedReference (identity <opaque>))
-                 ((Reference (Y (TypeN 0)))) true)))))))))
+                 ((Reference (Y (TypeN 0)))) false)))))))))
         (identity
          (Value
           (Function
@@ -3402,7 +3402,7 @@ let%expect_test "TypeN" =
   let source =
     {|
       fn id(X: Type) { X }
-      let must_fail = id[Type];
+      let must_fail = id(Type);
     |}
   in
   pp_compile source ;
@@ -3650,11 +3650,9 @@ let%expect_test "union variants constructing" =
 let%expect_test "unions duplicate variant" =
   let source =
     {|
-      fn Test(T: Type) {
-        union {
-          case Integer
-          case T
-        }
+      union Test[T: Type] {
+        case Integer
+        case T
       }
       let a = Test[builtin_Builder]; // should be OK
       let b = Test[Integer]; // should fail
@@ -3670,7 +3668,8 @@ let%expect_test "unions duplicate variant" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((T (TypeN 0)))) (function_returns (UnionSig 5))))
+             ((function_is_type) (function_params ((T (TypeN 0))))
+              (function_returns (UnionSig 5))))
             (function_impl
              (Fn
               (Return
@@ -4175,11 +4174,11 @@ let%expect_test "methods monomorphization" =
           fn id(self: Self, x: X) -> X { x }
         }
       }
-      let foo = Foo[Integer] {};
+      let foo = Foo(Integer) {};
       let x = foo.id(10);
 
       struct Empty {}
-      let foo_empty = Foo[Empty] {};
+      let foo_empty = Foo(Empty) {};
       let y = foo_empty.id(Empty{});
     |}
   in
@@ -5358,7 +5357,7 @@ let%expect_test "struct signatures" =
            Self { value: i }
          }
        }
-       fn extract_value[n: Integer](x: Int2(n)) -> Integer {
+       fn extract_value[n: Integer](x: Int2[n]) -> Integer {
          x.value
        }
        let five = extract_value[10](Int2[10].new(5));
@@ -5383,7 +5382,7 @@ let%expect_test "struct signatures" =
                     (ExprType
                      (FunctionCall
                       ((ResolvedReference (Int2 <opaque>))
-                       ((Reference (n IntegerType))) false))))))
+                       ((Reference (n IntegerType))) true))))))
                  (function_returns IntegerType))))))
             (function_impl
              (Fn
@@ -5395,7 +5394,7 @@ let%expect_test "struct signatures" =
                       (ExprType
                        (FunctionCall
                         ((ResolvedReference (Int2 <opaque>))
-                         ((Reference (n IntegerType))) false))))))
+                         ((Reference (n IntegerType))) true))))))
                    (function_returns IntegerType)))
                  (function_impl
                   (Fn
@@ -5406,7 +5405,7 @@ let%expect_test "struct signatures" =
                         (ExprType
                          (FunctionCall
                           ((ResolvedReference (Int2 <opaque>))
-                           ((Reference (n IntegerType))) false)))))
+                           ((Reference (n IntegerType))) true)))))
                       value IntegerType))))))))))))))
         (Int2
          (Value
@@ -5485,7 +5484,7 @@ let%expect_test "Deserilize intf with constraints" =
     {|
       struct Container[X: Type] { val x: X }
       interface Deserialize2 {
-        fn deserialize() -> Container(Self)
+        fn deserialize() -> Container[Self]
       }
       fn test(Y: Deserialize2) -> Y {
         let v = Y.deserialize();
@@ -5544,7 +5543,7 @@ let%expect_test "Deserilize intf with constraints" =
                                     (mk_struct_details
                                      ((mk_methods ()) (mk_impls ()) (mk_id 0)
                                       (mk_sig 1) (mk_span <opaque>)))))))))))
-                            ((ResolvedReference (Self <opaque>))) false)))))))
+                            ((ResolvedReference (Self <opaque>))) true)))))))
                      (intf_args ()) (intf_loc <opaque>))))))
                 (Return
                  (StructField
@@ -5566,7 +5565,7 @@ let%expect_test "Deserilize intf with constraints" =
                                 (mk_struct_details
                                  ((mk_methods ()) (mk_impls ()) (mk_id 0)
                                   (mk_sig 1) (mk_span <opaque>)))))))))))
-                        ((ResolvedReference (Self <opaque>))) false)))))
+                        ((ResolvedReference (Self <opaque>))) true)))))
                    x (ExprType (Reference (Y (InterfaceType 1)))))))))))))))
         (Deserialize2 (Value (Type (InterfaceType 1))))
         (Container
@@ -5637,7 +5636,7 @@ let%expect_test "Deserilize intf with constraints" =
                           (mk_struct_details
                            ((mk_methods ()) (mk_impls ()) (mk_id 0) (mk_sig 1)
                             (mk_span <opaque>)))))))))))
-                  ((ResolvedReference (Self <opaque>))) false))))))))))))
+                  ((ResolvedReference (Self <opaque>))) true))))))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (4
