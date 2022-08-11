@@ -1165,7 +1165,8 @@ functor
           List.map ~f:Syntax.value
 
         method private check_type ~expected actual =
-          type_checker#check_type ~program ~current_bindings ~expected actual
+          type_checker#check_type ~program ~current_bindings ~expected
+            (type_of program actual)
 
         method private with_bindings : 'a. tbinding list -> (unit -> 'a) -> 'a =
           fun added_bindings f ->

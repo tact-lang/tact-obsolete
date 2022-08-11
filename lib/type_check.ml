@@ -61,8 +61,8 @@ functor
           match fn_returns with
           | Some fn_returns' -> (
             match
-              self#check_type actual ~program ~current_bindings
-                ~expected:fn_returns'
+              self#check_type (type_of program actual) ~program
+                ~current_bindings ~expected:fn_returns'
             with
             | Ok ty ->
                 fn_returns <- Some ty ;
@@ -89,12 +89,8 @@ functor
             fn_returns <- prev ;
             (result, new_fn_returns)
 
-        method check_type ~program ~current_bindings ~expected
-            ?(actual_ty = None) actual_value =
-          let actual =
-            Option.value_or_thunk actual_ty ~default:(fun _ ->
-                type_of program actual_value )
-          in
+        method check_type ~program ~current_bindings ~expected actual_ty =
+          let actual = actual_ty in
           let remover = new remover_of_resolved_reference in
           let actual' = remover#visit_type_ () actual in
           let expected' = remover#visit_type_ () expected in
@@ -159,7 +155,7 @@ functor
             | StructSig _ | Type0 _ ->
                 Ok actual
             | _ -> (
-              match type_of program actual_value with
+              match actual_ty with
               | (StructSig _ as ty) | (UnionSig _ as ty) ->
                   Ok ty
               | _ ->
@@ -168,12 +164,13 @@ functor
               let from_intf_ =
                 let inter =
                   new interpreter (make_ctx program current_bindings functions)
-                    errors actual_value.span (fun _ f -> f)
+                    errors (Config.builtin_located ()).span (fun _ f -> f)
                 in
                 Value
                   (inter#interpret_fc
                      ( from_intf,
-                       [{value = Value (Type actual); span = actual_value.span}],
+                       [ { value = Value (Type actual);
+                           span = (Config.builtin_located ()).span } ],
                        true ) )
               in
               let impl =
@@ -197,19 +194,18 @@ functor
               | _ ->
                   Error (TypeError expected) )
           | InterfaceType v -> (
-            match actual_value.value with
-            | ResolvedReference (_, {value = Value (Type t); _}) | Value (Type t)
-              -> (
-              match Program.find_impl_intf program v t with
+            match actual_ty with
+            | Type0 ty -> (
+              match Program.find_impl_intf program v ty with
               | Some _ ->
-                  Ok t
+                  Ok actual_ty
               | _ ->
                   Error (TypeError expected) )
             | _ ->
                 Error (TypeError expected) )
           | ExprType ex ->
               self#check_type ~expected:(type_of program ex) ~program
-                ~current_bindings actual_value
+                ~current_bindings actual_ty
           | _otherwise ->
               Error (TypeError expected)
       end
