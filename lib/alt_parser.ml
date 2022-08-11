@@ -156,6 +156,8 @@ module Make (Config : Config.T) = struct
 
   and function_index state = (parens (comma_sep (locate expr))) state
 
+  and field_access state = (char '.' >>> locate ident) state
+
   and expr state =
     let opless_expr =
       integer
@@ -176,16 +178,27 @@ module Make (Config : Config.T) = struct
           infix (locate (string "-")) (op "subtract") Assoc_left ] ]
     in
     let chain p op = p >>= fun x -> many_fold_left (fun x f -> f x) x op in
-    (* handle type and function indices *)
+    (* handle type and function indices, method calls and field access  *)
     let exp =
       let funcall is_type_func_call arguments l =
-        Syntax.map_located l ~f:(fun _ ->
-            FunctionCall
-              (make_function_call ~fn:l ~arguments ~is_type_func_call ()) )
+        Syntax.map_located l ~f:(fun l' ->
+            match l' with
+            | FieldAccess {from_expr; to_field; _} ->
+                MethodCall
+                  (make_method_call ~receiver:from_expr ~receiver_fn:to_field
+                     ~receiver_arguments:arguments () )
+            | _ ->
+                FunctionCall
+                  (make_function_call ~fn:l ~arguments ~is_type_func_call ()) )
+      and make_field_access to_field from_expr =
+        Syntax.map_located to_field ~f:(fun _ ->
+            FieldAccess (make_field_access ~from_expr ~to_field ()) )
       in
       chain
         (expression operators (locate !!opless_expr))
-        (type_index |>> funcall true <|> (function_index |>> funcall false))
+        ( type_index |>> funcall true
+        <|> (function_index |>> funcall false)
+        <|> (field_access |>> make_field_access) )
     in
     (* handle operators *)
     (expression operators exp |>> Syntax.value) state
