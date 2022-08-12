@@ -143,10 +143,9 @@ module Make (Config : Config.T) = struct
 
   and struct_item state =
     ( struct_field
-    <<< (whitespace <|> skip_char ';' <|> look_ahead (skip_char '}')) )
+    <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}')) )
       state
 
-  (* FIXME: semicolon between or after items doesn't work yet *)
   and gen_struct :
         'a. ('a, 's) t -> 's state -> ('a * struct_definition, 's) reply =
    fun name state ->
