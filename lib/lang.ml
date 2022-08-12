@@ -531,7 +531,7 @@ functor
           in
           (* TODO: check method signatures *)
           match type_of program in_receiver with
-          | TypeN 0 ->
+          | TypeN 0 | Type0 _ ->
               make_call (expr_to_type program in_receiver) ~mk_args:(fun x -> x)
           | StructSig sign_id -> (
               let sign = Arena.get program.struct_signs sign_id in
@@ -1165,7 +1165,8 @@ functor
           List.map ~f:Syntax.value
 
         method private check_type ~expected actual =
-          type_checker#check_type ~program ~current_bindings ~expected actual
+          type_checker#check_type ~program ~current_bindings ~expected
+            (type_of program actual)
 
         method private with_bindings : 'a. tbinding list -> (unit -> 'a) -> 'a =
           fun added_bindings f ->
