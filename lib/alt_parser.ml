@@ -19,6 +19,8 @@ module Make (Config : Config.T) = struct
                 pos_cnum = _index } )
           () )
 
+  let chain p op = p >>= fun x -> many_fold_left (fun x f -> f x) x op
+
   let many_chars_starting_with lead p =
     pipe2 lead (many p) (fun lead rest -> lead :: rest) |>> String.of_char_list
 
@@ -92,6 +94,31 @@ module Make (Config : Config.T) = struct
     (not_followed_by keyword "identifier (uses a reserved keyword)" >> ident')
       state
 
+  and parameters state =
+    (brackets
+       (many (locate (pair !!(locate ident <<< char ':') !!(locate expr)))) )
+      state
+
+  and parameterization state =
+    let parameterize arguments expr =
+      Syntax.map_located expr ~f:(fun _ ->
+          Function
+            (make_function_definition (* FIXME: not sure it's a good span *)
+               ~function_def_span:expr.span
+                 (* FIXME: not sure about this location *)
+               ~params:arguments ~is_type_function:true
+               ~function_body:
+                 (make_function_body
+                    ~function_stmt:{value = Expr expr; span = expr.span}
+                    () )
+               () ) )
+    in
+    (chain
+       !!(parameters |>> parameterize)
+       !!( parameters
+         |>> fun arguments mk expr -> mk (parameterize arguments expr) ) )
+      state
+
   and attribute state =
     (pipe2
        (attempt (skip_char '@' >> locate ident))
@@ -141,15 +168,16 @@ module Make (Config : Config.T) = struct
   and struct_ state = (gen_struct (return ()) |>> snd) state
 
   and struct_stmt state =
-    ( gen_struct (locate ident)
-    |>> fun (binding_name, struct_) ->
+    ( gen_struct (pair !!(locate ident) parameterization)
+    |>> fun ((binding_name, parameterize), struct_) ->
     let span = Syntax.span_to_concrete struct_.struct_span in
     Let
       (Syntax.make_located ~span
          ~value:
            (make_binding ~binding_name
               ~binding_expr:
-                (Syntax.make_located ~span ~value:(Struct struct_) ())
+                (parameterize
+                   (Syntax.make_located ~span ~value:(Struct struct_) ()) )
               () )
          () ) )
       state
@@ -179,7 +207,6 @@ module Make (Config : Config.T) = struct
         [ infix (locate (string "+")) (op "add") Assoc_left;
           infix (locate (string "-")) (op "subtract") Assoc_left ] ]
     in
-    let chain p op = p >>= fun x -> many_fold_left (fun x f -> f x) x op in
     (* handle type and function indices, method calls and field access  *)
     let exp =
       let funcall is_type_func_call arguments l =
