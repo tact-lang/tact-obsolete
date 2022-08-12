@@ -104,8 +104,8 @@ module Make (Config : Config.T) = struct
       Syntax.map_located expr ~f:(fun _ ->
           Function
             (make_function_definition (* FIXME: not sure it's a good span *)
-               ~function_def_span:expr.span
-               ~params:arguments ~is_type_function:true
+               ~function_def_span:expr.span ~params:arguments
+               ~is_type_function:true
                ~function_body:
                  (make_function_body
                     ~function_stmt:{value = Expr expr; span = expr.span}
@@ -113,7 +113,7 @@ module Make (Config : Config.T) = struct
                () ) )
     in
     (chain
-       !!(parameters |>> parameterize)
+       !!(attempt parameters |>> parameterize <|> return (fun x -> x))
        !!( parameters
          |>> fun arguments mk expr -> mk (parameterize arguments expr) ) )
       state
@@ -143,7 +143,8 @@ module Make (Config : Config.T) = struct
 
   and struct_item state =
     ( struct_field
-    <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}')) )
+    <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
+    )
       state
 
   and gen_struct :
