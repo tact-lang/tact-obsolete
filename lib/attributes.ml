@@ -84,10 +84,8 @@ functor
                             false ) )
               in
               let ret_ty =
-                ExprType
-                  ( bl
-                  @@ FunctionCall
-                       (load_result_f, [bl @@ Value (Type self_ty)], true) )
+                TypeCall
+                  {func = load_result_f; args = [bl @@ Value (Type self_ty)]}
               in
               let function_signature =
                 bl

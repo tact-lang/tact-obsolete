@@ -207,20 +207,9 @@ functor
           let let_ = Syntax.value let_ in
           let st_ty = type_of program let_.destructuring_let_expr in
           let fields =
-            match st_ty with
-            | StructType id ->
-                (Program.get_struct program id).struct_fields
-                |> List.map ~f:(fun (n, ty) -> (n, ty.field_type))
-            | ExprType ex -> (
-              match type_of program ex with
-              | StructSig id ->
-                  (Arena.get program.struct_signs id).st_sig_fields
-                  |> List.map ~f:(fun (n, exty) ->
-                         (n, expr_to_type program exty) )
-              | _ ->
-                  s#report `Error (`IsNotStruct let_.destructuring_let_expr) )
-            | _ ->
-                s#report `Error (`IsNotStruct let_.destructuring_let_expr)
+            Type.get_struct_fields program st_ty
+            |> Option.value_or_thunk ~default:(fun _ ->
+                   s#report `Error (`IsNotStruct let_.destructuring_let_expr) )
           in
           (* Check if field names are correct *)
           List.iter let_.destructuring_let ~f:(fun (name, name2) ->
@@ -587,7 +576,7 @@ functor
                      ```
                   *)
                   let sign =
-                    (new self_type_updater (ExprType in_receiver))
+                    (new self_type_updater (expr_to_type program in_receiver))
                       #visit_function_signature () m
                   in
                   IntfMethodCall
@@ -604,7 +593,7 @@ functor
           | UnionType ut ->
               make_call (UnionType ut) ~mk_args:(fun args ->
                   in_receiver :: args )
-          | ExprType ex -> (
+          | other_ty -> (
             (* If receiver has expr type that have type Interface, that means that
                value should implement interface, so we accept this case to allow
                such constructions:
@@ -617,7 +606,7 @@ functor
                type_of(arg) = ExprType(Reference("X"))
                type_of(Reference("X")) = Intf
             *)
-            match type_of program ex with
+            match type_of_type program other_ty with
             | InterfaceType intf_id -> (
                 let intf = Program.get_intf program intf_id in
                 match
@@ -626,7 +615,9 @@ functor
                 with
                 | Some m ->
                     IntfMethodCall
-                      { intf_instance = ex;
+                      { intf_instance =
+                          { value = Value (Type other_ty);
+                            span = in_receiver.span };
                         intf_def = intf_id;
                         intf_method = (fn.value, m);
                         intf_args = in_receiver :: args;
@@ -641,11 +632,13 @@ functor
                 with
                 | Some m ->
                     let m =
-                      (new self_ref_updater ex.value)#visit_function_signature
-                        () m
+                      (new self_ref_updater (Value (Type other_ty)))
+                        #visit_function_signature () m
                     in
                     StructSigMethodCall
-                      { st_sig_call_instance = ex;
+                      { st_sig_call_instance =
+                          { value = Value (Type other_ty);
+                            span = in_receiver.span };
                         st_sig_call_def = sign_id;
                         st_sig_call_method = (fn.value, m);
                         st_sig_call_args = in_receiver :: args;
@@ -661,7 +654,9 @@ functor
                 with
                 | Some m ->
                     StructSigMethodCall
-                      { st_sig_call_instance = ex;
+                      { st_sig_call_instance =
+                          { value = Value (Type other_ty);
+                            span = in_receiver.span };
                         st_sig_call_def = sign_id;
                         st_sig_call_method = (fn.value, m);
                         st_sig_call_args = in_receiver :: args;
@@ -670,10 +665,7 @@ functor
                 | None ->
                     s#report `Error (`MethodNotFound (in_receiver, fn)) )
             | _ ->
-                s#report `Error (`CannotHaveMethods (in_receiver, ExprType ex))
-            )
-          | receiver_ty ->
-              s#report `Error (`CannotHaveMethods (in_receiver, receiver_ty))
+                s#report `Error (`CannotHaveMethods (in_receiver, other_ty)) )
 
         method! visit_function_definition env f =
           (* prepare parameter bindings *)
@@ -893,7 +885,7 @@ functor
                       {field_type = expr_to_type program x} )
                 in
                 let fields =
-                  check_fields (ExprType id) expected_fields fields
+                  check_fields (expr_to_type program id) expected_fields fields
                   |> List.map ~f:(fun (name, expr) -> (name.value, expr))
                 in
                 (id, fields)
@@ -1183,7 +1175,7 @@ functor
                   { value =
                       FunctionCall
                         ( from_intf,
-                          [ { value = Value (Type (ExprType case));
+                          [ { value = Value (Type (expr_to_type program case));
                               span = case.span } ],
                           false );
                     span = case.span }
