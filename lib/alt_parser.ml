@@ -105,7 +105,6 @@ module Make (Config : Config.T) = struct
           Function
             (make_function_definition (* FIXME: not sure it's a good span *)
                ~function_def_span:expr.span
-                 (* FIXME: not sure about this location *)
                ~params:arguments ~is_type_function:true
                ~function_body:
                  (make_function_body
