@@ -235,9 +235,10 @@ module Make (Config : Config.T) = struct
     ( locate
         ( skip_keyword "let"
         >>> pipe2
-              (locate ident <<< char '=')
+              (pair (locate ident) parameterization <<< char '=')
               (locate expr <<< char ';')
-              (fun binding_name binding_expr -> {binding_name; binding_expr}) )
+              (fun (binding_name, parameterize) binding_expr ->
+                {binding_name; binding_expr = parameterize binding_expr} ) )
     |>> fun x -> Let x )
       state
 
