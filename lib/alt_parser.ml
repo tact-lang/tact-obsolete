@@ -53,6 +53,8 @@ module Make (Config : Config.T) = struct
 
   let comma_sep p = sep_by p comma
 
+  let present p = option p |>> Option.is_some
+
   let ( >>> ) x y = whitespace >> x >> whitespace >> y << whitespace
 
   let ( <<< ) x y = whitespace >> x << whitespace << y << whitespace
@@ -213,29 +215,39 @@ module Make (Config : Config.T) = struct
     |>> fun x -> Let x )
       state
 
-  (* TODO: let {x, ..} = 123; does not work *)
   and destructing_let_stmt state =
-    let destructung_binding state =
+    let destructuring_binding state =
       let bind state =
-        pipe2 (locate ident)
-          (option (skip_keyword "as" >>> locate ident))
-          (fun id1 id2 ->
-            match id2 with Some id2 -> (id1, id2) | None -> (id1, id1) )
+        (pipe2 (locate ident)
+           (option (skip_keyword "as" >>> locate ident))
+           (fun id1 id2 ->
+             match id2 with Some id2 -> (id1, id2) | None -> (id1, id1) ) )
           state
       in
       ( char '{'
-      >>> ( attempt (locate (comma_sep !!bind) |>> fun x -> (x, false))
-          <|> pipe2
-                (locate (comma_sep !!bind))
-                !!(string "..")
-                (fun x _ -> (x, true)) )
+      >>> locate
+            (comma_sep !!(attempt (bind |>> fun b -> Some b) <|> return None))
+      >>= (fun bindings ->
+            ( match Syntax.value bindings |> List.rev with
+            | [] | [None] ->
+                present !!(skip_string "..")
+            | _ :: l ->
+                  (* TODO: improve this error state handling, it is a bit of a mess *)
+                if List.exists l ~f:Option.is_none then fun s ->
+                  Empty_failed
+                    (unexpected_error s "leading comma prior to this input")
+                else present !!(skip_string "..") )
+            |>> fun rest ->
+            ( Syntax.map_located bindings ~f:(fun bindings ->
+                  List.filter_map bindings ~f:(fun x -> x) ),
+              rest ) )
       <<< char '}' )
         state
     in
     ( locate
         ( skip_keyword "let"
         >>> pipe2
-              (destructung_binding <<< char '=')
+              (destructuring_binding <<< char '=')
               (locate expr)
               (fun (destructuring_binding, destructuring_binding_rest)
                    destructuring_binding_expr ->
