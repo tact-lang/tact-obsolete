@@ -232,7 +232,7 @@ module Make (Config : Config.T) = struct
             | [] | [None] ->
                 present !!(skip_string "..")
             | _ :: l ->
-                  (* TODO: improve this error state handling, it is a bit of a mess *)
+                (* TODO: improve this error state handling, it is a bit of a mess *)
                 if List.exists l ~f:Option.is_none then fun s ->
                   Empty_failed
                     (unexpected_error s "leading comma prior to this input")
