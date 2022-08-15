@@ -268,8 +268,15 @@ functor
                                 Reference ("tensor", tensor_type) );
                             Return (Reference ("value", NamedType ret)) ] } )
               @@ List.range ~start:`inclusive ~stop:`inclusive 1 sz
+            and default_functions : F.top_level_expr list =
+              [ { function_name = "func_believe_me";
+                  function_forall = ["A"; "B"];
+                  function_args = [("i", NamedType "A")];
+                  function_returns = NamedType "B";
+                  function_body = AsmFn [NOP] } ]
+              |> List.map ~f:(fun (x : F.function_) -> F.Function x)
             in
-            make_tensor_accessors 2
+            make_tensor_accessors 2 @ default_functions
             @ List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
 
         method cg_StructField : T.expr * string located * T.type_ -> _ =

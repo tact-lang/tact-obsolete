@@ -118,19 +118,24 @@ and pp_function f fn =
     ~flast:(fun (name, t) -> pp_type f t ; pp_print_space f () ; pp_ident f name) ;
   pp_print_string f ")" ;
   pp_print_space f () ;
-  pp_print_string f "{" ;
-  pp_print_newline f () ;
   pp_function_body f indentation fn.function_body ;
-  pp_print_string f "}" ;
   pp_close_box f ()
 
 and pp_function_body f indentation = function
   | Fn stmts ->
+      pp_print_string f "{" ;
+      pp_print_newline f () ;
       List.iter stmts ~f:(fun stmt ->
           pp_print_string f indentation ;
           pp_open_hovbox f 2 ;
           pp_stmt f stmt ;
-          pp_close_box f () )
+          pp_close_box f () ) ;
+      pp_print_string f "}"
+  | AsmFn [NOP] ->
+      pp_print_string f "asm" ;
+      pp_print_space f () ;
+      pp_print_string f "\"NOP\"" ;
+      pp_print_string f ";"
   | _ ->
       raise Unsupported
 

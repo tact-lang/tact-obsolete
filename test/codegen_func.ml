@@ -16,6 +16,7 @@ let%expect_test "simple function generation" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     int test() {
       return 0;
     } |}]
@@ -41,6 +42,7 @@ let%expect_test "passing struct to a function" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int test([int, int] t) {
          return 1;
        } |}]
@@ -63,6 +65,7 @@ let%expect_test "function calls" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int test(int value) {
          return value;
        }
@@ -90,6 +93,7 @@ let%expect_test "Int[bits] serializer codegen" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -104,6 +108,9 @@ let%expect_test "Int[bits] serializer codegen" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -173,9 +180,6 @@ let%expect_test "Int[bits] serializer codegen" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -235,6 +239,7 @@ let%expect_test "demo struct serializer" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -249,6 +254,9 @@ let%expect_test "demo struct serializer" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -318,9 +326,6 @@ let%expect_test "demo struct serializer" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -391,6 +396,7 @@ let%expect_test "demo struct serializer 2" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -405,6 +411,9 @@ let%expect_test "demo struct serializer 2" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -474,9 +483,6 @@ let%expect_test "demo struct serializer 2" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -544,6 +550,7 @@ let%expect_test "true and false" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     int test(int flag) {
       if (flag) {
       return 0;
@@ -575,6 +582,7 @@ let%expect_test "if/then/else" =
            (_, Value2 value) = tensor;
            return value;
          }
+         forall A, B -> B func_believe_me(A i) asm "NOP";
          int test(int flag) {
            if (flag) {
            return 1;
@@ -602,6 +610,7 @@ let%expect_test "serializer inner struct" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -616,6 +625,9 @@ let%expect_test "serializer inner struct" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -685,9 +697,6 @@ let%expect_test "serializer inner struct" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -747,6 +756,7 @@ let%expect_test "unions" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        tuple try(tuple x) {
          return x;
        } |}]
@@ -777,6 +787,7 @@ let%expect_test "switch statement" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -791,6 +802,9 @@ let%expect_test "switch statement" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -860,9 +874,6 @@ let%expect_test "switch statement" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -924,6 +935,7 @@ let%expect_test "tensor2" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -938,6 +950,9 @@ let%expect_test "tensor2" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -1007,9 +1022,6 @@ let%expect_test "tensor2" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -1065,6 +1077,7 @@ let%expect_test "serialization api" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -1079,6 +1092,9 @@ let%expect_test "serialization api" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -1148,9 +1164,6 @@ let%expect_test "serialization api" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -1440,6 +1453,7 @@ let%expect_test "deserialization api" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int builtin_less_or_equal(int i1, int i2) {
          return __<=__(i1, i2);
        }
@@ -1454,6 +1468,9 @@ let%expect_test "deserialization api" =
        }
        int builtin_not(int c) {
          return _~_(c);
+       }
+       _ believe_me(_ i) {
+         return func_believe_me(i);
        }
        _ builtin_accept_message() {
          return accept_message();
@@ -1523,9 +1540,6 @@ let%expect_test "deserialization api" =
        }
        builder builtin_begin_cell() {
          return begin_cell();
-       }
-       _ believe_me(_ x) {
-         return x;
        }
        [slice, slice] slice_load_bits(slice slice_, int bits) {
          (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -1826,6 +1840,7 @@ let%expect_test "destructuring let" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int test([int, int, int] t) {
          [int x, int y2, int z] = t;
          return y2;
@@ -1857,6 +1872,7 @@ let%expect_test "destructuring let with rest ignored" =
          (_, Value2 value) = tensor;
          return value;
        }
+       forall A, B -> B func_believe_me(A i) asm "NOP";
        int test([int, int, int] t) {
          [_, int y2, _] = t;
          return y2;
@@ -1884,6 +1900,7 @@ let%expect_test "deserializer" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     int builtin_less_or_equal(int i1, int i2) {
       return __<=__(i1, i2);
     }
@@ -1898,6 +1915,9 @@ let%expect_test "deserializer" =
     }
     int builtin_not(int c) {
       return _~_(c);
+    }
+    _ believe_me(_ i) {
+      return func_believe_me(i);
     }
     _ builtin_accept_message() {
       return accept_message();
@@ -1967,9 +1987,6 @@ let%expect_test "deserializer" =
     }
     builder builtin_begin_cell() {
       return begin_cell();
-    }
-    _ believe_me(_ x) {
-      return x;
     }
     [slice, slice] slice_load_bits(slice slice_, int bits) {
       (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -2035,6 +2052,7 @@ let%expect_test "deserializer unions" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     int builtin_less_or_equal(int i1, int i2) {
       return __<=__(i1, i2);
     }
@@ -2049,6 +2067,9 @@ let%expect_test "deserializer unions" =
     }
     int builtin_not(int c) {
       return _~_(c);
+    }
+    _ believe_me(_ i) {
+      return func_believe_me(i);
     }
     _ builtin_accept_message() {
       return accept_message();
@@ -2118,9 +2139,6 @@ let%expect_test "deserializer unions" =
     }
     builder builtin_begin_cell() {
       return begin_cell();
-    }
-    _ believe_me(_ x) {
-      return x;
     }
     [slice, slice] slice_load_bits(slice slice_, int bits) {
       (slice, slice) output = builtin_load_bits(slice_, bits);
@@ -2207,6 +2225,7 @@ let%expect_test "assignment" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     int test(int x) {
       int a = 1;
       a = x;
@@ -2238,6 +2257,7 @@ let%expect_test "assignment with condition block" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     int test(int x) {
       int a = 1;
       if (-1) {
@@ -2270,6 +2290,7 @@ let%expect_test "codegen while block" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     _ test() {
       int a = 10;
       while (-1) {
@@ -2352,6 +2373,7 @@ let%expect_test "codegen while block" =
       (_, Value2 value) = tensor;
       return value;
     }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
     int builtin_less_or_equal(int i1, int i2) {
       return __<=__(i1, i2);
     }
@@ -2366,6 +2388,9 @@ let%expect_test "codegen while block" =
     }
     int builtin_not(int c) {
       return _~_(c);
+    }
+    _ believe_me(_ i) {
+      return func_believe_me(i);
     }
     _ builtin_accept_message() {
       return accept_message();
@@ -2435,9 +2460,6 @@ let%expect_test "codegen while block" =
     }
     builder builtin_begin_cell() {
       return begin_cell();
-    }
-    _ believe_me(_ x) {
-      return x;
     }
     [slice, slice] slice_load_bits(slice slice_, int bits) {
       (slice, slice) output = builtin_load_bits(slice_, bits);
