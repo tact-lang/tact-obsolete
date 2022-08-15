@@ -188,6 +188,52 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
+  and interface_item state =
+    ( fn_stmt
+    |>> (fun x -> `Fn x)
+    <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
+    )
+      state
+
+  and gen_interface :
+        'a. ('a, 's) t -> 's state -> ('a * interface_definition, 's) reply =
+   fun name state ->
+    ( !!(locate
+           (pair attributes
+              (pair
+                 (skip_keyword "interface" >>> name)
+                 (char '{' >>> many !!interface_item <<< char '}') ) ) )
+    |>> fun v ->
+    let interface_attributes, (name, items) = Syntax.value v in
+    ( name,
+      make_interface_definition ~interface_attributes
+        ~interface_members:
+          (List.filter_map items ~f:(function
+            | `Fn (Let f) ->
+                Some f
+            | _ ->
+                None ) )
+        () ) )
+      state
+
+  and interface state = (gen_interface (return ()) |>> snd) state
+
+  and interface_stmt state =
+    ( locate (gen_interface (pair !!(locate ident) parameterization))
+    |>> fun v ->
+    let span = Syntax.span_to_concrete @@ Syntax.span v in
+    let (binding_name, parameterize), interface_ = Syntax.value v in
+    Let
+      (Syntax.make_located ~span
+         ~value:
+           (make_binding ~binding_name
+              ~binding_expr:
+                (parameterize
+                   (Syntax.make_located ~span ~value:(Interface interface_) ()) )
+              () )
+         () ) )
+      state
+
   and function_parameters state =
     (parens
        (many (locate (pair !!(locate ident <<< char ':') !!(locate expr)))) )
@@ -246,6 +292,7 @@ module Make (Config : Config.T) = struct
       <|> (struct_ |>> fun x -> Struct x)
       <|> (locate ident |>> fun x -> Reference x)
       <|> (fn |>> fun x -> Function x)
+      <|> (interface |>> fun x -> Interface x)
       <|> parens expr
     and operators =
       let op name _operator l r =
@@ -423,8 +470,9 @@ module Make (Config : Config.T) = struct
 
   and stmt state =
     ( whitespace
-    >> ( attempt let_ <|> attempt struct_stmt <|> attempt fn_stmt <|> switch
-       <|> while_loop <|> semicolon_stmt <|> if_stmt <|> code_block ) )
+    >> ( attempt let_ <|> attempt struct_stmt <|> attempt interface_stmt
+       <|> attempt fn_stmt <|> switch <|> while_loop <|> semicolon_stmt
+       <|> if_stmt <|> code_block ) )
       state
 
   and program state =
