@@ -143,6 +143,7 @@ module Make (Config : Config.T) = struct
 
   and struct_item state =
     ( struct_field
+    <|> (fn_stmt |>> fun x -> `Fn x)
     <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
     )
       state
@@ -161,7 +162,13 @@ module Make (Config : Config.T) = struct
       make_struct_definition ~struct_attributes
         ~fields:
           (List.filter_map items ~f:(function `Field f -> Some f | _ -> None))
-        ~struct_bindings:[] ~impls:[] ~struct_span:(Syntax.span v) () ) )
+        ~struct_bindings:
+          (List.filter_map items ~f:(function
+            | `Fn (Let f) ->
+                Some f
+            | _ ->
+                None ) )
+        ~impls:[] ~struct_span:(Syntax.span v) () ) )
       state
 
   and struct_ state = (gen_struct (return ()) |>> snd) state
