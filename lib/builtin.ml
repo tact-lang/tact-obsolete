@@ -150,12 +150,10 @@ functor
                     function_is_type = false;
                     function_params = [(bl "b", builder_struct)];
                     function_returns =
-                      ExprType
-                        ( bl
-                        @@ FunctionCall
-                             ( load_result_f,
-                               [bl @@ Reference (bl "Self", SelfType)],
-                               true ) ) } ) ] }
+                      TypeCall
+                        { func = load_result_f;
+                          args = [bl @@ Reference (bl "Self", SelfType)] } } )
+            ] }
       in
       intf
 
@@ -353,12 +351,9 @@ functor
                      function_is_type = false;
                      function_params = [(bl "slice", slice_ty)];
                      function_returns =
-                       ExprType
-                         ( bl
-                         @@ FunctionCall
-                              ( load_result_fn,
-                                [bl @@ Reference (bl "t", type0)],
-                                true ) ) } ) }
+                       TypeCall
+                         { func = load_result_fn;
+                           args = [bl @@ Reference (bl "t", type0)] } } ) }
       in
       let deserializer_struct_ty sid p =
         let s = Program.get_struct p sid in

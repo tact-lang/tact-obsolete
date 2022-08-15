@@ -232,7 +232,7 @@ functor
       | SelfType
       | InvalidType of expr
       | ExprType of expr
-      | ValueOf of type_
+      | TypeCall of {func : expr; args : expr list}
 
     and mk_union =
       { mk_union_attributes : attribute list; [@sexp.list]
@@ -381,6 +381,21 @@ functor
       List.filter_map bindings ~f:(fun (name, scope) ->
           match scope with Comptime value -> Some (name, value) | _ -> None )
 
+    class ['s] boolean_reduce (zero : bool) =
+      object (_self : 's)
+        inherit [_] reduce
+
+        method private zero = zero
+
+        method private plus = if zero then ( && ) else ( || )
+
+        method visit_instr _env _instr = zero
+
+        method visit_z _env _z = zero
+
+        method visit_arena _ _ _ = zero
+      end
+
     let sig_of_struct {struct_attributes; struct_fields; struct_details; _} sid
         =
       { st_sig_attributes = struct_attributes;
@@ -409,6 +424,8 @@ functor
       match expr.value with
       | Value (Type type_) ->
           type_
+      | FunctionCall (func, args, true) ->
+          TypeCall {func; args}
       | ResolvedReference (_, e) ->
           expr_to_type program e
       | _ ->
@@ -438,14 +455,16 @@ functor
           let f' = type_of program f in
           match f' with
           | FunctionType sign ->
-              type_of_call
-                ~self_ty:
-                  (Some
-                     (ExprType
-                        {value = FunctionCall (f, args, is_ty); span = expr.span}
-                     ) )
-                program args sign.value.function_params
-                sign.value.function_returns
+              let self_ty =
+                match is_ty with
+                | true ->
+                    TypeCall {func = f; args}
+                | false ->
+                    ExprType
+                      {value = FunctionCall (f, args, is_ty); span = expr.span}
+              in
+              type_of_call ~self_ty:(Some self_ty) program args
+                sign.value.function_params sign.value.function_returns
           | _ ->
               Errors.unreachable () )
       | Reference (_, t) ->
@@ -477,8 +496,16 @@ functor
           TypeN (x + 1)
       | Type0 _ | StructSig _ | UnionSig _ ->
           TypeN 1
-      | ValueOf ty ->
-          ty
+      | TypeCall {func; args} -> (
+          let f' = type_of program func in
+          match f' with
+          | FunctionType sign ->
+              type_of_call
+                ~self_ty:(Some (TypeCall {func; args}))
+                program args sign.value.function_params
+                sign.value.function_returns
+          | _ ->
+              Errors.unreachable () )
       | ExprType ex ->
           type_of program ex
       | other_ty ->
@@ -505,6 +532,8 @@ functor
 
           val mutable visited_union_signs : (int * int) list = []
 
+          val mutable updated = false
+
           method! visit_StructSig env sign_id =
             match List.Assoc.find visited_signs sign_id ~equal:equal_int with
             | Some new_id ->
@@ -516,8 +545,9 @@ functor
                   equal_option equal_int self_sig (Some sign_id)
                   && not inside_self_sig
                 then inside_self_sig <- true ;
+                updated <- false ;
                 let sign = Arena.get program.struct_signs sign_id in
-                let id, new_sign =
+                let id, _new_sign =
                   Arena.with_id program.struct_signs ~f:(fun new_id ->
                       let prev_vis_signs = visited_signs in
                       visited_signs <- (sign_id, new_id) :: visited_signs ;
@@ -525,10 +555,14 @@ functor
                       visited_signs <- prev_vis_signs ;
                       {new_sign with st_sig_id = new_id} )
                 in
-                if equal_struct_sig sign new_sign then (
-                  Arena.unsafe_drop_last program.struct_signs ;
-                  StructSig sign_id )
-                else StructSig id
+                let out =
+                  if not updated then (
+                    Arena.unsafe_drop_last program.struct_signs ;
+                    StructSig sign_id )
+                  else StructSig id
+                in
+                updated <- false ;
+                out
 
           method! visit_UnionSig env sign_id =
             match
@@ -554,7 +588,10 @@ functor
 
           method! visit_Reference _ (ref, ty) =
             List.find_map associated ~f:(fun (name, x) ->
-                if equal_string name ref.value then Some x.value else None )
+                if equal_string name ref.value then (
+                  updated <- true ;
+                  Some x.value )
+                else None )
             |> Option.value_or_thunk ~default:(fun _ -> Reference (ref, ty))
 
           method! visit_type_ env =
@@ -573,21 +610,6 @@ functor
             dependent_types_monomophizer program associated
       in
       monomorphizer#visit_type_ () returns
-
-    class ['s] boolean_reduce (zero : bool) =
-      object (_self : 's)
-        inherit [_] reduce
-
-        method private zero = zero
-
-        method private plus = if zero then ( && ) else ( || )
-
-        method visit_instr _env _instr = zero
-
-        method visit_z _env _z = zero
-
-        method visit_arena _ _ _ = zero
-      end
 
     type reason_non_immediate =
       | NonImmediateRef
@@ -647,9 +669,9 @@ functor
             | Some (Error _) ->
                 NonImmediate NonImmediateRef
             | None ->
-                raise
-                  (Errors.InternalCompilerError
-                     "Unresolved reference when it should be resolved." ) )
+                Errors.ice
+                  ( "Unresolved reference " ^ ref.value
+                  ^ " when it should be resolved." ) )
 
         method! visit_Primitive _ _ = NonImmediate NonImmediatePrimitive
 
@@ -935,5 +957,22 @@ functor
               None )
         | _ ->
             None
+    end
+
+    module Type = struct
+      let get_struct_fields program ty =
+        match ty with
+        | StructType id ->
+            (Program.get_struct program id).struct_fields
+            |> List.map ~f:(fun (n, ty) -> (n, ty.field_type))
+            |> fun x -> Some x
+        | other_ty -> (
+          match type_of_type program other_ty with
+          | StructSig id ->
+              (Arena.get program.struct_signs id).st_sig_fields
+              |> List.map ~f:(fun (n, exty) -> (n, expr_to_type program exty))
+              |> fun x -> Some x
+          | _ ->
+              None )
     end
   end

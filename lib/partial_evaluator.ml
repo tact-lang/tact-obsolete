@@ -84,8 +84,8 @@ functor
               in
               ctx.scope := vars :: !(ctx.scope) ;
               DestructuringLet {let_ with destructuring_let_expr = expr}
-          | ExprType ex -> (
-            match type_of ctx.program ex with
+          | other_ty -> (
+            match type_of_type ctx.program other_ty with
             | StructSig sign ->
                 let struct_sign = Arena.get ctx.program.struct_signs sign in
                 let vars =
@@ -95,14 +95,12 @@ functor
                         name
                       |> Option.value_exn
                       |> fun field_type ->
-                      (new_name, Runtime (ExprType field_type)) )
+                      (new_name, Runtime (expr_to_type ctx.program field_type)) )
                 in
                 ctx.scope := vars :: !(ctx.scope) ;
                 DestructuringLet {let_ with destructuring_let_expr = expr}
             | _ ->
-                ice "Type-check bug" )
-          | _ ->
-              ice "Type-check bug"
+                ice "Type-check bug 1" )
 
         method! visit_switch env switch =
           let cond = self#visit_expr env switch.switch_condition in
@@ -171,7 +169,7 @@ functor
                 | Type t ->
                     t
                 | _ ->
-                    ice "Type-check bug"
+                    ice "Type-check bug 2"
               in
               match
                 Program.find_impl_intf ctx.program call.intf_def intf_ty
@@ -188,7 +186,7 @@ functor
                       args,
                       method_.value.function_signature.value.function_is_type )
               | None ->
-                  ice "Type-check bug" )
+                  ice "Type-check bug 3" )
           | false ->
               IntfMethodCall {call with intf_instance; intf_args = args}
 
@@ -279,7 +277,7 @@ functor
                 | Type t ->
                     t
                 | _ ->
-                    ice "Type-check bug"
+                    ice "Type-check bug 4"
               in
               let methods = Program.methods_of ctx.program st_sig_ty in
               let method_ =
