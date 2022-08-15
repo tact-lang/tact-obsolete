@@ -181,6 +181,52 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
+  and function_parameters state =
+    (parens
+       (many (locate (pair !!(locate ident <<< char ':') !!(locate expr)))) )
+      state
+
+  and gen_fn :
+        'a. ('a, 's) t -> 's state -> ('a * function_definition, 's) reply =
+   fun name state ->
+    !!( locate
+          (pair attributes
+             (pair
+                (pair (skip_keyword "fn" >>> name) function_parameters)
+                (pair
+                   ( attempt (option (skip_string "->" >>> locate expr))
+                   <|> return None )
+                   (option (locate code_block)) ) ) )
+      |>> fun v ->
+      let function_attributes, ((name, params), (returns, function_body)) =
+        Syntax.value v
+      in
+      ( name,
+        make_function_definition ~function_attributes ~is_type_function:false
+          ~params ?returns
+          ?function_body:
+            (Option.map function_body ~f:(fun function_body ->
+                 {function_stmt = function_body} ) )
+          ~function_def_span:(Syntax.span v) () ) )
+      state
+
+  and fn state = (gen_fn (return ()) |>> snd) state
+
+  and fn_stmt state =
+    ( gen_fn (pair !!(locate ident) parameterization)
+    |>> fun ((binding_name, parameterize), fn) ->
+    let span = Syntax.span_to_concrete fn.function_def_span in
+    Let
+      (Syntax.make_located ~span
+         ~value:
+           (make_binding ~binding_name
+              ~binding_expr:
+                (parameterize
+                   (Syntax.make_located ~span ~value:(Function fn) ()) )
+              () )
+         () ) )
+      state
+
   and type_index state = (brackets (comma_sep (locate expr))) state
 
   and function_index state = (parens (comma_sep (locate expr))) state
@@ -192,6 +238,7 @@ module Make (Config : Config.T) = struct
       integer
       <|> (struct_ |>> fun x -> Struct x)
       <|> (locate ident |>> fun x -> Reference x)
+      <|> (fn |>> fun x -> Function x)
       <|> parens expr
     and operators =
       let op name _operator l r =
@@ -369,8 +416,8 @@ module Make (Config : Config.T) = struct
 
   and stmt state =
     ( whitespace
-    >> ( attempt let_ <|> attempt struct_stmt <|> switch <|> while_loop
-       <|> semicolon_stmt <|> if_stmt <|> code_block ) )
+    >> ( attempt let_ <|> attempt struct_stmt <|> attempt fn_stmt <|> switch
+       <|> while_loop <|> semicolon_stmt <|> if_stmt <|> code_block ) )
       state
 
   and program state =
