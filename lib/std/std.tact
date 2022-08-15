@@ -273,7 +273,7 @@ struct AddressStd {
 
 struct AddressVar {
   val len: Int[9]
-  val workchain_id: Int[8]
+  val workchain_id: Int[32]
   val address: Integer
 
   impl Serialize {
