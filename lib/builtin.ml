@@ -42,7 +42,7 @@ functor
                           { function_attributes = [];
                             function_is_type = false;
                             function_params =
-                              [(bl "s", slice_struct); (bl "v", t)];
+                              [(bl "v", t); (bl "s", slice_struct)];
                             function_returns = StructType id };
                       function_impl =
                         Fn
@@ -89,10 +89,10 @@ functor
                                { function_attributes = [];
                                  function_is_type = false;
                                  function_params =
-                                   [ (bl "s", slice_struct);
-                                     ( bl "v",
+                                   [ ( bl "v",
                                        ExprType (bl @@ Reference (bl "T", type0))
-                                     ) ];
+                                     );
+                                     (bl "s", slice_struct) ];
                                  function_returns = StructSig id } ) ];
                        st_sig_base_id = base_id;
                        st_sig_id = id } )
@@ -415,8 +415,8 @@ functor
           @@ Value
                (Struct
                   ( bl @@ Value (Type load_result_ty),
-                    [ ("value", out_value);
-                      ("slice", bl @@ Reference (bl "slice", slice_ty)) ] ) )
+                    [ ("slice", bl @@ Reference (bl "slice", slice_ty));
+                      ("value", out_value) ] ) )
         in
         let body = Block (deserialize_fields @ [bl @@ Return out]) in
         { function_signature =
@@ -718,20 +718,20 @@ functor
             make_builtin "end_cell" [("b", b)] c;
             make_builtin "store_int" [("b", b); ("i", i); ("bs", i)] b;
             make_builtin "store_uint" [("b", b); ("i", i); ("bs", i)] b;
-            make_builtin "store_coins" [("b", b); ("c", i)] b;
+            make_builtin "store_grams" [("b", b); ("c", i)] b;
             make_builtin "begin_parse" [("c", c)] s;
             make_builtin "load_int" [("s", s); ("bs", i)] (t2 s i);
             make_builtin "load_uint" [("s", s); ("bs", i)] (t2 s i);
             make_builtin "load_bits" [("s", s); ("bs", i)] (t2 s s);
-            make_builtin "load_coins" [("s", s)] (t2 s i);
+            make_builtin "load_grams" [("s", s)] (t2 s i);
             make_builtin "load_ref" [("s", s)] (t2 s c);
             make_builtin "slice_last" [("s", s); ("l", i)] s;
             make_builtin "slice_refs" [("s", s)] i;
             make_builtin "end_parse" [("s", s)] v;
             make_builtin "divmod" [("i1", i); ("i2", i)] (t2 i i);
-            make_builtin "send_raw_msg" [("c", c); ("f", i)] v;
+            make_builtin "send_raw_message" [("c", c); ("f", i)] v;
             make_builtin "throw" [("e", i)] v;
-            make_builtin "load_data" [] c;
+            make_builtin "get_data" [] c;
             make_builtin "set_data" [("d", c)] v;
             make_builtin "check_signature" [("h", i); ("s", s); ("k", i)] bool_;
             make_builtin "slice_hash" [("s", s)] i;
@@ -740,15 +740,15 @@ functor
             make_builtin_names "believe_me" "func_believe_me"
               [("i", HoleType)]
               HoleType;
-            make_builtin_names "builtin_not" "_~_" [("c", bool_)] bool_;
+            make_builtin_names "builtin_not" "func_bit_not" [("c", bool_)] bool_;
             make_builtin_names "builtin_add" "_+_" [("i1", i); ("i2", i)] i;
-            make_builtin_names "builtin_equal" "__==__"
+            make_builtin_names "builtin_equal" "_==_"
               [("i1", i); ("i2", i)]
               bool_;
             make_builtin_names "builtin_not_equal" "_!=_"
               [("i1", i); ("i2", i)]
               bool_;
-            make_builtin_names "builtin_less_or_equal" "__<=__"
+            make_builtin_names "builtin_less_or_equal" "_<=_"
               [("i1", i); ("i2", i)]
               bool_ ]
         in

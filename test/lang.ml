@@ -96,7 +96,7 @@ let%expect_test "scope resolution" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -259,7 +259,7 @@ let%expect_test "binding resolution" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -436,7 +436,7 @@ let%expect_test "scope resolution after let binding" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -603,7 +603,7 @@ let%expect_test "basic struct definition" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -786,7 +786,7 @@ let%expect_test "Tact function evaluation" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -959,7 +959,7 @@ let%expect_test "struct definition" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -1145,7 +1145,7 @@ let%expect_test "duplicate type field" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -1336,7 +1336,7 @@ let%expect_test "parametric struct instantiation" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 119))))
+                 ((function_params ((v (StructType 119)) (s (StructType 7))))
                   (function_returns (StructType 120))))
                 (function_impl
                  (Fn
@@ -1544,7 +1544,7 @@ let%expect_test "scoping that `let` introduces in code" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -1746,7 +1746,7 @@ let%expect_test "reference in function bodies" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -2235,7 +2235,7 @@ let%expect_test "type check error" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 120))))
+                 ((function_params ((v (StructType 120)) (s (StructType 7))))
                   (function_returns (StructType 121))))
                 (function_impl
                  (Fn
@@ -2384,7 +2384,7 @@ let%expect_test "type check error" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -2679,7 +2679,7 @@ let%expect_test "type check error" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 120))))
+                 ((function_params ((v (StructType 120)) (s (StructType 7))))
                   (function_returns (StructType 121))))
                 (function_impl
                  (Fn
@@ -2828,7 +2828,7 @@ let%expect_test "type check error" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -3152,7 +3152,7 @@ let%expect_test "serializer inner struct" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -3470,7 +3470,7 @@ let%expect_test "union variants constructing" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -3823,7 +3823,7 @@ let%expect_test "unions" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 120))))
+                 ((function_params ((v (StructType 120)) (s (StructType 7))))
                   (function_returns (StructType 121))))
                 (function_impl
                  (Fn
@@ -3972,7 +3972,7 @@ let%expect_test "unions" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -4312,7 +4312,7 @@ let%expect_test "switch statement" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 120))))
+                 ((function_params ((v (StructType 120)) (s (StructType 7))))
                   (function_returns (StructType 121))))
                 (function_impl
                  (Fn
@@ -4461,7 +4461,7 @@ let%expect_test "switch statement" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn
@@ -4742,7 +4742,7 @@ let%expect_test "let binding with type" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 120))))
+                 ((function_params ((v (StructType 120)) (s (StructType 7))))
                   (function_returns (StructType 121))))
                 (function_impl
                  (Fn
@@ -4891,7 +4891,7 @@ let%expect_test "let binding with type" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 118))))
+                 ((function_params ((v (StructType 118)) (s (StructType 7))))
                   (function_returns (StructType 119))))
                 (function_impl
                  (Fn

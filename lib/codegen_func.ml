@@ -22,6 +22,8 @@ functor
 
         val mutable functions : (T.function_ * F.function_) list = []
 
+        val mutable helpers : F.function_ list = []
+
         method cg_Fn body = F.Fn (List.concat (Option.value_exn body))
 
         method build_Integer : Zint.t -> F.expr = fun i -> F.Integer i
@@ -273,10 +275,17 @@ functor
                   function_forall = ["A"; "B"];
                   function_args = [("i", NamedType "A")];
                   function_returns = NamedType "B";
-                  function_body = AsmFn [NOP] } ]
+                  function_body = AsmFn "NOP" };
+                { function_name = "func_bit_not";
+                  function_forall = [];
+                  function_args = [("a", IntType)];
+                  function_returns = IntType;
+                  function_body =
+                    Fn [Return (UnaryOp ("~", Reference ("a", IntType)))] } ]
               |> List.map ~f:(fun (x : F.function_) -> F.Function x)
             in
             make_tensor_accessors 2 @ default_functions
+            @ List.map helpers ~f:(fun x -> F.Function x)
             @ List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
 
         method cg_StructField : T.expr * string located * T.type_ -> _ =
@@ -284,20 +293,26 @@ functor
             let build_access ~(tensor : int option) struct_ty field field_ty =
               match tensor with
               | None ->
-                  let name =
-                    match field with
-                    | 0 ->
-                        "first"
-                    | 1 ->
-                        "second"
-                    | 2 ->
-                        "third"
-                    | 3 ->
-                        "fourth"
-                    | _ ->
-                        raise Unsupported
+                  if field >= 16 then
+                    ice "Only structs with 16 or less fields are allowed" ;
+                  let fun_name = "get" ^ Int.to_string field in
+                  ( if
+                    not
+                    @@ List.exists helpers ~f:(fun x ->
+                           String.equal x.function_name fun_name )
+                  then
+                    let fn : F.function_ =
+                      { function_name = fun_name;
+                        function_forall = ["A"];
+                        function_body = AsmFn (Int.to_string field ^ " INDEX");
+                        function_args = [("t", UnknownTuple)];
+                        function_returns = NamedType "A" }
+                    in
+                    helpers <- fn :: helpers ) ;
+                  let converted_value =
+                    F.FunctionCall ("func_believe_me", [struct_ty], UnknownTuple)
                   in
-                  F.FunctionCall (name, [struct_ty], field_ty)
+                  F.FunctionCall (fun_name, [converted_value], field_ty)
               | Some arity ->
                   let name =
                     "tensor" ^ Int.to_string arity ^ "_value"

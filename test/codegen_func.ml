@@ -17,6 +17,9 @@ let%expect_test "simple function generation" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
     int test() {
       return 0;
     } |}]
@@ -43,6 +46,9 @@ let%expect_test "passing struct to a function" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        int test([int, int] t) {
          return 1;
        } |}]
@@ -66,6 +72,9 @@ let%expect_test "function calls" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        int test(int value) {
          return value;
        }
@@ -94,20 +103,23 @@ let%expect_test "Int[bits] serializer codegen" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -127,14 +139,14 @@ let%expect_test "Int[bits] serializer codegen" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -151,8 +163,8 @@ let%expect_test "Int[bits] serializer codegen" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -166,8 +178,8 @@ let%expect_test "Int[bits] serializer codegen" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -187,11 +199,11 @@ let%expect_test "Int[bits] serializer codegen" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -240,20 +252,25 @@ let%expect_test "demo struct serializer" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
+       forall A -> A get1(tuple t) asm "1 INDEX";
+       forall A -> A get0(tuple t) asm "0 INDEX";
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -273,14 +290,14 @@ let%expect_test "demo struct serializer" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -297,8 +314,8 @@ let%expect_test "demo struct serializer" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -312,8 +329,8 @@ let%expect_test "demo struct serializer" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -333,11 +350,11 @@ let%expect_test "demo struct serializer" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -358,8 +375,8 @@ let%expect_test "demo struct serializer" =
          return f2(builder_, self, 16);
        }
        builder T_serializer([int, int] self, builder b) {
-         builder b = f1(first(self), b);
-         builder b = f3(second(self), b);
+         builder b = f1(get0(func_believe_me(self)), b);
+         builder b = f3(get1(func_believe_me(self)), b);
          return b;
        }
        builder f4() {
@@ -397,20 +414,25 @@ let%expect_test "demo struct serializer 2" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
+       forall A -> A get1(tuple t) asm "1 INDEX";
+       forall A -> A get0(tuple t) asm "0 INDEX";
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -430,14 +452,14 @@ let%expect_test "demo struct serializer 2" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -454,8 +476,8 @@ let%expect_test "demo struct serializer 2" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -469,8 +491,8 @@ let%expect_test "demo struct serializer 2" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -490,11 +512,11 @@ let%expect_test "demo struct serializer 2" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -515,8 +537,8 @@ let%expect_test "demo struct serializer 2" =
          return f2(builder_, self, 16);
        }
        builder serialize_foo([int, int] self, builder b) {
-         builder b = f1(first(self), b);
-         builder b = f3(second(self), b);
+         builder b = f1(get0(func_believe_me(self)), b);
+         builder b = f3(get1(func_believe_me(self)), b);
          return b;
        }
        builder f4() {
@@ -551,6 +573,9 @@ let%expect_test "true and false" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
     int test(int flag) {
       if (flag) {
       return 0;
@@ -583,6 +608,9 @@ let%expect_test "if/then/else" =
            return value;
          }
          forall A, B -> B func_believe_me(A i) asm "NOP";
+         int func_bit_not(int a) {
+           return ~ a;
+         }
          int test(int flag) {
            if (flag) {
            return 1;
@@ -611,20 +639,24 @@ let%expect_test "serializer inner struct" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
+       forall A -> A get0(tuple t) asm "0 INDEX";
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -644,14 +676,14 @@ let%expect_test "serializer inner struct" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -668,8 +700,8 @@ let%expect_test "serializer inner struct" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -683,8 +715,8 @@ let%expect_test "serializer inner struct" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -704,11 +736,11 @@ let%expect_test "serializer inner struct" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -726,7 +758,7 @@ let%expect_test "serializer inner struct" =
          return f2(builder_, self, 32);
        }
        builder serialize_wallet([int, int] self, builder b) {
-         builder b = f1(first(self), b);
+         builder b = f1(get0(func_believe_me(self)), b);
          return b;
        } |}]
 
@@ -757,6 +789,9 @@ let%expect_test "unions" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        tuple try(tuple x) {
          return x;
        } |}]
@@ -788,20 +823,23 @@ let%expect_test "switch statement" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -821,14 +859,14 @@ let%expect_test "switch statement" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -845,8 +883,8 @@ let%expect_test "switch statement" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -860,8 +898,8 @@ let%expect_test "switch statement" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -881,11 +919,11 @@ let%expect_test "switch statement" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -936,20 +974,23 @@ let%expect_test "tensor2" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -969,14 +1010,14 @@ let%expect_test "tensor2" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -993,8 +1034,8 @@ let%expect_test "tensor2" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -1008,8 +1049,8 @@ let%expect_test "tensor2" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -1029,11 +1070,11 @@ let%expect_test "tensor2" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -1078,20 +1119,27 @@ let%expect_test "serialization api" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
+       forall A -> A get3(tuple t) asm "3 INDEX";
+       forall A -> A get2(tuple t) asm "2 INDEX";
+       forall A -> A get1(tuple t) asm "1 INDEX";
+       forall A -> A get0(tuple t) asm "0 INDEX";
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -1111,14 +1159,14 @@ let%expect_test "serialization api" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -1135,8 +1183,8 @@ let%expect_test "serialization api" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -1150,8 +1198,8 @@ let%expect_test "serialization api" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -1171,11 +1219,11 @@ let%expect_test "serialization api" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -1199,8 +1247,8 @@ let%expect_test "serialization api" =
          return f4(builder_, self, 9);
        }
        builder f12([int, int] self, builder b) {
-         builder b = f13(first(self), b);
-         builder b = f4(b, second(self), first(self));
+         builder b = f13(get0(func_believe_me(self)), b);
+         builder b = f4(b, get1(func_believe_me(self)), get0(func_believe_me(self)));
          return b;
        }
        builder f10(tuple self, builder b) {
@@ -1239,8 +1287,8 @@ let%expect_test "serialization api" =
          return f4(builder_, self, 256);
        }
        builder f17([int, int] self, builder b) {
-         builder b = f18(first(self), b);
-         builder b = f19(second(self), b);
+         builder b = f18(get0(func_believe_me(self)), b);
+         builder b = f19(get1(func_believe_me(self)), b);
          return b;
        }
        builder f16([int, int] self, builder b) {
@@ -1248,8 +1296,8 @@ let%expect_test "serialization api" =
          return f17(self, b);
        }
        builder f21([int, int, int] self, builder b) {
-         builder b = f13(first(self), b);
-         builder b = f18(second(self), b);
+         builder b = f13(get0(func_believe_me(self)), b);
+         builder b = f18(get1(func_believe_me(self)), b);
          return b;
        }
        builder f20([int, int, int] self, builder b) {
@@ -1325,10 +1373,10 @@ let%expect_test "serialization api" =
          return f23(builder_, self, 32);
        }
        builder f6([tuple, tuple, int, int] self, builder b) {
-         builder b = f7(first(self), b);
-         builder b = f9(second(self), b);
-         builder b = f22(third(self), b);
-         builder b = f24(fourth(self), b);
+         builder b = f7(get0(func_believe_me(self)), b);
+         builder b = f9(get1(func_believe_me(self)), b);
+         builder b = f22(get2(func_believe_me(self)), b);
+         builder b = f24(get3(func_believe_me(self)), b);
          return b;
        }
        builder f5([tuple, tuple, int, int] self, builder b) {
@@ -1338,39 +1386,39 @@ let%expect_test "serialization api" =
          return f4(builder_, self, 1);
        }
        builder f28([int, int, int] self, builder b) {
-         builder b = f29(first(self), b);
-         builder b = f29(second(self), b);
-         builder b = f29(third(self), b);
+         builder b = f29(get0(func_believe_me(self)), b);
+         builder b = f29(get1(func_believe_me(self)), b);
+         builder b = f29(get2(func_believe_me(self)), b);
          return b;
        }
        builder f27([int, int, int] self, builder b) {
          return f28(self, b);
        }
        builder f31([tuple, tuple] self, builder b) {
-         builder b = f7(first(self), b);
-         builder b = f14(second(self), b);
+         builder b = f7(get0(func_believe_me(self)), b);
+         builder b = f14(get1(func_believe_me(self)), b);
          return b;
        }
        builder f30([tuple, tuple] self, builder b) {
          return f31(self, b);
        }
        builder f35(builder self, int c) {
-         return builtin_store_coins(self, c);
+         return builtin_store_grams(self, c);
        }
        builder f34(int self, builder builder_) {
          return f35(builder_, self);
        }
        builder f33([int, int] self, builder b) {
-         builder b = f34(first(self), b);
-         builder b = f34(second(self), b);
+         builder b = f34(get0(func_believe_me(self)), b);
+         builder b = f34(get1(func_believe_me(self)), b);
          return b;
        }
        builder f32([int, int] self, builder b) {
          return f33(self, b);
        }
        builder f37([int, int] self, builder b) {
-         builder b = f22(first(self), b);
-         builder b = f24(second(self), b);
+         builder b = f22(get0(func_believe_me(self)), b);
+         builder b = f24(get1(func_believe_me(self)), b);
          return b;
        }
        builder f36([int, int] self, builder b) {
@@ -1378,10 +1426,10 @@ let%expect_test "serialization api" =
        }
        builder f26([[int, int, int], [tuple, tuple], [int, int], [int, int]]
            self, builder b) {
-         builder b = f27(first(self), b);
-         builder b = f30(second(self), b);
-         builder b = f32(third(self), b);
-         builder b = f36(fourth(self), b);
+         builder b = f27(get0(func_believe_me(self)), b);
+         builder b = f30(get1(func_believe_me(self)), b);
+         builder b = f32(get2(func_believe_me(self)), b);
+         builder b = f36(get3(func_believe_me(self)), b);
          return b;
        }
        builder f25([[int, int, int], [tuple, tuple], [int, int], [int, int]]
@@ -1415,10 +1463,10 @@ let%expect_test "serialization api" =
          return b;
        }
        builder f2([tuple, []] self, builder b) {
-         builder b = f3(first(self), b);
+         builder b = f3(get0(func_believe_me(self)), b);
          builder b = f4(b, 0, 1);
          builder b = f4(b, 0, 1);
-         builder b = f38(second(self), b);
+         builder b = f38(get1(func_believe_me(self)), b);
          return b;
        }
        _ test([tuple, []] m) {
@@ -1454,20 +1502,25 @@ let%expect_test "deserialization api" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
+       forall A -> A get1(tuple t) asm "1 INDEX";
+       forall A -> A get0(tuple t) asm "0 INDEX";
        int builtin_less_or_equal(int i1, int i2) {
-         return __<=__(i1, i2);
+         return _<=_(i1, i2);
        }
        int builtin_not_equal(int i1, int i2) {
          return _!=_(i1, i2);
        }
        int builtin_equal(int i1, int i2) {
-         return __==__(i1, i2);
+         return _==_(i1, i2);
        }
        int builtin_add(int i1, int i2) {
          return _+_(i1, i2);
        }
        int builtin_not(int c) {
-         return _~_(c);
+         return func_bit_not(c);
        }
        _ believe_me(_ i) {
          return func_believe_me(i);
@@ -1487,14 +1540,14 @@ let%expect_test "deserialization api" =
        _ builtin_set_data(cell d) {
          return set_data(d);
        }
-       cell builtin_load_data() {
-         return load_data();
+       cell builtin_get_data() {
+         return get_data();
        }
        _ builtin_throw(int e) {
          return throw(e);
        }
-       _ builtin_send_raw_msg(cell c, int f) {
-         return send_raw_msg(c, f);
+       _ builtin_send_raw_message(cell c, int f) {
+         return send_raw_message(c, f);
        }
        (int, int) builtin_divmod(int i1, int i2) {
          return divmod(i1, i2);
@@ -1511,8 +1564,8 @@ let%expect_test "deserialization api" =
        (slice, cell) builtin_load_ref(slice s) {
          return load_ref(s);
        }
-       (slice, int) builtin_load_coins(slice s) {
-         return load_coins(s);
+       (slice, int) builtin_load_grams(slice s) {
+         return load_grams(s);
        }
        (slice, slice) builtin_load_bits(slice s, int bs) {
          return load_bits(s, bs);
@@ -1526,8 +1579,8 @@ let%expect_test "deserialization api" =
        slice builtin_begin_parse(cell c) {
          return begin_parse(c);
        }
-       builder builtin_store_coins(builder b, int c) {
-         return store_coins(b, c);
+       builder builtin_store_grams(builder b, int c) {
+         return store_grams(b, c);
        }
        builder builtin_store_uint(builder b, int i, int bs) {
          return store_uint(b, i, bs);
@@ -1547,11 +1600,11 @@ let%expect_test "deserialization api" =
          slice slice2 = tensor2_value2(output);
          return [slice_, slice2];
        }
-       _ throw(int n) {
+       _ thrown(int n) {
          return builtin_throw(n);
        }
        _ send_raw_msg(cell msg, int flags) {
-         return builtin_send_raw_msg(msg, flags);
+         return builtin_send_raw_message(msg, flags);
        }
        int f0(int i) {
          return i;
@@ -1587,10 +1640,10 @@ let%expect_test "deserialization api" =
          [slice slice_, int bits] = f12(slice_, len);
          return [slice_, [len, bits]];
        }
-       [slice, tuple] f13(slice s, tuple v) {
+       [slice, tuple] f13(tuple v, slice s) {
          return [s, v];
        }
-       [slice, []] f15(slice s, [] v) {
+       [slice, []] f15([] v, slice s) {
          return [s, v];
        }
        [slice, []] f14(slice s) {
@@ -1598,18 +1651,18 @@ let%expect_test "deserialization api" =
        }
        [slice, tuple] f9(slice slice_) {
          [slice, int] res_discr = f5(slice_, 1);
-         if (builtin_equal(second(res_discr), 0)) {
-         [slice, []] res = f14(first(res_discr));
+         if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
+         [slice, []] res = f14(get0(func_believe_me(res_discr)));
        return
-       f13(first(res), second(res));
+       f13(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
-         [slice, int] res_discr = f5(first(res_discr), 1);
-       if (builtin_equal(second(res_discr), 1))
+         [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
+       if (builtin_equal(get1(func_believe_me(res_discr)), 1))
        {
-         [slice, [int, int]] res = f10(first(res_discr));
+         [slice, [int, int]] res = f10(get0(func_believe_me(res_discr)));
        return
-       f13(first(res), second(res));
+       f13(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        throw(0);
        }}
@@ -1621,24 +1674,24 @@ let%expect_test "deserialization api" =
          [slice slice_, int value] = res;
          return [slice_, value];
        }
-       [slice, [int, int, int]] f20(slice s, [int, int, int] v) {
+       [slice, [int, int, int]] f20([int, int, int] v, slice s) {
          return [s, v];
        }
        [slice, [int, int, int]] f18(slice s) {
          [slice, int] res_anycast = f12(s, 1);
-         if (builtin_equal(second(res_anycast), 0)) {
-         [slice, int] res_len = f11(first(res_anycast));
+         if (builtin_equal(get1(func_believe_me(res_anycast)), 0)) {
+         [slice, int] res_len = f11(get0(func_believe_me(res_anycast)));
        [slice, int] res_workchain =
-       f19(first(res_len));
+       f19(get0(func_believe_me(res_len)));
        [slice, int] res_address =
-       f12(first(res_workchain), res_len);
+       f12(get0(func_believe_me(res_workchain)), res_len);
        return
-       f20(first(res_address), [second(res_len), second(res_workchain), second(res_address)]);
+       f20(get0(func_believe_me(res_address)), [get1(func_believe_me(res_len)), get1(func_believe_me(res_workchain)), get1(func_believe_me(res_address))]);
        } else
        {
-         throw(0);
+         thrown(0);
        }}
-       [slice, tuple] f21(slice s, tuple v) {
+       [slice, tuple] f21(tuple v, slice s) {
          return [s, v];
        }
        [slice, int] f24(slice s) {
@@ -1649,30 +1702,30 @@ let%expect_test "deserialization api" =
        [slice, [int, int]] f23(slice slice_) {
          [slice slice_, int workchain_id] = f19(slice_);
          [slice slice_, int address] = f24(slice_);
-         return [[workchain_id, address], slice_];
+         return [slice_, [workchain_id, address]];
        }
        [slice, [int, int]] f22(slice s) {
          [slice, int] res_anycast = f12(s, 1);
-         if (builtin_equal(second(res_anycast), 0)) {
+         if (builtin_equal(get1(func_believe_me(res_anycast)), 0)) {
          return f23(s);
        } else
        {
-         throw(0);
+         thrown(0);
        }}
        [slice, tuple] f17(slice slice_) {
          [slice, int] res_discr = f5(slice_, 1);
-         if (builtin_equal(second(res_discr), 0)) {
-         [slice, [int, int]] res = f22(first(res_discr));
+         if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
+         [slice, [int, int]] res = f22(get0(func_believe_me(res_discr)));
        return
-       f21(first(res), second(res));
+       f21(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
-         [slice, int] res_discr = f5(first(res_discr), 1);
-       if (builtin_equal(second(res_discr), 1))
+         [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
+       if (builtin_equal(get1(func_believe_me(res_discr)), 1))
        {
-         [slice, [int, int, int]] res = f18(first(res_discr));
+         [slice, [int, int, int]] res = f18(get0(func_believe_me(res_discr)));
        return
-       f21(first(res), second(res));
+       f21(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        throw(0);
        }}
@@ -1680,12 +1733,12 @@ let%expect_test "deserialization api" =
          return f17(s);
        }
        [slice, int] f26(slice self) {
-         (slice, int) output = builtin_load_coins(self);
+         (slice, int) output = builtin_load_grams(self);
          slice slice_ = tensor2_value1(output);
          int coins = tensor2_value2(output);
          return [believe_me(slice_), coins];
        }
-       [slice, int] f27(slice s, int v) {
+       [slice, int] f27(int v, slice s) {
          return [s, v];
        }
        [slice, int] f25(slice s) {
@@ -1696,12 +1749,12 @@ let%expect_test "deserialization api" =
          [slice slice_, tuple src] = f8(slice_);
          [slice slice_, tuple dest] = f16(slice_);
          [slice slice_, int import_fee] = f25(slice_);
-         return [[src, dest, import_fee], slice_];
+         return [slice_, [src, dest, import_fee]];
        }
        [slice, [tuple, tuple, int]] f6(slice s) {
          return f7(s);
        }
-       [slice, tuple] f28(slice s, tuple v) {
+       [slice, tuple] f28(tuple v, slice s) {
          return [s, v];
        }
        [slice, int] f33(slice s) {
@@ -1713,7 +1766,7 @@ let%expect_test "deserialization api" =
          [slice slice_, int ihr_disabled] = f33(slice_);
          [slice slice_, int bounce] = f33(slice_);
          [slice slice_, int bounced] = f33(slice_);
-         return [[ihr_disabled, bounce, bounced], slice_];
+         return [slice_, [ihr_disabled, bounce, bounced]];
        }
        [slice, [int, int, int]] f31(slice s) {
          return f32(s);
@@ -1721,7 +1774,7 @@ let%expect_test "deserialization api" =
        [slice, [tuple, tuple]] f35(slice slice_) {
          [slice slice_, tuple src] = f16(slice_);
          [slice slice_, tuple dst] = f16(slice_);
-         return [[src, dst], slice_];
+         return [slice_, [src, dst]];
        }
        [slice, [tuple, tuple]] f34(slice s) {
          return f35(s);
@@ -1729,23 +1782,23 @@ let%expect_test "deserialization api" =
        [slice, [int, int]] f37(slice slice_) {
          [slice slice_, int ihr_fee] = f25(slice_);
          [slice slice_, int fwd_fee] = f25(slice_);
-         return [[ihr_fee, fwd_fee], slice_];
+         return [slice_, [ihr_fee, fwd_fee]];
        }
        [slice, [int, int]] f36(slice s) {
          return f37(s);
        }
        [slice, int] f40(slice s) {
          [slice, int] res = f5(s, 64);
-         return [first(res), second(res)];
+         return [get0(func_believe_me(res)), get1(func_believe_me(res))];
        }
        [slice, int] f41(slice s) {
          [slice, int] res = f5(s, 32);
-         return [first(res), second(res)];
+         return [get0(func_believe_me(res)), get1(func_believe_me(res))];
        }
        [slice, [int, int]] f39(slice slice_) {
          [slice slice_, int created_lt] = f40(slice_);
          [slice slice_, int created_at] = f41(slice_);
-         return [[created_lt, created_at], slice_];
+         return [slice_, [created_lt, created_at]];
        }
        [slice, [int, int]] f38(slice s) {
          return f39(s);
@@ -1756,7 +1809,7 @@ let%expect_test "deserialization api" =
          [slice slice_, [tuple, tuple] addresses] = f34(slice_);
          [slice slice_, [int, int] coins] = f36(slice_);
          [slice slice_, [int, int] timestamps] = f38(slice_);
-         return [[flags, addresses, coins, timestamps], slice_];
+         return [slice_, [flags, addresses, coins, timestamps]];
        }
        [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f29(slice s)
            {
@@ -1764,32 +1817,32 @@ let%expect_test "deserialization api" =
        }
        [slice, tuple] f4(slice slice_) {
          [slice, int] res_discr = f5(slice_, 1);
-         if (builtin_equal(second(res_discr), 0)) {
+         if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
          [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] res =
-           f29(first(res_discr));
+           f29(get0(func_believe_me(res_discr)));
        return
-       f28(first(res), second(res));
+       f28(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
-         [slice, int] res_discr = f5(first(res_discr), 1);
-       if (builtin_equal(second(res_discr), 1))
+         [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
+       if (builtin_equal(get1(func_believe_me(res_discr)), 1))
        {
-         [slice, [tuple, tuple, int]] res = f6(first(res_discr));
+         [slice, [tuple, tuple, int]] res = f6(get0(func_believe_me(res_discr)));
        return
-       f28(first(res), second(res));
+       f28(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        throw(0);
        }}
        [slice, tuple] f3(slice s) {
          return f4(s);
        }
-       [slice, []] f43(slice s, [] v) {
+       [slice, []] f43([] v, slice s) {
          return [s, v];
        }
        [slice, []] f42(slice s) {
          return f43(s, []);
        }
-       [slice, [tuple, []]] f44(slice s, [tuple, []] v) {
+       [slice, [tuple, []]] f44([tuple, []] v, slice s) {
          return [s, v];
        }
        [slice, [tuple, []]] f2(slice s) {
@@ -1808,7 +1861,7 @@ let%expect_test "deserialization api" =
        {
          }} else
        {
-         throw(0);
+         thrown(0);
        }}
        _ test(cell c) {
          slice s = f1(c);
@@ -1841,6 +1894,9 @@ let%expect_test "destructuring let" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        int test([int, int, int] t) {
          [int x, int y2, int z] = t;
          return y2;
@@ -1873,6 +1929,9 @@ let%expect_test "destructuring let with rest ignored" =
          return value;
        }
        forall A, B -> B func_believe_me(A i) asm "NOP";
+       int func_bit_not(int a) {
+         return ~ a;
+       }
        int test([int, int, int] t) {
          [_, int y2, _] = t;
          return y2;
@@ -1901,20 +1960,23 @@ let%expect_test "deserializer" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
     int builtin_less_or_equal(int i1, int i2) {
-      return __<=__(i1, i2);
+      return _<=_(i1, i2);
     }
     int builtin_not_equal(int i1, int i2) {
       return _!=_(i1, i2);
     }
     int builtin_equal(int i1, int i2) {
-      return __==__(i1, i2);
+      return _==_(i1, i2);
     }
     int builtin_add(int i1, int i2) {
       return _+_(i1, i2);
     }
     int builtin_not(int c) {
-      return _~_(c);
+      return func_bit_not(c);
     }
     _ believe_me(_ i) {
       return func_believe_me(i);
@@ -1934,14 +1996,14 @@ let%expect_test "deserializer" =
     _ builtin_set_data(cell d) {
       return set_data(d);
     }
-    cell builtin_load_data() {
-      return load_data();
+    cell builtin_get_data() {
+      return get_data();
     }
     _ builtin_throw(int e) {
       return throw(e);
     }
-    _ builtin_send_raw_msg(cell c, int f) {
-      return send_raw_msg(c, f);
+    _ builtin_send_raw_message(cell c, int f) {
+      return send_raw_message(c, f);
     }
     (int, int) builtin_divmod(int i1, int i2) {
       return divmod(i1, i2);
@@ -1958,8 +2020,8 @@ let%expect_test "deserializer" =
     (slice, cell) builtin_load_ref(slice s) {
       return load_ref(s);
     }
-    (slice, int) builtin_load_coins(slice s) {
-      return load_coins(s);
+    (slice, int) builtin_load_grams(slice s) {
+      return load_grams(s);
     }
     (slice, slice) builtin_load_bits(slice s, int bs) {
       return load_bits(s, bs);
@@ -1973,8 +2035,8 @@ let%expect_test "deserializer" =
     slice builtin_begin_parse(cell c) {
       return begin_parse(c);
     }
-    builder builtin_store_coins(builder b, int c) {
-      return store_coins(b, c);
+    builder builtin_store_grams(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_store_uint(builder b, int i, int bs) {
       return store_uint(b, i, bs);
@@ -1994,11 +2056,11 @@ let%expect_test "deserializer" =
       slice slice2 = tensor2_value2(output);
       return [slice_, slice2];
     }
-    _ throw(int n) {
+    _ thrown(int n) {
       return builtin_throw(n);
     }
     _ send_raw_msg(cell msg, int flags) {
-      return builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_message(msg, flags);
     }
     int f0(int i) {
       return i;
@@ -2028,7 +2090,7 @@ let%expect_test "deserializer" =
     [slice, [int, int]] test(slice slice_) {
       [slice slice_, int value1] = f1(slice_);
       [slice slice_, int value2] = f3(slice_);
-      return [[value1, value2], slice_];
+      return [slice_, [value1, value2]];
     } |}]
 
 let%expect_test "deserializer unions" =
@@ -2053,20 +2115,25 @@ let%expect_test "deserializer unions" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
+    forall A -> A get1(tuple t) asm "1 INDEX";
+    forall A -> A get0(tuple t) asm "0 INDEX";
     int builtin_less_or_equal(int i1, int i2) {
-      return __<=__(i1, i2);
+      return _<=_(i1, i2);
     }
     int builtin_not_equal(int i1, int i2) {
       return _!=_(i1, i2);
     }
     int builtin_equal(int i1, int i2) {
-      return __==__(i1, i2);
+      return _==_(i1, i2);
     }
     int builtin_add(int i1, int i2) {
       return _+_(i1, i2);
     }
     int builtin_not(int c) {
-      return _~_(c);
+      return func_bit_not(c);
     }
     _ believe_me(_ i) {
       return func_believe_me(i);
@@ -2086,14 +2153,14 @@ let%expect_test "deserializer unions" =
     _ builtin_set_data(cell d) {
       return set_data(d);
     }
-    cell builtin_load_data() {
-      return load_data();
+    cell builtin_get_data() {
+      return get_data();
     }
     _ builtin_throw(int e) {
       return throw(e);
     }
-    _ builtin_send_raw_msg(cell c, int f) {
-      return send_raw_msg(c, f);
+    _ builtin_send_raw_message(cell c, int f) {
+      return send_raw_message(c, f);
     }
     (int, int) builtin_divmod(int i1, int i2) {
       return divmod(i1, i2);
@@ -2110,8 +2177,8 @@ let%expect_test "deserializer unions" =
     (slice, cell) builtin_load_ref(slice s) {
       return load_ref(s);
     }
-    (slice, int) builtin_load_coins(slice s) {
-      return load_coins(s);
+    (slice, int) builtin_load_grams(slice s) {
+      return load_grams(s);
     }
     (slice, slice) builtin_load_bits(slice s, int bs) {
       return load_bits(s, bs);
@@ -2125,8 +2192,8 @@ let%expect_test "deserializer unions" =
     slice builtin_begin_parse(cell c) {
       return begin_parse(c);
     }
-    builder builtin_store_coins(builder b, int c) {
-      return store_coins(b, c);
+    builder builtin_store_grams(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_store_uint(builder b, int i, int bs) {
       return store_uint(b, i, bs);
@@ -2146,11 +2213,11 @@ let%expect_test "deserializer unions" =
       slice slice2 = tensor2_value2(output);
       return [slice_, slice2];
     }
-    _ throw(int n) {
+    _ thrown(int n) {
       return builtin_throw(n);
     }
     _ send_raw_msg(cell msg, int flags) {
-      return builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_message(msg, flags);
     }
     int f0(int i) {
       return i;
@@ -2178,7 +2245,7 @@ let%expect_test "deserializer unions" =
       [slice slice_, int value] = res;
       return [slice_, value];
     }
-    [slice, tuple] f4(slice s, tuple v) {
+    [slice, tuple] f4(tuple v, slice s) {
       return [s, v];
     }
     [slice, int] f5(slice s) {
@@ -2188,18 +2255,18 @@ let%expect_test "deserializer unions" =
     }
     [slice, tuple] deserialize_union(slice slice_) {
       [slice, int] res_discr = f1(slice_, 1);
-      if (builtin_equal(second(res_discr), 0)) {
-      [slice, int] res = f5(first(res_discr));
+      if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
+      [slice, int] res = f5(get0(func_believe_me(res_discr)));
     return
-    f4(first(res), second(res));
+    f4(get0(func_believe_me(res)), get1(func_believe_me(res)));
     } else
     {
-      [slice, int] res_discr = f1(first(res_discr), 1);
-    if (builtin_equal(second(res_discr), 1))
+      [slice, int] res_discr = f1(get0(func_believe_me(res_discr)), 1);
+    if (builtin_equal(get1(func_believe_me(res_discr)), 1))
     {
-      [slice, int] res = f2(first(res_discr));
+      [slice, int] res = f2(get0(func_believe_me(res_discr)));
     return
-    f4(first(res), second(res));
+    f4(get0(func_believe_me(res)), get1(func_believe_me(res)));
     } else
     throw(0);
     }} |}]
@@ -2226,6 +2293,9 @@ let%expect_test "assignment" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
     int test(int x) {
       int a = 1;
       a = x;
@@ -2258,6 +2328,9 @@ let%expect_test "assignment with condition block" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
     int test(int x) {
       int a = 1;
       if (-1) {
@@ -2291,6 +2364,9 @@ let%expect_test "codegen while block" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
     _ test() {
       int a = 10;
       while (-1) {
@@ -2337,11 +2413,11 @@ let%expect_test "codegen while block" =
     fn recv_external(input: Slice) {
       let body = MsgBody.deserialize(input).value;
       let data = body.data;
-      let state = WalletState.deserialize(Slice.parse(builtin_load_data())).value;
-      if (builtin_less_or_equal(data.valid_until.value, builtin_now())) { throw(35) }
-      if (builtin_not_equal(data.seqno.value, state.seqno.value)) { throw(33) }
-      if (builtin_not_equal(data.subwallet.value, state.subwallet.value)) { throw(34) }
-      if (builtin_not(body.signature.is_valid(state.public_key))) { throw(35) }
+      let state = WalletState.deserialize(Slice.parse(builtin_get_data())).value;
+      if (builtin_less_or_equal(data.valid_until.value, builtin_now())) { thrown(35) }
+      if (builtin_not_equal(data.seqno.value, state.seqno.value)) { thrown(33) }
+      if (builtin_not_equal(data.subwallet.value, state.subwallet.value)) { thrown(34) }
+      if (builtin_not(body.signature.is_valid(state.public_key))) { thrown(35) }
     
       builtin_accept_message();
     
@@ -2374,20 +2450,26 @@ let%expect_test "codegen while block" =
       return value;
     }
     forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
+    forall A -> A get2(tuple t) asm "2 INDEX";
+    forall A -> A get1(tuple t) asm "1 INDEX";
+    forall A -> A get0(tuple t) asm "0 INDEX";
     int builtin_less_or_equal(int i1, int i2) {
-      return __<=__(i1, i2);
+      return _<=_(i1, i2);
     }
     int builtin_not_equal(int i1, int i2) {
       return _!=_(i1, i2);
     }
     int builtin_equal(int i1, int i2) {
-      return __==__(i1, i2);
+      return _==_(i1, i2);
     }
     int builtin_add(int i1, int i2) {
       return _+_(i1, i2);
     }
     int builtin_not(int c) {
-      return _~_(c);
+      return func_bit_not(c);
     }
     _ believe_me(_ i) {
       return func_believe_me(i);
@@ -2407,14 +2489,14 @@ let%expect_test "codegen while block" =
     _ builtin_set_data(cell d) {
       return set_data(d);
     }
-    cell builtin_load_data() {
-      return load_data();
+    cell builtin_get_data() {
+      return get_data();
     }
     _ builtin_throw(int e) {
       return throw(e);
     }
-    _ builtin_send_raw_msg(cell c, int f) {
-      return send_raw_msg(c, f);
+    _ builtin_send_raw_message(cell c, int f) {
+      return send_raw_message(c, f);
     }
     (int, int) builtin_divmod(int i1, int i2) {
       return divmod(i1, i2);
@@ -2431,8 +2513,8 @@ let%expect_test "codegen while block" =
     (slice, cell) builtin_load_ref(slice s) {
       return load_ref(s);
     }
-    (slice, int) builtin_load_coins(slice s) {
-      return load_coins(s);
+    (slice, int) builtin_load_grams(slice s) {
+      return load_grams(s);
     }
     (slice, slice) builtin_load_bits(slice s, int bs) {
       return load_bits(s, bs);
@@ -2446,8 +2528,8 @@ let%expect_test "codegen while block" =
     slice builtin_begin_parse(cell c) {
       return begin_parse(c);
     }
-    builder builtin_store_coins(builder b, int c) {
-      return store_coins(b, c);
+    builder builtin_store_grams(builder b, int c) {
+      return store_grams(b, c);
     }
     builder builtin_store_uint(builder b, int i, int bs) {
       return store_uint(b, i, bs);
@@ -2467,11 +2549,11 @@ let%expect_test "codegen while block" =
       slice slice2 = tensor2_value2(output);
       return [slice_, slice2];
     }
-    _ throw(int n) {
+    _ thrown(int n) {
       return builtin_throw(n);
     }
     _ send_raw_msg(cell msg, int flags) {
-      return builtin_send_raw_msg(msg, flags);
+      return builtin_send_raw_message(msg, flags);
     }
     int f0(int i) {
       return i;
@@ -2484,14 +2566,14 @@ let%expect_test "codegen while block" =
     }
     _ recv_internal(slice _) {
     }
-    [slice, slice] f5(slice s, slice v) {
+    [slice, slice] f5(slice v, slice s) {
       return [s, v];
     }
     [slice, slice] f4(slice s) {
       [slice slice_, slice value] = slice_load_bits(s, 512);
       return f5(value, slice_);
     }
-    [slice, [slice, slice]] f6(slice s, [slice, slice] v) {
+    [slice, [slice, slice]] f6([slice, slice] v, slice s) {
       return [s, v];
     }
     [slice, [slice, slice]] f3(slice s) {
@@ -2506,18 +2588,18 @@ let%expect_test "codegen while block" =
     }
     [slice, int] f9(slice s) {
       [slice, int] res = f10(s, 32);
-      return [first(res), second(res)];
+      return [get0(func_believe_me(res)), get1(func_believe_me(res))];
     }
     [slice, [int, int, int]] f8(slice slice_) {
       [slice slice_, int subwallet] = f9(slice_);
       [slice slice_, int valid_until] = f9(slice_);
       [slice slice_, int seqno] = f9(slice_);
-      return [[subwallet, valid_until, seqno], slice_];
+      return [slice_, [subwallet, valid_until, seqno]];
     }
     [slice, [int, int, int]] f7(slice s) {
       return f8(s);
     }
-    [slice, slice] f12(slice s, slice v) {
+    [slice, slice] f12(slice v, slice s) {
       return [s, v];
     }
     [slice, slice] f11(slice s) {
@@ -2528,7 +2610,7 @@ let%expect_test "codegen while block" =
       [slice slice_, [slice, slice] signature] = f3(slice_);
       [slice slice_, [int, int, int] data] = f7(slice_);
       [slice slice_, slice rest] = f11(slice_);
-      return [[signature, data, rest], slice_];
+      return [slice_, [signature, data, rest]];
     }
     [slice, [[slice, slice], [int, int, int], slice]] f1(slice s) {
       return f2(s);
@@ -2538,20 +2620,20 @@ let%expect_test "codegen while block" =
     }
     [slice, int] f16(slice s) {
       [slice, int] res = f10(s, 256);
-      return [first(res), second(res)];
+      return [get0(func_believe_me(res)), get1(func_believe_me(res))];
     }
     [slice, [int, int, int]] f15(slice slice_) {
       [slice slice_, int seqno] = f9(slice_);
       [slice slice_, int subwallet] = f9(slice_);
       [slice slice_, int public_key] = f16(slice_);
-      return [[seqno, subwallet, public_key], slice_];
+      return [slice_, [seqno, subwallet, public_key]];
     }
     [slice, [int, int, int]] f14(slice s) {
       return f15(s);
     }
     int f17([slice, slice] self, int public_key) {
       return
-        is_signature_valid(hash_of_slice(second(self)), first(self), public_key);
+        is_signature_valid(hash_of_slice(get1(func_believe_me(self))), get0(func_believe_me(self)), public_key);
     }
     [slice, cell] f21(slice self) {
       (slice, cell) output = builtin_load_ref(self);
@@ -2559,7 +2641,7 @@ let%expect_test "codegen while block" =
       cell ref = tensor2_value2(output);
       return [believe_me(slice_), ref];
     }
-    [slice, cell] f22(slice s, cell v) {
+    [slice, cell] f22(cell v, slice s) {
       return [s, v];
     }
     [slice, cell] f20(slice s) {
@@ -2579,7 +2661,7 @@ let%expect_test "codegen while block" =
     }
     [slice, int] f24(slice slice_) {
       [slice slice_, int value] = f25(slice_);
-      return [value, slice_];
+      return [slice_, value];
     }
     [slice, int] f23(slice s) {
       return f24(s);
@@ -2587,7 +2669,7 @@ let%expect_test "codegen while block" =
     [slice, [cell, int]] f19(slice slice_) {
       [slice slice_, cell cell_] = f20(slice_);
       [slice slice_, int flags] = f23(slice_);
-      return [[cell_, flags], slice_];
+      return [slice_, [cell_, flags]];
     }
     [slice, [cell, int]] f18(slice s) {
       return f19(s);
@@ -2611,9 +2693,9 @@ let%expect_test "codegen while block" =
       return f33(builder_, self, 256);
     }
     builder f31([int, int, int] self, builder b) {
-      builder b = f32(first(self), b);
-      builder b = f32(second(self), b);
-      builder b = f34(third(self), b);
+      builder b = f32(get0(func_believe_me(self)), b);
+      builder b = f32(get1(func_believe_me(self)), b);
+      builder b = f34(get2(func_believe_me(self)), b);
       return b;
     }
     builder f30([int, int, int] self, builder b) {
@@ -2623,26 +2705,33 @@ let%expect_test "codegen while block" =
       return builtin_end_cell(self);
     }
     _ recv_external(slice input) {
-      [[slice, slice], [int, int, int], slice] body = second(f1(input));
-      [int, int, int] data = second(body);
-      [int, int, int] state = second(f14(f13(builtin_load_data())));
-      if (builtin_less_or_equal(second(data), builtin_now())) {
-      throw(35);
-    }  if (builtin_not_equal(third(data), first(state))) {
-      throw(33);
-    }  if (builtin_not_equal(first(data), second(state))) {
-      throw(34);
-    }  if (builtin_not(f17(first(body), third(state)))) {
-      throw(35);
+      [[slice, slice], [int, int, int], slice] body =
+        get1(func_believe_me(f1(input)));
+      [int, int, int] data = get1(func_believe_me(body));
+      [int, int, int] state = get1(func_believe_me(f14(f13(builtin_get_data()))));
+      if (builtin_less_or_equal(get1(func_believe_me(data)), builtin_now())) {
+      thrown(35);
+    }  if
+         (builtin_not_equal(get2(func_believe_me(data)), get0(func_believe_me(state))))
+         {
+      thrown(33);
+    }  if
+         (builtin_not_equal(get0(func_believe_me(data)), get1(func_believe_me(state))))
+         {
+      thrown(34);
+    }  if
+         (builtin_not(f17(get0(func_believe_me(body)), get2(func_believe_me(state)))))
+         {
+      thrown(35);
     }  builtin_accept_message();
-      slice slice_ = third(body);
+      slice slice_ = get2(func_believe_me(body));
       while (builtin_not_equal(f27(slice_), 0)) {
       [slice new_slice, [cell, int] next] = f18(slice_);
     slice_ =
     new_slice;
-    send_raw_msg(first(next), second(next));
+    send_raw_msg(get0(func_believe_me(next)), get1(func_believe_me(next)));
     }  [int, int, int] new_state =
-         [f28(builtin_add(first(state), 1)), second(state), third(state)];
+         [f28(builtin_add(get0(func_believe_me(state)), 1)), get1(func_believe_me(state)), get2(func_believe_me(state))];
       cell new_state = f35(f30(new_state, f29()));
       return builtin_set_data(new_state);
     } |}]

@@ -30,7 +30,7 @@ let%expect_test "Int[bits] constructor" =
              ((uty_methods
                ((new
                  ((function_signature
-                   ((function_params ((s (StructType 7)) (v (StructType 118))))
+                   ((function_params ((v (StructType 118)) (s (StructType 7))))
                     (function_returns (StructType 119))))
                   (function_impl
                    (Fn
@@ -218,7 +218,7 @@ let%expect_test "Int[bits] serializer" =
              ((uty_methods
                ((new
                  ((function_signature
-                   ((function_params ((s (StructType 7)) (v (StructType 118))))
+                   ((function_params ((v (StructType 118)) (s (StructType 7))))
                     (function_returns (StructType 119))))
                   (function_impl
                    (Fn
@@ -485,7 +485,7 @@ let%expect_test "demo struct serializer" =
              ((uty_methods
                ((new
                  ((function_signature
-                   ((function_params ((s (StructType 7)) (v (StructType 120))))
+                   ((function_params ((v (StructType 120)) (s (StructType 7))))
                     (function_returns (StructType 121))))
                   (function_impl
                    (Fn
@@ -634,7 +634,7 @@ let%expect_test "demo struct serializer" =
              ((uty_methods
                ((new
                  ((function_signature
-                   ((function_params ((s (StructType 7)) (v (StructType 118))))
+                   ((function_params ((v (StructType 118)) (s (StructType 7))))
                     (function_returns (StructType 119))))
                   (function_impl
                    (Fn
@@ -1057,13 +1057,13 @@ let%expect_test "deserializer" =
                  (Value
                   (Struct
                    ((Value (Type (StructType 120)))
-                    ((value
+                    ((slice (Reference (slice (StructType 7))))
+                     (value
                       (Value
                        (Struct
                         ((Value (Type (StructType 119)))
                          ((value1 (Reference (value1 (StructType 22))))
-                          (value2 (Reference (value2 (StructType 35)))))))))
-                     (slice (Reference (slice (StructType 7)))))))))))))))))
+                          (value2 (Reference (value2 (StructType 35))))))))))))))))))))))
         (Something (Value (Type (StructType 119))))))
       (structs
        ((120
@@ -1074,7 +1074,7 @@ let%expect_test "deserializer" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (StructType 119))))
+                 ((function_params ((v (StructType 119)) (s (StructType 7))))
                   (function_returns (StructType 120))))
                 (function_impl
                  (Fn
@@ -1317,7 +1317,7 @@ let%expect_test "Deserialize Unions" =
                          (Fn
                           (Return
                            (Primitive
-                            (Prim (name __==__)
+                            (Prim (name _==_)
                              (exprs
                               ((Reference (i1 IntegerType))
                                (Reference (i2 IntegerType))))))))))))
@@ -1372,7 +1372,7 @@ let%expect_test "Deserialize Unions" =
                          (Function
                           ((function_signature
                             ((function_params
-                              ((s (StructType 7)) (v (UnionType 119))))
+                              ((v (UnionType 119)) (s (StructType 7))))
                              (function_returns (StructType 122))))
                            (function_impl
                             (Fn
@@ -1456,7 +1456,7 @@ let%expect_test "Deserialize Unions" =
                                (Fn
                                 (Return
                                  (Primitive
-                                  (Prim (name __==__)
+                                  (Prim (name _==_)
                                    (exprs
                                     ((Reference (i1 IntegerType))
                                      (Reference (i2 IntegerType))))))))))))
@@ -1514,7 +1514,7 @@ let%expect_test "Deserialize Unions" =
                                (Function
                                 ((function_signature
                                   ((function_params
-                                    ((s (StructType 7)) (v (UnionType 119))))
+                                    ((v (UnionType 119)) (s (StructType 7))))
                                    (function_returns (StructType 122))))
                                  (function_impl
                                   (Fn
@@ -1545,7 +1545,7 @@ let%expect_test "Deserialize Unions" =
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((s (StructType 7)) (v (UnionType 119))))
+                 ((function_params ((v (UnionType 119)) (s (StructType 7))))
                   (function_returns (StructType 122))))
                 (function_impl
                  (Fn
