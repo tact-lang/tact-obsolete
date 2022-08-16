@@ -286,16 +286,16 @@ struct AddressVar {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      let res_anycast = s.load_int(1);
-      if (builtin_equal(res_anycast.value, 0)) {
-        let res_len = Int[9].deserialize(res_anycast.slice);
-        let res_workchain = Int[8].deserialize(res_len.slice);
-        let res_address = res_workchain.slice.load_int(res_len);
+      let {value as anycast, slice} = s.load_int(1);
+      if (builtin_equal(anycast, 0)) {
+        let {value as len, slice} = Int[9].deserialize(slice);
+        let {value as workchain_id, slice} = Int[32].deserialize(slice);
+        let {value as address, slice} = slice.load_int(len);
         return LoadResult[Self]
-          .new(res_address.slice, Self {
-            len: res_len.value,
-            workchain_id: res_workchain.value,
-            address: res_address.value,
+          .new(slice, Self {
+            len: len,
+            workchain_id: workchain_id,
+            address: address,
           });
       } else {
         thrown(0); // unreachable

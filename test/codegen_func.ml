@@ -1295,9 +1295,12 @@ let%expect_test "serialization api" =
          builder b = f4(b, 0, 0);
          return f17(self, b);
        }
+       builder f22(int self, builder builder_) {
+         return f4(builder_, self, 32);
+       }
        builder f21([int, int, int] self, builder b) {
          builder b = f13(get0(func_believe_me(self)), b);
-         builder b = f18(get1(func_believe_me(self)), b);
+         builder b = f22(get1(func_believe_me(self)), b);
          return b;
        }
        builder f20([int, int, int] self, builder b) {
@@ -1363,78 +1366,78 @@ let%expect_test "serialization api" =
        builder f7(tuple self, builder b) {
          return f8(self, b);
        }
-       builder f23(builder self, int uint, int bits) {
+       builder f24(builder self, int uint, int bits) {
          return builtin_store_uint(self, uint, bits);
        }
-       builder f22(int self, builder builder_) {
-         return f23(builder_, self, 64);
+       builder f23(int self, builder builder_) {
+         return f24(builder_, self, 64);
        }
-       builder f24(int self, builder builder_) {
-         return f23(builder_, self, 32);
+       builder f25(int self, builder builder_) {
+         return f24(builder_, self, 32);
        }
        builder f6([tuple, tuple, int, int] self, builder b) {
          builder b = f7(get0(func_believe_me(self)), b);
          builder b = f9(get1(func_believe_me(self)), b);
-         builder b = f22(get2(func_believe_me(self)), b);
-         builder b = f24(get3(func_believe_me(self)), b);
+         builder b = f23(get2(func_believe_me(self)), b);
+         builder b = f25(get3(func_believe_me(self)), b);
          return b;
        }
        builder f5([tuple, tuple, int, int] self, builder b) {
          return f6(self, b);
        }
-       builder f29(int self, builder builder_) {
+       builder f30(int self, builder builder_) {
          return f4(builder_, self, 1);
        }
-       builder f28([int, int, int] self, builder b) {
-         builder b = f29(get0(func_believe_me(self)), b);
-         builder b = f29(get1(func_believe_me(self)), b);
-         builder b = f29(get2(func_believe_me(self)), b);
+       builder f29([int, int, int] self, builder b) {
+         builder b = f30(get0(func_believe_me(self)), b);
+         builder b = f30(get1(func_believe_me(self)), b);
+         builder b = f30(get2(func_believe_me(self)), b);
          return b;
        }
-       builder f27([int, int, int] self, builder b) {
-         return f28(self, b);
+       builder f28([int, int, int] self, builder b) {
+         return f29(self, b);
        }
-       builder f31([tuple, tuple] self, builder b) {
+       builder f32([tuple, tuple] self, builder b) {
          builder b = f7(get0(func_believe_me(self)), b);
          builder b = f14(get1(func_believe_me(self)), b);
          return b;
        }
-       builder f30([tuple, tuple] self, builder b) {
-         return f31(self, b);
+       builder f31([tuple, tuple] self, builder b) {
+         return f32(self, b);
        }
-       builder f35(builder self, int c) {
+       builder f36(builder self, int c) {
          return builtin_store_grams(self, c);
        }
-       builder f34(int self, builder builder_) {
-         return f35(builder_, self);
+       builder f35(int self, builder builder_) {
+         return f36(builder_, self);
+       }
+       builder f34([int, int] self, builder b) {
+         builder b = f35(get0(func_believe_me(self)), b);
+         builder b = f35(get1(func_believe_me(self)), b);
+         return b;
        }
        builder f33([int, int] self, builder b) {
-         builder b = f34(get0(func_believe_me(self)), b);
-         builder b = f34(get1(func_believe_me(self)), b);
-         return b;
+         return f34(self, b);
        }
-       builder f32([int, int] self, builder b) {
-         return f33(self, b);
+       builder f38([int, int] self, builder b) {
+         builder b = f23(get0(func_believe_me(self)), b);
+         builder b = f25(get1(func_believe_me(self)), b);
+         return b;
        }
        builder f37([int, int] self, builder b) {
-         builder b = f22(get0(func_believe_me(self)), b);
-         builder b = f24(get1(func_believe_me(self)), b);
-         return b;
+         return f38(self, b);
        }
-       builder f36([int, int] self, builder b) {
-         return f37(self, b);
+       builder f27([[int, int, int], [tuple, tuple], [int, int], [int, int]]
+           self, builder b) {
+         builder b = f28(get0(func_believe_me(self)), b);
+         builder b = f31(get1(func_believe_me(self)), b);
+         builder b = f33(get2(func_believe_me(self)), b);
+         builder b = f37(get3(func_believe_me(self)), b);
+         return b;
        }
        builder f26([[int, int, int], [tuple, tuple], [int, int], [int, int]]
            self, builder b) {
-         builder b = f27(get0(func_believe_me(self)), b);
-         builder b = f30(get1(func_believe_me(self)), b);
-         builder b = f32(get2(func_believe_me(self)), b);
-         builder b = f36(get3(func_believe_me(self)), b);
-         return b;
-       }
-       builder f25([[int, int, int], [tuple, tuple], [int, int], [int, int]]
-           self, builder b) {
-         return f26(self, b);
+         return f27(self, b);
        }
        builder f3(tuple self, builder b) {
          {
@@ -1448,7 +1451,7 @@ let%expect_test "serialization api" =
        {
          builder b = f4(b, 0, 1);
        return
-       f25(info, b);
+       f26(info, b);
        }} else if (discr == 0)
        {
          [tuple, tuple, int, int] info = second(temp);
@@ -1459,14 +1462,14 @@ let%expect_test "serialization api" =
        }} else
        {
          }}}
-       builder f38([] self, builder b) {
+       builder f39([] self, builder b) {
          return b;
        }
        builder f2([tuple, []] self, builder b) {
          builder b = f3(get0(func_believe_me(self)), b);
          builder b = f4(b, 0, 1);
          builder b = f4(b, 0, 1);
-         builder b = f38(get1(func_believe_me(self)), b);
+         builder b = f39(get1(func_believe_me(self)), b);
          return b;
        }
        _ test([tuple, []] m) {
@@ -1670,7 +1673,7 @@ let%expect_test "deserialization api" =
          return f9(s);
        }
        [slice, int] f19(slice s) {
-         [slice, int] res = f12(s, 8);
+         [slice, int] res = f12(s, 32);
          [slice slice_, int value] = res;
          return [slice_, value];
        }
@@ -1678,15 +1681,15 @@ let%expect_test "deserialization api" =
          return [s, v];
        }
        [slice, [int, int, int]] f18(slice s) {
-         [slice, int] res_anycast = f12(s, 1);
-         if (builtin_equal(get1(func_believe_me(res_anycast)), 0)) {
-         [slice, int] res_len = f11(get0(func_believe_me(res_anycast)));
-       [slice, int] res_workchain =
-       f19(get0(func_believe_me(res_len)));
-       [slice, int] res_address =
-       f12(get0(func_believe_me(res_workchain)), res_len);
+         [slice slice_, int anycast] = f12(s, 1);
+         if (builtin_equal(anycast, 0)) {
+         [slice slice_, int len] = f11(slice_);
+       [slice slice_, int workchain_id] =
+       f19(slice_);
+       [slice slice_, int address] =
+       f12(slice_, len);
        return
-       f20(get0(func_believe_me(res_address)), [get1(func_believe_me(res_len)), get1(func_believe_me(res_workchain)), get1(func_believe_me(res_address))]);
+       f20(slice_, [len, workchain_id, address]);
        } else
        {
          thrown(0);
@@ -1695,13 +1698,18 @@ let%expect_test "deserialization api" =
          return [s, v];
        }
        [slice, int] f24(slice s) {
+         [slice, int] res = f12(s, 8);
+         [slice slice_, int value] = res;
+         return [slice_, value];
+       }
+       [slice, int] f25(slice s) {
          [slice, int] res = f12(s, 256);
          [slice slice_, int value] = res;
          return [slice_, value];
        }
        [slice, [int, int]] f23(slice slice_) {
-         [slice slice_, int workchain_id] = f19(slice_);
-         [slice slice_, int address] = f24(slice_);
+         [slice slice_, int workchain_id] = f24(slice_);
+         [slice slice_, int address] = f25(slice_);
          return [slice_, [workchain_id, address]];
        }
        [slice, [int, int]] f22(slice s) {
@@ -1732,96 +1740,96 @@ let%expect_test "deserialization api" =
        [slice, tuple] f16(slice s) {
          return f17(s);
        }
-       [slice, int] f26(slice self) {
+       [slice, int] f27(slice self) {
          (slice, int) output = builtin_load_grams(self);
          slice slice_ = tensor2_value1(output);
          int coins = tensor2_value2(output);
          return [believe_me(slice_), coins];
        }
-       [slice, int] f27(int v, slice s) {
+       [slice, int] f28(int v, slice s) {
          return [s, v];
        }
-       [slice, int] f25(slice s) {
-         [slice slice_, int value] = f26(s);
-         return f27(value, slice_);
+       [slice, int] f26(slice s) {
+         [slice slice_, int value] = f27(s);
+         return f28(value, slice_);
        }
        [slice, [tuple, tuple, int]] f7(slice slice_) {
          [slice slice_, tuple src] = f8(slice_);
          [slice slice_, tuple dest] = f16(slice_);
-         [slice slice_, int import_fee] = f25(slice_);
+         [slice slice_, int import_fee] = f26(slice_);
          return [slice_, [src, dest, import_fee]];
        }
        [slice, [tuple, tuple, int]] f6(slice s) {
          return f7(s);
        }
-       [slice, tuple] f28(tuple v, slice s) {
+       [slice, tuple] f29(tuple v, slice s) {
          return [s, v];
        }
-       [slice, int] f33(slice s) {
+       [slice, int] f34(slice s) {
          [slice, int] res = f12(s, 1);
          [slice slice_, int value] = res;
          return [slice_, value];
        }
-       [slice, [int, int, int]] f32(slice slice_) {
-         [slice slice_, int ihr_disabled] = f33(slice_);
-         [slice slice_, int bounce] = f33(slice_);
-         [slice slice_, int bounced] = f33(slice_);
+       [slice, [int, int, int]] f33(slice slice_) {
+         [slice slice_, int ihr_disabled] = f34(slice_);
+         [slice slice_, int bounce] = f34(slice_);
+         [slice slice_, int bounced] = f34(slice_);
          return [slice_, [ihr_disabled, bounce, bounced]];
        }
-       [slice, [int, int, int]] f31(slice s) {
-         return f32(s);
+       [slice, [int, int, int]] f32(slice s) {
+         return f33(s);
        }
-       [slice, [tuple, tuple]] f35(slice slice_) {
+       [slice, [tuple, tuple]] f36(slice slice_) {
          [slice slice_, tuple src] = f16(slice_);
          [slice slice_, tuple dst] = f16(slice_);
          return [slice_, [src, dst]];
        }
-       [slice, [tuple, tuple]] f34(slice s) {
-         return f35(s);
+       [slice, [tuple, tuple]] f35(slice s) {
+         return f36(s);
        }
-       [slice, [int, int]] f37(slice slice_) {
-         [slice slice_, int ihr_fee] = f25(slice_);
-         [slice slice_, int fwd_fee] = f25(slice_);
+       [slice, [int, int]] f38(slice slice_) {
+         [slice slice_, int ihr_fee] = f26(slice_);
+         [slice slice_, int fwd_fee] = f26(slice_);
          return [slice_, [ihr_fee, fwd_fee]];
        }
-       [slice, [int, int]] f36(slice s) {
-         return f37(s);
+       [slice, [int, int]] f37(slice s) {
+         return f38(s);
        }
-       [slice, int] f40(slice s) {
+       [slice, int] f41(slice s) {
          [slice, int] res = f5(s, 64);
          return [get0(func_believe_me(res)), get1(func_believe_me(res))];
        }
-       [slice, int] f41(slice s) {
+       [slice, int] f42(slice s) {
          [slice, int] res = f5(s, 32);
          return [get0(func_believe_me(res)), get1(func_believe_me(res))];
        }
-       [slice, [int, int]] f39(slice slice_) {
-         [slice slice_, int created_lt] = f40(slice_);
-         [slice slice_, int created_at] = f41(slice_);
+       [slice, [int, int]] f40(slice slice_) {
+         [slice slice_, int created_lt] = f41(slice_);
+         [slice slice_, int created_at] = f42(slice_);
          return [slice_, [created_lt, created_at]];
        }
-       [slice, [int, int]] f38(slice s) {
-         return f39(s);
+       [slice, [int, int]] f39(slice s) {
+         return f40(s);
        }
-       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f30(slice
+       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f31(slice
            slice_) {
-         [slice slice_, [int, int, int] flags] = f31(slice_);
-         [slice slice_, [tuple, tuple] addresses] = f34(slice_);
-         [slice slice_, [int, int] coins] = f36(slice_);
-         [slice slice_, [int, int] timestamps] = f38(slice_);
+         [slice slice_, [int, int, int] flags] = f32(slice_);
+         [slice slice_, [tuple, tuple] addresses] = f35(slice_);
+         [slice slice_, [int, int] coins] = f37(slice_);
+         [slice slice_, [int, int] timestamps] = f39(slice_);
          return [slice_, [flags, addresses, coins, timestamps]];
        }
-       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f29(slice s)
+       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f30(slice s)
            {
-         return f30(s);
+         return f31(s);
        }
        [slice, tuple] f4(slice slice_) {
          [slice, int] res_discr = f5(slice_, 1);
          if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
          [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] res =
-           f29(get0(func_believe_me(res_discr)));
+           f30(get0(func_believe_me(res_discr)));
        return
-       f28(get0(func_believe_me(res)), get1(func_believe_me(res)));
+       f29(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
          [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
@@ -1829,20 +1837,20 @@ let%expect_test "deserialization api" =
        {
          [slice, [tuple, tuple, int]] res = f6(get0(func_believe_me(res_discr)));
        return
-       f28(get0(func_believe_me(res)), get1(func_believe_me(res)));
+       f29(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        throw(0);
        }}
        [slice, tuple] f3(slice s) {
          return f4(s);
        }
-       [slice, []] f43([] v, slice s) {
+       [slice, []] f44([] v, slice s) {
          return [s, v];
        }
-       [slice, []] f42(slice s) {
-         return f43(s, []);
+       [slice, []] f43(slice s) {
+         return f44(s, []);
        }
-       [slice, [tuple, []]] f44([tuple, []] v, slice s) {
+       [slice, [tuple, []]] f45([tuple, []] v, slice s) {
          return [s, v];
        }
        [slice, [tuple, []]] f2(slice s) {
@@ -1852,11 +1860,11 @@ let%expect_test "deserialization api" =
          [slice slice_, int discr] = f12(slice_, 1);
        if (builtin_equal(discr, 0))
        {
-         [slice slice_, [] body] = f42(slice_);
+         [slice slice_, [] body] = f43(slice_);
        [tuple, _] mes =
        [info, believe_me(body)];
        return
-       f44(mes, slice_);
+       f45(mes, slice_);
        } else
        {
          }} else
