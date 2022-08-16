@@ -3,4 +3,6 @@
  (package tact)
  (name main)
  (modules main)
- (libraries tact linenoise base))
+ (preprocess
+  (pps ppx_blob))
+ (libraries core tact linenoise base bos ppx_blob))

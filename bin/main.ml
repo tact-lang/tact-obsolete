@@ -1,14 +1,57 @@
-open Base
+open Core
+open Bos
 module Show = Tact.Compiler.Show
 module Lang = Tact.Compiler.Lang
 module Syntax = Tact.Compiler.Syntax
 module Builtin = Tact.Compiler.Builtin
 
+let toolchain_available () =
+  let exists f =
+    match OS.Cmd.exists @@ Cmd.v f with Ok true -> true | _ -> false
+  in
+  match (exists "func", exists "fift") with
+  | _, _ ->
+      Option.is_some @@ Sys.getenv "FIFTPATH"
+  | exception _ ->
+      false
+
+let stdlib_fc = [%blob "stdlib.fc"]
+
+let compile filename program =
+  let cell_file =
+    (Filename.chop_extension filename |> Filename.basename) ^ ".cell"
+  in
+  ignore
+  @@ OS.File.with_tmp_oc
+       (format_of_string "tact_%s")
+       (fun path out () ->
+         Stdio.Out_channel.(
+           output_string out stdlib_fc ;
+           output_string out program ;
+           flush out ) ;
+         let output =
+           OS.Cmd.(
+             run_out Cmd.(v "func" % "-APS" % Fpath.to_string path) |> to_string )
+         in
+         match output with
+         | Ok fift ->
+             let fift = fift ^ "\nboc>B \"" ^ cell_file ^ "\" B>file\n" in
+             ( ignore
+             @@ OS.Cmd.(in_string fift |> run_io Cmd.(v "fift") |> to_null) ) ;
+             Caml.Format.print_string ("Compiled to " ^ cell_file) ;
+             Caml.Format.print_newline ()
+         | _ ->
+             Caml.Format.print_string "Failed to use the toolchain" ;
+             Caml.Format.print_newline () )
+       () ;
+  ()
+
 let interpret_file argv =
   let filename = Array.get argv 1 in
   match Tact.Compiler.compile_with_std ~filename (Caml.open_in filename) with
   | Ok program ->
-      Caml.Format.print_string program
+      if toolchain_available () then compile filename program
+      else Caml.Format.print_string program
   | Error errors ->
       Caml.Format.print_string errors
 
