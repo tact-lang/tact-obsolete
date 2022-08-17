@@ -352,7 +352,9 @@ module Make (Config : Config.T) = struct
                   StructConstructor {fields_construction; constructor_id} ) )
         else rhs'
       in
-      chain (expression operators (locate !!opless_expr)) rhs
+      chain
+        (expression operators (locate !!opless_expr))
+        (attempt rhs)
     in
     (* handle operators *)
     (expression operators exp |>> Syntax.value) state
