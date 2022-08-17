@@ -240,10 +240,10 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
-  and function_parameters state =
-    (parens
-       (many (locate (pair !!(locate ident <<< char ':') !!(locate expr)))) )
-      state
+  and named_param state =
+    (pair !!(locate ident <<< char ':') !!(locate expr)) state
+
+  and function_parameters state = (parens (many (locate named_param))) state
 
   and gen_fn :
         'a. ('a, 's) t -> 's state -> ('a * function_definition, 's) reply =
@@ -253,7 +253,11 @@ module Make (Config : Config.T) = struct
              (pair
                 (pair (skip_keyword "fn" >>> name) function_parameters)
                 (pair
-                   ( attempt (option (skip_string "->" >>> locate expr))
+                   ( attempt
+                       (option
+                          ( skip_string "->"
+                          >>> locate (expr ~struct_construction_allowed:false)
+                          ) )
                    <|> return None )
                    (option (locate code_block)) ) ) )
       |>> fun v ->
@@ -292,7 +296,10 @@ module Make (Config : Config.T) = struct
 
   and field_access state = (char '.' >>> locate ident) state
 
-  and expr state =
+  and struct_construction state =
+    (char '{' >>> many named_param <<< char '}') state
+
+  and expr ?(struct_construction_allowed = true) state =
     let opless_expr =
       integer
       <|> (attempt bool_ |>> fun x -> Bool x)
@@ -330,11 +337,22 @@ module Make (Config : Config.T) = struct
         Syntax.map_located to_field ~f:(fun _ ->
             FieldAccess (make_field_access ~from_expr ~to_field ()) )
       in
-      chain
-        (expression operators (locate !!opless_expr))
-        ( type_index |>> funcall true
+      let rhs' =
+        type_index |>> funcall true
         <|> (function_index |>> funcall false)
-        <|> (field_access |>> make_field_access) )
+        <|> (field_access |>> make_field_access)
+      in
+      let rhs =
+        if struct_construction_allowed then
+          rhs'
+          <|> ( struct_construction
+              |>> fun fields_construction constructor_id ->
+              (* FIXME: this span is wrong *)
+              Syntax.map_located constructor_id ~f:(fun _ ->
+                  StructConstructor {fields_construction; constructor_id} ) )
+        else rhs'
+      in
+      chain (expression operators (locate !!opless_expr)) rhs
     in
     (* handle operators *)
     (expression operators exp |>> Syntax.value) state
