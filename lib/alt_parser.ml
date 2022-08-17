@@ -475,14 +475,12 @@ module Make (Config : Config.T) = struct
        <|> if_stmt <|> code_block ) )
       state
 
-  and program state =
-    (stmt_seq ~f:Syntax.value << eof |>> fun s -> List.map ~f:Syntax.value s)
-      state
+  and program state = (stmt_seq ~f:Syntax.value << eof) state
 
-  let parse (s : string) : stmt list =
+  let parse (s : string) : program =
     match parse_string program s () with
     | Success e ->
-        e
+        {stmts = e}
     | Failed (msg, _) ->
         Caml.print_string msg ; failwith msg
 end
