@@ -9,7 +9,8 @@ type function_ =
     function_args : (ident * type_) list;
     function_returns : type_;
     function_body : function_body;
-    function_forall : ident list }
+    function_forall : ident list;
+    function_is_impure : bool }
 
 and function_body = AsmFn of string | Fn of stmt list [@sexp.list]
 
@@ -119,6 +120,8 @@ and pp_function f fn =
     ~flast:(fun (name, t) -> pp_type f t ; pp_print_space f () ; pp_ident f name) ;
   pp_print_string f ")" ;
   pp_print_space f () ;
+  if fn.function_is_impure then (
+    pp_print_string f "impure" ; pp_print_space f () ) ;
   pp_function_body f indentation fn.function_body ;
   pp_close_box f ()
 

@@ -224,7 +224,8 @@ functor
               function_returns =
                 self#lang_type_to_type
                   fn.value.function_signature.value.function_returns;
-              function_body = F.Fn (List.map body ~f:self#cg_stmt) }
+              function_body = F.Fn (List.map body ~f:self#cg_stmt);
+              function_is_impure = true }
 
         method cg_top_level_stmt : string -> T.expr -> F.top_level_expr option =
           fun name expr ->
@@ -268,20 +269,23 @@ functor
                                       (Some (F.NamedType typearg), "value")
                                     else (None, "_") ),
                                 Reference ("tensor", tensor_type) );
-                            Return (Reference ("value", NamedType ret)) ] } )
+                            Return (Reference ("value", NamedType ret)) ];
+                      function_is_impure = false } )
               @@ List.range ~start:`inclusive ~stop:`inclusive 1 sz
             and default_functions : F.top_level_expr list =
               [ { function_name = "func_believe_me";
                   function_forall = ["A"; "B"];
                   function_args = [("i", NamedType "A")];
                   function_returns = NamedType "B";
-                  function_body = AsmFn "NOP" };
+                  function_body = AsmFn "NOP";
+                  function_is_impure = false };
                 { function_name = "func_bit_not";
                   function_forall = [];
                   function_args = [("a", IntType)];
                   function_returns = IntType;
                   function_body =
-                    Fn [Return (UnaryOp ("~", Reference ("a", IntType)))] } ]
+                    Fn [Return (UnaryOp ("~", Reference ("a", IntType)))];
+                  function_is_impure = false } ]
               |> List.map ~f:(fun (x : F.function_) -> F.Function x)
             in
             make_tensor_accessors 2 @ default_functions
@@ -306,7 +310,8 @@ functor
                         function_forall = ["A"];
                         function_body = AsmFn (Int.to_string field ^ " INDEX");
                         function_args = [("t", UnknownTuple)];
-                        function_returns = NamedType "A" }
+                        function_returns = NamedType "A";
+                        function_is_impure = false }
                     in
                     helpers <- fn :: helpers ) ;
                   let converted_value =
