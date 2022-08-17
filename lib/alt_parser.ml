@@ -83,6 +83,12 @@ module Make (Config : Config.T) = struct
     |>> fun x -> Int (Zint.of_string x) )
       state
 
+  and bool_ state =
+    ( skip_keyword "true"
+    |>> (fun _ -> true)
+    <|> (skip_keyword "false" |>> fun _ -> false) )
+      state
+
   and ident' state =
     (* alphanumeric, underscore starting with letters and underscore only *)
     ( many_chars_starting_with (letter <|> char '_') (alphanum <|> char '_')
@@ -289,6 +295,7 @@ module Make (Config : Config.T) = struct
   and expr state =
     let opless_expr =
       integer
+      <|> (attempt bool_ |>> fun x -> Bool x)
       <|> (struct_ |>> fun x -> Struct x)
       <|> (locate ident |>> fun x -> Reference x)
       <|> (fn |>> fun x -> Function x)
