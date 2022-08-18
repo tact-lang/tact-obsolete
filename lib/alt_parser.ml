@@ -141,14 +141,14 @@ module Make (Config : Config.T) = struct
       state
 
   and attribute state =
-    (pipe2
-       (attempt (skip_char '@' >> locate ident))
-       (option (parens (comma_sep !!(locate expr))))
-       (fun attribute_ident -> function
-         | None ->
-             make_attribute ~attribute_ident ()
-         | Some attribute_exprs ->
-             make_attribute ~attribute_ident ~attribute_exprs () ) )
+    !!(pipe2
+         (attempt (skip_char '@' >> locate ident))
+         (option (parens (comma_sep !!(locate expr))))
+         (fun attribute_ident -> function
+           | None ->
+               make_attribute ~attribute_ident ()
+           | Some attribute_exprs ->
+               make_attribute ~attribute_ident ~attribute_exprs () ) )
       state
 
   and attributes state = (many attribute) state
