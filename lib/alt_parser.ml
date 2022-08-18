@@ -243,7 +243,8 @@ module Make (Config : Config.T) = struct
   and named_param state =
     (pair !!(locate ident <<< char ':') !!(locate expr)) state
 
-  and function_parameters state = (parens (many (locate named_param))) state
+  and function_parameters state =
+    (parens (comma_sep (locate named_param))) state
 
   and gen_fn :
         'a. ('a, 's) t -> 's state -> ('a * function_definition, 's) reply =
@@ -297,7 +298,7 @@ module Make (Config : Config.T) = struct
   and field_access state = (char '.' >>> locate ident) state
 
   and struct_construction state =
-    (char '{' >>> many named_param <<< char '}') state
+    (char '{' >>> comma_sep named_param <<< char '}') state
 
   and expr ?(struct_construction_allowed = true) state =
     let opless_expr =
@@ -352,9 +353,7 @@ module Make (Config : Config.T) = struct
                   StructConstructor {fields_construction; constructor_id} ) )
         else rhs'
       in
-      chain
-        (expression operators (locate !!opless_expr))
-        (attempt rhs)
+      chain (expression operators (locate !!opless_expr)) (attempt rhs)
     in
     (* handle operators *)
     (expression operators exp |>> Syntax.value) state
