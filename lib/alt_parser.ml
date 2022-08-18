@@ -237,6 +237,70 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
+  and union_member state = (skip_keyword "case" >>> locate expr) state
+
+  and union_item state =
+    ( union_member
+    |>> (fun x -> `Member x)
+    <|> (impl |>> fun x -> `Impl x)
+    <|> (fn_stmt |>> fun x -> `Fn x)
+    <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
+    )
+      state
+
+  and gen_union :
+        'a. ('a, 's) t -> 's state -> ('a * union_definition, 's) reply =
+   fun name state ->
+    ( !!(locate
+           (pair attributes
+              (pair
+                 (skip_keyword "union" >>> name)
+                 (char '{' >>> many !!union_item <<< char '}') ) ) )
+    |>> fun v ->
+    let union_attributes, (name, items) = Syntax.value v in
+    ( name,
+      make_union_definition ~union_attributes
+        ~union_members:
+          (List.filter_map items ~f:(function `Member f -> Some f | _ -> None))
+        ~union_bindings:
+          (List.filter_map items ~f:(function
+            | `Fn (Let f) ->
+                Some f
+            | _ ->
+                None ) )
+        ~union_impls:
+          (List.filter_map items ~f:(function
+            | `Impl impl ->
+                Some impl
+            | _ ->
+                None ) )
+        ~union_span:(Syntax.span v) () ) )
+      state
+
+  and union_ state =
+    ( gen_union parameterization
+    |>> fun (parameterize, union_) ->
+    parameterize
+      (Syntax.make_located
+         ~span:(Syntax.span_to_concrete union_.union_span)
+         ~value:(Union union_) () ) )
+      state
+
+  and union_stmt state =
+    ( gen_union (pair !!(locate ident) parameterization)
+    |>> fun ((binding_name, parameterize), union_) ->
+    let span = Syntax.span_to_concrete union_.union_span in
+    Let
+      (Syntax.make_located ~span
+         ~value:
+           (make_binding ~binding_name
+              ~binding_expr:
+                (parameterize
+                   (Syntax.make_located ~span ~value:(Union union_) ()) )
+              () )
+         () ) )
+      state
+
   and interface_item state =
     ( fn_stmt
     |>> (fun x -> `Fn x)
@@ -347,7 +411,7 @@ module Make (Config : Config.T) = struct
     let opless_expr =
       integer <|> string_
       <|> (attempt bool_ |>> fun x -> Bool x)
-      <|> (struct_ |>> Syntax.value)
+      <|> (struct_ |>> Syntax.value) <|> (union_ |>> Syntax.value)
       <|> (locate ident |>> fun x -> Reference x)
       <|> (fn |>> fun x -> Function x)
       <|> (interface |>> fun x -> Interface x)
@@ -550,9 +614,9 @@ module Make (Config : Config.T) = struct
 
   and stmt state =
     ( whitespace
-    >> ( attempt let_ <|> attempt struct_stmt <|> attempt interface_stmt
-       <|> attempt fn_stmt <|> switch <|> while_loop <|> semicolon_stmt
-       <|> if_stmt <|> code_block ) )
+    >> ( attempt let_ <|> attempt struct_stmt <|> attempt union_stmt
+       <|> attempt interface_stmt <|> attempt fn_stmt <|> switch <|> while_loop
+       <|> semicolon_stmt <|> if_stmt <|> code_block ) )
       state
 
   and program state = (stmt_seq ~f:Syntax.value << eof) state
