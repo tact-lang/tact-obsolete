@@ -367,7 +367,7 @@ module Make (Config : Config.T) = struct
                           >>> locate (expr ~struct_construction_allowed:false)
                           ) )
                    <|> return None )
-                   (option (locate code_block)) ) ) )
+                   (option (attempt (locate code_block)) ) ) ))
       |>> fun v ->
       let function_attributes, ((name, params), (returns, function_body)) =
         Syntax.value v
