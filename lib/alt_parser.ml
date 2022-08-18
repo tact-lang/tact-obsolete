@@ -60,10 +60,6 @@ module Make (Config : Config.T) = struct
 
   let brackets p = between (char '[') (char ']') p
 
-  let comma s = char ',' s
-
-  let comma_sep p = sep_by p comma
-
   let present p = option p |>> Option.is_some
 
   let ( >>> ) x y = whitespace >> x >> whitespace >> y << whitespace
@@ -75,6 +71,19 @@ module Make (Config : Config.T) = struct
   let postfix sym f = Postfix (sym |>> f)
 
   let prefix sym f = Prefix (sym |>> f)
+
+  let sep_by1 p sep =
+    p
+    >>= fun x ->
+    many (sep >>> (attempt (option p) <|> return None))
+    >>= fun xs -> return (Some x :: xs)
+
+  let sep_by p sep =
+    opt [] (sep_by1 p sep) |>> fun l -> List.filter_map l ~f:(fun s -> s)
+
+  let comma s = char ',' s
+
+  let comma_sep p = sep_by p comma
 
   let rec keyword state =
     ( string "as" <|> string "let" <|> string "interface" <|> string "impl"
