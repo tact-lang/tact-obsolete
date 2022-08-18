@@ -291,9 +291,9 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
-  and type_index state = (brackets (comma_sep (locate expr))) state
+  and type_index state = !!(brackets (comma_sep (locate expr))) state
 
-  and function_index state = (parens (comma_sep (locate expr))) state
+  and function_index state = !!(parens (comma_sep (locate expr))) state
 
   and field_access state = (char '.' >>> locate ident) state
 
