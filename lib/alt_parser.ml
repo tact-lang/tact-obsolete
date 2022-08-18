@@ -323,8 +323,19 @@ module Make (Config : Config.T) = struct
               (make_method_call ~receiver:l
                  ~receiver_fn:(Syntax.builtin_located (Ident name))
                  ~receiver_arguments:[r] () ) )
+      and negate _operator e =
+        Syntax.map_located _operator ~f:(fun _ ->
+            match Syntax.value e with
+            | Int x ->
+                Int (Z.neg x)
+            | _ ->
+                MethodCall
+                  (make_method_call ~receiver:e
+                     ~receiver_fn:(Syntax.builtin_located (Ident "neg"))
+                     ~receiver_arguments:[] () ) )
       in
-      [ [ infix (locate (string "*")) (op "mul") Assoc_left;
+      [ [prefix (locate (string "-")) negate];
+        [ infix (locate (string "*")) (op "mul") Assoc_left;
           infix (locate (string "/")) (op "div") Assoc_left ];
         [ infix (locate (string "+")) (op "add") Assoc_left;
           infix (locate (string "-")) (op "subtract") Assoc_left ] ]
