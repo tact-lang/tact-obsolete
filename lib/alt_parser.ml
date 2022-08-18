@@ -177,7 +177,14 @@ module Make (Config : Config.T) = struct
         ~impls:[] ~struct_span:(Syntax.span v) () ) )
       state
 
-  and struct_ state = (gen_struct (return ()) |>> snd) state
+  and struct_ state =
+    ( gen_struct parameterization
+    |>> fun (parameterize, struct_) ->
+    parameterize
+      (Syntax.make_located
+         ~span:(Syntax.span_to_concrete struct_.struct_span)
+         ~value:(Struct struct_) () ) )
+      state
 
   and struct_stmt state =
     ( gen_struct (pair !!(locate ident) parameterization)
@@ -304,7 +311,7 @@ module Make (Config : Config.T) = struct
     let opless_expr =
       integer
       <|> (attempt bool_ |>> fun x -> Bool x)
-      <|> (struct_ |>> fun x -> Struct x)
+      <|> (struct_ |>> Syntax.value)
       <|> (locate ident |>> fun x -> Reference x)
       <|> (fn |>> fun x -> Function x)
       <|> (interface |>> fun x -> Interface x)
