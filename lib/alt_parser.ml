@@ -683,7 +683,17 @@ module Make (Config : Config.T) = struct
        ) )
       state
 
-  and program state = (stmt_seq ~f:Syntax.value << eof) state
+  and program state =
+    ( stmt_seq ~f:Syntax.value <<< eof
+    |>> fun stmts ->
+    (* remove trailing Break *)
+    match List.rev stmts with
+    | [] ->
+        []
+    | stmt :: rest ->
+        (match Syntax.value stmt with Break s -> s | _ -> stmt) :: rest
+        |> List.rev )
+      state
 
   let parse (s : string) : program =
     match parse_string program s () with
