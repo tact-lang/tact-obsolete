@@ -153,6 +153,19 @@ module Make (Config : Config.T) = struct
 
   and attributes state = (many attribute) state
 
+  and impl_item state =
+    ( fn_stmt
+    |>> function Let binding -> binding | _ -> failwith "internal bug" )
+      state
+
+  and impl state =
+    (pipe3 attributes
+       (skip_keyword "impl" >>> locate expr)
+       (char '{' >>> many !!impl_item <<< char '}')
+       (fun impl_attributes interface methods ->
+         make_impl ~impl_attributes ~interface ~methods () ) )
+      state
+
   and struct_field state =
     ( locate
         !!(pipe3 attributes
@@ -165,6 +178,7 @@ module Make (Config : Config.T) = struct
 
   and struct_item state =
     ( struct_field
+    <|> (impl |>> fun x -> `Impl x)
     <|> (fn_stmt |>> fun x -> `Fn x)
     <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
     )
@@ -190,7 +204,13 @@ module Make (Config : Config.T) = struct
                 Some f
             | _ ->
                 None ) )
-        ~impls:[] ~struct_span:(Syntax.span v) () ) )
+        ~impls:
+          (List.filter_map items ~f:(function
+            | `Impl impl ->
+                Some impl
+            | _ ->
+                None ) )
+        ~struct_span:(Syntax.span v) () ) )
       state
 
   and struct_ state =
