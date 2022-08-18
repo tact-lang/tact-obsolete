@@ -540,10 +540,10 @@ let ident ==
 *)
 let enum_definition(name) ==
   enum_attributes = attributes;
-  ENUM;
+  enum_span = located(ENUM);
   n = name;
   (members, bindings) = delimited_separated_trailing_list_followed_by(LBRACE, enum_member, COMMA, list(sugared_function_definition(option(located(code_block)))), RBRACE);
-  { (n, Enum (make_enum_definition ~enum_attributes ~enum_members: members ~enum_bindings: bindings ())) }
+  { (n, Enum (make_enum_definition ~enum_attributes ~enum_members: members ~enum_bindings: bindings ~enum_span:enum_span.span ())) }
 
  (* Enum member
 

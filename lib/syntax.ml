@@ -51,7 +51,8 @@ functor
     and enum_definition =
       { enum_attributes : attribute list; [@sexp.list]
         enum_members : enum_member located list; [@sexp.list]
-        enum_bindings : binding located list [@sexp.list] }
+        enum_bindings : binding located list; [@sexp.list]
+        enum_span : (span[@sexp.opaque]) }
 
     and enum_member =
       { enum_name : ident located;

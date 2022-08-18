@@ -301,6 +301,69 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
+  and enum_member state =
+    (pipe2
+       !!(locate ident)
+       (attempt (option (skip_char '=' >>> locate expr)))
+       (fun enum_name enum_value -> {enum_name; enum_value}) )
+      state
+
+  and enum_item state =
+    ( locate enum_member
+    |>> (fun x -> `Member x)
+    <|> (impl |>> fun x -> `Impl x)
+    <|> (fn_stmt |>> fun x -> `Fn x)
+    <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
+    )
+      state
+
+  and gen_enum : 'a. ('a, 's) t -> 's state -> ('a * enum_definition, 's) reply
+      =
+   fun name state ->
+    ( !!(locate
+           (pair attributes
+              (pair
+                 (skip_keyword "enum" >>> name)
+                 (char '{' >>> many !!enum_item <<< char '}') ) ) )
+    |>> fun v ->
+    let enum_attributes, (name, items) = Syntax.value v in
+    ( name,
+      make_enum_definition ~enum_attributes
+        ~enum_members:
+          (List.filter_map items ~f:(function `Member f -> Some f | _ -> None))
+        ~enum_bindings:
+          (List.filter_map items ~f:(function
+            | `Fn (Let f) ->
+                Some f
+            | _ ->
+                None ) )
+        ~enum_span:(Syntax.span v) () ) )
+      state
+
+  and enum_ state =
+    ( gen_enum parameterization
+    |>> fun (parameterize, enum_) ->
+    parameterize
+      (Syntax.make_located
+         ~span:(Syntax.span_to_concrete enum_.enum_span)
+         ~value:(Enum enum_) () ) )
+      state
+
+  and enum_stmt state =
+    ( gen_enum (pair !!(locate ident) parameterization)
+    |>> fun ((binding_name, parameterize), enum_) ->
+    let span = Syntax.span_to_concrete enum_.enum_span in
+    Let
+      (Syntax.make_located ~span
+         ~value:
+           (make_binding ~binding_name
+              ~binding_expr:
+                (parameterize
+                   (Syntax.make_located ~span ~value:(Enum enum_) ()) )
+              () )
+         () ) )
+      state
+
   and interface_item state =
     ( fn_stmt
     |>> (fun x -> `Fn x)
@@ -367,7 +430,7 @@ module Make (Config : Config.T) = struct
                           >>> locate (expr ~struct_construction_allowed:false)
                           ) )
                    <|> return None )
-                   (option (attempt (locate code_block)) ) ) ))
+                   (option (attempt (locate code_block))) ) ) )
       |>> fun v ->
       let function_attributes, ((name, params), (returns, function_body)) =
         Syntax.value v
@@ -411,7 +474,7 @@ module Make (Config : Config.T) = struct
     let opless_expr =
       integer <|> string_
       <|> (attempt bool_ |>> fun x -> Bool x)
-      <|> (struct_ |>> Syntax.value) <|> (union_ |>> Syntax.value)
+      <|> (struct_ <|> union_ <|> enum_ |>> Syntax.value)
       <|> (locate ident |>> fun x -> Reference x)
       <|> (fn |>> fun x -> Function x)
       <|> (interface |>> fun x -> Interface x)
@@ -615,8 +678,9 @@ module Make (Config : Config.T) = struct
   and stmt state =
     ( whitespace
     >> ( attempt let_ <|> attempt struct_stmt <|> attempt union_stmt
-       <|> attempt interface_stmt <|> attempt fn_stmt <|> switch <|> while_loop
-       <|> semicolon_stmt <|> if_stmt <|> code_block ) )
+       <|> attempt enum_stmt <|> attempt interface_stmt <|> attempt fn_stmt
+       <|> switch <|> while_loop <|> semicolon_stmt <|> if_stmt <|> code_block
+       ) )
       state
 
   and program state = (stmt_seq ~f:Syntax.value << eof) state

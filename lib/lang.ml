@@ -471,7 +471,7 @@ functor
         method build_assignment _env assignment_ident assignment_expr =
           {assignment_ident; assignment_expr}
 
-        method build_enum_definition _env _ _ _ = ()
+        method build_enum_definition _env _ _ _ _ = ()
 
         method build_enum_member _env _name _value = ()
 
