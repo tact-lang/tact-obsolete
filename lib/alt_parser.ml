@@ -548,14 +548,53 @@ module Make (Config : Config.T) = struct
     (* handle operators *)
     (expression operators exp |>> Syntax.value) state
 
+  and cast span (expr : expr located) (typ : expr) =
+    make_located ~span
+      ~value:
+        (FunctionCall
+           { fn =
+               make_located ~span
+                 ~value:
+                   (Function
+                      (make_function_definition
+                         ~function_def_span:(span_of_concrete span)
+                         ~is_type_function:false
+                         ~params:
+                           [ make_located ~span
+                               ~value:
+                                 ( make_located ~span ~value:(Ident "v") (),
+                                   make_located ~span ~value:typ () )
+                               () ]
+                         ~returns:(make_located ~span ~value:typ ())
+                         ~function_body:
+                           (make_function_body
+                              ~function_stmt:
+                                {value = Return expr; span = expr.span}
+                              () )
+                         () ) )
+                 ();
+             arguments = [expr];
+             is_type_func_call = false } )
+      ()
+
   and let_ state =
     ( locate
         ( skip_keyword "let"
-        >>> pipe2
-              (pair (locate ident) parameterization <<< char '=')
+        >>> pipe3
+              (pair (locate ident) parameterization)
+              (option (char ':' >>> locate expr) <<< char '=')
               (locate expr <<< char ';')
-              (fun (binding_name, parameterize) binding_expr ->
-                {binding_name; binding_expr = parameterize binding_expr} ) )
+              (fun (binding_name, parameterize) type_ binding_expr ->
+                match type_ with
+                | None ->
+                    {binding_name; binding_expr = parameterize binding_expr}
+                | Some typ ->
+                    { binding_name;
+                      binding_expr =
+                        parameterize
+                          (cast
+                             (Syntax.span typ |> Syntax.span_to_concrete)
+                             binding_expr (Syntax.value typ) ) } ) )
     |>> fun x -> Let x )
       state
 
