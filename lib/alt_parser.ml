@@ -472,9 +472,9 @@ module Make (Config : Config.T) = struct
 
   and expr ?(struct_construction_allowed = true) state =
     let opless_expr =
-      integer <|> string_
+      attempt integer <|> attempt string_
       <|> (attempt bool_ |>> fun x -> Bool x)
-      <|> attempt (struct_ <|> union_ <|> enum_ |>> Syntax.value)
+      <|> (attempt struct_ <|> attempt union_ <|> attempt enum_ |>> Syntax.value)
       <|> (locate ident |>> fun x -> Reference x)
       <|> attempt (fn |>> fun x -> Function x)
       <|> (interface |>> fun x -> Interface x)
