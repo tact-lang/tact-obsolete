@@ -177,9 +177,9 @@ module Make (Config : Config.T) = struct
       state
 
   and struct_item state =
-    ( struct_field
-    <|> (impl |>> fun x -> `Impl x)
-    <|> (fn_stmt |>> fun x -> `Fn x)
+    ( attempt struct_field
+    <|> attempt (impl |>> fun x -> `Impl x)
+    <|> attempt (fn_stmt |>> fun x -> `Fn x)
     <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
     )
       state
@@ -240,10 +240,10 @@ module Make (Config : Config.T) = struct
   and union_member state = (skip_keyword "case" >>> locate expr) state
 
   and union_item state =
-    ( union_member
+    ( attempt union_member
     |>> (fun x -> `Member x)
-    <|> (impl |>> fun x -> `Impl x)
-    <|> (fn_stmt |>> fun x -> `Fn x)
+    <|> attempt (impl |>> fun x -> `Impl x)
+    <|> attempt (fn_stmt |>> fun x -> `Fn x)
     <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
     )
       state
@@ -309,10 +309,10 @@ module Make (Config : Config.T) = struct
       state
 
   and enum_item state =
-    ( locate enum_member
+    ( attempt (locate enum_member)
     |>> (fun x -> `Member x)
-    <|> (impl |>> fun x -> `Impl x)
-    <|> (fn_stmt |>> fun x -> `Fn x)
+    <|> attempt (impl |>> fun x -> `Impl x)
+    <|> attempt (fn_stmt |>> fun x -> `Fn x)
     <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
     )
       state
@@ -365,7 +365,7 @@ module Make (Config : Config.T) = struct
       state
 
   and interface_item state =
-    ( fn_stmt
+    ( attempt fn_stmt
     |>> (fun x -> `Fn x)
     <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
     )
@@ -474,9 +474,9 @@ module Make (Config : Config.T) = struct
     let opless_expr =
       integer <|> string_
       <|> (attempt bool_ |>> fun x -> Bool x)
-      <|> (struct_ <|> union_ <|> enum_ |>> Syntax.value)
+      <|> attempt (struct_ <|> union_ <|> enum_ |>> Syntax.value)
       <|> (locate ident |>> fun x -> Reference x)
-      <|> (fn |>> fun x -> Function x)
+      <|> attempt (fn |>> fun x -> Function x)
       <|> (interface |>> fun x -> Interface x)
       <|> parens expr
     and operators =
