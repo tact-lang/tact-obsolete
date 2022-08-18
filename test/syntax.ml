@@ -5,7 +5,7 @@ module Config = struct
 end
 
 module Syntax = Tact.Syntax.Make (Config)
-module Parser = Tact.Alt_parser.Make (Config)
+module Parser = Tact.Parser.Make (Config)
 
 let parse_program s = Parser.parse s
 

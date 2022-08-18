@@ -4,7 +4,7 @@ functor
   ->
   struct
     module Syntax = Tact.Syntax.Make (Config)
-    module Parser = Tact.Alt_parser.Make (Config)
+    module Parser = Tact.Parser.Make (Config)
     module Lang = Tact.Lang.Make (Config)
     module Show = Tact.Show.Make (Config)
     module Interpreter = Tact.Interpreter.Make (Config)

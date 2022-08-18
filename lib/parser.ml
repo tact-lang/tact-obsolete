@@ -743,10 +743,12 @@ module Make (Config : Config.T) = struct
         |> List.rev )
       state
 
+  exception Error of (string * error)
+
   let parse (s : string) : program =
     match parse_string program s () with
     | Success e ->
         {stmts = e}
-    | Failed (msg, _) ->
-        Caml.print_string msg ; failwith msg
+    | Failed (msg, err) ->
+        raise (Error (msg, err))
 end
