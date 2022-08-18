@@ -12,7 +12,6 @@ type function_ =
     function_forall : ident list }
 
 and function_body =
-  | AsmFn of Asm.instr list [@sexp.list]
   | Fn of stmt list [@sexp.list]
 
 and stmt =
@@ -131,8 +130,6 @@ and pp_function_body f indentation = function
           pp_open_hovbox f 2 ;
           pp_stmt f stmt ;
           pp_close_box f () )
-  | _ ->
-      raise Unsupported
 
 and pp_stmt f = function
   | Vars vars ->

@@ -1,5 +1,4 @@
 (lang dune 2.9)
-(using menhir 2.1)
 (generate_opam_files true)
 
 (name tact)
@@ -37,9 +36,6 @@
    (dune (and :build (>= 3.1.1)))
    (js_of_ocaml (>= 4.0.0))
    (mparser (>= 1.3))
-   (menhirLib (= 20220210))
-   (menhir (= 20220210))
-   (menhirSdk (= 20220210))
    (zarith (>= 1.12))
    (base (>= 0.15.0))
    (ppx_jane (>= 0.15.0))

@@ -1,7 +1,6 @@
 (library
  (libraries
   base
-  menhirLib
   ppx_show.runtime
   zarith
   visitors.runtime
@@ -21,9 +20,3 @@
  (preprocessor_deps
   (file std/std.tact))
  (name tact))
-
-(ocamllex asm_lexer)
-
-(menhir
- (modules asm_parser)
- (flags -v))
