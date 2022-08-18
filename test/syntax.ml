@@ -1280,11 +1280,14 @@ let%expect_test "attributes" =
                  ((function_attributes (((attribute_ident (Ident attr)))))
                   (function_body
                    ((function_stmt (CodeBlock ((Break (Expr (Bool true))))))))
-                  (function_def_span <opaque>))))))))))))
+                  (function_def_span <opaque>)))))))
+            (enum_span <opaque>))))))
        (Let
         ((binding_name (Ident E1))
          (binding_expr
-          (Enum ((enum_attributes (((attribute_ident (Ident attr))))))))))))) |}]
+          (Enum
+           ((enum_attributes (((attribute_ident (Ident attr)))))
+            (enum_span <opaque>))))))))) |}]
 
 let%expect_test "assignment" =
   let source = {|
