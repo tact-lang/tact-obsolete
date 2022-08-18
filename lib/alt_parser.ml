@@ -160,7 +160,7 @@ module Make (Config : Config.T) = struct
 
   and impl state =
     (pipe3 attributes
-       (skip_keyword "impl" >>> locate expr)
+       (skip_keyword "impl" >>> locate (expr ~struct_construction_allowed:false))
        (char '{' >>> many !!impl_item <<< char '}')
        (fun impl_attributes interface methods ->
          make_impl ~impl_attributes ~interface ~methods () ) )
