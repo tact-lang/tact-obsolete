@@ -4,3 +4,6 @@ _opam
 .vscode
 .conflicts
 .DS_Store
+*.fc
+*.fif
+*.cell

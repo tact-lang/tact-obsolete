@@ -11,8 +11,7 @@ type function_ =
     function_body : function_body;
     function_forall : ident list }
 
-and function_body =
-  | Fn of stmt list [@sexp.list]
+and function_body = AsmFn of string | Fn of stmt list [@sexp.list]
 
 and stmt =
   | Vars of (type_ * ident * expr) list
@@ -30,6 +29,7 @@ and expr =
   | Tuple of expr list
   | FunctionCall of (ident * expr list * type_)
   | Operator of (expr * operator * expr)
+  | UnaryOp of (string * expr)
 
 and operator = EqualityOperator
 
@@ -64,6 +64,8 @@ let rec type_of = function
   | FunctionCall (_, _, ty) ->
       ty
   | Operator (_, EqualityOperator, _) ->
+      IntType
+  | UnaryOp (_, _) ->
       IntType
 
 open Caml.Format
@@ -117,19 +119,24 @@ and pp_function f fn =
     ~flast:(fun (name, t) -> pp_type f t ; pp_print_space f () ; pp_ident f name) ;
   pp_print_string f ")" ;
   pp_print_space f () ;
-  pp_print_string f "{" ;
-  pp_print_newline f () ;
   pp_function_body f indentation fn.function_body ;
-  pp_print_string f "}" ;
   pp_close_box f ()
 
 and pp_function_body f indentation = function
   | Fn stmts ->
+      pp_print_string f "{" ;
+      pp_print_newline f () ;
       List.iter stmts ~f:(fun stmt ->
           pp_print_string f indentation ;
           pp_open_hovbox f 2 ;
           pp_stmt f stmt ;
-          pp_close_box f () )
+          pp_close_box f () ) ;
+      pp_print_string f "}"
+  | AsmFn str ->
+      pp_print_string f "asm" ;
+      pp_print_space f () ;
+      pp_print_string f @@ "\"" ^ str ^ "\"" ;
+      pp_print_string f ";"
 
 and pp_stmt f = function
   | Vars vars ->
@@ -248,6 +255,8 @@ and pp_expr f = function
       pp_operator f op ;
       pp_print_space f () ;
       pp_expr f right
+  | UnaryOp (op, expr) ->
+      pp_print_string f op ; pp_print_space f () ; pp_expr f expr
 
 and pp_operator f = function EqualityOperator -> pp_print_string f "=="
 

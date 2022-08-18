@@ -20,7 +20,7 @@ struct Builder {
     Self { inner: builtin_store_uint(self.inner, uint, bits) }
   }
   fn serialize_coins(self: Self, c: Integer) -> Self {
-    Self { inner: builtin_store_coins(self.inner, c) }
+    Self { inner: builtin_store_grams(self.inner, c) }
   }
 }
 
@@ -46,7 +46,7 @@ struct Slice {
   }
 
   fn load_coins(self: Self) -> LoadResult[Integer] {
-    let output = builtin_load_coins(self.s);
+    let output = builtin_load_grams(self.s);
     let slice = Self { s: output.value1 };
     let coins = output.value2 ;
     LoadResult[Integer] { slice: believe_me(slice), value: coins }
@@ -97,7 +97,7 @@ struct SliceBits[N: Integer] {
   }
 }
 
-fn throw(n: Integer) {
+fn thrown(n: Integer) {
   builtin_throw(n);
 }
 
@@ -140,8 +140,8 @@ struct Int[bits: Integer] {
       let res = s.load_int(bits);
       let {slice, value} = res;
       
-      LoadResult[Self] { 
-        slice: slice, 
+      LoadResult[Self] {
+        slice: slice,
         value: Self { value: value }
       }
     }
@@ -265,7 +265,7 @@ struct AddressStd {
       if (builtin_equal(res_anycast.value, 0)) {
         return deserializer[Self](s);
       } else {
-        throw(0); // unreachable
+        thrown(0); // unreachable
       }
     }
   }
@@ -273,7 +273,7 @@ struct AddressStd {
 
 struct AddressVar {
   val len: Int[9]
-  val workchain_id: Int[8]
+  val workchain_id: Int[32]
   val address: Integer
 
   impl Serialize {
@@ -286,19 +286,19 @@ struct AddressVar {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      let res_anycast = s.load_int(1);
-      if (builtin_equal(res_anycast.value, 0)) {
-        let res_len = Int[9].deserialize(res_anycast.slice);
-        let res_workchain = Int[8].deserialize(res_len.slice);
-        let res_address = res_workchain.slice.load_int(res_len);
+      let {value as anycast, slice} = s.load_int(1);
+      if (builtin_equal(anycast, 0)) {
+        let {value as len, slice} = Int[9].deserialize(slice);
+        let {value as workchain_id, slice} = Int[32].deserialize(slice);
+        let {value as address, slice} = slice.load_int(len);
         return LoadResult[Self]
-          .new(res_address.slice, Self {
-            len: res_len.value,
-            workchain_id: res_workchain.value,
-            address: res_address.value,
+          .new(slice, Self {
+            len: len,
+            workchain_id: workchain_id,
+            address: address,
           });
       } else {
-        throw(0); // unreachable
+        thrown(0); // unreachable
       }
     }
   }
@@ -517,7 +517,7 @@ struct Message[X: Deserialize] {
           /* TODO: cells */
         }
       } else {
-        throw(0);
+        thrown(0);
       }
     }
   }
@@ -546,7 +546,7 @@ struct SendRawMsgFlags {
 }
 
 fn send_raw_msg(msg: Cell, flags: SendRawMsgFlags) -> VoidType {
-  builtin_send_raw_msg(msg.c, flags.value.value);
+  builtin_send_raw_message(msg.c, flags.value.value);
 }
 
 fn send_internal[X: Serialize](header: IntMsgInfoRelaxed, body: X, flags: SendRawMsgFlags) -> VoidType {

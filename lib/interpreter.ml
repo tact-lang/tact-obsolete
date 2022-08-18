@@ -202,8 +202,9 @@ functor
                   match self#interpret_expr intf_instance with
                   | Type t ->
                       t
-                  | _ ->
-                      ice "Type-check bug?"
+                  | out ->
+                      print_sexp @@ sexp_of_value out ;
+                      ice "Type-check bug 1?"
                 in
                 match Program.find_impl_intf ctx.program intf_def ty with
                 | Some impl ->
@@ -231,7 +232,7 @@ functor
                   | Type t ->
                       t
                   | _ ->
-                      ice "Type-check bug?"
+                      ice "Type-check bug 2?"
                 in
                 match Program.find_impl_intf ctx.program st_sig_call_def ty with
                 | Some impl ->
@@ -453,6 +454,15 @@ functor
           function
           | ExprType ex -> (
             match self#interpret_expr ex with
+            | Type t ->
+                t
+            | Void ->
+                VoidType
+            | ex2 ->
+                print_sexp (sexp_of_value ex2) ;
+                ice "Type-check bug" )
+          | TypeCall {func; args} -> (
+            match self#interpret_fc (func, args, true) with
             | Type t ->
                 t
             | Void ->
