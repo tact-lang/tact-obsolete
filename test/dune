@@ -13,7 +13,7 @@
   (staged_pps ppx_matches ppx_expect ppx_sexp_conv))
  (name tact_tests)
  (inline_tests)
- (modules errors syntax immediacy_check builtin lang codegen_func)
+ (modules syntax immediacy_check builtin lang codegen_func errors)
  (libraries tact core sexplib shared))
 
 (library

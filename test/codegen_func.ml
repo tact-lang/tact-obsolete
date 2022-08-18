@@ -2254,7 +2254,7 @@ let%expect_test "codegen while block" =
       fn test() {
         let a = 10;
         while (true) {
-          a = 20
+          a = 20;
         }
       }
     |}

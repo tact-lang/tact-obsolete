@@ -76,10 +76,10 @@ let%expect_test "failed scope resolution" =
   [%expect
     {|
     Error[1]: Unresolved identifier Int256
-    File: "":2:12
+    File: "":2:0
       |
-    2 |     let T = Int256;
-      |             ^^^^^^ Cannot resolve this identifier |}]
+    2 | Int256;
+      | ^^^^^^ Cannot resolve this identifier |}]
 
 let%expect_test "method not found" =
   let source = {|
@@ -91,10 +91,12 @@ let%expect_test "method not found" =
   [%expect
     {|
     Error[1]: Method method not found in <anonymous>
-    File: "":4:19
+    File: "":4:23
       |
-    4 |       let _ = St{}.method();
-      |                    ^^^^^^ Method not found |}]
+    4 |
+
+          let _ = St{}.method();
+      |                        ^^^^^^ Method not found |}]
 
 let%expect_test "duplicate field" =
   let source =
@@ -109,10 +111,11 @@ let%expect_test "duplicate field" =
   [%expect
     {|
     Error[1]: Duplicate struct field field
-    File: "":3:12
+    File: "":3:19
       |
-    3 |         val field: Integer
-      |             ^^^^^ Duplicated |}]
+    3 |  Foo {
+            val field: Integer
+      |                    ^^^^^ Duplicated |}]
 
 let%expect_test "duplicate variant" =
   let source =
@@ -133,15 +136,24 @@ let%expect_test "duplicate variant" =
   [%expect
     {|
     Error[1]: Duplicate variant with type Integer
-    File: "":1:0
+    File: "":2:0
       |
-    1 | ...
-      | ^^^ Duplicated variant in this union
+    2 | union Test1 {...
+      | ^^^^^^^^^^^^^^^^ Duplicated variant in this union
     Error[1]: Duplicate variant with type Integer
-    File: "":11:14
+    File: "":11:144
        |
-    11 |       let _ = Test2[Integer];
-       |               ^^^^^^^^^^^^^ Duplicated variant in this union |}]
+    11 | st1 {
+            case Integer
+            case Integer
+          }
+
+          union Test2[T: Type] {
+            case Integer
+            case T
+          }
+          let _ = Test2[Integer];
+       |                                                                                                                                                 ^^^^^^^^^^^^^ Duplicated variant in this union |}]
 
 let%expect_test "type errors" =
   let source =
@@ -164,25 +176,57 @@ let%expect_test "type errors" =
   [%expect
     {|
     Error[1]: Expected type `<struct 1>` but found `Integer`
-    File: "":5:8
+    File: "":5:49
       |
-    5 |         123
-      |         ^^^ This has type `Integer`
+    5 | ruct Test {}
+
+          fn test1() -> Test {
+            123...
+      |                                                  ^^^^^^ This has type `Integer`
     Error[1]: Expected type `<struct 1>` but found `Integer`
-    File: "":9:15
+    File: "":9:97
       |
-    9 |         return 123;
-      |                ^^^ This has type `Integer`
+    9 | st {}
+
+          fn test1() -> Test {
+            123
+          }
+
+          fn test2() -> Test {
+            return 123;
+      |                                                                                                  ^^^ This has type `Integer`
     Error[1]: Expected type `<struct 1>` but found `Integer`
-    File: "":13:18
+    File: "":13:159
        |
-    13 |       expect_test(123);
-       |                   ^^^ This has type `Integer`
+    13 | {}
+
+          fn test1() -> Test {
+            123
+          }
+
+          fn test2() -> Test {
+            return 123;
+          }
+
+          fn expect_test(t: Test) {}
+          expect_test(123);
+       |                                                                                                                                                                ^^^ This has type `Integer`
     Error[1]: Expected 1 arguments but found 1.
-    File: "":13:6
+    File: "":13:159
        |
-    13 |       expect_test(123);
-       |       ^^^^^^^^^^^ When calling this function |}]
+    13 | struct Test {}
+
+          fn test1() -> Test {
+            123
+          }
+
+          fn test2() -> Test {
+            return 123;
+          }
+
+          fn expect_test(t: Test) {}
+          expect_test(123);
+       |                                                                                                                                                                ^^^^^^^^^^^ When calling this function |}]
 
 let%expect_test "is not a struct error" =
   let source =
@@ -195,10 +239,11 @@ let%expect_test "is not a struct error" =
   [%expect
     {|
     Error[1]: Expression is not struct type, so it cannot be used in such context.
-    File: "":3:14
+    File: "":3:24
       |
-    3 |       let a = test() { field: 123 };
-      |               ^^^^^^ This is not struct type |}]
+    3 | ) { 123 }
+          let a = test() { field: 123 };
+      |                         ^^^^ This is not struct type |}]
 
 let%expect_test "cannot have methods error" =
   let source = {|
@@ -208,10 +253,10 @@ let%expect_test "cannot have methods error" =
   [%expect
     {|
     Error[1]: Type `Integer` cannot have methods.
-    File: "":2:6
+    File: "":2:0
       |
-    2 |       123.test();
-      |       ^^^ This cannot have methods |}]
+    2 | 123.test();
+      | ^^^ This cannot have methods |}]
 
 let%expect_test "this cannot be called error" =
   let source = {|
@@ -221,10 +266,10 @@ let%expect_test "this cannot be called error" =
   [%expect
     {|
     Error[1]: Expected function but got value with `Integer` type.
-    File: "":2:6
+    File: "":2:0
       |
-    2 |       123();
-      |       ^^^ This cannot be called |}]
+    2 | 123();
+      | ^^^ This cannot be called |}]
 
 let%expect_test "argument number mismatch" =
   let source = {|
@@ -235,10 +280,11 @@ let%expect_test "argument number mismatch" =
   [%expect
     {|
         Error[1]: Expected 1 arguments but found 3.
-        File: "":3:6
+        File: "":3:29
           |
-        3 |       test(10, 20, 30);
-          |       ^^^^ When calling this function |}]
+        3 | fn test(x: Integer) {}
+              test(10, 20, 30);
+          |                              ^^^^ When calling this function |}]
 
 (* FIXME: this should print error. *)
 let%expect_test "uninterpretable statement" =
@@ -297,10 +343,12 @@ let%expect_test "field not found" =
     3 |       let _ = Empty{}.field;
       |                       ^^^^^ This field not found
     Error[1]: Field `field` not found.
-    File: "":4:11
+    File: "":4:51
       |
-    4 |       let {field} = Empty{};
-      |            ^^^^^ This field not found |}]
+    4 | t Empty {}
+          let _ = Empty{}.field;
+          let {field} = Empty{};
+      |                                                    ^^^^^ This field not found |}]
 
 let%expect_test "missing field error" =
   let source =
@@ -313,10 +361,11 @@ let%expect_test "missing field error" =
   [%expect
     {|
     Error[1]: Field `field` missing in destructuring statement.
-    File: "":3:6
+    File: "":3:41
       |
-    3 |       let {} = Test{field: 10};
-      |       ^^^^^^^^^^^^^^^^^^^^^^^^ In this binding |}]
+    3 | struct Test { val field: Integer }
+          let {} = Test{field: 10};
+      |                                          ^^^^^^^^^^^^^^^^^^^^^^^^ In this binding |}]
 
 let%expect_test "Case Not Found Error" =
   let source =
@@ -337,10 +386,16 @@ let%expect_test "Case Not Found Error" =
   [%expect
     {|
     Error[1]: Case type not found in union.
-    File: "":9:24
+    File: "":9:168
       |
-    9 |           case Int[123] _ => { return 123; }
-      |                         ^ Type of this variable is not found in the condition union |}]
+    9 |     case Int[10]
+            case Int[20]
+          }
+          fn test(value: Test) {
+            switch (value) {
+              case Int[10] _ => { return 10; }
+              case Int[123] _ => { return 123; }
+      |                                                                                                                                                                         ^ Type of this variable is not found in the condition union |}]
 
 let%expect_test "Expected Type Function" =
   let source =
@@ -354,7 +409,9 @@ let%expect_test "Expected Type Function" =
   [%expect
     {|
     Error[1]: Function should be called using `[]` brackets but called with `()` parens.
-    File: "":4:14
+    File: "":4:30
       |
-    4 |       let _ = Test(Integer);
-      |               ^^^^^^^^^^^^ When calling this function |}]
+    4 | st[X: Type] {}
+
+          let _ = Test(Integer);
+      |                               ^^^^^^^^^^^^ When calling this function |}]
