@@ -31,6 +31,15 @@ module Make (Config : Config.T) = struct
     | Some c ->
         Consumed_ok (c, advance_state s 1, No_error)
 
+  let any_char_but x s =
+    match read_char s with
+    | Some x' when Char.equal x x' ->
+        Empty_failed (expected_error s ("any char but " ^ String.of_char x))
+    | None ->
+        Empty_failed (expected_error s "any char but EOF")
+    | Some c ->
+        Consumed_ok (c, advance_state s 1, No_error)
+
   let comment_line = skip_string "//" >> skip_many any_char_but_nl_or_eof
 
   let rec comment_block state =
@@ -81,6 +90,13 @@ module Make (Config : Config.T) = struct
   and integer state =
     ( many_chars_starting_with digit (digit <|> char '_')
     |>> fun x -> Int (Zint.of_string x) )
+      state
+
+  and string_ state =
+    ( skip_char '"'
+    >> many (any_char_but '"')
+    << skip_char '"'
+    |>> fun x -> String (String.of_char_list x) )
       state
 
   and bool_ state =
@@ -309,7 +325,7 @@ module Make (Config : Config.T) = struct
 
   and expr ?(struct_construction_allowed = true) state =
     let opless_expr =
-      integer
+      integer <|> string_
       <|> (attempt bool_ |>> fun x -> Bool x)
       <|> (struct_ |>> Syntax.value)
       <|> (locate ident |>> fun x -> Reference x)
