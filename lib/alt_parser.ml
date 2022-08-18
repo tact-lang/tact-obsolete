@@ -486,7 +486,7 @@ module Make (Config : Config.T) = struct
     >>> pipe3
           (char '(' >>> locate expr <<< char ')')
           (locate code_block)
-          (option (skip_keyword "else" >>> locate code_block))
+          (option (skip_keyword "else" >>> locate (code_block <|> if_stmt)))
           (fun condition body else_ -> {condition; body; else_}) )
       state
 
