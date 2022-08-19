@@ -593,7 +593,7 @@ functor
           | UnionType ut ->
               make_call (UnionType ut) ~mk_args:(fun args ->
                   in_receiver :: args )
-          | other_ty -> (
+          | (ExprType _ as other_ty) | (TypeCall _ as other_ty) -> (
             (* If receiver has expr type that have type Interface, that means that
                value should implement interface, so we accept this case to allow
                such constructions:
@@ -666,6 +666,8 @@ functor
                     s#report `Error (`MethodNotFound (in_receiver, fn)) )
             | _ ->
                 s#report `Error (`CannotHaveMethods (in_receiver, other_ty)) )
+          | ty ->
+              make_call ty ~mk_args:(fun args -> in_receiver :: args)
 
         method! visit_function_definition env f =
           (* prepare parameter bindings *)

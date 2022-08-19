@@ -534,7 +534,10 @@ functor
                               self#interpret_stmt function_impl [] )
                       | Error _ ->
                           Void )
-                  | {function_impl = BuiltinFn (function_impl, _); _} ->
+                  | { function_impl =
+                        ( BuiltinFn (function_impl, _)
+                        | UniversalFn (_, (function_impl, _)) );
+                      _ } ->
                       let value = function_impl ctx.program args' in
                       value )
                 | _ ->

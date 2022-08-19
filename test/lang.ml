@@ -5483,3 +5483,15 @@ let%expect_test "methods incrementally added" =
               (function_returns HoleType)))))
           (un_sig_base_id 2)))))
       (attr_executors <opaque>))) |}]
+
+let%expect_test "Universal Functions" =
+  let source = {|
+    let three = 1.add(2);
+  |} in
+  pp_compile source ~include_std:false ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((three (Value (Integer 3))))) (structs ())
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]

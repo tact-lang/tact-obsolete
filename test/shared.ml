@@ -41,6 +41,10 @@ functor
         interfaces =
           strip_if_exists_in_other program.interfaces previous.interfaces
             ~equal:(fun (id1, _) (id2, _) -> equal_int id1 id2);
+        type_functions =
+          strip_if_exists_in_other program.type_functions
+            previous.type_functions ~equal:(fun (id1, _) (id2, _) ->
+              Lang.equal_type_ id1 id2 );
         struct_signs =
           Lang.Arena.strip_if_exists program.struct_signs previous.struct_signs;
         union_signs =

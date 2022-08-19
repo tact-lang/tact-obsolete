@@ -655,6 +655,7 @@ functor
         type_counter = 0;
         memoized_fcalls = [];
         interfaces = [];
+        type_functions = [];
         struct_signs = Arena.default ();
         union_signs = Arena.default ();
         attr_executors = Attributes.attr_executors }
@@ -755,6 +756,43 @@ functor
         {p with bindings = p.bindings @ make_bindings builtins}
     end
 
+    let add_builtin_types_methods p =
+      let integer_functions =
+        make_bindings
+          [ ( "add",
+              { function_signature =
+                  bl
+                  @@ { function_params =
+                         [(bl "left", IntegerType); (bl "right", IntegerType)];
+                       function_returns = IntegerType;
+                       function_attributes = [];
+                       function_is_type = false };
+                function_impl =
+                  (let builtin_add = Program.find_binding_exn p "builtin_add" in
+                   UniversalFn
+                     ( bl
+                       @@ Block
+                            [ bl
+                              @@ Return
+                                   ( bl
+                                   @@ FunctionCall
+                                        ( builtin_add,
+                                          [ bl
+                                            @@ Reference (bl "left", IntegerType);
+                                            bl
+                                            @@ Reference
+                                                 (bl "right", IntegerType) ],
+                                          false ) ) ],
+                       builtin_fun (fun _ args ->
+                           match args with
+                           | [Integer x; Integer y] ->
+                               Integer (Z.add x y)
+                           | _ ->
+                               Errors.ice "unreachable" ) ) ) } ) ]
+      in
+      let methods = [(IntegerType, {ty_functions = integer_functions})] in
+      {p with type_functions = p.type_functions @ methods}
+
     let add_default_bindings p =
       let bs =
         make_bindings
@@ -793,8 +831,8 @@ functor
        new program for each call, not one global mutable variable. *)
     let default_program () =
       empty_program () |> add_builtin_bindings |> add_default_bindings
-      |> MakeBuiltins.add_builtins |> add_default_structs |> add_default_intfs
-      |> add_deserializer
+      |> MakeBuiltins.add_builtins |> add_builtin_types_methods
+      |> add_default_structs |> add_default_intfs |> add_deserializer
 
     let std = [%blob "std/std.tact"]
   end

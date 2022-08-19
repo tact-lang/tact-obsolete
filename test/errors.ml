@@ -207,11 +207,11 @@ let%expect_test "cannot have methods error" =
   pp source ~include_std:false ;
   [%expect
     {|
-    Error[1]: Type `Integer` cannot have methods.
-    File: "":2:6
+    Error[1]: Method test not found in 123
+    File: "":2:10
       |
     2 |       123.test();
-      |       ^^^ This cannot have methods |}]
+      |           ^^^^ Method not found |}]
 
 let%expect_test "this cannot be called error" =
   let source = {|

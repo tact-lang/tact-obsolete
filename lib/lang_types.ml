@@ -140,8 +140,12 @@ functor
             [@hash.ignore] [@visitors.name "arena"]
         mutable union_signs : union_sig Arena.t;
             [@hash.ignore] [@visitors.name "arena"]
+        mutable type_functions : (type_ * ty_details) list;
+            [@hash.ignore] [@sexp.list]
         attr_executors : ((string * attr_executor) list[@sexp.opaque])
             [@visitors.opaque] [@equal.ignore] [@compare.ignore] }
+
+    and ty_details = {ty_functions : (string located * function_) list}
 
     and expr = expr_kind located
 
@@ -318,7 +322,10 @@ functor
         function_params : (string located * type_) list;
         function_returns : type_ }
 
-    and function_impl = Fn of stmt | BuiltinFn of builtin_fn
+    and function_impl =
+      | Fn of stmt
+      | BuiltinFn of builtin_fn
+      | UniversalFn of (stmt * builtin_fn)
 
     and function_call = expr * expr list * (bool[@sexp.bool])
 
@@ -719,6 +726,8 @@ functor
           | x ->
               x
 
+        method! visit_UniversalFn _ _ = Immediate
+
         method! visit_branch env {branch_var; branch_stmt; _} =
           self#with_arguments [branch_var.value] (fun _ ->
               self#visit_stmt env branch_stmt )
@@ -837,8 +846,12 @@ functor
             List.find_map_exn p.unions ~f:(fun (id, u') ->
                 if equal_int id u then Some u'.union_details.uty_methods
                 else None )
-        | _ ->
-            []
+        | ty -> (
+          match List.Assoc.find p.type_functions ty ~equal:equal_type_ with
+          | Some {ty_functions} ->
+              ty_functions
+          | None ->
+              [] )
 
       let impls_of p = function
         | StructType s ->
@@ -942,6 +955,10 @@ functor
 
       let find_binding p name =
         List.Assoc.find p.bindings (builtin_located name)
+          ~equal:(equal_located equal_string)
+
+      let find_binding_exn p name =
+        List.Assoc.find_exn p.bindings (builtin_located name)
           ~equal:(equal_located equal_string)
 
       let get_union_cases p = function
