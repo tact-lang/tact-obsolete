@@ -1127,14 +1127,7 @@ let%expect_test "attributes" =
       }
     }
 
-    @attr
-    enum E {
-      @attr fn x() { true }
-    }
-
-    let E1 = @attr enum { };
-
-    |}
+        |}
   in
   pp source ;
   [%expect
@@ -1233,27 +1226,7 @@ let%expect_test "attributes" =
                      (function_body
                       ((function_stmt (CodeBlock ((Break (Expr (Bool true))))))))
                      (function_def_span <opaque>))))))))))
-            (struct_span <opaque>))))))
-       (Let
-        ((binding_name (Ident E))
-         (binding_expr
-          (Enum
-           ((enum_attributes (((attribute_ident (Ident attr)))))
-            (enum_bindings
-             (((binding_name (Ident x))
-               (binding_expr
-                (Function
-                 ((function_attributes (((attribute_ident (Ident attr)))))
-                  (function_body
-                   ((function_stmt (CodeBlock ((Break (Expr (Bool true))))))))
-                  (function_def_span <opaque>)))))))
-            (enum_span <opaque>))))))
-       (Let
-        ((binding_name (Ident E1))
-         (binding_expr
-          (Enum
-           ((enum_attributes (((attribute_ident (Ident attr)))))
-            (enum_span <opaque>))))))))) |}]
+            (struct_span <opaque>))))))))) |}]
 
 let%expect_test "assignment" =
   let source = {|

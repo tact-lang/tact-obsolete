@@ -48,16 +48,6 @@ functor
         receiver_fn : ident located;
         receiver_arguments : expr located list }
 
-    and enum_definition =
-      { enum_attributes : attribute list; [@sexp.list]
-        enum_members : enum_member located list; [@sexp.list]
-        enum_bindings : binding located list; [@sexp.list]
-        enum_span : (span[@sexp.opaque]) }
-
-    and enum_member =
-      { enum_name : ident located;
-        enum_value : expr located option [@sexp.option] }
-
     (* TODO: union impls *)
     and union_definition =
       { union_attributes : attribute list; [@sexp.list]
@@ -74,7 +64,6 @@ functor
       | Struct of struct_definition
       | StructConstructor of struct_constructor
       | Interface of interface_definition
-      | Enum of enum_definition
       | Union of union_definition
       | Reference of ident located
       | FieldAccess of field_access
