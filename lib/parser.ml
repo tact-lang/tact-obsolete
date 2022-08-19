@@ -4,19 +4,23 @@ module Make (Config : Config.T) = struct
   module Syntax = Syntax.Make (Config)
   open Syntax
 
+  let get_pos' s =
+    (get_pos |>> fun (index, line, offset) -> (index, line, index - offset + 1))
+      s
+
   let locate value =
-    pipe3 get_pos value get_pos
-      (fun (_index0, _line0, _column0) value (_index, _line, _column) ->
+    pipe3 get_pos' value get_pos'
+      (fun (index0, line0, line_begin0) value (index1, line1, line_begin1) ->
         Syntax.make_located ~value
           ~span:
             ( { pos_fname = "";
-                pos_lnum = _line0;
-                pos_bol = _column0;
-                pos_cnum = _index0 },
+                pos_lnum = line0;
+                pos_bol = line_begin0;
+                pos_cnum = index0 },
               { pos_fname = "";
-                pos_lnum = _line;
-                pos_bol = _column;
-                pos_cnum = _index } )
+                pos_lnum = line1;
+                pos_bol = line_begin1;
+                pos_cnum = index1 } )
           () )
 
   let chain p op = p >>= fun x -> many_fold_left (fun x f -> f x) x op
