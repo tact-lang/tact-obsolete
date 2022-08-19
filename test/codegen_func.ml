@@ -193,12 +193,6 @@ let%expect_test "Int[bits] serializer codegen" =
        builder builtin_begin_cell() impure {
          return begin_cell();
        }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
-       }
        _ thrown(int n) impure {
          return builtin_throw(n);
        }
@@ -343,12 +337,6 @@ let%expect_test "demo struct serializer" =
        }
        builder builtin_begin_cell() impure {
          return begin_cell();
-       }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
        }
        _ thrown(int n) impure {
          return builtin_throw(n);
@@ -505,12 +493,6 @@ let%expect_test "demo struct serializer 2" =
        }
        builder builtin_begin_cell() impure {
          return begin_cell();
-       }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
        }
        _ thrown(int n) impure {
          return builtin_throw(n);
@@ -730,12 +712,6 @@ let%expect_test "serializer inner struct" =
        builder builtin_begin_cell() impure {
          return begin_cell();
        }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
-       }
        _ thrown(int n) impure {
          return builtin_throw(n);
        }
@@ -913,12 +889,6 @@ let%expect_test "switch statement" =
        builder builtin_begin_cell() impure {
          return begin_cell();
        }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
-       }
        _ thrown(int n) impure {
          return builtin_throw(n);
        }
@@ -1064,12 +1034,6 @@ let%expect_test "tensor2" =
        builder builtin_begin_cell() impure {
          return begin_cell();
        }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
-       }
        _ thrown(int n) impure {
          return builtin_throw(n);
        }
@@ -1212,12 +1176,6 @@ let%expect_test "serialization api" =
        }
        builder builtin_begin_cell() impure {
          return begin_cell();
-       }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
        }
        _ thrown(int n) impure {
          return builtin_throw(n);
@@ -1596,12 +1554,6 @@ let%expect_test "deserialization api" =
        }
        builder builtin_begin_cell() impure {
          return begin_cell();
-       }
-       [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-         (slice, slice) output = builtin_load_bits(slice_, bits);
-         slice slice_ = tensor2_value1(output);
-         slice slice2 = tensor2_value2(output);
-         return [slice_, slice2];
        }
        _ thrown(int n) impure {
          return builtin_throw(n);
@@ -2058,12 +2010,6 @@ let%expect_test "deserializer" =
     builder builtin_begin_cell() impure {
       return begin_cell();
     }
-    [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-      (slice, slice) output = builtin_load_bits(slice_, bits);
-      slice slice_ = tensor2_value1(output);
-      slice slice2 = tensor2_value2(output);
-      return [slice_, slice2];
-    }
     _ thrown(int n) impure {
       return builtin_throw(n);
     }
@@ -2214,12 +2160,6 @@ let%expect_test "deserializer unions" =
     }
     builder builtin_begin_cell() impure {
       return begin_cell();
-    }
-    [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-      (slice, slice) output = builtin_load_bits(slice_, bits);
-      slice slice_ = tensor2_value1(output);
-      slice slice2 = tensor2_value2(output);
-      return [slice_, slice2];
     }
     _ thrown(int n) impure {
       return builtin_throw(n);
@@ -2551,12 +2491,6 @@ let%expect_test "codegen while block" =
     builder builtin_begin_cell() impure {
       return begin_cell();
     }
-    [slice, slice] slice_load_bits(slice slice_, int bits) impure {
-      (slice, slice) output = builtin_load_bits(slice_, bits);
-      slice slice_ = tensor2_value1(output);
-      slice slice2 = tensor2_value2(output);
-      return [slice_, slice2];
-    }
     _ thrown(int n) impure {
       return builtin_throw(n);
     }
@@ -2574,149 +2508,155 @@ let%expect_test "codegen while block" =
     }
     _ recv_internal(slice _) impure {
     }
-    [slice, slice] f5(slice v, slice s) impure {
+    [slice, slice] f5(slice self, int bits) impure {
+      (slice, slice) output = builtin_load_bits(self, bits);
+      slice slice_ = tensor2_value1(output);
+      slice slice2 = tensor2_value2(output);
+      return [believe_me(slice_), believe_me(slice2)];
+    }
+    [slice, slice] f6(slice v, slice s) impure {
       return [s, v];
     }
     [slice, slice] f4(slice s) impure {
-      [slice slice_, slice value] = slice_load_bits(s, 512);
-      return f5(value, slice_);
+      [slice slice_, slice value] = f5(s, 512);
+      return f6(value, slice_);
     }
-    [slice, [slice, slice]] f6([slice, slice] v, slice s) impure {
+    [slice, [slice, slice]] f7([slice, slice] v, slice s) impure {
       return [s, v];
     }
     [slice, [slice, slice]] f3(slice s) impure {
       [slice slice_, slice sig] = f4(s);
-      return f6([sig, slice_], slice_);
+      return f7([sig, slice_], slice_);
     }
-    [slice, int] f10(slice self, int bits) impure {
+    [slice, int] f11(slice self, int bits) impure {
       (slice, int) output = builtin_load_uint(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
       return [believe_me(slice_), int_];
     }
-    [slice, int] f9(slice s) impure {
-      [slice, int] res = f10(s, 32);
+    [slice, int] f10(slice s) impure {
+      [slice, int] res = f11(s, 32);
       return [get0(func_believe_me(res)), get1(func_believe_me(res))];
     }
-    [slice, [int, int, int]] f8(slice slice_) impure {
-      [slice slice_, int subwallet] = f9(slice_);
-      [slice slice_, int valid_until] = f9(slice_);
-      [slice slice_, int seqno] = f9(slice_);
+    [slice, [int, int, int]] f9(slice slice_) impure {
+      [slice slice_, int subwallet] = f10(slice_);
+      [slice slice_, int valid_until] = f10(slice_);
+      [slice slice_, int seqno] = f10(slice_);
       return [slice_, [subwallet, valid_until, seqno]];
     }
-    [slice, [int, int, int]] f7(slice s) impure {
-      return f8(s);
+    [slice, [int, int, int]] f8(slice s) impure {
+      return f9(s);
     }
-    [slice, slice] f12(slice v, slice s) impure {
+    [slice, slice] f13(slice v, slice s) impure {
       return [s, v];
     }
-    [slice, slice] f11(slice s) impure {
+    [slice, slice] f12(slice s) impure {
       slice empty_slice = builtin_slice_last(s, 0);
-      return f12(s, empty_slice);
+      return f13(s, empty_slice);
     }
     [slice, [[slice, slice], [int, int, int], slice]] f2(slice slice_) impure {
       [slice slice_, [slice, slice] signature] = f3(slice_);
-      [slice slice_, [int, int, int] data] = f7(slice_);
-      [slice slice_, slice rest] = f11(slice_);
+      [slice slice_, [int, int, int] data] = f8(slice_);
+      [slice slice_, slice rest] = f12(slice_);
       return [slice_, [signature, data, rest]];
     }
     [slice, [[slice, slice], [int, int, int], slice]] f1(slice s) impure {
       return f2(s);
     }
-    slice f13(cell cell_) impure {
+    slice f14(cell cell_) impure {
       return builtin_begin_parse(cell_);
     }
-    [slice, int] f16(slice s) impure {
-      [slice, int] res = f10(s, 256);
+    [slice, int] f17(slice s) impure {
+      [slice, int] res = f11(s, 256);
       return [get0(func_believe_me(res)), get1(func_believe_me(res))];
     }
-    [slice, [int, int, int]] f15(slice slice_) impure {
-      [slice slice_, int seqno] = f9(slice_);
-      [slice slice_, int subwallet] = f9(slice_);
-      [slice slice_, int public_key] = f16(slice_);
+    [slice, [int, int, int]] f16(slice slice_) impure {
+      [slice slice_, int seqno] = f10(slice_);
+      [slice slice_, int subwallet] = f10(slice_);
+      [slice slice_, int public_key] = f17(slice_);
       return [slice_, [seqno, subwallet, public_key]];
     }
-    [slice, [int, int, int]] f14(slice s) impure {
-      return f15(s);
+    [slice, [int, int, int]] f15(slice s) impure {
+      return f16(s);
     }
-    int f17([slice, slice] self, int public_key) impure {
+    int f18([slice, slice] self, int public_key) impure {
       return
         is_signature_valid(hash_of_slice(get1(func_believe_me(self))), get0(func_believe_me(self)), public_key);
     }
-    [slice, cell] f21(slice self) impure {
+    [slice, cell] f22(slice self) impure {
       (slice, cell) output = builtin_load_ref(self);
       slice slice_ = tensor2_value1(output);
       cell ref = tensor2_value2(output);
       return [believe_me(slice_), ref];
     }
-    [slice, cell] f22(cell v, slice s) impure {
+    [slice, cell] f23(cell v, slice s) impure {
       return [s, v];
     }
-    [slice, cell] f20(slice s) impure {
-      [slice slice_, cell value] = f21(s);
-      return f22(value, slice_);
+    [slice, cell] f21(slice s) impure {
+      [slice slice_, cell value] = f22(s);
+      return f23(value, slice_);
     }
-    [slice, int] f26(slice self, int bits) impure {
+    [slice, int] f27(slice self, int bits) impure {
       (slice, int) output = builtin_load_int(self, bits);
       slice slice_ = tensor2_value1(output);
       int int_ = tensor2_value2(output);
       return [believe_me(slice_), int_];
     }
-    [slice, int] f25(slice s) impure {
-      [slice, int] res = f26(s, 8);
+    [slice, int] f26(slice s) impure {
+      [slice, int] res = f27(s, 8);
       [slice slice_, int value] = res;
       return [slice_, value];
     }
-    [slice, int] f24(slice slice_) impure {
-      [slice slice_, int value] = f25(slice_);
+    [slice, int] f25(slice slice_) impure {
+      [slice slice_, int value] = f26(slice_);
       return [slice_, value];
     }
-    [slice, int] f23(slice s) impure {
-      return f24(s);
+    [slice, int] f24(slice s) impure {
+      return f25(s);
     }
-    [slice, [cell, int]] f19(slice slice_) impure {
-      [slice slice_, cell cell_] = f20(slice_);
-      [slice slice_, int flags] = f23(slice_);
+    [slice, [cell, int]] f20(slice slice_) impure {
+      [slice slice_, cell cell_] = f21(slice_);
+      [slice slice_, int flags] = f24(slice_);
       return [slice_, [cell_, flags]];
     }
-    [slice, [cell, int]] f18(slice s) impure {
-      return f19(s);
+    [slice, [cell, int]] f19(slice s) impure {
+      return f20(s);
     }
-    int f27(slice self) impure {
+    int f28(slice self) impure {
       return builtin_slice_refs(self);
     }
-    int f28(int i) impure {
+    int f29(int i) impure {
       return i;
     }
-    builder f29() impure {
+    builder f30() impure {
       return builtin_begin_cell();
     }
-    builder f33(builder self, int uint, int bits) impure {
+    builder f34(builder self, int uint, int bits) impure {
       return builtin_store_uint(self, uint, bits);
     }
-    builder f32(int self, builder builder_) impure {
-      return f33(builder_, self, 32);
+    builder f33(int self, builder builder_) impure {
+      return f34(builder_, self, 32);
     }
-    builder f34(int self, builder builder_) impure {
-      return f33(builder_, self, 256);
+    builder f35(int self, builder builder_) impure {
+      return f34(builder_, self, 256);
     }
-    builder f31([int, int, int] self, builder b) impure {
-      builder b = f32(get0(func_believe_me(self)), b);
-      builder b = f32(get1(func_believe_me(self)), b);
-      builder b = f34(get2(func_believe_me(self)), b);
+    builder f32([int, int, int] self, builder b) impure {
+      builder b = f33(get0(func_believe_me(self)), b);
+      builder b = f33(get1(func_believe_me(self)), b);
+      builder b = f35(get2(func_believe_me(self)), b);
       return b;
     }
-    builder f30([int, int, int] self, builder b) impure {
-      return f31(self, b);
+    builder f31([int, int, int] self, builder b) impure {
+      return f32(self, b);
     }
-    cell f35(builder self) impure {
+    cell f36(builder self) impure {
       return builtin_end_cell(self);
     }
     _ recv_external(slice input) impure {
       [[slice, slice], [int, int, int], slice] body =
         get1(func_believe_me(f1(input)));
       [int, int, int] data = get1(func_believe_me(body));
-      [int, int, int] state = get1(func_believe_me(f14(f13(builtin_get_data()))));
+      [int, int, int] state = get1(func_believe_me(f15(f14(builtin_get_data()))));
       if (builtin_less_or_equal(get1(func_believe_me(data)), builtin_now())) {
       thrown(35);
     }  if
@@ -2728,18 +2668,18 @@ let%expect_test "codegen while block" =
          {
       thrown(34);
     }  if
-         (builtin_not(f17(get0(func_believe_me(body)), get2(func_believe_me(state)))))
+         (builtin_not(f18(get0(func_believe_me(body)), get2(func_believe_me(state)))))
          {
       thrown(35);
     }  builtin_accept_message();
       slice slice_ = get2(func_believe_me(body));
-      while (builtin_not_equal(f27(slice_), 0)) {
-      [slice new_slice, [cell, int] next] = f18(slice_);
+      while (builtin_not_equal(f28(slice_), 0)) {
+      [slice new_slice, [cell, int] next] = f19(slice_);
     slice_ =
     new_slice;
     send_raw_msg(get0(func_believe_me(next)), get1(func_believe_me(next)));
     }  [int, int, int] new_state =
-         [f28(builtin_add(get0(func_believe_me(state)), 1)), get1(func_believe_me(state)), get2(func_believe_me(state))];
-      cell new_state = f35(f30(new_state, f29()));
+         [f29(builtin_add(get0(func_believe_me(state)), 1)), get1(func_believe_me(state)), get2(func_believe_me(state))];
+      cell new_state = f36(f31(new_state, f30()));
       return builtin_set_data(new_state);
     } |}]

@@ -75,7 +75,7 @@ let%expect_test "program returns" =
       (struct_signs
        (1
         (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 120)
-          (st_sig_id 45)))))
+          (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "scope resolution" =
@@ -749,7 +749,7 @@ let%expect_test "basic struct definition" =
       (struct_signs
        (1
         (((st_sig_fields ((t (Value (Type (StructType 120))))))
-          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "Tact function evaluation" =
@@ -1107,7 +1107,7 @@ let%expect_test "struct definition" =
         (((st_sig_fields
            ((a (Value (Type (StructType 120))))
             (b (ResolvedReference (Bool <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "duplicate type field" =
@@ -1128,7 +1128,7 @@ let%expect_test "duplicate type field" =
           ((a (Value (Type (StructType 120))))
            (a (ResolvedReference (Bool <opaque>)))))
          (mk_struct_details
-          ((mk_methods ()) (mk_impls ()) (mk_id 122) (mk_sig 45)
+          ((mk_methods ()) (mk_impls ()) (mk_id 122) (mk_sig 46)
            (mk_span <opaque>)))))))
      ((bindings ((MyType (Value (Type (StructType 123))))))
       (structs
@@ -1293,7 +1293,7 @@ let%expect_test "duplicate type field" =
         (((st_sig_fields
            ((a (Value (Type (StructType 120))))
             (a (ResolvedReference (Bool <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "parametric struct instantiation" =
@@ -1314,14 +1314,14 @@ let%expect_test "parametric struct instantiation" =
           (Function
            ((function_signature
              ((function_is_type) (function_params ((A (TypeN 0))))
-              (function_returns (StructSig 45))))
+              (function_returns (StructSig 46))))
             (function_impl
              (Fn
               (Return
                (MkStructDef
                 ((mk_struct_fields ((a (Reference (A (TypeN 0))))))
                  (mk_struct_details
-                  ((mk_methods ()) (mk_impls ()) (mk_id 120) (mk_sig 45)
+                  ((mk_methods ()) (mk_impls ()) (mk_id 120) (mk_sig 46)
                    (mk_span <opaque>))))))))))))))
       (structs
        ((123
@@ -1482,7 +1482,7 @@ let%expect_test "parametric struct instantiation" =
       (struct_signs
        (1
         (((st_sig_fields ((a (Reference (A (TypeN 0)))))) (st_sig_methods ())
-          (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "function without a return type" =
@@ -1955,10 +1955,10 @@ let%expect_test "struct method access" =
           (st_sig_methods
            ((bar
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 45)))))
+               ((self (ExprType (Reference (Self (StructSig 46)))))
                 (i IntegerType)))
               (function_returns IntegerType)))))
-          (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "struct type method access" =
@@ -1996,7 +1996,7 @@ let%expect_test "struct type method access" =
           (st_sig_methods
            ((bar
              ((function_params ((i IntegerType))) (function_returns IntegerType)))))
-          (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "Self type resolution in methods" =
@@ -2032,9 +2032,9 @@ let%expect_test "Self type resolution in methods" =
           (st_sig_methods
            ((bar
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 45)))))))
-              (function_returns (ExprType (Reference (Self (StructSig 45)))))))))
-          (st_sig_base_id 120) (st_sig_id 45)))))
+               ((self (ExprType (Reference (Self (StructSig 46)))))))
+              (function_returns (ExprType (Reference (Self (StructSig 46)))))))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "union method access" =
@@ -2207,7 +2207,7 @@ let%expect_test "struct instantiation" =
         (((st_sig_fields
            ((a (ResolvedReference (Integer <opaque>)))
             (b (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "type check error" =
@@ -2873,7 +2873,7 @@ let%expect_test "implement interface op" =
            ((op
              ((function_params ((left IntegerType) (right IntegerType)))
               (function_returns IntegerType)))))
-          (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "implement interface op" =
@@ -2931,8 +2931,8 @@ let%expect_test "implement interface op" =
           (st_sig_methods
            ((new
              ((function_params ())
-              (function_returns (ExprType (Reference (Self (StructSig 45)))))))))
-          (st_sig_base_id 121) (st_sig_id 45)))))
+              (function_returns (ExprType (Reference (Self (StructSig 46)))))))))
+          (st_sig_base_id 121) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "serializer inner struct" =
@@ -3001,9 +3001,9 @@ let%expect_test "serializer inner struct" =
         (((st_sig_fields
            ((y (Value (Type (StructType 41))))
             (z (ResolvedReference (Inner <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 46))
+          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 47))
          ((st_sig_fields ((x (Value (Type (StructType 41))))))
-          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "reference resolving in inner functions" =
@@ -3755,7 +3755,7 @@ let%expect_test "methods monomorphization" =
           (Function
            ((function_signature
              ((function_params ((X (TypeN 0))))
-              (function_returns (StructSig 45))))
+              (function_returns (StructSig 46))))
             (function_impl
              (Fn
               (Return
@@ -3767,14 +3767,14 @@ let%expect_test "methods monomorphization" =
                       (MkFunction
                        ((function_signature
                          ((function_params
-                           ((self (ExprType (Reference (Self (StructSig 45)))))
+                           ((self (ExprType (Reference (Self (StructSig 46)))))
                             (x (ExprType (Reference (X (TypeN 0)))))))
                           (function_returns (ExprType (Reference (X (TypeN 0)))))))
                         (function_impl
                          (Fn
                           (Return
                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))
-                   (mk_impls ()) (mk_id 120) (mk_sig 45) (mk_span <opaque>))))))))))))))
+                   (mk_impls ()) (mk_id 120) (mk_sig 46) (mk_span <opaque>))))))))))))))
       (structs
        ((124
          ((struct_fields ())
@@ -3805,15 +3805,15 @@ let%expect_test "methods monomorphization" =
       (struct_signs
        (2
         (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 122)
-          (st_sig_id 46))
+          (st_sig_id 47))
          ((st_sig_fields ())
           (st_sig_methods
            ((id
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 45)))))
+               ((self (ExprType (Reference (Self (StructSig 46)))))
                 (x (ExprType (Reference (X (TypeN 0)))))))
               (function_returns (ExprType (Reference (X (TypeN 0)))))))))
-          (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "switch statement" =
@@ -4410,9 +4410,9 @@ let%expect_test "interface constraints" =
           (st_sig_methods
            ((beep
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 45)))))))
+               ((self (ExprType (Reference (Self (StructSig 46)))))))
               (function_returns IntegerType)))))
-          (st_sig_base_id 121) (st_sig_id 45)))))
+          (st_sig_base_id 121) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "destructuring let" =
@@ -4466,7 +4466,7 @@ let%expect_test "destructuring let" =
            ((x (ResolvedReference (Integer <opaque>)))
             (y (ResolvedReference (Integer <opaque>)))
             (z (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "destructuring let with missing fields" =
@@ -4518,7 +4518,7 @@ let%expect_test "destructuring let with missing fields" =
            ((x (ResolvedReference (Integer <opaque>)))
             (y (ResolvedReference (Integer <opaque>)))
             (z (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "destructuring let with missing fields ignored" =
@@ -4569,7 +4569,7 @@ let%expect_test "destructuring let with missing fields ignored" =
            ((x (ResolvedReference (Integer <opaque>)))
             (y (ResolvedReference (Integer <opaque>)))
             (z (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_methods ()) (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "type that does not implement interface passed to the \
@@ -4607,7 +4607,7 @@ let%expect_test "type that does not implement interface passed to the \
       (struct_signs
        (1
         (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 121)
-          (st_sig_id 45)))))
+          (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "struct signatures" =
@@ -4637,7 +4637,7 @@ let%expect_test "struct signatures" =
           (Function
            ((function_signature
              ((function_is_type) (function_params ((bits IntegerType)))
-              (function_returns (StructSig 45))))
+              (function_returns (StructSig 46))))
             (function_impl
              (Fn
               (Return
@@ -4651,15 +4651,15 @@ let%expect_test "struct signatures" =
                        ((function_signature
                          ((function_params ((i IntegerType)))
                           (function_returns
-                           (ExprType (Reference (Self (StructSig 45)))))))
+                           (ExprType (Reference (Self (StructSig 46)))))))
                         (function_impl
                          (Fn
                           (Return
                            (Value
                             (Struct
-                             ((Reference (Self (StructSig 45)))
+                             ((Reference (Self (StructSig 46)))
                               ((value (Reference (i IntegerType)))))))))))))))
-                   (mk_impls ()) (mk_id 120) (mk_sig 45) (mk_span <opaque>))))))))))))))
+                   (mk_impls ()) (mk_id 120) (mk_sig 46) (mk_span <opaque>))))))))))))))
       (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
@@ -4667,8 +4667,8 @@ let%expect_test "struct signatures" =
           (st_sig_methods
            ((new
              ((function_params ((i IntegerType)))
-              (function_returns (ExprType (Reference (Self (StructSig 45)))))))))
-          (st_sig_base_id 120) (st_sig_id 45)))))
+              (function_returns (ExprType (Reference (Self (StructSig 46)))))))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "Deserilize intf with constraints" =
@@ -5159,7 +5159,7 @@ let%expect_test "attributes" =
           (Function
            ((function_signature
              ((function_is_type) (function_params ((X IntegerType)))
-              (function_returns (StructSig 46))))
+              (function_returns (StructSig 47))))
             (function_impl
              (Fn
               (Return
@@ -5168,7 +5168,7 @@ let%expect_test "attributes" =
                   (((attribute_ident attr) (attribute_exprs ()))))
                  (mk_struct_fields ())
                  (mk_struct_details
-                  ((mk_methods ()) (mk_impls ()) (mk_id 122) (mk_sig 46)
+                  ((mk_methods ()) (mk_impls ()) (mk_id 122) (mk_sig 47)
                    (mk_span <opaque>))))))))))))
         (T (Value (Type (StructType 121))))))
       (structs
@@ -5268,13 +5268,13 @@ let%expect_test "attributes" =
              ((function_attributes
                (((attribute_ident attr) (attribute_exprs ()))))
               (function_params ()) (function_returns BoolType)))))
-          (st_sig_base_id 131) (st_sig_id 48))
+          (st_sig_base_id 131) (st_sig_id 49))
          ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 123)
-          (st_sig_id 47))
+          (st_sig_id 48))
          ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 122)
-          (st_sig_id 46))
+          (st_sig_id 47))
          ((st_sig_attributes
            (((attribute_ident attr) (attribute_exprs ()))
             ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
@@ -5286,7 +5286,7 @@ let%expect_test "attributes" =
              ((function_attributes
                (((attribute_ident attr) (attribute_exprs ()))))
               (function_params ()) (function_returns BoolType)))))
-          (st_sig_base_id 120) (st_sig_id 45)))))
+          (st_sig_base_id 120) (st_sig_id 46)))))
       (union_signs
        (2
         (((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))

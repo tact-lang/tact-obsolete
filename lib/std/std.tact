@@ -59,20 +59,19 @@ struct Slice {
     LoadResult[Cell] { slice: believe_me(slice), value: ref }
   }
 
+  fn load_bits(self: Self, bits: Integer) -> LoadResult[Self] {
+    let output = builtin_load_bits(self.s, bits);
+    let slice = Self { s: output.value1 };
+    let slice2 = Self { s: output.value2 };
+    LoadResult[Self] { slice: believe_me(slice), value: believe_me(slice2) }
+  }
+
   /* Developer notes: if you add `LoadResult[...]` type, don't forget to
      increment Slice id in the `builtins.ml` */
 
   fn refs_count(self: Self) -> Integer {
     builtin_slice_refs(self.s)
   }
-}
-
-/* TODO: make this as method. */
-fn slice_load_bits(slice: Slice, bits: Integer) -> LoadResult[Slice] {
-  let output = builtin_load_bits(slice.s, bits);
-  let slice = Slice { s: output.value1 };
-  let slice2 = Slice { s: output.value2 };
-  LoadResult[Slice] { slice: slice, value: slice2 }
 }
 
 struct RefCell {
@@ -91,7 +90,7 @@ struct SliceBits[N: Integer] {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      let {slice, value} = slice_load_bits(s, N);
+      let {slice, value} = s.load_bits(N);
       LoadResult[Self].new(Self { inner: value }, slice)
     } 
   }
