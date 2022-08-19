@@ -103,8 +103,6 @@ functor
         method! visit_CodeBlock env block =
           s#with_bindings [] (fun _ -> super#visit_CodeBlock env block)
 
-        method build_Enum _env _enum = InvalidExpr
-
         method build_FieldAccess _env fieldaccess = StructField fieldaccess
 
         method! visit_FieldAccess env fa =
@@ -461,10 +459,6 @@ functor
 
         method build_assignment _env assignment_ident assignment_expr =
           {assignment_ident; assignment_expr}
-
-        method build_enum_definition _env _ _ _ _ = ()
-
-        method build_enum_member _env _name _value = ()
 
         method build_field_access _env expr field =
           let mk_err () = s#report `Error (`FieldNotFoundF field) in
