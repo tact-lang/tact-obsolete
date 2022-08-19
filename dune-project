@@ -43,6 +43,7 @@
    (containers (>= 3.8.0))
    (linenoise (>= 1.3.1))
    (bos (>= 0.2.1))
+   (cmdliner (>= 1.1.1))
    (core (and :with-test (>= 0.15.0)))
    (ppx_expect (and :with-test (>= 0.15.0)))
    (ppx_matches (and :with-test (>= 0.1)))

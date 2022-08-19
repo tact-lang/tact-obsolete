@@ -5,4 +5,4 @@
  (modules main)
  (preprocess
   (pps ppx_blob))
- (libraries core tact linenoise base bos ppx_blob))
+ (libraries core tact linenoise base bos cmdliner ppx_blob))
