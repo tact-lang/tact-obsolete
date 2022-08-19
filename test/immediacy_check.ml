@@ -18,7 +18,7 @@ type error = [Lang.error | Interpreter.error] [@@deriving sexp_of]
 
 let make_errors e = new Errors.errors e
 
-let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
+let parse_program s = Parser.parse s
 
 let strip_if_exists_in_other o1 o2 ~equal =
   List.filter o1 ~f:(fun o1_item -> not @@ List.exists o2 ~f:(equal o1_item))

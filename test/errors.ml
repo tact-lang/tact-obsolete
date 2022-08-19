@@ -133,10 +133,10 @@ let%expect_test "duplicate variant" =
   [%expect
     {|
     Error[1]: Duplicate variant with type Integer
-    File: "":1:0
+    File: "":2:6
       |
-    1 | ...
-      | ^^^ Duplicated variant in this union
+    2 |       union Test1 {...
+      |       ^^^^^^^^^^^^^^^^ Duplicated variant in this union
     Error[1]: Duplicate variant with type Integer
     File: "":11:14
        |
@@ -166,8 +166,8 @@ let%expect_test "type errors" =
     Error[1]: Expected type `<struct 1>` but found `Integer`
     File: "":5:8
       |
-    5 |         123
-      |         ^^^ This has type `Integer`
+    5 |         123...
+      |         ^^^^^^ This has type `Integer`
     Error[1]: Expected type `<struct 1>` but found `Integer`
     File: "":9:15
       |
@@ -198,7 +198,7 @@ let%expect_test "is not a struct error" =
     File: "":3:14
       |
     3 |       let a = test() { field: 123 };
-      |               ^^^^^^ This is not struct type |}]
+      |               ^^^^ This is not struct type |}]
 
 let%expect_test "cannot have methods error" =
   let source = {|
@@ -234,11 +234,11 @@ let%expect_test "argument number mismatch" =
   pp source ~include_std:false ;
   [%expect
     {|
-        Error[1]: Expected 1 arguments but found 3.
-        File: "":3:6
-          |
-        3 |       test(10, 20, 30);
-          |       ^^^^ When calling this function |}]
+    Error[1]: Expected 1 arguments but found 3.
+    File: "":3:6
+      |
+    3 |       test(10, 20, 30);
+      |       ^^^^ When calling this function |}]
 
 (* FIXME: this should print error. *)
 let%expect_test "uninterpretable statement" =

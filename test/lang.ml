@@ -21,7 +21,7 @@ let add_bin_op_intf p =
 
 let%expect_test "program returns" =
   let sources =
-    [{| 1 |}; {| return 1|}; {| fn x() { 1 } x() |}; {| struct T {} |}]
+    [{| 1 |}; {| return 1;|}; {| fn x() { 1 } x() |}; {| struct T {} |}]
   in
   List.iter ~f:pp_compile sources ;
   [%expect
@@ -2181,7 +2181,7 @@ let%expect_test "struct instantiation" =
       val b: Integer
     }
 
-    let t = T{a: 1, b: 2}
+    let t = T{a: 1, b: 2};
   |}
   in
   pp_compile source ;
@@ -2484,11 +2484,10 @@ let%expect_test "compile-time if/then/else" =
              ((function_params ()) (function_returns IntegerType)))
             (function_impl
              (Fn
-              (Break
-               (If
-                ((if_condition (Value (Bool true)))
-                 (if_then (Block ((Return (Value (Integer 1))))))
-                 (if_else ((Block ((Return (Value (Integer 2))))))))))))))))
+              (If
+               ((if_condition (Value (Bool true)))
+                (if_then (Block ((Return (Value (Integer 1))))))
+                (if_else ((Block ((Return (Value (Integer 2)))))))))))))))
         (test
          (Value
           (Function
@@ -2504,7 +2503,7 @@ let%expect_test "type check error" =
       {
         fn foo(x: Int[99]) { return x; }
 
-        let a = foo(Int[10].new(1))
+        let a = foo(Int[10].new(1));
       }
     |}
   in
@@ -3847,14 +3846,13 @@ let%expect_test "switch statement" =
               (function_returns IntegerType)))
             (function_impl
              (Fn
-              (Break
-               (Switch
-                ((switch_condition (Reference (i (UnionType 123))))
-                 (branches
-                  (((branch_ty (StructType 41)) (branch_var vax)
-                    (branch_stmt (Block ((Return (Value (Integer 32)))))))
-                   ((branch_ty (StructType 120)) (branch_var vax)
-                    (branch_stmt (Block ((Return (Value (Integer 64))))))))))))))))))
+              (Switch
+               ((switch_condition (Reference (i (UnionType 123))))
+                (branches
+                 (((branch_ty (StructType 41)) (branch_var vax)
+                   (branch_stmt (Block ((Return (Value (Integer 32)))))))
+                  ((branch_ty (StructType 120)) (branch_var vax)
+                   (branch_stmt (Block ((Return (Value (Integer 64)))))))))))))))))
         (Ints (Value (Type (UnionType 123))))))
       (structs
        ((121

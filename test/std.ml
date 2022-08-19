@@ -18,7 +18,7 @@ type error = [Lang.error | Interpreter.error] * Lang.program
 
 let make_errors e = new Errors.errors e
 
-let parse_program s = Parser.program Tact.Lexer.token (Lexing.from_string s)
+let parse_program s = Parser.parse s
 
 let pp_sexp = Sexplib.Sexp.pp_hum Caml.Format.std_formatter
 

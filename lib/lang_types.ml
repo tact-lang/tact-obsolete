@@ -71,8 +71,6 @@ functor
       object (_ : 's)
         inherit ['s] Zint.map
 
-        inherit ['s] Asm.map
-
         inherit ['s] Arena.visitor
 
         method visit_located
@@ -105,8 +103,6 @@ functor
         inherit ['s] VisitorsRuntime.map
 
         inherit ['s] Zint.map
-
-        inherit ['s] Asm.map
 
         inherit ['s] Arena.visitor
 
