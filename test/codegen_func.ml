@@ -106,14 +106,38 @@ let%expect_test "Int[bits] serializer codegen" =
        int func_bit_not(int a) {
          return ~ a;
        }
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -251,14 +275,38 @@ let%expect_test "demo struct serializer" =
        }
        forall A -> A get1(tuple t) asm "1 INDEX";
        forall A -> A get0(tuple t) asm "0 INDEX";
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -407,14 +455,38 @@ let%expect_test "demo struct serializer 2" =
        }
        forall A -> A get1(tuple t) asm "1 INDEX";
        forall A -> A get0(tuple t) asm "0 INDEX";
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -625,14 +697,38 @@ let%expect_test "serializer inner struct" =
          return ~ a;
        }
        forall A -> A get0(tuple t) asm "0 INDEX";
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -802,14 +898,38 @@ let%expect_test "switch statement" =
        int func_bit_not(int a) {
          return ~ a;
        }
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -947,14 +1067,38 @@ let%expect_test "tensor2" =
        int func_bit_not(int a) {
          return ~ a;
        }
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -1090,14 +1234,38 @@ let%expect_test "serialization api" =
        forall A -> A get2(tuple t) asm "2 INDEX";
        forall A -> A get1(tuple t) asm "1 INDEX";
        forall A -> A get0(tuple t) asm "0 INDEX";
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -1468,14 +1636,38 @@ let%expect_test "deserialization api" =
        }
        forall A -> A get1(tuple t) asm "1 INDEX";
        forall A -> A get0(tuple t) asm "0 INDEX";
-       int builtin_less_or_equal(int i1, int i2) impure {
+       int builtin_gt(int i1, int i2) impure {
+         return _>_(i1, i2);
+       }
+       int builtin_geq(int i1, int i2) impure {
+         return _>=_(i1, i2);
+       }
+       int builtin_lt(int i1, int i2) impure {
+         return _<_(i1, i2);
+       }
+       int builtin_leq(int i1, int i2) impure {
          return _<=_(i1, i2);
        }
-       int builtin_not_equal(int i1, int i2) impure {
+       int builtin_neq(int i1, int i2) impure {
          return _!=_(i1, i2);
        }
-       int builtin_equal(int i1, int i2) impure {
+       int builtin_eq(int i1, int i2) impure {
          return _==_(i1, i2);
+       }
+       int builtin_bit_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_bit_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
+       int builtin_div(int i1, int i2) impure {
+         return _/_(i1, i2);
+       }
+       int builtin_mul(int i1, int i2) impure {
+         return _*_(i1, i2);
+       }
+       int builtin_sub(int i1, int i2) impure {
+         return _-_(i1, i2);
        }
        int builtin_add(int i1, int i2) impure {
          return _+_(i1, i2);
@@ -1606,14 +1798,14 @@ let%expect_test "deserialization api" =
        }
        [slice, tuple] f9(slice slice_) impure {
          [slice, int] res_discr = f5(slice_, 1);
-         if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
+         if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
          [slice, []] res = f14(get0(func_believe_me(res_discr)));
        return
        f13(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
          [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
-       if (builtin_equal(get1(func_believe_me(res_discr)), 1))
+       if (builtin_eq(get1(func_believe_me(res_discr)), 1))
        {
          [slice, [int, int]] res = f10(get0(func_believe_me(res_discr)));
        return
@@ -1634,7 +1826,7 @@ let%expect_test "deserialization api" =
        }
        [slice, [int, int, int]] f18(slice s) impure {
          [slice slice_, int anycast] = f12(s, 1);
-         if (builtin_equal(anycast, 0)) {
+         if (builtin_eq(anycast, 0)) {
          [slice slice_, int len] = f11(slice_);
        [slice slice_, int workchain_id] =
        f19(slice_);
@@ -1666,7 +1858,7 @@ let%expect_test "deserialization api" =
        }
        [slice, [int, int]] f22(slice s) impure {
          [slice, int] res_anycast = f12(s, 1);
-         if (builtin_equal(get1(func_believe_me(res_anycast)), 0)) {
+         if (builtin_eq(get1(func_believe_me(res_anycast)), 0)) {
          return f23(s);
        } else
        {
@@ -1674,14 +1866,14 @@ let%expect_test "deserialization api" =
        }}
        [slice, tuple] f17(slice slice_) impure {
          [slice, int] res_discr = f5(slice_, 1);
-         if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
+         if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
          [slice, [int, int]] res = f22(get0(func_believe_me(res_discr)));
        return
        f21(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
          [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
-       if (builtin_equal(get1(func_believe_me(res_discr)), 1))
+       if (builtin_eq(get1(func_believe_me(res_discr)), 1))
        {
          [slice, [int, int, int]] res = f18(get0(func_believe_me(res_discr)));
        return
@@ -1777,7 +1969,7 @@ let%expect_test "deserialization api" =
        }
        [slice, tuple] f4(slice slice_) impure {
          [slice, int] res_discr = f5(slice_, 1);
-         if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
+         if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
          [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] res =
            f30(get0(func_believe_me(res_discr)));
        return
@@ -1785,7 +1977,7 @@ let%expect_test "deserialization api" =
        } else
        {
          [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
-       if (builtin_equal(get1(func_believe_me(res_discr)), 1))
+       if (builtin_eq(get1(func_believe_me(res_discr)), 1))
        {
          [slice, [tuple, tuple, int]] res = f6(get0(func_believe_me(res_discr)));
        return
@@ -1808,9 +2000,9 @@ let%expect_test "deserialization api" =
        [slice, [tuple, []]] f2(slice s) impure {
          [slice slice_, tuple info] = f3(s);
          [slice slice_, int init] = f12(slice_, 1);
-         if (builtin_equal(init, 0)) {
+         if (builtin_eq(init, 0)) {
          [slice slice_, int discr] = f12(slice_, 1);
-       if (builtin_equal(discr, 0))
+       if (builtin_eq(discr, 0))
        {
          [slice slice_, [] body] = f43(slice_);
        [tuple, _] mes =
@@ -1923,14 +2115,38 @@ let%expect_test "deserializer" =
     int func_bit_not(int a) {
       return ~ a;
     }
-    int builtin_less_or_equal(int i1, int i2) impure {
+    int builtin_gt(int i1, int i2) impure {
+      return _>_(i1, i2);
+    }
+    int builtin_geq(int i1, int i2) impure {
+      return _>=_(i1, i2);
+    }
+    int builtin_lt(int i1, int i2) impure {
+      return _<_(i1, i2);
+    }
+    int builtin_leq(int i1, int i2) impure {
       return _<=_(i1, i2);
     }
-    int builtin_not_equal(int i1, int i2) impure {
+    int builtin_neq(int i1, int i2) impure {
       return _!=_(i1, i2);
     }
-    int builtin_equal(int i1, int i2) impure {
+    int builtin_eq(int i1, int i2) impure {
       return _==_(i1, i2);
+    }
+    int builtin_bit_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_bit_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
+    int builtin_div(int i1, int i2) impure {
+      return _/_(i1, i2);
+    }
+    int builtin_mul(int i1, int i2) impure {
+      return _*_(i1, i2);
+    }
+    int builtin_sub(int i1, int i2) impure {
+      return _-_(i1, i2);
     }
     int builtin_add(int i1, int i2) impure {
       return _+_(i1, i2);
@@ -2074,14 +2290,38 @@ let%expect_test "deserializer unions" =
     }
     forall A -> A get1(tuple t) asm "1 INDEX";
     forall A -> A get0(tuple t) asm "0 INDEX";
-    int builtin_less_or_equal(int i1, int i2) impure {
+    int builtin_gt(int i1, int i2) impure {
+      return _>_(i1, i2);
+    }
+    int builtin_geq(int i1, int i2) impure {
+      return _>=_(i1, i2);
+    }
+    int builtin_lt(int i1, int i2) impure {
+      return _<_(i1, i2);
+    }
+    int builtin_leq(int i1, int i2) impure {
       return _<=_(i1, i2);
     }
-    int builtin_not_equal(int i1, int i2) impure {
+    int builtin_neq(int i1, int i2) impure {
       return _!=_(i1, i2);
     }
-    int builtin_equal(int i1, int i2) impure {
+    int builtin_eq(int i1, int i2) impure {
       return _==_(i1, i2);
+    }
+    int builtin_bit_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_bit_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
+    int builtin_div(int i1, int i2) impure {
+      return _/_(i1, i2);
+    }
+    int builtin_mul(int i1, int i2) impure {
+      return _*_(i1, i2);
+    }
+    int builtin_sub(int i1, int i2) impure {
+      return _-_(i1, i2);
     }
     int builtin_add(int i1, int i2) impure {
       return _+_(i1, i2);
@@ -2203,14 +2443,14 @@ let%expect_test "deserializer unions" =
     }
     [slice, tuple] deserialize_union(slice slice_) impure {
       [slice, int] res_discr = f1(slice_, 1);
-      if (builtin_equal(get1(func_believe_me(res_discr)), 0)) {
+      if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
       [slice, int] res = f5(get0(func_believe_me(res_discr)));
     return
     f4(get0(func_believe_me(res)), get1(func_believe_me(res)));
     } else
     {
       [slice, int] res_discr = f1(get0(func_believe_me(res_discr)), 1);
-    if (builtin_equal(get1(func_believe_me(res_discr)), 1))
+    if (builtin_eq(get1(func_believe_me(res_discr)), 1))
     {
       [slice, int] res = f2(get0(func_believe_me(res_discr)));
     return
@@ -2362,15 +2602,15 @@ let%expect_test "codegen while block" =
       let body = MsgBody.deserialize(input).value;
       let data = body.data;
       let state = WalletState.deserialize(Slice.parse(builtin_get_data())).value;
-      if (builtin_less_or_equal(data.valid_until.value, builtin_now())) { thrown(35) }
-      if (builtin_not_equal(data.seqno.value, state.seqno.value)) { thrown(33) }
-      if (builtin_not_equal(data.subwallet.value, state.subwallet.value)) { thrown(34) }
+      if (builtin_leq(data.valid_until.value, builtin_now())) { thrown(35) }
+      if (builtin_neq(data.seqno.value, state.seqno.value)) { thrown(33) }
+      if (builtin_neq(data.subwallet.value, state.subwallet.value)) { thrown(34) }
       if (builtin_not(body.signature.is_valid(state.public_key))) { thrown(35) }
     
       builtin_accept_message();
     
       let slice = body.rest.inner;
-      while (builtin_not_equal(slice.refs_count(), 0)) {
+      while (builtin_neq(slice.refs_count(), 0)) {
         let {value as next, slice as new_slice} = NextMessage.deserialize(slice);
         slice = new_slice;
         send_raw_msg(next.cell.inner, next.flags);
@@ -2404,14 +2644,38 @@ let%expect_test "codegen while block" =
     forall A -> A get2(tuple t) asm "2 INDEX";
     forall A -> A get1(tuple t) asm "1 INDEX";
     forall A -> A get0(tuple t) asm "0 INDEX";
-    int builtin_less_or_equal(int i1, int i2) impure {
+    int builtin_gt(int i1, int i2) impure {
+      return _>_(i1, i2);
+    }
+    int builtin_geq(int i1, int i2) impure {
+      return _>=_(i1, i2);
+    }
+    int builtin_lt(int i1, int i2) impure {
+      return _<_(i1, i2);
+    }
+    int builtin_leq(int i1, int i2) impure {
       return _<=_(i1, i2);
     }
-    int builtin_not_equal(int i1, int i2) impure {
+    int builtin_neq(int i1, int i2) impure {
       return _!=_(i1, i2);
     }
-    int builtin_equal(int i1, int i2) impure {
+    int builtin_eq(int i1, int i2) impure {
       return _==_(i1, i2);
+    }
+    int builtin_bit_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_bit_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
+    int builtin_div(int i1, int i2) impure {
+      return _/_(i1, i2);
+    }
+    int builtin_mul(int i1, int i2) impure {
+      return _*_(i1, i2);
+    }
+    int builtin_sub(int i1, int i2) impure {
+      return _-_(i1, i2);
     }
     int builtin_add(int i1, int i2) impure {
       return _+_(i1, i2);
@@ -2657,14 +2921,12 @@ let%expect_test "codegen while block" =
         get1(func_believe_me(f1(input)));
       [int, int, int] data = get1(func_believe_me(body));
       [int, int, int] state = get1(func_believe_me(f15(f14(builtin_get_data()))));
-      if (builtin_less_or_equal(get1(func_believe_me(data)), builtin_now())) {
+      if (builtin_leq(get1(func_believe_me(data)), builtin_now())) {
       thrown(35);
-    }  if
-         (builtin_not_equal(get2(func_believe_me(data)), get0(func_believe_me(state))))
+    }  if (builtin_neq(get2(func_believe_me(data)), get0(func_believe_me(state))))
          {
       thrown(33);
-    }  if
-         (builtin_not_equal(get0(func_believe_me(data)), get1(func_believe_me(state))))
+    }  if (builtin_neq(get0(func_believe_me(data)), get1(func_believe_me(state))))
          {
       thrown(34);
     }  if
@@ -2673,7 +2935,7 @@ let%expect_test "codegen while block" =
       thrown(35);
     }  builtin_accept_message();
       slice slice_ = get2(func_believe_me(body));
-      while (builtin_not_equal(f28(slice_), 0)) {
+      while (builtin_neq(f28(slice_), 0)) {
       [slice new_slice, [cell, int] next] = f19(slice_);
     slice_ =
     new_slice;

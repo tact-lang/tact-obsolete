@@ -508,7 +508,7 @@ functor
               (* Stmt 2: if (builtin_equal(res_discr.value, <discr>)) *)
               let if_condition =
                 let eq_fn =
-                  Program.find_binding p "builtin_equal" |> Option.value_exn
+                  Program.find_binding p "builtin_eq" |> Option.value_exn
                 in
                 (* This is a hack to get LoadResult[Integer] type *)
                 let res_discr_ty =
@@ -743,52 +743,70 @@ functor
               HoleType;
             make_builtin_names "builtin_not" "func_bit_not" [("c", bool_)] bool_;
             make_builtin_names "builtin_add" "_+_" [("i1", i); ("i2", i)] i;
-            make_builtin_names "builtin_equal" "_==_"
-              [("i1", i); ("i2", i)]
-              bool_;
-            make_builtin_names "builtin_not_equal" "_!=_"
-              [("i1", i); ("i2", i)]
-              bool_;
-            make_builtin_names "builtin_less_or_equal" "_<=_"
-              [("i1", i); ("i2", i)]
-              bool_ ]
+            make_builtin_names "builtin_sub" "_-_" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_mul" "_*_" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_div" "_/_" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_bit_and" "_&_" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_bit_or" "_|_" [("i1", i); ("i2", i)] i;
+            make_builtin_names "builtin_eq" "_==_" [("i1", i); ("i2", i)] bool_;
+            make_builtin_names "builtin_neq" "_!=_" [("i1", i); ("i2", i)] bool_;
+            make_builtin_names "builtin_leq" "_<=_" [("i1", i); ("i2", i)] bool_;
+            make_builtin_names "builtin_lt" "_<_" [("i1", i); ("i2", i)] bool_;
+            make_builtin_names "builtin_geq" "_>=_" [("i1", i); ("i2", i)] bool_;
+            make_builtin_names "builtin_gt" "_>_" [("i1", i); ("i2", i)] bool_
+          ]
         in
         {p with bindings = p.bindings @ make_bindings builtins}
     end
 
     let add_builtin_types_methods p =
       let integer_functions =
+        let rec make_bin_op fun_c_name op ret_ty =
+          { function_signature =
+              bl
+              @@ { function_params =
+                     [(bl "left", IntegerType); (bl "right", IntegerType)];
+                   function_returns = ret_ty;
+                   function_attributes = [];
+                   function_is_type = false };
+            function_impl =
+              (let builtin_add = Program.find_binding_exn p fun_c_name in
+               UniversalFn
+                 ( bl
+                   @@ Block
+                        [ bl
+                          @@ Return
+                               ( bl
+                               @@ FunctionCall
+                                    ( builtin_add,
+                                      [ bl @@ Reference (bl "left", IntegerType);
+                                        bl @@ Reference (bl "right", IntegerType)
+                                      ],
+                                      false ) ) ],
+                   builtin_fun (fun _ args ->
+                       match args with
+                       | [Integer x; Integer y] ->
+                           op x y
+                       | _ ->
+                           Errors.ice "unreachable" ) ) ) }
+        and arith_op name op =
+          make_bin_op name (fun x y -> Integer (op x y)) IntegerType
+        and logic_op name op =
+          make_bin_op name (fun x y -> Bool (op x y)) BoolType
+        in
         make_bindings
-          [ ( "add",
-              { function_signature =
-                  bl
-                  @@ { function_params =
-                         [(bl "left", IntegerType); (bl "right", IntegerType)];
-                       function_returns = IntegerType;
-                       function_attributes = [];
-                       function_is_type = false };
-                function_impl =
-                  (let builtin_add = Program.find_binding_exn p "builtin_add" in
-                   UniversalFn
-                     ( bl
-                       @@ Block
-                            [ bl
-                              @@ Return
-                                   ( bl
-                                   @@ FunctionCall
-                                        ( builtin_add,
-                                          [ bl
-                                            @@ Reference (bl "left", IntegerType);
-                                            bl
-                                            @@ Reference
-                                                 (bl "right", IntegerType) ],
-                                          false ) ) ],
-                       builtin_fun (fun _ args ->
-                           match args with
-                           | [Integer x; Integer y] ->
-                               Integer (Z.add x y)
-                           | _ ->
-                               Errors.ice "unreachable" ) ) ) } ) ]
+          [ ("add", arith_op "builtin_add" Z.add);
+            ("sub", arith_op "builtin_sub" Z.sub);
+            ("mul", arith_op "builtin_mul" Z.mul);
+            ("div", arith_op "builtin_div" Z.div);
+            ("bit_and", arith_op "builtin_bit_and" Z.logand);
+            ("bit_or", arith_op "builtin_bit_or" Z.logor);
+            ("eq", logic_op "builtin_eq" Z.equal);
+            ("neq", logic_op "builtin_neq" (fun x y -> not (Z.equal x y)));
+            ("leq", logic_op "builtin_leq" Z.leq);
+            ("lt", logic_op "builtin_lt" Z.lt);
+            ("geq", logic_op "builtin_geq" Z.geq);
+            ("gt", logic_op "builtin_gt" Z.gt) ]
       in
       let methods = [(IntegerType, {ty_functions = integer_functions})] in
       {p with type_functions = p.type_functions @ methods}
