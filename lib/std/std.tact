@@ -202,7 +202,7 @@ struct AddrNone {
 // deriving from the `len` field which requires more powerful dependent types than we have for now.
 // Do we want to make such declarations possible?
 struct AddrExtern { 
-  val len: Int[9]
+  val len: Int9
   val bits: Integer
 
   impl Serialize {
@@ -215,7 +215,7 @@ struct AddrExtern {
 
   impl Deserialize {
     fn deserialize(slice: Slice) -> LoadResult[Self] {
-      let {value as len, slice} = Int[9].deserialize(slice);
+      let {value as len, slice} = Int9.deserialize(slice);
       let {value as bits, slice} = slice.load_int(len);
 
       LoadResult[Self] { 
@@ -241,10 +241,10 @@ union MsgAddressExt {
 }
 
 struct AddressStd {
-  val workchain_id: Int[8]
-  val address: Int[256]
+  val workchain_id: Int8
+  val address: Int256
 
-  fn new(workchain_id: Int[8], address: Int[256]) -> Self {
+  fn new(workchain_id: Int8, address: Int256) -> Self {
     Self {
       workchain_id: workchain_id,
       address: address,
@@ -271,8 +271,8 @@ struct AddressStd {
 }
 
 struct AddressVar {
-  val len: Int[9]
-  val workchain_id: Int[32]
+  val len: Int9
+  val workchain_id: Int32
   val address: Integer
 
   impl Serialize {
@@ -287,8 +287,8 @@ struct AddressVar {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let {value as anycast, slice} = s.load_int(1);
       if (anycast == 0) {
-        let {value as len, slice} = Int[9].deserialize(slice);
-        let {value as workchain_id, slice} = Int[32].deserialize(slice);
+        let {value as len, slice} = Int9.deserialize(slice);
+        let {value as workchain_id, slice} = Int32.deserialize(slice);
         let {value as address, slice} = slice.load_int(len);
         return LoadResult[Self]
           .new(slice, Self {
@@ -327,16 +327,16 @@ union MsgAddress {
 struct ExtOutMsgInfoRelaxed {
   val src: MsgAddress
   val dest: MsgAddressExt
-  val created_lt: Uint[64]
-  val created_at: Uint[32]
+  val created_lt: Uint64
+  val created_at: Uint32
 
   @derive
   impl Serialize {}
 }
 
 struct Timestamps {
-  val created_lt: Uint[64]
-  val created_at: Uint[32]
+  val created_lt: Uint64
+  val created_at: Uint32
 
   fn zeros() -> Self {
     Self {
@@ -353,9 +353,9 @@ struct Timestamps {
 }
 
 struct IntMsgInfoFlags {
-  val ihr_disabled: Int[1]
-  val bounce: Int[1]
-  val bounced: Int[1]
+  val ihr_disabled: Int1
+  val bounce: Int1
+  val bounced: Int1
 
   @derive
   impl Serialize {}
@@ -524,7 +524,7 @@ struct Message[X: Deserialize] {
 }
 
 struct SendRawMsgFlags {
-  val value: Int[8]
+  val value: Int8
 
   fn default() -> Self {
     Self { value: 0 }
@@ -563,11 +563,11 @@ fn send_external[X: Serialize](header: ExtOutMsgInfoRelaxed, body: X, flags: Sen
   send_raw_msg(ce, flags);
 }
 
-fn hash_of_slice(s: Slice) -> Uint[256] {
-  return Uint[256].new(builtin_slice_hash(s.s));
+fn hash_of_slice(s: Slice) -> Uint256 {
+  return Uint256.new(builtin_slice_hash(s.s));
 }
 
-fn is_signature_valid(hash: Uint[256], sign: SliceBits[512], pubkey: Uint[256]) -> Bool {
+fn is_signature_valid(hash: Uint256, sign: SliceBits[512], pubkey: Uint256) -> Bool {
   return builtin_check_signature(hash.value, sign.inner.s, pubkey.value);
 }
 
@@ -575,7 +575,7 @@ struct Signature {
   val _sig: SliceBits[512]
   val _rest: Slice
 
-  fn is_valid(self: Self, public_key: Uint[256]) -> Bool {
+  fn is_valid(self: Self, public_key: Uint256) -> Bool {
     return is_signature_valid(hash_of_slice(self._rest), self._sig, public_key);
   }
 
@@ -603,7 +603,7 @@ struct SignedBody[X: Deserialize] {
   val _sign: Signature
   val _rest: X
 
-  fn verify_body(self: Self, pubkey: Uint[256]) -> X {
+  fn verify_body(self: Self, pubkey: Uint256) -> X {
     if (self._sign.is_valid(pubkey)) {
       return self._rest;
     } else {

@@ -1324,3 +1324,33 @@ let%expect_test "operators" =
         (MethodCall
          ((receiver (Int 1)) (receiver_fn (Ident gt))
           (receiver_arguments ((Int 1))))))))) |}]
+
+let%expect_test "sized int/uint helpers" =
+  let source =
+    {|
+    Uint32; // same as:
+    Uint[32];
+    Int31; // same as:
+    Int[31];
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Expr
+        (FunctionCall
+         ((fn (Reference (Ident Uint))) (arguments ((Int 32)))
+          (is_type_func_call))))
+       (Expr
+        (FunctionCall
+         ((fn (Reference (Ident Uint))) (arguments ((Int 32)))
+          (is_type_func_call))))
+       (Expr
+        (FunctionCall
+         ((fn (Reference (Ident Int))) (arguments ((Int 31)))
+          (is_type_func_call))))
+       (Expr
+        (FunctionCall
+         ((fn (Reference (Ident Int))) (arguments ((Int 31)))
+          (is_type_func_call))))))) |}]

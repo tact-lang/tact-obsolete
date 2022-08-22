@@ -419,11 +419,40 @@ module Make (Config : Config.T) = struct
   and struct_construction state =
     (char '{' >>> comma_sep named_param <<< char '}') state
 
+  (*
+    A workaround for IntNN and UintNN types. In order to avoid generating all the
+    types in Builtin we simply process them at the parsing stage and convert to Int[NN]
+    and Uint[NN] respectively.
+
+    The main reason for this choice right now is that `Int` and `Uint` are defined in std
+    and the less Builtin depends on that, the better and the easier it is.
+   *)
+  and sized_int state =
+    let int_ = many_chars_starting_with digit digit |>> Int.of_string in
+    let sized p name upper_bound state =
+      match (pair p int_) state with
+      | (Empty_ok ((_, v), _, _) | Consumed_ok ((_, v), _, _))
+        when v > upper_bound ->
+          fail (name ^ " upper bound is " ^ Int.to_string upper_bound) state
+      | other ->
+          other
+    in
+    ( sized (locate (string "Int")) "Int" 257
+    <|> sized (locate (string "Uint")) "Uint" 256
+    |>> fun (t, sz) ->
+    let ident = Syntax.map_located t ~f:(fun s -> Ident s) in
+    let typ = Syntax.map_located t ~f:(fun _ -> Reference ident) in
+    let sz = Syntax.map_located t ~f:(fun _ -> Int (Z.of_int sz)) in
+    FunctionCall
+      (make_function_call ~fn:typ ~arguments:[sz] ~is_type_func_call:true ()) )
+      state
+
   and expr ?(struct_construction_allowed = true) state =
     let opless_expr =
       attempt integer <|> attempt string_
       <|> (attempt bool_ |>> fun x -> Bool x)
       <|> (attempt struct_ <|> attempt union_ |>> Syntax.value)
+      <|> attempt sized_int
       <|> (locate ident |>> fun x -> Reference x)
       <|> attempt (fn |>> fun x -> Function x)
       <|> (interface |>> fun x -> Interface x)

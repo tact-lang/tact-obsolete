@@ -70,16 +70,16 @@ let pp =
 
 let%expect_test "failed scope resolution" =
   let source = {|
-    let T = Int256;
+    let T = IntN256;
   |} in
   pp source ;
   [%expect
     {|
-    Error[1]: Unresolved identifier Int256
+    Error[1]: Unresolved identifier IntN256
     File: "":2:12
       |
-    2 |     let T = Int256;
-      |             ^^^^^^ Cannot resolve this identifier |}]
+    2 |     let T = IntN256;
+      |             ^^^^^^^ Cannot resolve this identifier |}]
 
 let%expect_test "method not found" =
   let source = {|
