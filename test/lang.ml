@@ -5493,3 +5493,15 @@ let%expect_test "Universal Functions" =
      ((bindings ((three (Value (Integer 3))))) (structs ())
       (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "Operators" =
+  let source = {|
+    let _ = 1 + 2 - 3 * 4 / 5 & 6 | 7;
+  |} in
+  pp_compile source ~include_std:false ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((_ (Value (Integer 2))))) (structs ()) (type_counter <opaque>)
+      (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
+      (attr_executors <opaque>))) |}]

@@ -1824,9 +1824,11 @@ let%expect_test "deserialization api" =
        [slice, [int, int, int]] f20([int, int, int] v, slice s) impure {
          return [s, v];
        }
+       int f21(int left, int right) impure {
+       }
        [slice, [int, int, int]] f18(slice s) impure {
          [slice slice_, int anycast] = f12(s, 1);
-         if (builtin_eq(anycast, 0)) {
+         if (f21(anycast, 0)) {
          [slice slice_, int len] = f11(slice_);
        [slice slice_, int workchain_id] =
        f19(slice_);
@@ -1838,28 +1840,28 @@ let%expect_test "deserialization api" =
        {
          thrown(0);
        }}
-       [slice, tuple] f21(tuple v, slice s) impure {
+       [slice, tuple] f22(tuple v, slice s) impure {
          return [s, v];
        }
-       [slice, int] f24(slice s) impure {
+       [slice, int] f25(slice s) impure {
          [slice, int] res = f12(s, 8);
          [slice slice_, int value] = res;
          return [slice_, value];
        }
-       [slice, int] f25(slice s) impure {
+       [slice, int] f26(slice s) impure {
          [slice, int] res = f12(s, 256);
          [slice slice_, int value] = res;
          return [slice_, value];
        }
-       [slice, [int, int]] f23(slice slice_) impure {
-         [slice slice_, int workchain_id] = f24(slice_);
-         [slice slice_, int address] = f25(slice_);
+       [slice, [int, int]] f24(slice slice_) impure {
+         [slice slice_, int workchain_id] = f25(slice_);
+         [slice slice_, int address] = f26(slice_);
          return [slice_, [workchain_id, address]];
        }
-       [slice, [int, int]] f22(slice s) impure {
+       [slice, [int, int]] f23(slice s) impure {
          [slice, int] res_anycast = f12(s, 1);
-         if (builtin_eq(get1(func_believe_me(res_anycast)), 0)) {
-         return f23(s);
+         if (f21(get1(func_believe_me(res_anycast)), 0)) {
+         return f24(s);
        } else
        {
          thrown(0);
@@ -1867,9 +1869,9 @@ let%expect_test "deserialization api" =
        [slice, tuple] f17(slice slice_) impure {
          [slice, int] res_discr = f5(slice_, 1);
          if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
-         [slice, [int, int]] res = f22(get0(func_believe_me(res_discr)));
+         [slice, [int, int]] res = f23(get0(func_believe_me(res_discr)));
        return
-       f21(get0(func_believe_me(res)), get1(func_believe_me(res)));
+       f22(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
          [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
@@ -1877,103 +1879,103 @@ let%expect_test "deserialization api" =
        {
          [slice, [int, int, int]] res = f18(get0(func_believe_me(res_discr)));
        return
-       f21(get0(func_believe_me(res)), get1(func_believe_me(res)));
+       f22(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        throw(0);
        }}
        [slice, tuple] f16(slice s) impure {
          return f17(s);
        }
-       [slice, int] f27(slice self) impure {
+       [slice, int] f28(slice self) impure {
          (slice, int) output = builtin_load_grams(self);
          slice slice_ = tensor2_value1(output);
          int coins = tensor2_value2(output);
          return [believe_me(slice_), coins];
        }
-       [slice, int] f28(int v, slice s) impure {
+       [slice, int] f29(int v, slice s) impure {
          return [s, v];
        }
-       [slice, int] f26(slice s) impure {
-         [slice slice_, int value] = f27(s);
-         return f28(value, slice_);
+       [slice, int] f27(slice s) impure {
+         [slice slice_, int value] = f28(s);
+         return f29(value, slice_);
        }
        [slice, [tuple, tuple, int]] f7(slice slice_) impure {
          [slice slice_, tuple src] = f8(slice_);
          [slice slice_, tuple dest] = f16(slice_);
-         [slice slice_, int import_fee] = f26(slice_);
+         [slice slice_, int import_fee] = f27(slice_);
          return [slice_, [src, dest, import_fee]];
        }
        [slice, [tuple, tuple, int]] f6(slice s) impure {
          return f7(s);
        }
-       [slice, tuple] f29(tuple v, slice s) impure {
+       [slice, tuple] f30(tuple v, slice s) impure {
          return [s, v];
        }
-       [slice, int] f34(slice s) impure {
+       [slice, int] f35(slice s) impure {
          [slice, int] res = f12(s, 1);
          [slice slice_, int value] = res;
          return [slice_, value];
        }
-       [slice, [int, int, int]] f33(slice slice_) impure {
-         [slice slice_, int ihr_disabled] = f34(slice_);
-         [slice slice_, int bounce] = f34(slice_);
-         [slice slice_, int bounced] = f34(slice_);
+       [slice, [int, int, int]] f34(slice slice_) impure {
+         [slice slice_, int ihr_disabled] = f35(slice_);
+         [slice slice_, int bounce] = f35(slice_);
+         [slice slice_, int bounced] = f35(slice_);
          return [slice_, [ihr_disabled, bounce, bounced]];
        }
-       [slice, [int, int, int]] f32(slice s) impure {
-         return f33(s);
+       [slice, [int, int, int]] f33(slice s) impure {
+         return f34(s);
        }
-       [slice, [tuple, tuple]] f36(slice slice_) impure {
+       [slice, [tuple, tuple]] f37(slice slice_) impure {
          [slice slice_, tuple src] = f16(slice_);
          [slice slice_, tuple dst] = f16(slice_);
          return [slice_, [src, dst]];
        }
-       [slice, [tuple, tuple]] f35(slice s) impure {
-         return f36(s);
+       [slice, [tuple, tuple]] f36(slice s) impure {
+         return f37(s);
        }
-       [slice, [int, int]] f38(slice slice_) impure {
-         [slice slice_, int ihr_fee] = f26(slice_);
-         [slice slice_, int fwd_fee] = f26(slice_);
+       [slice, [int, int]] f39(slice slice_) impure {
+         [slice slice_, int ihr_fee] = f27(slice_);
+         [slice slice_, int fwd_fee] = f27(slice_);
          return [slice_, [ihr_fee, fwd_fee]];
        }
-       [slice, [int, int]] f37(slice s) impure {
-         return f38(s);
+       [slice, [int, int]] f38(slice s) impure {
+         return f39(s);
        }
-       [slice, int] f41(slice s) impure {
+       [slice, int] f42(slice s) impure {
          [slice, int] res = f5(s, 64);
          return [get0(func_believe_me(res)), get1(func_believe_me(res))];
        }
-       [slice, int] f42(slice s) impure {
+       [slice, int] f43(slice s) impure {
          [slice, int] res = f5(s, 32);
          return [get0(func_believe_me(res)), get1(func_believe_me(res))];
        }
-       [slice, [int, int]] f40(slice slice_) impure {
-         [slice slice_, int created_lt] = f41(slice_);
-         [slice slice_, int created_at] = f42(slice_);
+       [slice, [int, int]] f41(slice slice_) impure {
+         [slice slice_, int created_lt] = f42(slice_);
+         [slice slice_, int created_at] = f43(slice_);
          return [slice_, [created_lt, created_at]];
        }
-       [slice, [int, int]] f39(slice s) impure {
-         return f40(s);
+       [slice, [int, int]] f40(slice s) impure {
+         return f41(s);
        }
-       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f31(slice
+       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f32(slice
            slice_) impure {
-         [slice slice_, [int, int, int] flags] = f32(slice_);
-         [slice slice_, [tuple, tuple] addresses] = f35(slice_);
-         [slice slice_, [int, int] coins] = f37(slice_);
-         [slice slice_, [int, int] timestamps] = f39(slice_);
+         [slice slice_, [int, int, int] flags] = f33(slice_);
+         [slice slice_, [tuple, tuple] addresses] = f36(slice_);
+         [slice slice_, [int, int] coins] = f38(slice_);
+         [slice slice_, [int, int] timestamps] = f40(slice_);
          return [slice_, [flags, addresses, coins, timestamps]];
        }
-       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f30(slice s)
+       [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f31(slice s)
            impure {
-         return f31(s);
+         return f32(s);
        }
        [slice, tuple] f4(slice slice_) impure {
          [slice, int] res_discr = f5(slice_, 1);
          if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
          [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] res =
-           f30(get0(func_believe_me(res_discr)));
+           f31(get0(func_believe_me(res_discr)));
        return
-       f29(get0(func_believe_me(res)), get1(func_believe_me(res)));
+       f30(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        {
          [slice, int] res_discr = f5(get0(func_believe_me(res_discr)), 1);
@@ -1981,34 +1983,34 @@ let%expect_test "deserialization api" =
        {
          [slice, [tuple, tuple, int]] res = f6(get0(func_believe_me(res_discr)));
        return
-       f29(get0(func_believe_me(res)), get1(func_believe_me(res)));
+       f30(get0(func_believe_me(res)), get1(func_believe_me(res)));
        } else
        throw(0);
        }}
        [slice, tuple] f3(slice s) impure {
          return f4(s);
        }
-       [slice, []] f44([] v, slice s) impure {
+       [slice, []] f45([] v, slice s) impure {
          return [s, v];
        }
-       [slice, []] f43(slice s) impure {
-         return f44(s, []);
+       [slice, []] f44(slice s) impure {
+         return f45(s, []);
        }
-       [slice, [tuple, []]] f45([tuple, []] v, slice s) impure {
+       [slice, [tuple, []]] f46([tuple, []] v, slice s) impure {
          return [s, v];
        }
        [slice, [tuple, []]] f2(slice s) impure {
          [slice slice_, tuple info] = f3(s);
          [slice slice_, int init] = f12(slice_, 1);
-         if (builtin_eq(init, 0)) {
+         if (f21(init, 0)) {
          [slice slice_, int discr] = f12(slice_, 1);
-       if (builtin_eq(discr, 0))
+       if (f21(discr, 0))
        {
-         [slice slice_, [] body] = f43(slice_);
+         [slice slice_, [] body] = f44(slice_);
        [tuple, _] mes =
        [info, believe_me(body)];
        return
-       f45(mes, slice_);
+       f46(mes, slice_);
        } else
        {
          }} else

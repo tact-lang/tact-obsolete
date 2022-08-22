@@ -261,7 +261,7 @@ struct AddressStd {
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let res_anycast = s.load_int(1);
-      if (builtin_eq(res_anycast.value, 0)) {
+      if (res_anycast.value == 0) {
         return deserializer[Self](s);
       } else {
         thrown(0); // unreachable
@@ -286,7 +286,7 @@ struct AddressVar {
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let {value as anycast, slice} = s.load_int(1);
-      if (builtin_eq(anycast, 0)) {
+      if (anycast == 0) {
         let {value as len, slice} = Int[9].deserialize(slice);
         let {value as workchain_id, slice} = Int[32].deserialize(slice);
         let {value as address, slice} = slice.load_int(len);
@@ -505,9 +505,9 @@ struct Message[X: Deserialize] {
       let {slice, value as info} = CommonMsgInfo.deserialize(s);
       let {slice, value as init} = slice.load_int(1);
 
-      if (builtin_eq(init, 0)) {
+      if (init == 0) {
         let {slice, value as discr} = slice.load_int(1);
-        if (builtin_eq(discr, 0)) {
+        if (discr == 0) {
           let {slice, value as body} = X.deserialize(slice);
           // FIXME: weird bug
           let mes = Self { info: info, body: believe_me(body) };
