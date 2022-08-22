@@ -1,15 +1,15 @@
 struct MsgBody {
-  val subwallet: Uint[32]
-  val valid_until: Uint[32]
-  val seqno: Uint[32]
+  val subwallet: Uint32
+  val valid_until: Uint32
+  val seqno: Uint32
 
   @derive impl Deserialize {}
 }
 
 struct WalletState {
-  val seqno: Uint[32]
-  val subwallet: Uint[32]
-  val public_key: Uint[256]
+  val seqno: Uint32
+  val subwallet: Uint32
+  val public_key: Uint256
 
   @derive impl Deserialize {}
   @derive impl Serialize {}

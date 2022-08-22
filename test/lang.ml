@@ -406,12 +406,12 @@ let%expect_test "binding resolution" =
 
 let%expect_test "failed scope resolution" =
   let source = {|
-    let T = Int256;
+    let T = NotInt256;
   |} in
   pp_compile source ;
   [%expect
     {|
-    (((UnresolvedIdentifier Int256))
+    (((UnresolvedIdentifier NotInt256))
      ((bindings ()) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
       (attr_executors <opaque>))) |}]
@@ -4611,17 +4611,17 @@ let%expect_test "type that does not implement interface passed to the \
 let%expect_test "struct signatures" =
   let source =
     {|
-       struct Int2[bits: Integer] {
+       struct IntN2[bits: Integer] {
          val value: Integer
          fn new(i: Integer) -> Self {
            Self { value: i }
          }
        }
-       fn extract_value[n: Integer](x: Int2[n]) -> Integer {
+       fn extract_value[n: Integer](x: IntN2[n]) -> Integer {
          x.value
        }
-       let five = extract_value[10](Int2[10].new(5));
-       let zero = extract_value[20](Int2[20].new(0));
+       let five = extract_value[10](IntN2[10].new(5));
+       let zero = extract_value[20](IntN2[20].new(0));
      |}
   in
   pp_compile source ;
@@ -4630,7 +4630,7 @@ let%expect_test "struct signatures" =
     (((FieldNotFoundF value) (UnresolvedIdentifier extract_value)
       (UnresolvedIdentifier extract_value))
      ((bindings
-       ((Int2
+       ((IntN2
          (Value
           (Function
            ((function_signature
