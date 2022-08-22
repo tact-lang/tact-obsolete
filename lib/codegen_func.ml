@@ -209,9 +209,10 @@ functor
           fun name fn ->
             let body =
               match fn.value.function_impl with
-              | Fn {value = Block stmts; _} ->
+              | Fn {value = Block stmts; _}
+              | UniversalFn ({value = Block stmts; _}, _) ->
                   stmts
-              | Fn stmt ->
+              | Fn stmt | UniversalFn (stmt, _) ->
                   [stmt]
               | _ ->
                   []
@@ -291,6 +292,20 @@ functor
             make_tensor_accessors 2 @ default_functions
             @ List.map helpers ~f:(fun x -> F.Function x)
             @ List.map (List.rev functions) ~f:(fun (_, f) -> F.Function f)
+            |> List.map ~f:(fun x ->
+                   match x with
+                   | F.Function f ->
+                       if String.equal f.function_name "believe_me" then
+                         F.Function
+                           { function_name = "believe_me";
+                             function_forall = ["A"; "B"];
+                             function_args = [("i", NamedType "A")];
+                             function_returns = NamedType "B";
+                             function_body = AsmFn "NOP";
+                             function_is_impure = false }
+                       else F.Function f
+                   | x ->
+                       x )
 
         method cg_StructField : T.expr * string located * T.type_ -> _ =
           fun (from_expr, field, _) ->

@@ -1,14 +1,7 @@
-struct MsgBodyData {
+struct MsgBody {
   val subwallet: Uint[32]
   val valid_until: Uint[32]
   val seqno: Uint[32]
-
-  @derive impl Deserialize {}
-}
-struct MsgBody {
-  val signature: Signature
-  val data: MsgBodyData
-  val rest: RestSlice
 
   @derive impl Deserialize {}
 }
@@ -32,18 +25,17 @@ struct NextMessage {
 fn recv_internal(_: Slice) {}
 
 fn recv_external(input: Slice) {
-  let body = MsgBody.deserialize(input).value;
-  let data = body.data;
+  let {value as signed, slice} = SignedBody[MsgBody].deserialize(input);
   let state = WalletState.deserialize(Slice.parse(builtin_get_data())).value;
 
-  if (data.valid_until.value <= builtin_now()) { thrown(35) }
-  if (data.seqno.value != state.seqno.value) { thrown(33) }
-  if (data.subwallet.value != state.subwallet.value) { thrown(34) }
-  //if (builtin_not(body.signature.is_valid(state.public_key))) { thrown(35) }
+  let body = signed.verify_body(state.public_key);
+
+  if (body.valid_until.value < builtin_now()) { thrown(35) }
+  if (body.seqno.value != state.seqno.value) { thrown(33) }
+  if (body.subwallet.value != state.subwallet.value) { thrown(34) }
 
   builtin_accept_message();
 
-  let slice = body.rest.inner;
   while (slice.refs_count() != 0) {
     let {value as next, slice as new_slice} = NextMessage.deserialize(slice);
     slice = new_slice;

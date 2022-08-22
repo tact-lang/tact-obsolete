@@ -90,7 +90,7 @@ struct SliceBits[N: Integer] {
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
-      let {slice, value} = s.load_bits(N);
+      let {value, slice} = s.load_bits(N);
       LoadResult[Self].new(Self { inner: value }, slice)
     } 
   }
@@ -514,6 +514,7 @@ struct Message[X: Deserialize] {
           return LoadResult[Self].new(mes, slice);
         } else {
           /* TODO: cells */
+          thrown(0);
         }
       } else {
         thrown(0);
@@ -594,6 +595,33 @@ struct RestSlice {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let empty_slice = builtin_slice_last(s.s, 0);
       LoadResult[Self].new(Self{inner: s}, empty_slice)
+    }
+  }
+}
+
+struct SignedBody[X: Deserialize] {
+  val _sign: Signature
+  val _rest: X
+
+  fn verify_body(self: Self, pubkey: Uint[256]) -> X {
+    if (self._sign.is_valid(pubkey)) {
+      return self._rest;
+    } else {
+      thrown(0);
+      // This will never be called but without this return, FunC does not compile
+      // this code.
+      return self._rest;
+    }
+  }
+
+  impl Deserialize {
+    fn deserialize(slice: Slice) -> LoadResult[Self] {
+      let {value as sign, slice} = Signature.deserialize(slice);
+      let {value as rest, slice} = X.deserialize(slice);
+      LoadResult[Self].new(
+        Self { _sign: sign, _rest: believe_me(rest) },
+        slice
+      )
     }
   }
 }

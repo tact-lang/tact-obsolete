@@ -19,7 +19,7 @@ let stdlib_fc = [%blob "stdlib.fc"]
 
 let compile ?(target = `Cell) filename program =
   let ext =
-    match target with `Cell -> ".cell" | `Func -> ".func" | `Fift -> ".fift"
+    match target with `Cell -> ".cell" | `Func -> ".fc" | `Fift -> ".fif"
   and is_func = match target with `Func -> true | _ -> false
   and is_fift = match target with `Fift -> true | _ -> false in
   let out_file =

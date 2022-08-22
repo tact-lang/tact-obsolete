@@ -134,7 +134,8 @@ and pp_function_body f indentation = function
           pp_open_hovbox f 2 ;
           pp_stmt f stmt ;
           pp_close_box f () ) ;
-      pp_print_string f "}"
+      pp_print_string f "}" ;
+      pp_print_space f ()
   | AsmFn str ->
       pp_print_string f "asm" ;
       pp_print_space f () ;
@@ -203,7 +204,8 @@ and pp_stmt f = function
       pp_open_hovbox f 2 ;
       pp_stmt f stmt ;
       pp_close_box f () ;
-      pp_print_string f "}"
+      pp_print_string f "}" ;
+      pp_print_space f ()
   | Block stmts ->
       pp_print_string f "{" ;
       pp_print_newline f () ;
@@ -211,7 +213,8 @@ and pp_stmt f = function
       pp_open_hovbox f 2 ;
       List.iter stmts ~f:(pp_stmt f) ;
       pp_close_box f () ;
-      pp_print_string f "}"
+      pp_print_string f "}" ;
+      pp_print_space f ()
   | If (condition, then_, else_) ->
       pp_print_string f "if" ;
       pp_print_space f () ;
