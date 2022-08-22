@@ -1254,3 +1254,73 @@ let%expect_test "while loop syntax" =
         ((while_cond (Bool true))
          (while_body
           (CodeBlock ((Expr (FunctionCall ((fn (Reference (Ident do_stuff)))))))))))))) |}]
+
+let%expect_test "operators" =
+  let source =
+    {|
+    1 + 1;
+    1 - 1;
+    1 * 1;
+    1 / 1;
+    1 & 1;
+    1 | 1;
+    1 == 1;
+    1 != 1;
+    1 <= 1;
+    1 < 1;
+    1 >= 1;
+    1 > 1;
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident add))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident sub))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident mul))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident div))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident bit_and))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident bit_or))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident eq))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident neq))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident leq))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident lt))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident geq))
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Int 1)) (receiver_fn (Ident gt))
+          (receiver_arguments ((Int 1))))))))) |}]

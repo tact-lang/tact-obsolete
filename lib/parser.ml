@@ -460,10 +460,10 @@ module Make (Config : Config.T) = struct
         (* LOGIC OPERATORS *)
         [ infix (locate (string "==")) (op "eq") Assoc_left;
           infix (locate (string "!=")) (op "neq") Assoc_left;
-          infix (locate (string "<=")) (op "leq") Assoc_left;
           infix (locate (string "<")) (op "lt") Assoc_left;
-          infix (locate (string ">=")) (op "geq") Assoc_left;
-          infix (locate (string ">")) (op "gt") Assoc_left ] ]
+          infix (locate (string "<=")) (op "leq") Assoc_left;
+          infix (locate (string ">")) (op "gt") Assoc_left;
+          infix (locate (string ">=")) (op "geq") Assoc_left ] ]
     in
     (* handle type and function indices, method calls and field access  *)
     let exp =
