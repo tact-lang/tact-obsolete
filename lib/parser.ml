@@ -4,11 +4,10 @@ module Make (Config : Config.T) = struct
   module Syntax = Syntax.Make (Config)
   open Syntax
 
-  let get_pos' s =
-    (get_pos |>> fun (index, line, offset) -> (index, line, index - offset + 1))
-      s
-
   let locate value =
+    let get_pos' =
+      get_pos |>> fun (index, line, offset) -> (index, line, index - offset + 1)
+    in
     pipe3 get_pos' value get_pos'
       (fun (index0, line0, line_begin0) value (index1, line1, line_begin1) ->
         Syntax.make_located ~value
