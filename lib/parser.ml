@@ -29,7 +29,7 @@ module Make (Config : Config.T) = struct
     | other ->
         other
 
-  (** Infix alias for [must_parse] *)
+  (** Prefix alias for [must_parse] *)
   let ( !!! ) = must_parse
 
   (** Handles exception raised by [must_parse] or [!!!] alias operator **)
