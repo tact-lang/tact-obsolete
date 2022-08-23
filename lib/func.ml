@@ -80,6 +80,22 @@ let list_iter ~f ~flast l =
 
 let indentation = "  "
 
+open struct
+  let string_repeat s n =
+    let s = Bytes.of_string s in
+    let len = Bytes.length s in
+    let res = Bytes.create (n * len) in
+    for i = 0 to Int.pred n do
+      Bytes.blit ~src:s ~src_pos:0 ~dst:res ~dst_pos:(i * len) ~len
+    done ;
+    Bytes.to_string res
+end
+
+let pp_indentation f level = pp_print_string f (string_repeat " " (level * 2))
+
+let boxed ?(box_size = 2) f ~func =
+  pp_open_box f box_size ; func f ; pp_close_box f ()
+
 let rec pp_program f program =
   let prev_margin = pp_get_margin f () in
   let prev_indent = pp_get_max_indent f () in
@@ -87,14 +103,14 @@ let rec pp_program f program =
   pp_set_max_indent f 40 ;
   List.iter program ~f:(function
     | Function fn ->
-        pp_function f fn ; pp_print_newline f ()
+        pp_function 0 f fn ; pp_print_newline f ()
     | Global _ ->
         () ) ;
   pp_set_margin f prev_margin ;
   pp_set_max_indent f prev_indent
 
-and pp_function f fn =
-  pp_open_box f 4 ;
+and pp_function level f fn =
+  pp_open_box f 2 ;
   ( match fn.function_forall with
   | [] ->
       ()
@@ -122,112 +138,119 @@ and pp_function f fn =
   pp_print_space f () ;
   if fn.function_is_impure then (
     pp_print_string f "impure" ; pp_print_space f () ) ;
-  pp_function_body f indentation fn.function_body ;
+  pp_function_body (level + 1) f fn.function_body ;
   pp_close_box f ()
 
-and pp_function_body f indentation = function
+and pp_function_body level f = function
   | Fn stmts ->
       pp_print_string f "{" ;
       pp_print_newline f () ;
       List.iter stmts ~f:(fun stmt ->
-          pp_print_string f indentation ;
-          pp_open_hovbox f 2 ;
-          pp_stmt f stmt ;
+          pp_indentation f level ;
+          pp_open_box f 2 ;
+          pp_stmt level f stmt ;
           pp_close_box f () ) ;
-      pp_print_string f "}" ;
-      pp_print_space f ()
+      pp_print_string f "}"
   | AsmFn str ->
       pp_print_string f "asm" ;
       pp_print_space f () ;
       pp_print_string f @@ "\"" ^ str ^ "\"" ;
       pp_print_string f ";"
 
-and pp_stmt f = function
+and pp_stmt level f = function
   | Vars vars ->
       List.iter vars ~f:(fun (t, n, expr) ->
-          pp_type f t ;
-          pp_print_space f () ;
-          pp_ident f n ;
+          boxed f ~func:(fun f ->
+              pp_type f t ;
+              pp_print_space f () ;
+              pp_ident f n ;
+              pp_print_space f () ;
+              pp_print_string f "=" ;
+              pp_print_space f () ;
+              pp_expr f expr ;
+              pp_print_string f ";" ;
+              pp_close_box f () ;
+              pp_print_newline f () ) )
+  | DestructuringBinding (vars, expr) ->
+      let tensor =
+        match expr with Reference (_, TensorType _) -> true | _ -> false
+      in
+      boxed f ~func:(fun f ->
+          pp_print_string f (if tensor then "(" else "[") ;
+          list_iter vars
+            ~f:(fun (t, n) ->
+              ( match t with
+              | Some t ->
+                  pp_type f t ; pp_print_space f ()
+              | None ->
+                  () ) ;
+              pp_ident f n ; pp_print_string f "," ; pp_print_space f () )
+            ~flast:(fun (t, n) ->
+              ( match t with
+              | Some t ->
+                  pp_type f t ; pp_print_space f ()
+              | None ->
+                  () ) ;
+              pp_ident f n ) ;
+          pp_print_string f (if tensor then ")" else "]") ;
           pp_print_space f () ;
           pp_print_string f "=" ;
           pp_print_space f () ;
           pp_expr f expr ;
           pp_print_string f ";" ;
           pp_print_newline f () )
-  | DestructuringBinding (vars, expr) ->
-      let tensor =
-        match expr with Reference (_, TensorType _) -> true | _ -> false
-      in
-      pp_print_string f (if tensor then "(" else "[") ;
-      list_iter vars
-        ~f:(fun (t, n) ->
-          ( match t with
-          | Some t ->
-              pp_type f t ; pp_print_space f ()
-          | None ->
-              () ) ;
-          pp_ident f n ; pp_print_string f "," ; pp_print_space f () )
-        ~flast:(fun (t, n) ->
-          ( match t with
-          | Some t ->
-              pp_type f t ; pp_print_space f ()
-          | None ->
-              () ) ;
-          pp_ident f n ) ;
-      pp_print_string f (if tensor then ")" else "]") ;
-      pp_print_space f () ;
-      pp_print_string f "=" ;
-      pp_print_space f () ;
-      pp_expr f expr ;
-      pp_print_string f ";" ;
-      pp_print_newline f ()
   | Assignment (ident, expr) ->
-      pp_ident f ident ;
-      pp_print_space f () ;
-      pp_print_string f "=" ;
-      pp_print_space f () ;
-      pp_expr f expr ;
-      pp_print_string f ";" ;
-      pp_print_newline f ()
+      boxed f ~func:(fun f ->
+          pp_ident f ident ;
+          pp_print_space f () ;
+          pp_print_string f "=" ;
+          pp_print_space f () ;
+          pp_expr f expr ;
+          pp_print_string f ";" ;
+          pp_print_newline f () )
   | Return expr ->
-      pp_print_string f "return" ;
-      pp_print_space f () ;
-      pp_expr f expr ;
-      pp_print_string f ";" ;
-      pp_print_newline f ()
+      boxed f ~func:(fun f ->
+          pp_print_string f "return" ;
+          pp_print_space f () ;
+          pp_expr f expr ;
+          pp_print_string f ";" ;
+          pp_print_newline f () )
   | Expr expr ->
       pp_expr f expr ; pp_print_string f ";" ; pp_print_newline f ()
   | Block [stmt] ->
       pp_print_string f "{" ;
       pp_print_newline f () ;
-      pp_print_string f indentation ;
-      pp_open_hovbox f 2 ;
-      pp_stmt f stmt ;
-      pp_close_box f () ;
+      boxed f ~func:(fun f ->
+          pp_indentation f (level + 1) ;
+          pp_stmt (level + 1) f stmt ) ;
+      pp_indentation f level ;
       pp_print_string f "}" ;
-      pp_print_space f ()
+      pp_print_newline f ()
   | Block stmts ->
       pp_print_string f "{" ;
       pp_print_newline f () ;
-      pp_print_string f indentation ;
-      pp_open_hovbox f 2 ;
-      List.iter stmts ~f:(pp_stmt f) ;
-      pp_close_box f () ;
+      boxed f ~func:(fun f ->
+          List.iter stmts ~f:(fun x ->
+              pp_indentation f (level + 1) ;
+              pp_stmt (level + 1) f x ) ) ;
+      pp_indentation f level ;
       pp_print_string f "}" ;
-      pp_print_space f ()
+      pp_print_newline f ()
   | If (condition, then_, else_) ->
-      pp_print_string f "if" ;
-      pp_print_space f () ;
-      pp_print_string f "(" ;
-      pp_expr f condition ;
-      pp_print_string f ")" ;
-      pp_print_space f () ;
-      pp_stmt f then_ ;
-      Option.iter else_ ~f:(fun e ->
+      boxed f ~func:(fun f ->
+          pp_print_string f "if" ;
           pp_print_space f () ;
-          pp_print_string f "else" ;
+          pp_print_string f "(" ;
+          pp_expr f condition ;
+          pp_print_string f ")" ;
           pp_print_space f () ;
-          pp_stmt f e )
+          pp_stmt level f then_ ;
+          Option.iter else_ ~f:(fun e ->
+              boxed f ~func:(fun f ->
+                  pp_indentation f level ;
+                  pp_print_string f "else" ;
+                  pp_print_space f () ;
+                  pp_stmt level f e ) ) )
   | While {cond; body} ->
       pp_print_string f "while" ;
       pp_print_space f () ;
@@ -235,7 +258,7 @@ and pp_stmt f = function
       pp_expr f cond ;
       pp_print_string f ")" ;
       pp_print_space f () ;
-      pp_stmt f body
+      pp_stmt (level + 1) f body
 
 and pp_expr f = function
   | Integer i ->
