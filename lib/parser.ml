@@ -252,8 +252,8 @@ module Make (Config : Config.T) = struct
   and union_member state = (skip_keyword "case" >>> locate expr) state
 
   and union_item state =
-    ( attempt union_member
-    |>> (fun x -> `Member x)
+    ( attempt (pair attributes union_member)
+    |>> (fun (x, y) -> `Member (y, x))
     <|> attempt (impl |>> fun x -> `Impl x)
     <|> attempt (fn_stmt |>> fun x -> `Fn x)
     <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))

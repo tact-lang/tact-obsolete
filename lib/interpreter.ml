@@ -319,9 +319,11 @@ functor
                 Type (StructType s.struct_details.uty_id)
             | MkUnionDef {mk_union_attributes; mk_cases; mk_union_details} ->
                 let cases =
-                  List.map mk_cases ~f:(fun ex ->
+                  List.map mk_cases ~f:(fun (ex, attrs) ->
                       let ty = self#interpret_expr ex in
-                      expr_to_type ctx.program {value = Value ty; span = ex.span} )
+                      ( expr_to_type ctx.program
+                          {value = Value ty; span = ex.span},
+                        attrs ) )
                   |> self#check_unions_for_doubled_types
                 in
                 let u =
@@ -554,16 +556,16 @@ functor
             | None ->
                 ice "Resolver bug"
 
-        method private check_unions_for_doubled_types : type_ list -> type_ list
-            =
+        method private check_unions_for_doubled_types
+            : (type_ * 'a) list -> (type_ * 'a) list =
           fun xs ->
-            List.fold xs ~init:[] ~f:(fun acc x ->
-                match List.exists acc ~f:(equal_type_ x) with
+            List.fold xs ~init:[] ~f:(fun acc (x, attrs) ->
+                match List.exists acc ~f:(fun (y, _) -> equal_type_ x y) with
                 | true ->
                     errors#report `Error (`DuplicateVariant (x, call_span)) () ;
                     acc
                 | false ->
-                    x :: acc )
+                    (x, attrs) :: acc )
 
         method private with_vars : 'a. tbinding list -> (unit -> 'a) -> 'a =
           fun vars f ->

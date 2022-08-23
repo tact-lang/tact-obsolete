@@ -717,10 +717,11 @@ let%expect_test "union definition" =
          (binding_expr
           (Union
            ((union_members
-             ((FunctionCall
-               ((fn (Reference (Ident Int))) (arguments ((Int 257)))
-                (is_type_func_call)))
-              (Reference (Ident Bool))))
+             (((FunctionCall
+                ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                 (is_type_func_call)))
+               ())
+              ((Reference (Ident Bool)) ())))
             (union_span <opaque>))))))))) |}]
 
 let%expect_test "union definition using let binding" =
@@ -741,10 +742,11 @@ let%expect_test "union definition using let binding" =
          (binding_expr
           (Union
            ((union_members
-             ((FunctionCall
-               ((fn (Reference (Ident Int))) (arguments ((Int 257)))
-                (is_type_func_call)))
-              (Reference (Ident Bool))))
+             (((FunctionCall
+                ((fn (Reference (Ident Int))) (arguments ((Int 257)))
+                 (is_type_func_call)))
+               ())
+              ((Reference (Ident Bool)) ())))
             (union_span <opaque>))))))))) |}]
 
 let%expect_test "parameterized union definition" =
@@ -770,7 +772,7 @@ let%expect_test "parameterized union definition" =
                (Expr
                 (Union
                  ((union_members
-                   ((Reference (Ident T)) (Reference (Ident Null))))
+                   (((Reference (Ident T)) ()) ((Reference (Ident Null)) ())))
                   (union_span <opaque>)))))))
             (function_def_span <opaque>))))))))) |}]
 
@@ -797,7 +799,7 @@ let%expect_test "parameterized union definition using let binding" =
                (Expr
                 (Union
                  ((union_members
-                   ((Reference (Ident T)) (Reference (Ident Null))))
+                   (((Reference (Ident T)) ()) ((Reference (Ident Null)) ())))
                   (union_span <opaque>)))))))
             (function_def_span <opaque>))))))))) |}]
 
@@ -1203,13 +1205,15 @@ let%expect_test "attributes" =
          (binding_expr
           (Union
            ((union_attributes (((attribute_ident (Ident attr)))))
-            (union_members ((Reference (Ident Void)))) (union_span <opaque>))))))
+            (union_members (((Reference (Ident Void)) ())))
+            (union_span <opaque>))))))
        (Let
         ((binding_name (Ident U1))
          (binding_expr
           (Union
            ((union_attributes (((attribute_ident (Ident attr)))))
-            (union_members ((Reference (Ident Void)))) (union_span <opaque>))))))
+            (union_members (((Reference (Ident Void)) ())))
+            (union_span <opaque>))))))
        (Let
         ((binding_name (Ident Ti))
          (binding_expr

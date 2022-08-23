@@ -116,14 +116,14 @@ functor
           let union =
             List.Assoc.find_exn program.unions union ~equal:equal_int
           in
-          let (T.Discriminator discr) =
+          let (T.Discriminator {discr; _}) =
             List.Assoc.find_exn union.cases e_ty ~equal:T.equal_type_
           in
           F.Tuple [F.Integer (Z.of_int discr); expr]
 
         method get_discriminator : T.union -> T.type_ -> int =
           fun union ty ->
-            let (T.Discriminator discr) =
+            let (T.Discriminator {discr; _}) =
               List.Assoc.find_exn union.cases ty ~equal:T.equal_type_
             in
             discr

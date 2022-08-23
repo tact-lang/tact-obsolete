@@ -190,7 +190,7 @@ functor
                (Z.of_int (int_required_bits (List.length union.cases - 1))) )
         in
         let branches =
-          List.filter_map union.cases ~f:(fun (ty, Discriminator discr) ->
+          List.filter_map union.cases ~f:(fun (ty, Discriminator {discr; _}) ->
               let serialize_ty =
                 match
                   List.Assoc.find (Program.methods_of p ty)
@@ -436,8 +436,11 @@ functor
               1 + (int_required_bits @@ Int.shift_right x 1)
         in
         let discriminator_len =
-          Value
-            (Integer (Z.of_int (int_required_bits (List.length u.cases - 1))))
+          let max_discr_value =
+            List.fold u.cases ~init:0
+              ~f:(fun max (_, Discriminator {discr; _}) -> Int.max max discr)
+          in
+          Value (Integer (Z.of_int (int_required_bits max_discr_value)))
         in
         let load_result_ty =
           let id = p.type_counter in
@@ -485,7 +488,7 @@ functor
           List.fold u.cases
             ~init:(bl @@ Expr (bl throw_fn))
             ~f:(fun else_stmt (case_ty, Discriminator disc) ->
-              let slice_expr =
+              let _slice_expr =
                 match equal_type_ case_ty first_case with
                 | true ->
                     initial_slice
@@ -500,7 +503,12 @@ functor
                   bl
                   @@ FunctionCall
                        ( load_uint_fn,
-                         [slice_expr; bl @@ discriminator_len],
+                         [ initial_slice;
+                           bl
+                           @@ Option.value
+                                (Option.map disc.bits ~f:(fun x ->
+                                     Value (Integer (Z.of_int x)) ) )
+                                ~default:discriminator_len ],
                          false )
                 in
                 bl @@ Let [(bl "res_discr", fcall)]
@@ -529,7 +537,7 @@ functor
                 bl
                 @@ FunctionCall
                      ( eq_fn,
-                       [get_discr; bl @@ Value (Integer (Z.of_int disc))],
+                       [get_discr; bl @@ Value (Integer (Z.of_int disc.discr))],
                        false )
               in
               (* Stmt 3: let res = <CaseTy>.deserialize(res_discr.slice); *)

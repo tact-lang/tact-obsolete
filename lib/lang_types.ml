@@ -236,7 +236,7 @@ functor
 
     and mk_union =
       { mk_union_attributes : attribute list; [@sexp.list]
-        mk_cases : expr list;
+        mk_cases : (expr * (attribute list[@sexp.list])) list;
         mk_union_details : mk_details }
 
     and mk_struct =
@@ -285,7 +285,8 @@ functor
         (* ID of the base of the struct. *)
         un_sig_base_id : int }
 
-    and discriminator = Discriminator of int
+    and discriminator =
+      | Discriminator of {discr : int; bits : int option [@sexp.option]}
 
     and struct_field = {field_type : type_}
 

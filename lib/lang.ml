@@ -1034,7 +1034,11 @@ functor
           let prev_functions = functions in
           functions <- functions + 1 ;
           let cases =
-            s#visit_list (s#visit_located s#visit_expr) env def.union_members
+            s#visit_list
+              (fun env (x, y) ->
+                ( s#visit_located s#visit_expr env x,
+                  s#visit_list s#visit_attribute env y ) )
+              env def.union_members
           in
           let attributes =
             s#visit_list s#visit_attribute env def.union_attributes
@@ -1044,7 +1048,8 @@ functor
           let sign_id, _ =
             Arena.with_id program.union_signs ~f:(fun _ ->
                 { un_sig_attributes = attributes;
-                  un_sig_cases = List.map cases ~f:(expr_to_type program);
+                  un_sig_cases =
+                    List.map cases ~f:(fun (x, _) -> expr_to_type program x);
                   un_sig_methods = [];
                   un_sig_base_id = union_base_id } )
           in
@@ -1098,7 +1103,9 @@ functor
                        | _ ->
                            None ) ) )
           in
-          let convert_impls = s#make_from_impls cases union_base_id in
+          let convert_impls =
+            s#make_from_impls (List.map cases ~f:fst) union_base_id
+          in
           let mk_union =
             { mk_union_attributes = attributes;
               mk_cases = cases;

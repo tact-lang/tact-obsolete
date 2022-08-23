@@ -51,7 +51,7 @@ functor
     (* TODO: union impls *)
     and union_definition =
       { union_attributes : attribute list; [@sexp.list]
-        union_members : expr located list; [@sexp.list]
+        union_members : (expr located * attribute list) list; [@sexp.list]
         union_bindings : binding located list; [@sexp.list]
         union_impls : impl list; [@sexp.list]
         union_span : (span[@sexp.opaque]) }

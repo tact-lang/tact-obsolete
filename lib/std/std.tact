@@ -230,7 +230,9 @@ struct AddrExtern {
 }
 
 union MsgAddressExt {
+  @discriminator(0, 2) // 0b00
   case AddrNone
+  @discriminator(1, 2) // 0b01
   case AddrExtern
 
   @derive
@@ -304,7 +306,9 @@ struct AddressVar {
 }
 
 union MsgAddressInt {
+  @discriminator(2, 2) // 0b10
   case AddressStd
+  @discriminator(3, 2) // 0b11
   case AddressVar
 
   @derive
@@ -313,9 +317,12 @@ union MsgAddressInt {
   @derive
   impl Deserialize {}
 }
+
 union MsgAddress {
-  case MsgAddressExt
-  case MsgAddressInt
+  case AddrNone
+  case AddrExtern
+  case AddressStd
+  case AddressVar
 
   @derive
   impl Serialize {}
@@ -445,11 +452,10 @@ struct IntMsgInfoRelaxed {
     dst: MsgAddressInt,
     coins: IntMsgInfoCoins,
   ) -> Self {
-    let src: MsgAddressExt = AddrNone{};
     Self {
       flags: flags,
       addresses: IntMsgInfoRelaxedAddresses {
-        src: src, // it will be replaced by smartcontract address by TVM
+        src: AddrNone{}, // it will be replaced by smartcontract address by TVM
         dst: dst,
       },
       coins: coins,
