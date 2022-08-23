@@ -4,6 +4,17 @@ module Make (Config : Config.T) = struct
   module Syntax = Syntax.Make (Config)
   open Syntax
 
+  exception Must_have_parsed of error
+
+  let must_parse p s =
+    match p s with
+    | Consumed_failed e ->
+        raise (Must_have_parsed e)
+    | other ->
+        other
+
+  let ( !!! ) = must_parse
+
   let locate value =
     let get_pos' =
       get_pos |>> fun (index, line, offset) -> (index, line, index - offset + 1)
@@ -203,7 +214,7 @@ module Make (Config : Config.T) = struct
            (pair attributes
               (pair
                  (skip_keyword "struct" >>> name)
-                 (char '{' >>> many !!struct_item <<< char '}') ) ) )
+                 !!!(char '{' >>> many !!struct_item <<< char '}') ) ) )
     |>> fun v ->
     let struct_attributes, (name, items) = Syntax.value v in
     ( name,
@@ -267,7 +278,7 @@ module Make (Config : Config.T) = struct
            (pair attributes
               (pair
                  (skip_keyword "union" >>> name)
-                 (char '{' >>> many !!union_item <<< char '}') ) ) )
+                 !!!(char '{' >>> many !!union_item <<< char '}') ) ) )
     |>> fun v ->
     let union_attributes, (name, items) = Syntax.value v in
     ( name,
@@ -327,7 +338,7 @@ module Make (Config : Config.T) = struct
            (pair attributes
               (pair
                  (skip_keyword "interface" >>> name)
-                 (char '{' >>> many !!interface_item <<< char '}') ) ) )
+                 !!!(char '{' >>> many !!interface_item <<< char '}') ) ) )
     |>> fun v ->
     let interface_attributes, (name, items) = Syntax.value v in
     ( name,
@@ -372,14 +383,14 @@ module Make (Config : Config.T) = struct
           (pair attributes
              (pair
                 (pair (skip_keyword "fn" >>> name) function_parameters)
-                (pair
-                   ( attempt
-                       (option
-                          ( skip_string "->"
-                          >>> locate (expr ~struct_construction_allowed:false)
-                          ) )
-                   <|> return None )
-                   (option (attempt (locate code_block))) ) ) )
+                !!!(pair
+                      ( attempt
+                          (option
+                             ( skip_string "->"
+                             >>> locate
+                                   (expr ~struct_construction_allowed:false) ) )
+                      <|> return None )
+                      (option (attempt (locate code_block))) ) ) )
       |>> fun v ->
       let function_attributes, ((name, params), (returns, function_body)) =
         Syntax.value v
@@ -723,10 +734,17 @@ module Make (Config : Config.T) = struct
         |> List.rev )
       state
 
+  and handle_errors p state =
+    match p state with
+    | res ->
+        res
+    | exception Must_have_parsed e ->
+        Consumed_failed e
+
   exception Error of (string * error)
 
   let parse (s : string) : program =
-    match parse_string program s () with
+    match parse_string (handle_errors program) s () with
     | Success e ->
         {stmts = e}
     | Failed (msg, err) ->
