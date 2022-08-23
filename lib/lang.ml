@@ -307,8 +307,6 @@ functor
           current_bindings := update !current_bindings ;
           Assignment {assignment_ident; assignment_expr = right}
 
-        method build_MutRef _env _mutref = InvalidExpr
-
         method build_Reference : _ -> string located -> _ =
           fun _ ref ->
             match find_in_scope ref.value !current_bindings with

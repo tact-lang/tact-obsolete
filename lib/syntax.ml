@@ -73,7 +73,6 @@ functor
       | Int of (Zint.t[@visitors.name "z"])
       | Bool of bool
       | String of string
-      | MutRef of ident located
 
     and stmt =
       | CodeBlock of (stmt located list[@sexp.list])
