@@ -26,11 +26,11 @@ fn recv_internal(_: Slice) {}
 
 fn recv_external(input: Slice) {
   let {value as signed, slice} = SignedBody[MsgBody].deserialize(input);
-  let state = WalletState.deserialize(Slice.parse(builtin_get_data())).value;
+  let state = WalletState.deserialize(Slice.parse(Globals.load_state())).value;
 
   let body = signed.verify_body(state.public_key);
 
-  if (body.valid_until.value < builtin_now()) { thrown(35) }
+  if (body.valid_until.value <= builtin_now()) { thrown(35) }
   if (body.seqno.value != state.seqno.value) { thrown(33) }
   if (body.subwallet.value != state.subwallet.value) { thrown(34) }
 
@@ -48,5 +48,5 @@ fn recv_external(input: Slice) {
     public_key: state.public_key
   };
   let new_state = new_state.serialize(Builder.new()).build();
-  builtin_set_data(new_state.c);
+  Globals.save_state(new_state);
 }

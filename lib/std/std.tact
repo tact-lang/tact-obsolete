@@ -22,6 +22,21 @@ struct Builder {
   fn serialize_coins(self: Self, c: Integer) -> Self {
     Self { inner: builtin_store_grams(self.inner, c) }
   }
+  fn serialize_ref(self: Self, cell: Cell) -> Self {
+    Self { inner: builtin_store_ref(self.inner, cell.c) }
+  }
+  fn serialize_maybe_ref(self: Self, maybe_cell: Cell) -> Self {
+    Self { inner: builtin_store_maybe_ref(self.inner, maybe_cell.c) }
+  }
+  fn bits(self: Self) -> Integer {
+    builtin_builder_bits(self.inner)
+  }
+  fn refs(self: Self) -> Integer {
+    builtin_builder_refs(self.inner)
+  }
+  fn depth(self: Self) -> Integer {
+    builtin_builder_depth(self.inner)
+  }
 }
 
 struct Slice {
@@ -72,11 +87,25 @@ struct Slice {
   fn refs_count(self: Self) -> Integer {
     builtin_slice_refs(self.s)
   }
+  fn bits(self: Self) -> Integer {
+    builtin_slice_bits(self.s)
+  }
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      Builder { inner: builtin_store_slice(b.inner, self.s) }
+    }
+  }
 }
 
 struct RefCell {
   val inner: Cell
 
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      b.serialize_ref(self.inner)
+    }
+  }
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
       let {slice, value} = s.load_ref();
@@ -87,6 +116,8 @@ struct RefCell {
 
 struct SliceBits[N: Integer] {
   val inner: Slice
+
+  @derive impl Serialize {}
 
   impl Deserialize {
     fn deserialize(s: Slice) -> LoadResult[Self] {
@@ -360,9 +391,24 @@ struct Timestamps {
 }
 
 struct IntMsgInfoFlags {
-  val ihr_disabled: Int1
-  val bounce: Int1
-  val bounced: Int1
+  val ihr_disabled: Uint1
+  val bounce: Uint1
+  val bounced: Uint1
+
+  fn new(ihr_disabled: Bool, bounce: Bool) -> Self {
+    fn bool_to_int(x: Bool) -> Uint1 {
+      if (x) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+    Self {
+      ihr_disabled: bool_to_int(ihr_disabled),
+      bounce: bool_to_int(bounce),
+      bounced: 0, // will be rewrited by the validator
+    }
+  }
 
   @derive
   impl Serialize {}
@@ -629,5 +675,34 @@ struct SignedBody[X: Deserialize] {
         slice
       )
     }
+  }
+}
+
+struct Globals {
+  fn load_state() -> Cell {
+    Cell { c: builtin_get_data() }
+  }
+  fn save_state(state: Cell) {
+    builtin_set_data(state.c)
+  }
+  fn get_now() -> Int[32] {
+    builtin_now()
+  }
+  fn get_my_address() -> AddressStd {
+    AddressStd.deserialize(builtin_my_address()).value
+  }
+  fn get_balance() -> Coins {
+    struct Balance {
+      val tons: Coins
+      val extra_currencies: Cell
+    }
+    let balance: Balance = believe_me(builtin_get_balance());
+    return balance.tons;
+  }
+  fn get_logical_time() -> Int[64] {
+    builtin_cur_lt()
+  }
+  fn get_block_logical_time() -> Int[64] {
+    builtin_block_lt()
   }
 }

@@ -176,16 +176,32 @@ let%expect_test "Int[bits] serializer codegen" =
          return accept_message();
        }
 
-       int builtin_now() impure {
-         return now();
-       }
-
        int builtin_slice_hash(slice s) impure {
          return slice_hash(s);
        }
 
        int builtin_check_signature(int h, slice s, int k) impure {
          return check_signature(h, s, k);
+       }
+
+       int builtin_block_lt() impure {
+         return block_lt();
+       }
+
+       int builtin_cur_lt() impure {
+         return cur_lt();
+       }
+
+       _ builtin_get_balance() impure {
+         return get_balance();
+       }
+
+       slice builtin_my_address() impure {
+         return my_address();
+       }
+
+       int builtin_now() impure {
+         return now();
        }
 
        _ builtin_set_data(cell d) impure {
@@ -210,6 +226,10 @@ let%expect_test "Int[bits] serializer codegen" =
 
        _ builtin_end_parse(slice s) impure {
          return end_parse(s);
+       }
+
+       int builtin_slice_bits(slice s) impure {
+         return slice_bits(s);
        }
 
        int builtin_slice_refs(slice s) impure {
@@ -242,6 +262,30 @@ let%expect_test "Int[bits] serializer codegen" =
 
        slice builtin_begin_parse(cell c) impure {
          return begin_parse(c);
+       }
+
+       int builtin_builder_depth(builder b) impure {
+         return builder_depth(b);
+       }
+
+       int builtin_builder_refs(builder b) impure {
+         return builder_refs(b);
+       }
+
+       int builtin_builder_bits(builder b) impure {
+         return builder_bits(b);
+       }
+
+       builder builtin_store_maybe_ref(builder b, cell c) impure {
+         return store_maybe_ref(b, c);
+       }
+
+       builder builtin_store_slice(builder b, slice s) impure {
+         return store_slice(b, s);
+       }
+
+       builder builtin_store_ref(builder b, cell c) impure {
+         return store_ref(b, c);
        }
 
        builder builtin_store_grams(builder b, int c) impure {
@@ -389,16 +433,32 @@ let%expect_test "demo struct serializer" =
          return accept_message();
        }
 
-       int builtin_now() impure {
-         return now();
-       }
-
        int builtin_slice_hash(slice s) impure {
          return slice_hash(s);
        }
 
        int builtin_check_signature(int h, slice s, int k) impure {
          return check_signature(h, s, k);
+       }
+
+       int builtin_block_lt() impure {
+         return block_lt();
+       }
+
+       int builtin_cur_lt() impure {
+         return cur_lt();
+       }
+
+       _ builtin_get_balance() impure {
+         return get_balance();
+       }
+
+       slice builtin_my_address() impure {
+         return my_address();
+       }
+
+       int builtin_now() impure {
+         return now();
        }
 
        _ builtin_set_data(cell d) impure {
@@ -423,6 +483,10 @@ let%expect_test "demo struct serializer" =
 
        _ builtin_end_parse(slice s) impure {
          return end_parse(s);
+       }
+
+       int builtin_slice_bits(slice s) impure {
+         return slice_bits(s);
        }
 
        int builtin_slice_refs(slice s) impure {
@@ -455,6 +519,30 @@ let%expect_test "demo struct serializer" =
 
        slice builtin_begin_parse(cell c) impure {
          return begin_parse(c);
+       }
+
+       int builtin_builder_depth(builder b) impure {
+         return builder_depth(b);
+       }
+
+       int builtin_builder_refs(builder b) impure {
+         return builder_refs(b);
+       }
+
+       int builtin_builder_bits(builder b) impure {
+         return builder_bits(b);
+       }
+
+       builder builtin_store_maybe_ref(builder b, cell c) impure {
+         return store_maybe_ref(b, c);
+       }
+
+       builder builtin_store_slice(builder b, slice s) impure {
+         return store_slice(b, s);
+       }
+
+       builder builtin_store_ref(builder b, cell c) impure {
+         return store_ref(b, c);
        }
 
        builder builtin_store_grams(builder b, int c) impure {
@@ -616,16 +704,32 @@ let%expect_test "demo struct serializer 2" =
          return accept_message();
        }
 
-       int builtin_now() impure {
-         return now();
-       }
-
        int builtin_slice_hash(slice s) impure {
          return slice_hash(s);
        }
 
        int builtin_check_signature(int h, slice s, int k) impure {
          return check_signature(h, s, k);
+       }
+
+       int builtin_block_lt() impure {
+         return block_lt();
+       }
+
+       int builtin_cur_lt() impure {
+         return cur_lt();
+       }
+
+       _ builtin_get_balance() impure {
+         return get_balance();
+       }
+
+       slice builtin_my_address() impure {
+         return my_address();
+       }
+
+       int builtin_now() impure {
+         return now();
        }
 
        _ builtin_set_data(cell d) impure {
@@ -650,6 +754,10 @@ let%expect_test "demo struct serializer 2" =
 
        _ builtin_end_parse(slice s) impure {
          return end_parse(s);
+       }
+
+       int builtin_slice_bits(slice s) impure {
+         return slice_bits(s);
        }
 
        int builtin_slice_refs(slice s) impure {
@@ -682,6 +790,30 @@ let%expect_test "demo struct serializer 2" =
 
        slice builtin_begin_parse(cell c) impure {
          return begin_parse(c);
+       }
+
+       int builtin_builder_depth(builder b) impure {
+         return builder_depth(b);
+       }
+
+       int builtin_builder_refs(builder b) impure {
+         return builder_refs(b);
+       }
+
+       int builtin_builder_bits(builder b) impure {
+         return builder_bits(b);
+       }
+
+       builder builtin_store_maybe_ref(builder b, cell c) impure {
+         return store_maybe_ref(b, c);
+       }
+
+       builder builtin_store_slice(builder b, slice s) impure {
+         return store_slice(b, s);
+       }
+
+       builder builtin_store_ref(builder b, cell c) impure {
+         return store_ref(b, c);
        }
 
        builder builtin_store_grams(builder b, int c) impure {
@@ -911,16 +1043,32 @@ let%expect_test "serializer inner struct" =
          return accept_message();
        }
 
-       int builtin_now() impure {
-         return now();
-       }
-
        int builtin_slice_hash(slice s) impure {
          return slice_hash(s);
        }
 
        int builtin_check_signature(int h, slice s, int k) impure {
          return check_signature(h, s, k);
+       }
+
+       int builtin_block_lt() impure {
+         return block_lt();
+       }
+
+       int builtin_cur_lt() impure {
+         return cur_lt();
+       }
+
+       _ builtin_get_balance() impure {
+         return get_balance();
+       }
+
+       slice builtin_my_address() impure {
+         return my_address();
+       }
+
+       int builtin_now() impure {
+         return now();
        }
 
        _ builtin_set_data(cell d) impure {
@@ -945,6 +1093,10 @@ let%expect_test "serializer inner struct" =
 
        _ builtin_end_parse(slice s) impure {
          return end_parse(s);
+       }
+
+       int builtin_slice_bits(slice s) impure {
+         return slice_bits(s);
        }
 
        int builtin_slice_refs(slice s) impure {
@@ -977,6 +1129,30 @@ let%expect_test "serializer inner struct" =
 
        slice builtin_begin_parse(cell c) impure {
          return begin_parse(c);
+       }
+
+       int builtin_builder_depth(builder b) impure {
+         return builder_depth(b);
+       }
+
+       int builtin_builder_refs(builder b) impure {
+         return builder_refs(b);
+       }
+
+       int builtin_builder_bits(builder b) impure {
+         return builder_bits(b);
+       }
+
+       builder builtin_store_maybe_ref(builder b, cell c) impure {
+         return store_maybe_ref(b, c);
+       }
+
+       builder builtin_store_slice(builder b, slice s) impure {
+         return store_slice(b, s);
+       }
+
+       builder builtin_store_ref(builder b, cell c) impure {
+         return store_ref(b, c);
        }
 
        builder builtin_store_grams(builder b, int c) impure {
@@ -1159,16 +1335,32 @@ let%expect_test "switch statement" =
          return accept_message();
        }
 
-       int builtin_now() impure {
-         return now();
-       }
-
        int builtin_slice_hash(slice s) impure {
          return slice_hash(s);
        }
 
        int builtin_check_signature(int h, slice s, int k) impure {
          return check_signature(h, s, k);
+       }
+
+       int builtin_block_lt() impure {
+         return block_lt();
+       }
+
+       int builtin_cur_lt() impure {
+         return cur_lt();
+       }
+
+       _ builtin_get_balance() impure {
+         return get_balance();
+       }
+
+       slice builtin_my_address() impure {
+         return my_address();
+       }
+
+       int builtin_now() impure {
+         return now();
        }
 
        _ builtin_set_data(cell d) impure {
@@ -1193,6 +1385,10 @@ let%expect_test "switch statement" =
 
        _ builtin_end_parse(slice s) impure {
          return end_parse(s);
+       }
+
+       int builtin_slice_bits(slice s) impure {
+         return slice_bits(s);
        }
 
        int builtin_slice_refs(slice s) impure {
@@ -1225,6 +1421,30 @@ let%expect_test "switch statement" =
 
        slice builtin_begin_parse(cell c) impure {
          return begin_parse(c);
+       }
+
+       int builtin_builder_depth(builder b) impure {
+         return builder_depth(b);
+       }
+
+       int builtin_builder_refs(builder b) impure {
+         return builder_refs(b);
+       }
+
+       int builtin_builder_bits(builder b) impure {
+         return builder_bits(b);
+       }
+
+       builder builtin_store_maybe_ref(builder b, cell c) impure {
+         return store_maybe_ref(b, c);
+       }
+
+       builder builtin_store_slice(builder b, slice s) impure {
+         return store_slice(b, s);
+       }
+
+       builder builtin_store_ref(builder b, cell c) impure {
+         return store_ref(b, c);
        }
 
        builder builtin_store_grams(builder b, int c) impure {
@@ -1370,16 +1590,32 @@ let%expect_test "tensor2" =
          return accept_message();
        }
 
-       int builtin_now() impure {
-         return now();
-       }
-
        int builtin_slice_hash(slice s) impure {
          return slice_hash(s);
        }
 
        int builtin_check_signature(int h, slice s, int k) impure {
          return check_signature(h, s, k);
+       }
+
+       int builtin_block_lt() impure {
+         return block_lt();
+       }
+
+       int builtin_cur_lt() impure {
+         return cur_lt();
+       }
+
+       _ builtin_get_balance() impure {
+         return get_balance();
+       }
+
+       slice builtin_my_address() impure {
+         return my_address();
+       }
+
+       int builtin_now() impure {
+         return now();
        }
 
        _ builtin_set_data(cell d) impure {
@@ -1404,6 +1640,10 @@ let%expect_test "tensor2" =
 
        _ builtin_end_parse(slice s) impure {
          return end_parse(s);
+       }
+
+       int builtin_slice_bits(slice s) impure {
+         return slice_bits(s);
        }
 
        int builtin_slice_refs(slice s) impure {
@@ -1436,6 +1676,30 @@ let%expect_test "tensor2" =
 
        slice builtin_begin_parse(cell c) impure {
          return begin_parse(c);
+       }
+
+       int builtin_builder_depth(builder b) impure {
+         return builder_depth(b);
+       }
+
+       int builtin_builder_refs(builder b) impure {
+         return builder_refs(b);
+       }
+
+       int builtin_builder_bits(builder b) impure {
+         return builder_bits(b);
+       }
+
+       builder builtin_store_maybe_ref(builder b, cell c) impure {
+         return store_maybe_ref(b, c);
+       }
+
+       builder builtin_store_slice(builder b, slice s) impure {
+         return store_slice(b, s);
+       }
+
+       builder builtin_store_ref(builder b, cell c) impure {
+         return store_ref(b, c);
        }
 
        builder builtin_store_grams(builder b, int c) impure {
@@ -1579,16 +1843,32 @@ let%expect_test "serialization api" =
          return accept_message();
        }
 
-       int builtin_now() impure {
-         return now();
-       }
-
        int builtin_slice_hash(slice s) impure {
          return slice_hash(s);
        }
 
        int builtin_check_signature(int h, slice s, int k) impure {
          return check_signature(h, s, k);
+       }
+
+       int builtin_block_lt() impure {
+         return block_lt();
+       }
+
+       int builtin_cur_lt() impure {
+         return cur_lt();
+       }
+
+       _ builtin_get_balance() impure {
+         return get_balance();
+       }
+
+       slice builtin_my_address() impure {
+         return my_address();
+       }
+
+       int builtin_now() impure {
+         return now();
        }
 
        _ builtin_set_data(cell d) impure {
@@ -1613,6 +1893,10 @@ let%expect_test "serialization api" =
 
        _ builtin_end_parse(slice s) impure {
          return end_parse(s);
+       }
+
+       int builtin_slice_bits(slice s) impure {
+         return slice_bits(s);
        }
 
        int builtin_slice_refs(slice s) impure {
@@ -1645,6 +1929,30 @@ let%expect_test "serialization api" =
 
        slice builtin_begin_parse(cell c) impure {
          return begin_parse(c);
+       }
+
+       int builtin_builder_depth(builder b) impure {
+         return builder_depth(b);
+       }
+
+       int builtin_builder_refs(builder b) impure {
+         return builder_refs(b);
+       }
+
+       int builtin_builder_bits(builder b) impure {
+         return builder_bits(b);
+       }
+
+       builder builtin_store_maybe_ref(builder b, cell c) impure {
+         return store_maybe_ref(b, c);
+       }
+
+       builder builtin_store_slice(builder b, slice s) impure {
+         return store_slice(b, s);
+       }
+
+       builder builtin_store_ref(builder b, cell c) impure {
+         return store_ref(b, c);
        }
 
        builder builtin_store_grams(builder b, int c) impure {
@@ -1849,7 +2157,7 @@ let%expect_test "serialization api" =
        }
 
        builder f28(int self, builder builder_) impure {
-         return f4(builder_, self, 1);
+         return f22(builder_, self, 1);
        }
 
        builder f27([int, int, int] self, builder b) impure {
@@ -2080,16 +2388,32 @@ let%expect_test "deserialization api" =
         return accept_message();
       }
 
-      int builtin_now() impure {
-        return now();
-      }
-
       int builtin_slice_hash(slice s) impure {
         return slice_hash(s);
       }
 
       int builtin_check_signature(int h, slice s, int k) impure {
         return check_signature(h, s, k);
+      }
+
+      int builtin_block_lt() impure {
+        return block_lt();
+      }
+
+      int builtin_cur_lt() impure {
+        return cur_lt();
+      }
+
+      _ builtin_get_balance() impure {
+        return get_balance();
+      }
+
+      slice builtin_my_address() impure {
+        return my_address();
+      }
+
+      int builtin_now() impure {
+        return now();
       }
 
       _ builtin_set_data(cell d) impure {
@@ -2114,6 +2438,10 @@ let%expect_test "deserialization api" =
 
       _ builtin_end_parse(slice s) impure {
         return end_parse(s);
+      }
+
+      int builtin_slice_bits(slice s) impure {
+        return slice_bits(s);
       }
 
       int builtin_slice_refs(slice s) impure {
@@ -2146,6 +2474,30 @@ let%expect_test "deserialization api" =
 
       slice builtin_begin_parse(cell c) impure {
         return begin_parse(c);
+      }
+
+      int builtin_builder_depth(builder b) impure {
+        return builder_depth(b);
+      }
+
+      int builtin_builder_refs(builder b) impure {
+        return builder_refs(b);
+      }
+
+      int builtin_builder_bits(builder b) impure {
+        return builder_bits(b);
+      }
+
+      builder builtin_store_maybe_ref(builder b, cell c) impure {
+        return store_maybe_ref(b, c);
+      }
+
+      builder builtin_store_slice(builder b, slice s) impure {
+        return store_slice(b, s);
+      }
+
+      builder builtin_store_ref(builder b, cell c) impure {
+        return store_ref(b, c);
       }
 
       builder builtin_store_grams(builder b, int c) impure {
@@ -2366,9 +2718,8 @@ let%expect_test "deserialization api" =
       }
 
       [slice, int] f35(slice s) impure {
-        [slice, int] res = f12(s, 1);
-        [slice slice_, int value] = res;
-        return [slice_, value];
+        [slice, int] res = f5(s, 1);
+        return [get0(func_believe_me(res)), get1(func_believe_me(res))];
       }
 
       [slice, [int, int, int]] f34(slice slice_) impure {
@@ -2657,16 +3008,32 @@ let%expect_test "deserializer" =
       return accept_message();
     }
 
-    int builtin_now() impure {
-      return now();
-    }
-
     int builtin_slice_hash(slice s) impure {
       return slice_hash(s);
     }
 
     int builtin_check_signature(int h, slice s, int k) impure {
       return check_signature(h, s, k);
+    }
+
+    int builtin_block_lt() impure {
+      return block_lt();
+    }
+
+    int builtin_cur_lt() impure {
+      return cur_lt();
+    }
+
+    _ builtin_get_balance() impure {
+      return get_balance();
+    }
+
+    slice builtin_my_address() impure {
+      return my_address();
+    }
+
+    int builtin_now() impure {
+      return now();
     }
 
     _ builtin_set_data(cell d) impure {
@@ -2691,6 +3058,10 @@ let%expect_test "deserializer" =
 
     _ builtin_end_parse(slice s) impure {
       return end_parse(s);
+    }
+
+    int builtin_slice_bits(slice s) impure {
+      return slice_bits(s);
     }
 
     int builtin_slice_refs(slice s) impure {
@@ -2723,6 +3094,30 @@ let%expect_test "deserializer" =
 
     slice builtin_begin_parse(cell c) impure {
       return begin_parse(c);
+    }
+
+    int builtin_builder_depth(builder b) impure {
+      return builder_depth(b);
+    }
+
+    int builtin_builder_refs(builder b) impure {
+      return builder_refs(b);
+    }
+
+    int builtin_builder_bits(builder b) impure {
+      return builder_bits(b);
+    }
+
+    builder builtin_store_maybe_ref(builder b, cell c) impure {
+      return store_maybe_ref(b, c);
+    }
+
+    builder builtin_store_slice(builder b, slice s) impure {
+      return store_slice(b, s);
+    }
+
+    builder builtin_store_ref(builder b, cell c) impure {
+      return store_ref(b, c);
     }
 
     builder builtin_store_grams(builder b, int c) impure {
@@ -2877,16 +3272,32 @@ let%expect_test "deserializer unions" =
       return accept_message();
     }
 
-    int builtin_now() impure {
-      return now();
-    }
-
     int builtin_slice_hash(slice s) impure {
       return slice_hash(s);
     }
 
     int builtin_check_signature(int h, slice s, int k) impure {
       return check_signature(h, s, k);
+    }
+
+    int builtin_block_lt() impure {
+      return block_lt();
+    }
+
+    int builtin_cur_lt() impure {
+      return cur_lt();
+    }
+
+    _ builtin_get_balance() impure {
+      return get_balance();
+    }
+
+    slice builtin_my_address() impure {
+      return my_address();
+    }
+
+    int builtin_now() impure {
+      return now();
     }
 
     _ builtin_set_data(cell d) impure {
@@ -2911,6 +3322,10 @@ let%expect_test "deserializer unions" =
 
     _ builtin_end_parse(slice s) impure {
       return end_parse(s);
+    }
+
+    int builtin_slice_bits(slice s) impure {
+      return slice_bits(s);
     }
 
     int builtin_slice_refs(slice s) impure {
@@ -2943,6 +3358,30 @@ let%expect_test "deserializer unions" =
 
     slice builtin_begin_parse(cell c) impure {
       return begin_parse(c);
+    }
+
+    int builtin_builder_depth(builder b) impure {
+      return builder_depth(b);
+    }
+
+    int builtin_builder_refs(builder b) impure {
+      return builder_refs(b);
+    }
+
+    int builtin_builder_bits(builder b) impure {
+      return builder_bits(b);
+    }
+
+    builder builtin_store_maybe_ref(builder b, cell c) impure {
+      return store_maybe_ref(b, c);
+    }
+
+    builder builtin_store_slice(builder b, slice s) impure {
+      return store_slice(b, s);
+    }
+
+    builder builtin_store_ref(builder b, cell c) impure {
+      return store_ref(b, c);
     }
 
     builder builtin_store_grams(builder b, int c) impure {
@@ -3288,16 +3727,32 @@ let%expect_test "codegen while block" =
       return accept_message();
     }
 
-    int builtin_now() impure {
-      return now();
-    }
-
     int builtin_slice_hash(slice s) impure {
       return slice_hash(s);
     }
 
     int builtin_check_signature(int h, slice s, int k) impure {
       return check_signature(h, s, k);
+    }
+
+    int builtin_block_lt() impure {
+      return block_lt();
+    }
+
+    int builtin_cur_lt() impure {
+      return cur_lt();
+    }
+
+    _ builtin_get_balance() impure {
+      return get_balance();
+    }
+
+    slice builtin_my_address() impure {
+      return my_address();
+    }
+
+    int builtin_now() impure {
+      return now();
     }
 
     _ builtin_set_data(cell d) impure {
@@ -3322,6 +3777,10 @@ let%expect_test "codegen while block" =
 
     _ builtin_end_parse(slice s) impure {
       return end_parse(s);
+    }
+
+    int builtin_slice_bits(slice s) impure {
+      return slice_bits(s);
     }
 
     int builtin_slice_refs(slice s) impure {
@@ -3354,6 +3813,30 @@ let%expect_test "codegen while block" =
 
     slice builtin_begin_parse(cell c) impure {
       return begin_parse(c);
+    }
+
+    int builtin_builder_depth(builder b) impure {
+      return builder_depth(b);
+    }
+
+    int builtin_builder_refs(builder b) impure {
+      return builder_refs(b);
+    }
+
+    int builtin_builder_bits(builder b) impure {
+      return builder_bits(b);
+    }
+
+    builder builtin_store_maybe_ref(builder b, cell c) impure {
+      return store_maybe_ref(b, c);
+    }
+
+    builder builtin_store_slice(builder b, slice s) impure {
+      return store_slice(b, s);
+    }
+
+    builder builtin_store_ref(builder b, cell c) impure {
+      return store_ref(b, c);
     }
 
     builder builtin_store_grams(builder b, int c) impure {

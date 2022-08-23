@@ -728,6 +728,12 @@ functor
             make_builtin "store_int" [("b", b); ("i", i); ("bs", i)] b;
             make_builtin "store_uint" [("b", b); ("i", i); ("bs", i)] b;
             make_builtin "store_grams" [("b", b); ("c", i)] b;
+            make_builtin "store_ref" [("b", b); ("c", c)] b;
+            make_builtin "store_slice" [("b", b); ("s", s)] b;
+            make_builtin "store_maybe_ref" [("b", b); ("c", c)] b;
+            make_builtin "builder_bits" [("b", b)] i;
+            make_builtin "builder_refs" [("b", b)] i;
+            make_builtin "builder_depth" [("b", b)] i;
             make_builtin "begin_parse" [("c", c)] s;
             make_builtin "load_int" [("s", s); ("bs", i)] (t2 s i);
             make_builtin "load_uint" [("s", s); ("bs", i)] (t2 s i);
@@ -736,19 +742,27 @@ functor
             make_builtin "load_ref" [("s", s)] (t2 s c);
             make_builtin "slice_last" [("s", s); ("l", i)] s;
             make_builtin "slice_refs" [("s", s)] i;
+            make_builtin "slice_bits" [("s", s)] i;
             make_builtin "end_parse" [("s", s)] v;
             make_builtin "divmod" [("i1", i); ("i2", i)] (t2 i i);
             make_builtin "send_raw_message" [("c", c); ("f", i)] v;
             make_builtin "throw" [("e", i)] v;
+            (* State and Globals *)
             make_builtin "get_data" [] c;
             make_builtin "set_data" [("d", c)] v;
+            make_builtin "now" [] i;
+            make_builtin "my_address" [] s;
+            make_builtin "get_balance" [] v (* [int, slice] *);
+            make_builtin "cur_lt" [] i;
+            make_builtin "block_lt" [] i;
+            (* Utilities *)
             make_builtin "check_signature" [("h", i); ("s", s); ("k", i)] bool_;
             make_builtin "slice_hash" [("s", s)] i;
-            make_builtin "now" [] i;
             make_builtin "accept_message" [] v;
             make_builtin_names "believe_me" "func_believe_me"
               [("i", HoleType)]
               HoleType;
+            (* Operators *)
             make_builtin_names "builtin_not" "func_bit_not" [("c", bool_)] bool_;
             make_builtin_names "builtin_add" "_+_" [("i1", i); ("i2", i)] i;
             make_builtin_names "builtin_sub" "_-_" [("i1", i); ("i2", i)] i;
