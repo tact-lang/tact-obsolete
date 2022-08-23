@@ -38,9 +38,8 @@ and eval_stmt ~(constructor : _ Lang.constructor) ~filename text =
             ( attempt (locate stmt)
             <|> ( locate expr
                 |>> fun s -> Syntax.map_located s ~f:(fun _ -> Syntax.Expr s) )
-          <|> locate (return (Syntax.CodeBlock [])) )
-            ) )
-        text () 
+            <|> locate (return (Syntax.CodeBlock [])) ) ) )
+      text ()
   with
   | Success stx -> (
       let errors = constructor#get_errors in
