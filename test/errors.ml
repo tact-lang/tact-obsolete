@@ -1,6 +1,7 @@
 module Config = Shared.EnabledConfig
 module Show = Tact.Show.Make (Shared.EnabledConfig)
 open Config
+open Base
 
 let fmt = Caml.Format.std_formatter
 
@@ -67,6 +68,13 @@ let pp =
       List.iter elist ~f:(fun x ->
           let s = Show.show_error source x in
           Caml.Format.print_string s ) )
+
+let handle_parse_error (f : unit -> unit) =
+  match f () with
+  | value ->
+      value
+  | exception Shared.Enabled.Parser.Error (msg, _) ->
+      Caml.print_string msg
 
 let%expect_test "failed scope resolution" =
   let source = {|
@@ -358,3 +366,31 @@ let%expect_test "Expected Type Function" =
       |
     4 |       let _ = Test(Integer);
       |               ^^^^^^^^^^^^ When calling this function |}]
+
+let%expect_test "Proper error positioning for ambigiously defined data types" =
+  let sources =
+    [ {|
+      struct T {v}
+      |};
+      {|
+      interface I {i}
+      |};
+      {|
+      union U {u}
+     |} ]
+  in
+  List.iter sources ~f:(fun s -> handle_parse_error (fun () -> pp s)) ;
+  [%expect
+    {|
+    Error in line 2, column 17:
+          struct T {v}
+                    ^
+    Expecting "//", "fn", "impl", "val", '@', '}', block comment or whitespace
+    Error in line 2, column 20:
+          interface I {i}
+                       ^
+    Expecting "//", "fn", '@', '}', block comment or whitespace
+    Error in line 2, column 16:
+          union U {u}
+                   ^
+    Expecting "//", "case", "fn", "impl", '@', '}', block comment or whitespace |}]
