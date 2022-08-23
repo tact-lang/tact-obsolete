@@ -6,6 +6,22 @@ module Make (Config : Config.T) = struct
 
   exception Must_have_parsed of error
 
+  (** [must_parse p] will throw an exception if [p] returns an error, it must be handled
+      by [handle_errors] or a similar combinator. 
+
+      It is designed to primarily handle the situation when [attempt] is not sufficient
+      in distinguishing syntax disambiguation versus syntax failure.
+
+      Say, we have a `struct_stmt` combinator and a `stmt_expr` combinator and `struct_stmt` will
+      fail if it'll encounter a struct expression (struct without a name). That doesn't make it 
+      an invalid struct but it does make it an invalid `struct_stmt`. But how do we disambiguate
+      this? This is where [must_parse] enters the picture. At a point where we can tell that this
+      is in fact a `struct_stmt`, we wrap the following combinators into [must_parse]. This implies
+      that at that point, we've successfully disambiguated a stmt from exp and any syntax error is
+      not to be backtracked. This is why we throw an exception at this point, to make sure it is
+      to be handled at the top level.
+
+  *)
   let must_parse p s =
     match p s with
     | Consumed_failed e ->
@@ -13,7 +29,16 @@ module Make (Config : Config.T) = struct
     | other ->
         other
 
+  (** Infix alias for [must_parse] *)
   let ( !!! ) = must_parse
+
+  (** Handles exception raised by [must_parse] or [!!!] alias operator **)
+  let handle_errors p state =
+    match p state with
+    | res ->
+        res
+    | exception Must_have_parsed e ->
+        Consumed_failed e
 
   let locate value =
     let get_pos' =
@@ -733,13 +758,6 @@ module Make (Config : Config.T) = struct
         (match Syntax.value stmt with Break s -> s | _ -> stmt) :: rest
         |> List.rev )
       state
-
-  and handle_errors p state =
-    match p state with
-    | res ->
-        res
-    | exception Must_have_parsed e ->
-        Consumed_failed e
 
   exception Error of (string * error)
 
