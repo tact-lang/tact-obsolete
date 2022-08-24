@@ -1727,69 +1727,33 @@ let%expect_test "serialization api" =
     builder f26([int, int, int] self, builder b) impure {
       return f27(self, b);
     }
-    builder f32(tuple self, builder b) impure {
-      {
-        tuple temp = self;
-        int discr = first(temp);
-        if (discr == 3) {
-          [int, int, int] var = second(temp);
-          {
-            _ b = store_uint(b, 3, 1);
-            builder b = f16(var, b);
-            return b;
-          }
-        }
-        else if (discr == 2) {
-          [int, int] var = second(temp);
-          {
-            _ b = store_uint(b, 2, 1);
-            builder b = f12(var, b);
-            return b;
-          }
-        }
-        else {
-        }
-      }
+    builder f32(builder self, int c) impure {
+      return builtin_store_grams(self, c);
     }
-    builder f31(tuple self, builder b) impure {
-      return f32(self, b);
+    builder f31(int self, builder builder_) impure {
+      return f32(builder_, self);
     }
-    builder f30([tuple, tuple] self, builder b) impure {
-      builder b = f7(get0(func_believe_me(self)), b);
+    builder f30([int, int] self, builder b) impure {
+      builder b = f31(get0(func_believe_me(self)), b);
       builder b = f31(get1(func_believe_me(self)), b);
       return b;
     }
-    builder f29([tuple, tuple] self, builder b) impure {
+    builder f29([int, int] self, builder b) impure {
       return f30(self, b);
     }
-    builder f36(builder self, int c) impure {
-      return builtin_store_grams(self, c);
-    }
-    builder f35(int self, builder builder_) impure {
-      return f36(builder_, self);
-    }
     builder f34([int, int] self, builder b) impure {
-      builder b = f35(get0(func_believe_me(self)), b);
-      builder b = f35(get1(func_believe_me(self)), b);
+      builder b = f21(get0(func_believe_me(self)), b);
+      builder b = f23(get1(func_believe_me(self)), b);
       return b;
     }
     builder f33([int, int] self, builder b) impure {
       return f34(self, b);
     }
-    builder f38([int, int] self, builder b) impure {
-      builder b = f21(get0(func_believe_me(self)), b);
-      builder b = f23(get1(func_believe_me(self)), b);
-      return b;
-    }
-    builder f37([int, int] self, builder b) impure {
-      return f38(self, b);
-    }
     builder f25([[int, int, int], [tuple, tuple], [int, int], [int, int]]
       self, builder b) impure {
       builder b = f26(get0(func_believe_me(self)), b);
-      builder b = f29(get1(func_believe_me(self)), b);
-      builder b = f33(get2(func_believe_me(self)), b);
-      builder b = f37(get3(func_believe_me(self)), b);
+      builder b = f29(get2(func_believe_me(self)), b);
+      builder b = f33(get3(func_believe_me(self)), b);
       return b;
     }
     builder f24([[int, int, int], [tuple, tuple], [int, int], [int, int]]
@@ -1819,14 +1783,14 @@ let%expect_test "serialization api" =
         }
       }
     }
-    builder f39([] self, builder b) impure {
+    builder f35([] self, builder b) impure {
       return b;
     }
     builder f2([tuple, []] self, builder b) impure {
       builder b = f3(get0(func_believe_me(self)), b);
       builder b = f4(b, 0, 1);
       builder b = f4(b, 0, 1);
-      builder b = f39(get1(func_believe_me(self)), b);
+      builder b = f35(get1(func_believe_me(self)), b);
       return b;
     }
     _ test([tuple, []] m) impure {
@@ -2227,15 +2191,15 @@ let%expect_test "deserialization api" =
       return f32(s);
     }
     [slice, tuple] f4(slice slice_) impure {
-      [slice, int] res_discr = f5(slice_, 1);
+      [slice, int] res_discr = f5(slice_, 2);
       if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
         [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] res =
           f31(get0(func_believe_me(res_discr)));
         return f30(get0(func_believe_me(res)), get1(func_believe_me(res)));
       }
       else {
-        [slice, int] res_discr = f5(slice_, 1);
-        if (builtin_eq(get1(func_believe_me(res_discr)), 1)) {
+        [slice, int] res_discr = f5(slice_, 2);
+        if (builtin_eq(get1(func_believe_me(res_discr)), 2)) {
           [slice, [tuple, tuple, int]] res = f6(get0(func_believe_me(res_discr)));
           return f30(get0(func_believe_me(res)), get1(func_believe_me(res)));
         }

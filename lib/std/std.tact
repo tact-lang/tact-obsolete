@@ -459,6 +459,9 @@ struct IntMsgInfo {
   }
 
   @derive
+  impl Serialize {}
+
+  @derive
   impl Deserialize {}
 }
 
@@ -473,54 +476,21 @@ struct ExtInMsgInfo {
 
 union CommonMsgInfo {
   case IntMsgInfo
+  @discriminator(2, 2) // 0b10
   case ExtInMsgInfo
 
   @derive
   impl Deserialize {}
 }
 
-struct IntMsgInfoRelaxedAddresses {
-  val src: MsgAddress
-  val dst: MsgAddressInt
-
-  @derive
-  impl Serialize {}
-}
-
-struct IntMsgInfoRelaxed {
-  val flags: IntMsgInfoFlags
-  val addresses: IntMsgInfoRelaxedAddresses
-  val coins: IntMsgInfoCoins
-  val timestamps: Timestamps
-
-  fn new(
-    flags: IntMsgInfoFlags, 
-    dst: MsgAddressInt,
-    coins: IntMsgInfoCoins,
-  ) -> Self {
-    Self {
-      flags: flags,
-      addresses: IntMsgInfoRelaxedAddresses {
-        src: AddrNone{}, // it will be replaced by smartcontract address by TVM
-        dst: dst,
-      },
-      coins: coins,
-      timestamps: Timestamps.zeros(), // it will be replaced by current timestamps by TVM
-    }
-  }
-
-  @derive
-  impl Serialize {}
-}
-
 union CommonMsgInfoRelaxed {
   case ExtOutMsgInfoRelaxed
-  case IntMsgInfoRelaxed
+  case IntMsgInfo
 
   impl Serialize {
     fn serialize(self: Self, b: Builder) -> Builder {
       switch(self) {
-        case IntMsgInfoRelaxed info => {
+        case IntMsgInfo info => {
           let b = b.serialize_int(0, 1);
           return info.serialize(b);
         }
@@ -601,7 +571,7 @@ fn send_raw_msg(msg: Cell, flags: SendRawMsgFlags) -> VoidType {
   builtin_send_raw_message(msg.c, flags.value.value);
 }
 
-fn send_internal[X: Serialize](header: IntMsgInfoRelaxed, body: X, flags: SendRawMsgFlags) -> VoidType {
+fn send_internal[X: Serialize](header: IntMsgInfo, body: X, flags: SendRawMsgFlags) -> VoidType {
   let info: CommonMsgInfoRelaxed = header;
   let msg = MessageRelaxed[X] { info: info, body: body };
   let ce = msg.serialize(Builder.new()).build();
