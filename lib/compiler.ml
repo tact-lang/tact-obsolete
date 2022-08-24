@@ -44,15 +44,18 @@ and eval_stmt ~(constructor : _ Lang.constructor) ~filename text =
   with
   | Success stx -> (
       let errors = constructor#get_errors in
-      let stmt =
-        constructor#visit_located constructor#visit_stmt Lang.default_ctx stx
-      in
       let result =
-        (constructor#make_interpreter stmt.span)#interpret_stmt
-          (Syntax.map_located
-             ~f:(function Lang.Expr e -> Lang.Return e | stmt -> stmt)
-             stmt )
-          []
+        try
+          let stmt =
+            constructor#visit_located constructor#visit_stmt Lang.default_ctx
+              stx
+          in
+          (constructor#make_interpreter stmt.span)#interpret_stmt
+            (Syntax.map_located
+               ~f:(function Lang.Expr e -> Lang.Return e | stmt -> stmt)
+               stmt )
+            []
+        with Lang.Skip -> Void
       in
       match errors#to_result () with
       | Error _ ->
