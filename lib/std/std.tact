@@ -426,6 +426,8 @@ struct IntMsgInfoAddresses {
 }
 
 struct IntMsgInfoCoins {
+  val amount: Coins
+  val _extra_currencies: Uint1 // we ignore extra_currencies for now
   val ihr_fee: Coins
   val fwd_fee: Coins
 
@@ -556,7 +558,7 @@ struct SendRawMsgFlags {
     Self { value: 128 }
   }
 
-  fn carry_rest_from_transaction_input() -> Self {
+  fn carry_rest_from_input() -> Self {
     Self { value: 64 }
   }
 

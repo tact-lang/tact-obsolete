@@ -1733,12 +1733,14 @@ let%expect_test "serialization api" =
     builder f31(int self, builder builder_) impure {
       return f32(builder_, self);
     }
-    builder f30([int, int] self, builder b) impure {
+    builder f30([int, int, int, int] self, builder b) impure {
       builder b = f31(get0(func_believe_me(self)), b);
-      builder b = f31(get1(func_believe_me(self)), b);
+      builder b = f28(get1(func_believe_me(self)), b);
+      builder b = f31(get2(func_believe_me(self)), b);
+      builder b = f31(get3(func_believe_me(self)), b);
       return b;
     }
-    builder f29([int, int] self, builder b) impure {
+    builder f29([int, int, int, int] self, builder b) impure {
       return f30(self, b);
     }
     builder f34([int, int] self, builder b) impure {
@@ -1749,14 +1751,14 @@ let%expect_test "serialization api" =
     builder f33([int, int] self, builder b) impure {
       return f34(self, b);
     }
-    builder f25([[int, int, int], [tuple, tuple], [int, int], [int, int]]
+    builder f25([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
       self, builder b) impure {
       builder b = f26(get0(func_believe_me(self)), b);
       builder b = f29(get2(func_believe_me(self)), b);
       builder b = f33(get3(func_believe_me(self)), b);
       return b;
     }
-    builder f24([[int, int, int], [tuple, tuple], [int, int], [int, int]]
+    builder f24([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
       self, builder b) impure {
       return f25(self, b);
     }
@@ -1765,8 +1767,8 @@ let%expect_test "serialization api" =
         tuple temp = self;
         int discr = first(temp);
         if (discr == 1) {
-          [[int, int, int], [tuple, tuple], [int, int], [int, int]] info =
-            second(temp);
+          [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]] info
+            = second(temp);
           {
             builder b = f4(b, 0, 1);
             return f24(info, b);
@@ -2154,12 +2156,14 @@ let%expect_test "deserialization api" =
     [slice, [tuple, tuple]] f36(slice s) impure {
       return f37(s);
     }
-    [slice, [int, int]] f39(slice slice_) impure {
+    [slice, [int, int, int, int]] f39(slice slice_) impure {
+      [slice slice_, int amount] = f27(slice_);
+      [slice slice_, int _extra_currencies] = f35(slice_);
       [slice slice_, int ihr_fee] = f27(slice_);
       [slice slice_, int fwd_fee] = f27(slice_);
-      return [slice_, [ihr_fee, fwd_fee]];
+      return [slice_, [amount, _extra_currencies, ihr_fee, fwd_fee]];
     }
-    [slice, [int, int]] f38(slice s) impure {
+    [slice, [int, int, int, int]] f38(slice s) impure {
       return f39(s);
     }
     [slice, int] f42(slice s) impure {
@@ -2178,23 +2182,23 @@ let%expect_test "deserialization api" =
     [slice, [int, int]] f40(slice s) impure {
       return f41(s);
     }
-    [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f32(slice
-      slice_) impure {
+    [slice, [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]]
+      f32(slice slice_) impure {
       [slice slice_, [int, int, int] flags] = f33(slice_);
       [slice slice_, [tuple, tuple] addresses] = f36(slice_);
-      [slice slice_, [int, int] coins] = f38(slice_);
+      [slice slice_, [int, int, int, int] coins] = f38(slice_);
       [slice slice_, [int, int] timestamps] = f40(slice_);
       return [slice_, [flags, addresses, coins, timestamps]];
     }
-    [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] f31(slice s)
-      impure {
+    [slice, [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]]
+      f31(slice s) impure {
       return f32(s);
     }
     [slice, tuple] f4(slice slice_) impure {
       [slice, int] res_discr = f5(slice_, 2);
       if (builtin_eq(get1(func_believe_me(res_discr)), 0)) {
-        [slice, [[int, int, int], [tuple, tuple], [int, int], [int, int]]] res =
-          f31(get0(func_believe_me(res_discr)));
+        [slice, [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]]
+          res = f31(get0(func_believe_me(res_discr)));
         return f30(get0(func_believe_me(res)), get1(func_believe_me(res)));
       }
       else {
