@@ -154,6 +154,8 @@ functor
                       in
                       Value fc
                     else FunctionCall fc
+                | _ when not !no_errors ->
+                    raise Skip
                 | _ ->
                     let expected = List.length sign.value.function_params in
                     let actual = List.length args in

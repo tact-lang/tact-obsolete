@@ -185,12 +185,7 @@ let%expect_test "type errors" =
     File: "":13:18
        |
     13 |       expect_test(123);
-       |                   ^^^ This has type `Integer`
-    Error[1]: Expected 1 arguments but found 1.
-    File: "":13:6
-       |
-    13 |       expect_test(123);
-       |       ^^^^^^^^^^^ When calling this function |}]
+       |                   ^^^ This has type `Integer` |}]
 
 let%expect_test "is not a struct error" =
   let source =

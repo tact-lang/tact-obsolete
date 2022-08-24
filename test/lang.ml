@@ -2361,8 +2361,7 @@ let%expect_test "type check error" =
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((StructType 132) (StructType 134) <opaque>))
-      (ArgumentNumberMismatch (1 1 <opaque>)))
+    (((TypeError ((StructType 132) (StructType 134) <opaque>)))
      ((bindings
        ((foo
          (Value
@@ -2967,8 +2966,7 @@ let%expect_test "TypeN" =
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((TypeN 0) (TypeN 1) <opaque>))
-      (ArgumentNumberMismatch (1 1 <opaque>)))
+    (((TypeError ((TypeN 0) (TypeN 1) <opaque>)))
      ((bindings
        ((id
          (Value
@@ -3850,8 +3848,7 @@ let%expect_test "let binding with a non-matching type" =
   [%expect
     {|
     (((TypeError (BoolType IntegerType <opaque>))
-      (TypeError (BoolType IntegerType <opaque>))
-      (ArgumentNumberMismatch (1 1 <opaque>)))
+      (TypeError (BoolType IntegerType <opaque>)))
      ((bindings ()) (structs ()) (type_counter <opaque>)
       (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
       (attr_executors <opaque>))) |}]
@@ -4137,8 +4134,7 @@ let%expect_test "type that does not implement interface passed to the \
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((InterfaceType 132) (Type0 (StructType 134)) <opaque>))
-      (ArgumentNumberMismatch (1 1 <opaque>)))
+    (((TypeError ((InterfaceType 132) (Type0 (StructType 134)) <opaque>)))
      ((bindings
        ((Foo (Value (Type (StructType 134))))
         (ExpectedIntf
