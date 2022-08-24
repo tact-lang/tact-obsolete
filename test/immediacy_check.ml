@@ -424,3 +424,16 @@ let%expect_test "Immediacy Checks Unions Functions" =
   let _ = Option.value_exn @@ Result.ok @@ compile source in
   pp_sexp @@ sexp_of_bool true ;
   [%expect {| true |}]
+
+let%expect_test "Immediacy Checks Unions Functions" =
+  let source =
+    {|
+    union MsgAddressExt {
+      case Integer
+      fn serialize(self: Self) { }
+    }
+     |}
+  in
+  let _ = Option.value_exn @@ Result.ok @@ compile source in
+  pp_sexp @@ sexp_of_bool true ;
+  [%expect {| true |}]

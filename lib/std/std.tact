@@ -431,6 +431,15 @@ struct IntMsgInfoCoins {
   val ihr_fee: Coins
   val fwd_fee: Coins
 
+  fn new(amount: Coins, ihr_fee: Coins, fwd_fee: Coins) -> Self {
+    Self {
+      amount: amount,
+      _extra_currencies: 0,
+      ihr_fee: ihr_fee,
+      fwd_fee: fwd_fee,
+    }
+  }
+
   @derive
   impl Serialize {}
 
@@ -554,12 +563,12 @@ struct SendRawMsgFlags {
     Self { value: 0 }
   }
 
-  fn carry_smart_contract_balance() -> Self {
-    Self { value: 128 }
+  fn carry_remaining_balance(self: Self) -> Self {
+    Self { value: self.value.value + 128 }
   }
 
-  fn carry_rest_from_input() -> Self {
-    Self { value: 64 }
+  fn carry_remaining_input(self: Self) -> Self {
+    Self { value: self.value.value + 64 }
   }
 
   @derive
@@ -676,5 +685,103 @@ struct Globals {
   }
   fn get_block_logical_time() -> Int[64] {
     builtin_block_lt()
+  }
+}
+
+struct RemainingBalance{}
+struct RemainingInput{}
+union Money {
+  case Coins
+  case RemainingBalance
+  case RemainingInput
+}
+
+struct RequestBuilder[X: Serialize] {
+  val msg_flags: IntMsgInfoFlags
+  val send_flags: SendRawMsgFlags
+  val coins: IntMsgInfoCoins
+  val is_body_setup: Bool // TODO: make `Option[T]` type.
+  val body: X
+
+  fn new() -> Self {
+    Self {
+      msg_flags: IntMsgInfoFlags.new(false, false),
+      send_flags: SendRawMsgFlags.default(),
+      coins: IntMsgInfoCoins.new(Coins.new(0), Coins.new(0), Coins.new(0)),
+      is_body_setup: false,
+      body: believe_me(0),
+    }
+  }
+
+  fn can_be_bounced(self: Self) -> Self {
+    Self {
+      msg_flags: IntMsgInfoFlags { ihr_disabled: self.msg_flags.ihr_disabled, bounce: 1, bounced: 0 },
+      send_flags: self.send_flags,
+      body: self.body,
+      is_body_setup: self.is_body_setup,
+      coins: self.coins,
+    }
+  }
+  fn ihr_disabled(self: Self) -> Self {
+    Self {
+      msg_flags: IntMsgInfoFlags { ihr_disabled: 1, bounce: self.msg_flags.bounce, bounced: 0 },
+      send_flags: self.send_flags,
+      body: self.body,
+      is_body_setup: self.is_body_setup,
+      coins: self.coins,
+    }
+  }
+  fn money(self: Self, money: Money) -> Self {
+    switch (money) {
+      case Coins coins => {
+        return Self {
+          msg_flags: self.msg_flags,
+          send_flags: self.send_flags,
+          body: self.body,
+          is_body_setup: self.is_body_setup,
+          coins: IntMsgInfoCoins.new(coins, self.coins.ihr_fee, self.coins.fwd_fee),
+        };
+      }
+      case RemainingBalance _ => {
+        return Self {
+          msg_flags: self.msg_flags,
+          send_flags: self.send_flags.carry_remaining_balance(),
+          body: self.body,
+          is_body_setup: self.is_body_setup,
+          coins: self.coins,
+        };
+      }
+      case RemainingInput _ => {
+        return Self {
+          msg_flags: self.msg_flags,
+          send_flags: self.send_flags.carry_remaining_input(),
+          body: self.body,
+          is_body_setup: self.is_body_setup,
+          coins: self.coins,
+        };
+      }
+    }
+  }
+  fn body(self: Self, body: X) -> Self {
+    Self {
+      msg_flags: self.msg_flags,
+      send_flags: self.send_flags,
+      body: body,
+      is_body_setup: true,
+      coins: self.coins,
+    }
+  }
+  fn send_to(self: Self, dst: MsgAddressInt) {
+    if (self.is_body_setup) {
+      // TODO: I don't know why MessageRelaxed[X] type does not work here.
+      let info = IntMsgInfo.new(self.msg_flags, dst, self.coins);
+      let b = info.serialize(Builder.new());
+      let b = b.serialize_int(0, 1); // init
+      let b = b.serialize_int(0, 1); // body discriminant
+      let b = self.body.serialize(b);
+      send_raw_msg(b.build(), self.send_flags);
+    } else {
+      thrown(87);
+    }
   }
 }

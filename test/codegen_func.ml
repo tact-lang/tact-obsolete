@@ -3265,3 +3265,353 @@ let%expect_test "codegen while block" =
       cell new_state = f36(f31(new_state, f30()));
       return builtin_set_data(new_state);
     } |}]
+
+let%expect_test "request builder" =
+  let source =
+    {|
+      struct EmptyMsg { @derive impl Serialize {} }
+      fn test() {
+        let b = RequestBuilder[EmptyMsg].new()
+                  .can_be_bounced()
+                  .ihr_disabled()
+                  .money(Coins.new(1))
+                  .body(EmptyMsg{})
+                  .send_to(AddressStd.new(0, 0));
+      }
+    |}
+  in
+  pp_codegen source ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
+    forall A -> A get4(tuple t) asm "4 INDEX";
+    forall A -> A get3(tuple t) asm "3 INDEX";
+    forall A -> A get2(tuple t) asm "2 INDEX";
+    forall A -> A get1(tuple t) asm "1 INDEX";
+    forall A -> A get0(tuple t) asm "0 INDEX";
+    int builtin_gt(int i1, int i2) impure {
+      return _>_(i1, i2);
+    }
+    int builtin_geq(int i1, int i2) impure {
+      return _>=_(i1, i2);
+    }
+    int builtin_lt(int i1, int i2) impure {
+      return _<_(i1, i2);
+    }
+    int builtin_leq(int i1, int i2) impure {
+      return _<=_(i1, i2);
+    }
+    int builtin_neq(int i1, int i2) impure {
+      return _!=_(i1, i2);
+    }
+    int builtin_eq(int i1, int i2) impure {
+      return _==_(i1, i2);
+    }
+    int builtin_bit_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_bit_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
+    int builtin_div(int i1, int i2) impure {
+      return _/_(i1, i2);
+    }
+    int builtin_mul(int i1, int i2) impure {
+      return _*_(i1, i2);
+    }
+    int builtin_sub(int i1, int i2) impure {
+      return _-_(i1, i2);
+    }
+    int builtin_add(int i1, int i2) impure {
+      return _+_(i1, i2);
+    }
+    int builtin_not(int c) impure {
+      return func_bit_not(c);
+    }
+    forall A, B -> B believe_me(A i) asm "NOP";
+    _ builtin_accept_message() impure {
+      return accept_message();
+    }
+    int builtin_slice_hash(slice s) impure {
+      return slice_hash(s);
+    }
+    int builtin_check_signature(int h, slice s, int k) impure {
+      return check_signature(h, s, k);
+    }
+    int builtin_block_lt() impure {
+      return block_lt();
+    }
+    int builtin_cur_lt() impure {
+      return cur_lt();
+    }
+    _ builtin_get_balance() impure {
+      return get_balance();
+    }
+    slice builtin_my_address() impure {
+      return my_address();
+    }
+    int builtin_now() impure {
+      return now();
+    }
+    _ builtin_set_data(cell d) impure {
+      return set_data(d);
+    }
+    cell builtin_get_data() impure {
+      return get_data();
+    }
+    _ builtin_throw(int e) impure {
+      return throw(e);
+    }
+    _ builtin_send_raw_message(cell c, int f) impure {
+      return send_raw_message(c, f);
+    }
+    (int, int) builtin_divmod(int i1, int i2) impure {
+      return divmod(i1, i2);
+    }
+    _ builtin_end_parse(slice s) impure {
+      return end_parse(s);
+    }
+    int builtin_slice_bits(slice s) impure {
+      return slice_bits(s);
+    }
+    int builtin_slice_refs(slice s) impure {
+      return slice_refs(s);
+    }
+    slice builtin_slice_last(slice s, int l) impure {
+      return slice_last(s, l);
+    }
+    (slice, cell) builtin_load_ref(slice s) impure {
+      return load_ref(s);
+    }
+    (slice, int) builtin_load_grams(slice s) impure {
+      return load_grams(s);
+    }
+    (slice, slice) builtin_load_bits(slice s, int bs) impure {
+      return load_bits(s, bs);
+    }
+    (slice, int) builtin_load_uint(slice s, int bs) impure {
+      return load_uint(s, bs);
+    }
+    (slice, int) builtin_load_int(slice s, int bs) impure {
+      return load_int(s, bs);
+    }
+    slice builtin_begin_parse(cell c) impure {
+      return begin_parse(c);
+    }
+    int builtin_builder_depth(builder b) impure {
+      return builder_depth(b);
+    }
+    int builtin_builder_refs(builder b) impure {
+      return builder_refs(b);
+    }
+    int builtin_builder_bits(builder b) impure {
+      return builder_bits(b);
+    }
+    builder builtin_store_maybe_ref(builder b, cell c) impure {
+      return store_maybe_ref(b, c);
+    }
+    builder builtin_store_slice(builder b, slice s) impure {
+      return store_slice(b, s);
+    }
+    builder builtin_store_ref(builder b, cell c) impure {
+      return store_ref(b, c);
+    }
+    builder builtin_store_grams(builder b, int c) impure {
+      return store_grams(b, c);
+    }
+    builder builtin_store_uint(builder b, int i, int bs) impure {
+      return store_uint(b, i, bs);
+    }
+    builder builtin_store_int(builder b, int i, int bs) impure {
+      return store_int(b, i, bs);
+    }
+    cell builtin_end_cell(builder b) impure {
+      return end_cell(b);
+    }
+    builder builtin_begin_cell() impure {
+      return begin_cell();
+    }
+    _ thrown(int n) impure {
+      return builtin_throw(n);
+    }
+    _ send_raw_msg(cell msg, int flags) impure {
+      return builtin_send_raw_message(msg, flags);
+    }
+    int f0(int i) impure {
+      return i;
+    }
+    int hash_of_slice(slice s) impure {
+      return f0(builtin_slice_hash(s));
+    }
+    int is_signature_valid(int hash, slice sign, int pubkey) impure {
+      return builtin_check_signature(hash, sign, pubkey);
+    }
+    [[int, int, int], int, [int, int, int, int], int, []] f1() impure {
+      return [[0, 0, 0], 0, [0, 0, 0, 0], 0, believe_me(0)];
+    }
+    [[int, int, int], int, [int, int, int, int], int, []]
+      f2([[int, int, int], int, [int, int, int, int], int, []] self) impure {
+      return
+        [[get0(func_believe_me(get0(func_believe_me(self)))), 1, 0], get1(func_believe_me(self)), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
+    }
+    [[int, int, int], int, [int, int, int, int], int, []]
+      f3([[int, int, int], int, [int, int, int, int], int, []] self) impure {
+      return
+        [[1, get1(func_believe_me(get0(func_believe_me(self)))), 0], get1(func_believe_me(self)), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
+    }
+    int f6(int left, int right) impure {
+      return builtin_add(left, right);
+    }
+    int f7(int i) impure {
+      return i;
+    }
+    int f5(int self) impure {
+      return f7(f6(self, 64));
+    }
+    int f8(int self) impure {
+      return f7(f6(self, 128));
+    }
+    [int, int, int, int] f9(int amount, int ihr_fee, int fwd_fee) impure {
+      return [amount, 0, ihr_fee, fwd_fee];
+    }
+    [[int, int, int], int, [int, int, int, int], int, []]
+      f4([[int, int, int], int, [int, int, int, int], int, []] self, tuple money)
+      impure {
+      {
+        tuple temp = money;
+        int discr = first(temp);
+        if (discr == 0) {
+          int coins = second(temp);
+          {
+            return
+              [get0(func_believe_me(self)), get1(func_believe_me(self)), f9(coins, get2(func_believe_me(get2(func_believe_me(self)))), get3(func_believe_me(get2(func_believe_me(self))))), get3(func_believe_me(self)), get4(func_believe_me(self))];
+          }
+        }
+        else if (discr == 1) {
+          [] _ = second(temp);
+          {
+            return
+              [get0(func_believe_me(self)), f8(get1(func_believe_me(self))), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
+          }
+        }
+        else if (discr == 2) {
+          [] _ = second(temp);
+          {
+            return
+              [get0(func_believe_me(self)), f5(get1(func_believe_me(self))), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
+          }
+        }
+        else {
+        }
+      }
+    }
+    [[int, int, int], int, [int, int, int, int], int, []]
+      f10([[int, int, int], int, [int, int, int, int], int, []] self, [] body)
+      impure {
+      return
+        [get0(func_believe_me(self)), get1(func_believe_me(self)), get2(func_believe_me(self)), -1, body];
+    }
+    [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+      f12([int, int, int] flags, tuple dst, [int, int, int, int] coins) impure {
+      return [flags, [[2, [0, 0]], dst], coins, [0, 0]];
+    }
+    builder f13() impure {
+      return builtin_begin_cell();
+    }
+    builder f19(builder self, int uint, int bits) impure {
+      return builtin_store_uint(self, uint, bits);
+    }
+    builder f18(int self, builder builder_) impure {
+      return f19(builder_, self, 1);
+    }
+    builder f17([int, int, int] self, builder b) impure {
+      builder b = f18(get0(func_believe_me(self)), b);
+      builder b = f18(get1(func_believe_me(self)), b);
+      builder b = f18(get2(func_believe_me(self)), b);
+      return b;
+    }
+    builder f16([int, int, int] self, builder b) impure {
+      return f17(self, b);
+    }
+    builder f23(builder self, int c) impure {
+      return builtin_store_grams(self, c);
+    }
+    builder f22(int self, builder builder_) impure {
+      return f23(builder_, self);
+    }
+    builder f21([int, int, int, int] self, builder b) impure {
+      builder b = f22(get0(func_believe_me(self)), b);
+      builder b = f18(get1(func_believe_me(self)), b);
+      builder b = f22(get2(func_believe_me(self)), b);
+      builder b = f22(get3(func_believe_me(self)), b);
+      return b;
+    }
+    builder f20([int, int, int, int] self, builder b) impure {
+      return f21(self, b);
+    }
+    builder f26(int self, builder builder_) impure {
+      return f19(builder_, self, 64);
+    }
+    builder f27(int self, builder builder_) impure {
+      return f19(builder_, self, 32);
+    }
+    builder f25([int, int] self, builder b) impure {
+      builder b = f26(get0(func_believe_me(self)), b);
+      builder b = f27(get1(func_believe_me(self)), b);
+      return b;
+    }
+    builder f24([int, int] self, builder b) impure {
+      return f25(self, b);
+    }
+    builder f15([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+      self, builder b) impure {
+      builder b = f16(get0(func_believe_me(self)), b);
+      builder b = f20(get2(func_believe_me(self)), b);
+      builder b = f24(get3(func_believe_me(self)), b);
+      return b;
+    }
+    builder f14([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+      self, builder b) impure {
+      return f15(self, b);
+    }
+    builder f28(builder self, int int_, int bits) impure {
+      return builtin_store_int(self, int_, bits);
+    }
+    builder f30([] self, builder b) impure {
+      return b;
+    }
+    builder f29([] self, builder b) impure {
+      return f30(self, b);
+    }
+    cell f31(builder self) impure {
+      return builtin_end_cell(self);
+    }
+    _ f11([[int, int, int], int, [int, int, int, int], int, []] self, tuple dst)
+      impure {
+      if (get3(func_believe_me(self))) {
+        [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]] info =
+          f12(get0(func_believe_me(self)), dst, get2(func_believe_me(self)));
+        builder b = f14(info, f13());
+        builder b = f28(b, 0, 1);
+        builder b = f28(b, 0, 1);
+        builder b = f29(get4(func_believe_me(self)), b);
+        send_raw_msg(f31(b), get1(func_believe_me(self)));
+      }
+      else {
+        thrown(87);
+      }
+    }
+    _ test() impure {
+      _ b = f11(f10(f4(f3(f2(f1())), 1), []), [0, 0]);
+    } |}]

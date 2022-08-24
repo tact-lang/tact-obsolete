@@ -20,46 +20,46 @@ let%expect_test "Int[bits] constructor" =
           (i
            (Value
             (Struct
-             ((Value (Type (StructType 122))) ((value (Value (Integer 100))))))))))
+             ((Value (Type (StructType 132))) ((value (Value (Integer 100))))))))))
         (structs
-         ((123
+         ((133
            ((struct_fields
              ((slice ((field_type (StructType 7))))
-              (value ((field_type (StructType 122))))))
+              (value ((field_type (StructType 132))))))
             (struct_details
              ((uty_methods
                ((new
                  ((function_signature
-                   ((function_params ((v (StructType 122)) (s (StructType 7))))
-                    (function_returns (StructType 123))))
+                   ((function_params ((v (StructType 132)) (s (StructType 7))))
+                    (function_returns (StructType 133))))
                   (function_impl
                    (Fn
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 123)))
+                       ((Value (Type (StructType 133)))
                         ((slice (Reference (s (StructType 7))))
-                         (value (Reference (v (StructType 122)))))))))))))))
-              (uty_impls ()) (uty_id 123) (uty_base_id -500)))))
-          (122
+                         (value (Reference (v (StructType 132)))))))))))))))
+              (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
+          (132
            ((struct_fields ((value ((field_type IntegerType)))))
             (struct_details
              ((uty_methods
                ((from
                  ((function_signature
                    ((function_params ((i IntegerType)))
-                    (function_returns (StructType 122))))
+                    (function_returns (StructType 132))))
                   (function_impl
                    (Fn
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 122)))
+                       ((Value (Type (StructType 132)))
                         ((value (Reference (i IntegerType))))))))))))
                 (deserialize
                  ((function_signature
                    ((function_params ((s (StructType 7))))
-                    (function_returns (StructType 123))))
+                    (function_returns (StructType 133))))
                   (function_impl
                    (Fn
                     (Block
@@ -76,17 +76,17 @@ let%expect_test "Int[bits] constructor" =
                       (Return
                        (Value
                         (Struct
-                         ((Value (Type (StructType 123)))
+                         ((Value (Type (StructType 133)))
                           ((slice (Reference (slice (StructType 7))))
                            (value
                             (Value
                              (Struct
-                              ((Value (Type (StructType 122)))
+                              ((Value (Type (StructType 132)))
                                ((value (Reference (value IntegerType)))))))))))))))))))
                 (serialize
                  ((function_signature
                    ((function_params
-                     ((self (StructType 122)) (builder (StructType 3))))
+                     ((self (StructType 132)) (builder (StructType 3))))
                     (function_returns (StructType 3))))
                   (function_impl
                    (Fn
@@ -95,19 +95,19 @@ let%expect_test "Int[bits] constructor" =
                       ((ResolvedReference (serialize_int <opaque>))
                        ((Reference (builder (StructType 3)))
                         (StructField
-                         ((Reference (self (StructType 122))) value IntegerType))
+                         ((Reference (self (StructType 132))) value IntegerType))
                         (Value (Integer 257)))
                        false)))))))
                 (new
                  ((function_signature
                    ((function_params ((i IntegerType)))
-                    (function_returns (StructType 122))))
+                    (function_returns (StructType 132))))
                   (function_impl
                    (Fn
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 122)))
+                       ((Value (Type (StructType 132)))
                         ((value (Reference (i IntegerType))))))))))))))
               (uty_impls
                (((impl_interface -1)
@@ -115,7 +115,7 @@ let%expect_test "Int[bits] constructor" =
                   ((serialize
                     ((function_signature
                       ((function_params
-                        ((self (StructType 122)) (builder (StructType 3))))
+                        ((self (StructType 132)) (builder (StructType 3))))
                        (function_returns (StructType 3))))
                      (function_impl
                       (Fn
@@ -124,7 +124,7 @@ let%expect_test "Int[bits] constructor" =
                          ((ResolvedReference (serialize_int <opaque>))
                           ((Reference (builder (StructType 3)))
                            (StructField
-                            ((Reference (self (StructType 122))) value IntegerType))
+                            ((Reference (self (StructType 132))) value IntegerType))
                            (Value (Integer 257)))
                           false))))))))))
                 ((impl_interface -2)
@@ -132,7 +132,7 @@ let%expect_test "Int[bits] constructor" =
                   ((deserialize
                     ((function_signature
                       ((function_params ((s (StructType 7))))
-                       (function_returns (StructType 123))))
+                       (function_returns (StructType 133))))
                      (function_impl
                       (Fn
                        (Block
@@ -151,27 +151,27 @@ let%expect_test "Int[bits] constructor" =
                          (Return
                           (Value
                            (Struct
-                            ((Value (Type (StructType 123)))
+                            ((Value (Type (StructType 133)))
                              ((slice (Reference (slice (StructType 7))))
                               (value
                                (Value
                                 (Struct
-                                 ((Value (Type (StructType 122)))
+                                 ((Value (Type (StructType 132)))
                                   ((value (Reference (value IntegerType))))))))))))))))))))))
                 ((impl_interface 17)
                  (impl_methods
                   ((from
                     ((function_signature
                       ((function_params ((i IntegerType)))
-                       (function_returns (StructType 122))))
+                       (function_returns (StructType 132))))
                      (function_impl
                       (Fn
                        (Return
                         (Value
                          (Struct
-                          ((Value (Type (StructType 122)))
+                          ((Value (Type (StructType 132)))
                            ((value (Reference (i IntegerType)))))))))))))))))
-              (uty_id 122) (uty_base_id 16)))))))
+              (uty_id 132) (uty_base_id 16)))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
         (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
@@ -248,7 +248,7 @@ let%expect_test "demo struct serializer" =
                     ((ResolvedReference (T_serializer <opaque>))
                      ((Value
                        (Struct
-                        ((Value (Type (StructType 125)))
+                        ((Value (Type (StructType 135)))
                          ((a
                            (Value
                             (Struct
@@ -257,7 +257,7 @@ let%expect_test "demo struct serializer" =
                           (b
                            (Value
                             (Struct
-                             ((Value (Type (StructType 122)))
+                             ((Value (Type (StructType 132)))
                               ((value (Value (Integer 1))))))))))))
                       (Reference (b (StructType 3))))
                      false)))))))))))
@@ -265,7 +265,7 @@ let%expect_test "demo struct serializer" =
            (Value
             (Function
              ((function_signature
-               ((function_params ((self (StructType 125)) (b (StructType 3))))
+               ((function_params ((self (StructType 135)) (b (StructType 3))))
                 (function_returns (StructType 3))))
               (function_impl
                (Fn
@@ -291,7 +291,7 @@ let%expect_test "demo struct serializer" =
                                 (Value (Integer 32)))
                                false))))))))
                        ((StructField
-                         ((Reference (self (StructType 125))) a (StructType 41)))
+                         ((Reference (self (StructType 135))) a (StructType 41)))
                         (Reference (b (StructType 3))))
                        false)))))
                   (Let
@@ -301,7 +301,7 @@ let%expect_test "demo struct serializer" =
                         (Function
                          ((function_signature
                            ((function_params
-                             ((self (StructType 122)) (builder (StructType 3))))
+                             ((self (StructType 132)) (builder (StructType 3))))
                             (function_returns (StructType 3))))
                           (function_impl
                            (Fn
@@ -310,61 +310,61 @@ let%expect_test "demo struct serializer" =
                               ((ResolvedReference (serialize_int <opaque>))
                                ((Reference (builder (StructType 3)))
                                 (StructField
-                                 ((Reference (self (StructType 122))) value
+                                 ((Reference (self (StructType 132))) value
                                   IntegerType))
                                 (Value (Integer 16)))
                                false))))))))
                        ((StructField
-                         ((Reference (self (StructType 125))) b (StructType 122)))
+                         ((Reference (self (StructType 135))) b (StructType 132)))
                         (Reference (b (StructType 3))))
                        false)))))
                   (Return (Reference (b (StructType 3))))))))))))
-          (T (Value (Type (StructType 125))))))
+          (T (Value (Type (StructType 135))))))
         (structs
-         ((125
+         ((135
            ((struct_fields
              ((a ((field_type (StructType 41))))
-              (b ((field_type (StructType 122))))))
+              (b ((field_type (StructType 132))))))
             (struct_details
-             ((uty_methods ()) (uty_impls ()) (uty_id 125) (uty_base_id 124)))))
-          (123
+             ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))
+          (133
            ((struct_fields
              ((slice ((field_type (StructType 7))))
-              (value ((field_type (StructType 122))))))
+              (value ((field_type (StructType 132))))))
             (struct_details
              ((uty_methods
                ((new
                  ((function_signature
-                   ((function_params ((v (StructType 122)) (s (StructType 7))))
-                    (function_returns (StructType 123))))
+                   ((function_params ((v (StructType 132)) (s (StructType 7))))
+                    (function_returns (StructType 133))))
                   (function_impl
                    (Fn
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 123)))
+                       ((Value (Type (StructType 133)))
                         ((slice (Reference (s (StructType 7))))
-                         (value (Reference (v (StructType 122)))))))))))))))
-              (uty_impls ()) (uty_id 123) (uty_base_id -500)))))
-          (122
+                         (value (Reference (v (StructType 132)))))))))))))))
+              (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
+          (132
            ((struct_fields ((value ((field_type IntegerType)))))
             (struct_details
              ((uty_methods
                ((from
                  ((function_signature
                    ((function_params ((i IntegerType)))
-                    (function_returns (StructType 122))))
+                    (function_returns (StructType 132))))
                   (function_impl
                    (Fn
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 122)))
+                       ((Value (Type (StructType 132)))
                         ((value (Reference (i IntegerType))))))))))))
                 (deserialize
                  ((function_signature
                    ((function_params ((s (StructType 7))))
-                    (function_returns (StructType 123))))
+                    (function_returns (StructType 133))))
                   (function_impl
                    (Fn
                     (Block
@@ -381,17 +381,17 @@ let%expect_test "demo struct serializer" =
                       (Return
                        (Value
                         (Struct
-                         ((Value (Type (StructType 123)))
+                         ((Value (Type (StructType 133)))
                           ((slice (Reference (slice (StructType 7))))
                            (value
                             (Value
                              (Struct
-                              ((Value (Type (StructType 122)))
+                              ((Value (Type (StructType 132)))
                                ((value (Reference (value IntegerType)))))))))))))))))))
                 (serialize
                  ((function_signature
                    ((function_params
-                     ((self (StructType 122)) (builder (StructType 3))))
+                     ((self (StructType 132)) (builder (StructType 3))))
                     (function_returns (StructType 3))))
                   (function_impl
                    (Fn
@@ -400,19 +400,19 @@ let%expect_test "demo struct serializer" =
                       ((ResolvedReference (serialize_int <opaque>))
                        ((Reference (builder (StructType 3)))
                         (StructField
-                         ((Reference (self (StructType 122))) value IntegerType))
+                         ((Reference (self (StructType 132))) value IntegerType))
                         (Value (Integer 16)))
                        false)))))))
                 (new
                  ((function_signature
                    ((function_params ((i IntegerType)))
-                    (function_returns (StructType 122))))
+                    (function_returns (StructType 132))))
                   (function_impl
                    (Fn
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 122)))
+                       ((Value (Type (StructType 132)))
                         ((value (Reference (i IntegerType))))))))))))))
               (uty_impls
                (((impl_interface -1)
@@ -420,7 +420,7 @@ let%expect_test "demo struct serializer" =
                   ((serialize
                     ((function_signature
                       ((function_params
-                        ((self (StructType 122)) (builder (StructType 3))))
+                        ((self (StructType 132)) (builder (StructType 3))))
                        (function_returns (StructType 3))))
                      (function_impl
                       (Fn
@@ -429,7 +429,7 @@ let%expect_test "demo struct serializer" =
                          ((ResolvedReference (serialize_int <opaque>))
                           ((Reference (builder (StructType 3)))
                            (StructField
-                            ((Reference (self (StructType 122))) value IntegerType))
+                            ((Reference (self (StructType 132))) value IntegerType))
                            (Value (Integer 16)))
                           false))))))))))
                 ((impl_interface -2)
@@ -437,7 +437,7 @@ let%expect_test "demo struct serializer" =
                   ((deserialize
                     ((function_signature
                       ((function_params ((s (StructType 7))))
-                       (function_returns (StructType 123))))
+                       (function_returns (StructType 133))))
                      (function_impl
                       (Fn
                        (Block
@@ -455,34 +455,34 @@ let%expect_test "demo struct serializer" =
                          (Return
                           (Value
                            (Struct
-                            ((Value (Type (StructType 123)))
+                            ((Value (Type (StructType 133)))
                              ((slice (Reference (slice (StructType 7))))
                               (value
                                (Value
                                 (Struct
-                                 ((Value (Type (StructType 122)))
+                                 ((Value (Type (StructType 132)))
                                   ((value (Reference (value IntegerType))))))))))))))))))))))
                 ((impl_interface 17)
                  (impl_methods
                   ((from
                     ((function_signature
                       ((function_params ((i IntegerType)))
-                       (function_returns (StructType 122))))
+                       (function_returns (StructType 132))))
                      (function_impl
                       (Fn
                        (Return
                         (Value
                          (Struct
-                          ((Value (Type (StructType 122)))
+                          ((Value (Type (StructType 132)))
                            ((value (Reference (i IntegerType)))))))))))))))))
-              (uty_id 122) (uty_base_id 16)))))))
+              (uty_id 132) (uty_base_id 16)))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>)
         (struct_signs
          (1
           (((st_sig_fields
              ((a (Value (Type (StructType 41))))
-              (b (Value (Type (StructType 122))))))
-            (st_sig_methods ()) (st_sig_base_id 124) (st_sig_id 51)))))
+              (b (Value (Type (StructType 132))))))
+            (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 54)))))
         (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "from interface" =
@@ -508,30 +508,30 @@ let%expect_test "from interface" =
        ((bindings
          ((var
            (Value
-            (Struct ((Value (Type (StructType 123))) ((a (Value (Integer 10))))))))
+            (Struct ((Value (Type (StructType 133))) ((a (Value (Integer 10))))))))
           (check
            (Value
             (Function
              ((function_signature
-               ((function_params ((y (StructType 123))))
-                (function_returns (StructType 123))))
-              (function_impl (Fn (Return (Reference (y (StructType 123))))))))))
-          (Value (Value (Type (StructType 123))))))
+               ((function_params ((y (StructType 133))))
+                (function_returns (StructType 133))))
+              (function_impl (Fn (Return (Reference (y (StructType 133))))))))))
+          (Value (Value (Type (StructType 133))))))
         (structs
-         ((123
+         ((133
            ((struct_fields ((a ((field_type IntegerType)))))
             (struct_details
              ((uty_methods
                ((from
                  ((function_signature
                    ((function_params ((x IntegerType)))
-                    (function_returns (StructType 123))))
+                    (function_returns (StructType 133))))
                   (function_impl
                    (Fn
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 123)))
+                       ((Value (Type (StructType 133)))
                         ((a (Reference (x IntegerType))))))))))))))
               (uty_impls
                (((impl_interface 17)
@@ -539,15 +539,15 @@ let%expect_test "from interface" =
                   ((from
                     ((function_signature
                       ((function_params ((x IntegerType)))
-                       (function_returns (StructType 123))))
+                       (function_returns (StructType 133))))
                      (function_impl
                       (Fn
                        (Return
                         (Value
                          (Struct
-                          ((Value (Type (StructType 123)))
+                          ((Value (Type (StructType 133)))
                            ((a (Reference (x IntegerType)))))))))))))))))
-              (uty_id 123) (uty_base_id 122)))))))
+              (uty_id 133) (uty_base_id 132)))))))
         (type_counter <opaque>) (memoized_fcalls <opaque>)
         (struct_signs
          (1
@@ -555,8 +555,8 @@ let%expect_test "from interface" =
             (st_sig_methods
              ((from
                ((function_params ((x IntegerType)))
-                (function_returns (ExprType (Reference (Self (StructSig 51)))))))))
-            (st_sig_base_id 122) (st_sig_id 51)))))
+                (function_returns (ExprType (Reference (Self (StructSig 54)))))))))
+            (st_sig_base_id 132) (st_sig_id 54)))))
         (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "tensor2" =
@@ -678,7 +678,7 @@ let%expect_test "deserializer" =
           (Function
            ((function_signature
              ((function_params ((slice (StructType 7))))
-              (function_returns (StructType 124))))
+              (function_returns (StructType 134))))
             (function_impl
              (Fn
               (Block
@@ -757,48 +757,48 @@ let%expect_test "deserializer" =
                 (Return
                  (Value
                   (Struct
-                   ((Value (Type (StructType 124)))
+                   ((Value (Type (StructType 134)))
                     ((slice (Reference (slice (StructType 7))))
                      (value
                       (Value
                        (Struct
-                        ((Value (Type (StructType 123)))
+                        ((Value (Type (StructType 133)))
                          ((value1 (Reference (value1 (StructType 22))))
                           (value2 (Reference (value2 (StructType 35))))))))))))))))))))))
-        (Something (Value (Type (StructType 123))))))
+        (Something (Value (Type (StructType 133))))))
       (structs
-       ((124
+       ((134
          ((struct_fields
            ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 123))))))
+            (value ((field_type (StructType 133))))))
           (struct_details
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((v (StructType 123)) (s (StructType 7))))
-                  (function_returns (StructType 124))))
+                 ((function_params ((v (StructType 133)) (s (StructType 7))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 124)))
+                     ((Value (Type (StructType 134)))
                       ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 123)))))))))))))))
-            (uty_impls ()) (uty_id 124) (uty_base_id -500)))))
-        (123
+                       (value (Reference (v (StructType 133)))))))))))))))
+            (uty_impls ()) (uty_id 134) (uty_base_id -500)))))
+        (133
          ((struct_fields
            ((value1 ((field_type (StructType 22))))
             (value2 ((field_type (StructType 35))))))
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 123) (uty_base_id 122)))))))
+           ((uty_methods ()) (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
         (((st_sig_fields
            ((value1 (Value (Type (StructType 22))))
             (value2 (Value (Type (StructType 35))))))
-          (st_sig_methods ()) (st_sig_base_id 122) (st_sig_id 51)))))
+          (st_sig_methods ()) (st_sig_base_id 132) (st_sig_id 54)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "derive Serialize" =
@@ -816,15 +816,15 @@ let%expect_test "derive Serialize" =
   [%expect
     {|
     (Ok
-     ((bindings ((Something (Value (Type (StructType 123))))))
+     ((bindings ((Something (Value (Type (StructType 133))))))
       (structs
-       ((123
+       ((133
          ((struct_fields ((value1 ((field_type (StructType 22))))))
           (struct_details
            ((uty_methods
              ((serialize
                ((function_signature
-                 ((function_params ((self (StructType 123)) (b (StructType 3))))
+                 ((function_params ((self (StructType 133)) (b (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -834,7 +834,7 @@ let%expect_test "derive Serialize" =
                       (Function
                        ((function_signature
                          ((function_params
-                           ((self (StructType 123)) (b (StructType 3))))
+                           ((self (StructType 133)) (b (StructType 3))))
                           (function_returns (StructType 3))))
                         (function_impl
                          (Fn
@@ -862,12 +862,12 @@ let%expect_test "derive Serialize" =
                                           (Value (Integer 9)))
                                          false))))))))
                                  ((StructField
-                                   ((Reference (self (StructType 123))) value1
+                                   ((Reference (self (StructType 133))) value1
                                     (StructType 22)))
                                   (Reference (b (StructType 3))))
                                  false)))))
                             (Return (Reference (b (StructType 3)))))))))))
-                     ((Reference (self (StructType 123)))
+                     ((Reference (self (StructType 133)))
                       (Reference (b (StructType 3))))
                      false)))))))))
             (uty_impls
@@ -876,7 +876,7 @@ let%expect_test "derive Serialize" =
                 ((serialize
                   ((function_signature
                     ((function_params
-                      ((self (StructType 123)) (b (StructType 3))))
+                      ((self (StructType 133)) (b (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -886,7 +886,7 @@ let%expect_test "derive Serialize" =
                          (Function
                           ((function_signature
                             ((function_params
-                              ((self (StructType 123)) (b (StructType 3))))
+                              ((self (StructType 133)) (b (StructType 3))))
                              (function_returns (StructType 3))))
                            (function_impl
                             (Fn
@@ -914,15 +914,15 @@ let%expect_test "derive Serialize" =
                                              (Value (Integer 9)))
                                             false))))))))
                                     ((StructField
-                                      ((Reference (self (StructType 123))) value1
+                                      ((Reference (self (StructType 133))) value1
                                        (StructType 22)))
                                      (Reference (b (StructType 3))))
                                     false)))))
                                (Return (Reference (b (StructType 3)))))))))))
-                        ((Reference (self (StructType 123)))
+                        ((Reference (self (StructType 133)))
                          (Reference (b (StructType 3))))
                         false))))))))))))
-            (uty_id 123) (uty_base_id 122)))))))
+            (uty_id 133) (uty_base_id 132)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
@@ -930,10 +930,10 @@ let%expect_test "derive Serialize" =
           (st_sig_methods
            ((serialize
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 51)))))
+               ((self (ExprType (Reference (Self (StructSig 54)))))
                 (b (StructType 3))))
               (function_returns (StructType 3))))))
-          (st_sig_base_id 122) (st_sig_id 51)))))
+          (st_sig_base_id 132) (st_sig_id 54)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "Deserialize Unions" =
@@ -956,7 +956,7 @@ let%expect_test "Deserialize Unions" =
           (Function
            ((function_signature
              ((function_params ((slice (StructType 7))))
-              (function_returns (StructType 126))))
+              (function_returns (StructType 136))))
             (function_impl
              (Fn
               (Block
@@ -1073,21 +1073,21 @@ let%expect_test "Deserialize Unions" =
                          (Function
                           ((function_signature
                             ((function_params
-                              ((v (UnionType 123)) (s (StructType 7))))
-                             (function_returns (StructType 126))))
+                              ((v (UnionType 133)) (s (StructType 7))))
+                             (function_returns (StructType 136))))
                            (function_impl
                             (Fn
                              (Return
                               (Value
                                (Struct
-                                ((Value (Type (StructType 126)))
+                                ((Value (Type (StructType 136)))
                                  ((slice (Reference (s (StructType 7))))
-                                  (value (Reference (v (UnionType 123))))))))))))))
+                                  (value (Reference (v (UnionType 133))))))))))))))
                         ((StructField
-                          ((Reference (res (StructType 126))) slice
+                          ((Reference (res (StructType 136))) slice
                            (StructType 7)))
                          (StructField
-                          ((Reference (res (StructType 126))) value
+                          ((Reference (res (StructType 136))) value
                            (StructType 33))))
                         true))))))
                   (if_else
@@ -1213,50 +1213,50 @@ let%expect_test "Deserialize Unions" =
                                (Function
                                 ((function_signature
                                   ((function_params
-                                    ((v (UnionType 123)) (s (StructType 7))))
-                                   (function_returns (StructType 126))))
+                                    ((v (UnionType 133)) (s (StructType 7))))
+                                   (function_returns (StructType 136))))
                                  (function_impl
                                   (Fn
                                    (Return
                                     (Value
                                      (Struct
-                                      ((Value (Type (StructType 126)))
+                                      ((Value (Type (StructType 136)))
                                        ((slice (Reference (s (StructType 7))))
-                                        (value (Reference (v (UnionType 123))))))))))))))
+                                        (value (Reference (v (UnionType 133))))))))))))))
                               ((StructField
-                                ((Reference (res (StructType 126))) slice
+                                ((Reference (res (StructType 136))) slice
                                  (StructType 7)))
                                (StructField
-                                ((Reference (res (StructType 126))) value
+                                ((Reference (res (StructType 136))) value
                                  (StructType 22))))
                               true))))))
                         (if_else
                          ((Expr
                            (Primitive
                             (Prim (name throw) (exprs ((Value (Integer 0)))))))))))))))))))))))))
-        (TestUnion (Value (Type (UnionType 123))))))
+        (TestUnion (Value (Type (UnionType 133))))))
       (structs
-       ((126
+       ((136
          ((struct_fields
            ((slice ((field_type (StructType 7))))
-            (value ((field_type (UnionType 123))))))
+            (value ((field_type (UnionType 133))))))
           (struct_details
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((v (UnionType 123)) (s (StructType 7))))
-                  (function_returns (StructType 126))))
+                 ((function_params ((v (UnionType 133)) (s (StructType 7))))
+                  (function_returns (StructType 136))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 126)))
+                     ((Value (Type (StructType 136)))
                       ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (UnionType 123)))))))))))))))
-            (uty_impls ()) (uty_id 126) (uty_base_id -500)))))))
+                       (value (Reference (v (UnionType 133)))))))))))))))
+            (uty_impls ()) (uty_id 136) (uty_base_id -500)))))))
       (unions
-       ((123
+       ((133
          ((union_attributes ())
           (cases
            (((StructType 22) (Discriminator (discr 1)))
@@ -1264,34 +1264,34 @@ let%expect_test "Deserialize Unions" =
           (union_details
            ((uty_methods ())
             (uty_impls
-             (((impl_interface 124)
+             (((impl_interface 134)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v (StructType 33))))
-                     (function_returns (UnionType 122))))
+                     (function_returns (UnionType 132))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 33))) 123))))))))))
-              ((impl_interface 125)
+                      (MakeUnionVariant ((Reference (v (StructType 33))) 133))))))))))
+              ((impl_interface 135)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v (StructType 22))))
-                     (function_returns (UnionType 122))))
+                     (function_returns (UnionType 132))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 22))) 123))))))))))))
-            (uty_id 123) (uty_base_id 122)))))))
+                      (MakeUnionVariant ((Reference (v (StructType 22))) 133))))))))))))
+            (uty_id 133) (uty_base_id 132)))))))
       (interfaces
-       ((125
+       ((135
          ((interface_methods
            ((from
              ((function_params ((from (StructType 22))))
               (function_returns SelfType)))))))
-        (124
+        (134
          ((interface_methods
            ((from
              ((function_params ((from (StructType 33))))
@@ -1300,5 +1300,5 @@ let%expect_test "Deserialize Unions" =
       (union_signs
        (1
         (((un_sig_cases ((StructType 33) (StructType 22))) (un_sig_methods ())
-          (un_sig_base_id 122)))))
+          (un_sig_base_id 132)))))
       (attr_executors <opaque>))) |}]

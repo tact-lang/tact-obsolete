@@ -108,6 +108,7 @@ functor
             | Value (UnionVariant (v, u)) ->
                 self#cg_union_variant {value = Value v; span = expr.span} u
             | _ ->
+                (* T.print_sexp @@ T.sexp_of_expr expr ; *)
                 raise Unsupported
 
         method cg_union_variant expr union =
@@ -233,9 +234,8 @@ functor
             match expr.value with
             | Value (Function f) -> (
               try Some (F.Function (self#add_function f ~name:(Some name)))
-              with ex ->
-                if equal_string name "deserialize_union" then raise ex else None
-              )
+              with _ ->
+                None (*if equal_string name "test" then raise ex else None*) )
             | _ ->
                 None
 
