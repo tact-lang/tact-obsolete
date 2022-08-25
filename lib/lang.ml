@@ -493,6 +493,60 @@ functor
         method build_function_call _env fn args is_ty = (fn, args, is_ty)
 
         method build_method_call _env in_receiver fn args =
+          let build_fcall f args is_type_fn =
+            let span =
+              merge_spans f.span (merge_spans_list @@ List.map args ~f:span)
+            in
+            match type_of program f with
+            | FunctionType sign -> (
+                if not @@ Bool.equal is_type_fn sign.value.function_is_type then (
+                  errors#report `Error
+                    (`ExpectedTypeFunction (sign.value.function_is_type, span))
+                    () ;
+                  Value Void )
+                else
+                  let no_errors = ref true in
+                  let types_satisfying =
+                    List.map2 sign.value.function_params args
+                      ~f:(fun (_, expected) expr ->
+                        match s#check_type ~expected expr with
+                        | Ok _ ->
+                            expr
+                        | Error (NeedFromCall func) ->
+                            let s = FunctionCall (func, [expr], false) in
+                            {value = s; span = expr.span}
+                        | _ ->
+                            errors#report `Error
+                              (`TypeError
+                                (expected, type_of program expr, expr.span) )
+                              () ;
+                            no_errors := false ;
+                            {value = Value Void; span = expr.span} )
+                  in
+                  match types_satisfying with
+                  | Ok args' when !no_errors ->
+                      let fc = (f, args', is_type_fn) in
+                      if
+                        is_immediate_expr !current_bindings program
+                          {value = FunctionCall (f, args', is_type_fn); span}
+                      then
+                        let fc =
+                          let inter = s#make_interpreter span in
+                          let fc = inter#interpret_fc fc in
+                          fc
+                        in
+                        Value fc
+                      else FunctionCall fc
+                  | _ when not !no_errors ->
+                      raise Skip
+                  | _ ->
+                      let expected = List.length sign.value.function_params in
+                      let actual = List.length args in
+                      s#report `Error
+                        (`ArgumentNumberMismatch (expected, actual, f.span)) )
+            | ty ->
+                s#report `Error (`ExpectedFunction (ty, f.span))
+          in
           let make_call receiver ~mk_args =
             match
               Program.methods_of program receiver
@@ -502,13 +556,12 @@ functor
                   else None )
             with
             | Some (span, fn') ->
-                FunctionCall
-                  ( { value =
-                        ResolvedReference
-                          (fn, {value = Value (Function fn'); span});
-                      span = fn.span },
-                    mk_args args,
-                    false (* FIXME: add is_type for methods *) )
+                build_fcall
+                  { value =
+                      ResolvedReference
+                        (fn, {value = Value (Function fn'); span});
+                    span = fn.span }
+                  (mk_args args) false (* FIXME: add is_type for methods *)
             | None ->
                 s#report `Error (`MethodNotFound (in_receiver, fn))
           in

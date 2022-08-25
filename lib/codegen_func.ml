@@ -121,6 +121,7 @@ functor
             List.Assoc.find_exn union.cases e_ty ~equal:T.equal_type_
           in
           F.Tuple [F.Integer (Z.of_int discr); expr]
+          |> fun t -> F.FunctionCall ("func_believe_me", [t], F.UnknownTuple)
 
         method get_discriminator : T.union -> T.type_ -> int =
           fun union ty ->
@@ -182,7 +183,15 @@ functor
                 ice "Type-check error"
           in
           let branches =
-            List.fold (List.rev switch.branches) ~init:(F.Block [])
+            List.fold (List.rev switch.branches)
+              ~init:
+                (F.Block
+                   [ F.Expr
+                       (F.FunctionCall
+                          ("thrown", [F.Integer (Z.of_int 90)], F.InferType) );
+                     F.Return
+                       (F.FunctionCall
+                          ("func_believe_me", [F.Tuple []], F.InferType) ) ] )
               ~f:(fun acc b ->
                 let ty_discr = self#get_discriminator union b.value.branch_ty in
                 let cond =
@@ -202,7 +211,7 @@ functor
                                 F.IntType ) ) ];
                       self#cg_stmt b.value.branch_stmt ]
                 in
-                F.If (cond, inner, Some acc) )
+                F.Block [F.If (cond, inner, Some acc)] )
           in
           F.Block [f_cond; f_discr; branches]
 
@@ -234,8 +243,9 @@ functor
             match expr.value with
             | Value (Function f) -> (
               try Some (F.Function (self#add_function f ~name:(Some name)))
-              with _ ->
-                None (*if equal_string name "test" then raise ex else None*) )
+              with ex ->
+                if equal_string name "test_req_builder" then raise ex else None
+              )
             | _ ->
                 None
 
@@ -366,8 +376,11 @@ functor
 
         method cg_Primitive : T.primitive -> F.expr =
           function
-          | Prim {name; exprs} ->
-              F.FunctionCall (name, List.map exprs ~f:self#cg_expr, F.InferType)
+          | Prim {name; exprs; out_ty} ->
+              F.FunctionCall
+                ( name,
+                  List.map exprs ~f:self#cg_expr,
+                  self#lang_type_to_type out_ty )
 
         method private lang_type_to_type : T.type_ -> F.type_ =
           function
@@ -377,9 +390,10 @@ functor
               F.IntType
           | StructType s ->
               self#struct_to_ty (T.Program.get_struct program s)
-          | UnionType u ->
-              self#create_ty_from_union
-                (List.Assoc.find_exn program.unions u ~equal:equal_int)
+          | UnionType _ ->
+              F.UnknownTuple
+              (* self#create_ty_from_union
+                 (List.Assoc.find_exn program.unions u ~equal:equal_int) *)
           | BuiltinType "Builder" ->
               F.BuilderType
           | BuiltinType "Cell" ->

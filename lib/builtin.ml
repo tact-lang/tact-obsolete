@@ -190,7 +190,8 @@ functor
                (Z.of_int (int_required_bits (List.length union.cases - 1))) )
         in
         let branches =
-          List.filter_map union.cases ~f:(fun (ty, Discriminator {discr; _}) ->
+          List.filter_map union.cases
+            ~f:(fun (ty, Discriminator ({discr; _} as disc)) ->
               let serialize_ty =
                 match
                   List.Assoc.find (Program.methods_of p ty)
@@ -205,7 +206,7 @@ functor
               serialize_ty
               |> Option.map ~f:(fun method_ ->
                      { branch_ty = ty;
-                       branch_var = bl "var";
+                       branch_var = bl "varr";
                        branch_stmt =
                          bl
                          @@ Block
@@ -232,15 +233,29 @@ functor
                                                             (Integer
                                                                (Z.of_int discr)
                                                             );
-                                                       bl discriminator_len ] }
-                                              ) ) ];
+                                                       bl
+                                                       @@ Option.value
+                                                            (Option.map
+                                                               disc.bits
+                                                               ~f:(fun x ->
+                                                                 Value
+                                                                   (Integer
+                                                                      (Z.of_int
+                                                                         x ) ) )
+                                                            )
+                                                            ~default:
+                                                              discriminator_len
+                                                     ];
+                                                   out_ty =
+                                                     BuiltinType "Builder" } )
+                                       ) ];
                                 bl
                                 @@ Let
                                      [ ( bl "b",
                                          bl
                                          @@ FunctionCall
                                               ( bl @@ Value (Function method_),
-                                                [ bl @@ Reference (bl "var", ty);
+                                                [ bl @@ Reference (bl "varr", ty);
                                                   bl
                                                   @@ Reference
                                                        (bl "b", builder_struct)
@@ -453,7 +468,10 @@ functor
         in
         let throw_fn =
           Primitive
-            (Prim {name = "throw"; exprs = [bl @@ Value (Integer (Z.of_int 0))]})
+            (Prim
+               { name = "throw";
+                 exprs = [bl @@ Value (Integer (Z.of_int 0))];
+                 out_ty = VoidType } )
         in
         let get_method ty m =
           match Program.find_method p ty m with
@@ -700,8 +718,11 @@ functor
                           (bl
                              (Return
                                 ( bl
-                                @@ Primitive (Prim {name = func_name; exprs}) )
-                             ) ) } ) ) )
+                                @@ Primitive
+                                     (Prim
+                                        { name = func_name;
+                                          exprs;
+                                          out_ty = ret_ty } ) ) ) ) } ) ) )
 
         let make_builtin name args ret_ty =
           make_builtin_names ("builtin_" ^ name) name args ret_ty

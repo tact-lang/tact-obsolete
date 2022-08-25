@@ -349,7 +349,7 @@ functor
     and branch =
       {branch_ty : type_; branch_var : string located; branch_stmt : stmt}
 
-    and primitive = Prim of {name : string; exprs : expr list}
+    and primitive = Prim of {name : string; exprs : expr list; out_ty : type_}
 
     (* This type will be extended in the future *)
     and attr_target = ImplAttrTarget of {impl : mk_impl; self_ty : type_}

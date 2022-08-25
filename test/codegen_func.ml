@@ -992,6 +992,16 @@ let%expect_test "unions" =
        }
        tuple try(tuple x) impure {
          return x;
+       }
+       tuple f0(int v) impure {
+         return func_believe_me([0, v]);
+       }
+       tuple f1([] v) impure {
+         return func_believe_me([1, v]);
+       }
+       _ test_try(int x, [] y) impure {
+         tuple test1 = try(f0(x));
+         tuple test2 = try(f1(y));
        } |}]
 
 let%expect_test "switch statement" =
@@ -1185,19 +1195,25 @@ let%expect_test "switch statement" =
       {
         tuple temp = i;
         int discr = first(temp);
-        if (discr == 0) {
-          int vax = second(temp);
-          {
-            return 32;
+        {
+          if (discr == 0) {
+            int vax = second(temp);
+            {
+              return 32;
+            }
           }
-        }
-        else if (discr == 1) {
-          int vax = second(temp);
-          {
-            return 64;
+          else {
+            if (discr == 1) {
+              int vax = second(temp);
+              {
+                return 64;
+              }
+            }
+            else {
+              thrown(90);
+              return func_believe_me([]);
+            }
           }
-        }
-        else {
         }
       }
     } |}]
@@ -1630,39 +1646,49 @@ let%expect_test "serialization api" =
       {
         tuple temp = self;
         int discr = first(temp);
-        if (discr == 3) {
-          [int, int, int] var = second(temp);
-          {
-            _ b = store_uint(b, 3, 2);
-            builder b = f16(var, b);
-            return b;
+        {
+          if (discr == 3) {
+            [int, int, int] varr = second(temp);
+            {
+              builder b = store_uint(b, 3, 2);
+              builder b = f16(varr, b);
+              return b;
+            }
           }
-        }
-        else if (discr == 2) {
-          [int, int] var = second(temp);
-          {
-            _ b = store_uint(b, 2, 2);
-            builder b = f12(var, b);
-            return b;
+          else {
+            if (discr == 2) {
+              [int, int] varr = second(temp);
+              {
+                builder b = store_uint(b, 2, 2);
+                builder b = f12(varr, b);
+                return b;
+              }
+            }
+            else {
+              if (discr == 1) {
+                [int, int] varr = second(temp);
+                {
+                  builder b = store_uint(b, 1, 2);
+                  builder b = f10(varr, b);
+                  return b;
+                }
+              }
+              else {
+                if (discr == 0) {
+                  [] varr = second(temp);
+                  {
+                    builder b = store_uint(b, 0, 2);
+                    builder b = f9(varr, b);
+                    return b;
+                  }
+                }
+                else {
+                  thrown(90);
+                  return func_believe_me([]);
+                }
+              }
+            }
           }
-        }
-        else if (discr == 1) {
-          [int, int] var = second(temp);
-          {
-            _ b = store_uint(b, 1, 2);
-            builder b = f10(var, b);
-            return b;
-          }
-        }
-        else if (discr == 0) {
-          [] var = second(temp);
-          {
-            _ b = store_uint(b, 0, 2);
-            builder b = f9(var, b);
-            return b;
-          }
-        }
-        else {
         }
       }
     }
@@ -1673,23 +1699,29 @@ let%expect_test "serialization api" =
       {
         tuple temp = self;
         int discr = first(temp);
-        if (discr == 1) {
-          [int, int] var = second(temp);
-          {
-            _ b = store_uint(b, 1, 1);
-            builder b = f10(var, b);
-            return b;
+        {
+          if (discr == 1) {
+            [int, int] varr = second(temp);
+            {
+              builder b = store_uint(b, 1, 2);
+              builder b = f10(varr, b);
+              return b;
+            }
           }
-        }
-        else if (discr == 0) {
-          [] var = second(temp);
-          {
-            _ b = store_uint(b, 0, 1);
-            builder b = f9(var, b);
-            return b;
+          else {
+            if (discr == 0) {
+              [] varr = second(temp);
+              {
+                builder b = store_uint(b, 0, 2);
+                builder b = f9(varr, b);
+                return b;
+              }
+            }
+            else {
+              thrown(90);
+              return func_believe_me([]);
+            }
           }
-        }
-        else {
         }
       }
     }
@@ -1727,35 +1759,77 @@ let%expect_test "serialization api" =
     builder f26([int, int, int] self, builder b) impure {
       return f27(self, b);
     }
-    builder f32(builder self, int c) impure {
-      return builtin_store_grams(self, c);
+    builder f32(tuple self, builder b) impure {
+      {
+        tuple temp = self;
+        int discr = first(temp);
+        {
+          if (discr == 3) {
+            [int, int, int] varr = second(temp);
+            {
+              builder b = store_uint(b, 3, 2);
+              builder b = f16(varr, b);
+              return b;
+            }
+          }
+          else {
+            if (discr == 2) {
+              [int, int] varr = second(temp);
+              {
+                builder b = store_uint(b, 2, 2);
+                builder b = f12(varr, b);
+                return b;
+              }
+            }
+            else {
+              thrown(90);
+              return func_believe_me([]);
+            }
+          }
+        }
+      }
     }
-    builder f31(int self, builder builder_) impure {
-      return f32(builder_, self);
+    builder f31(tuple self, builder b) impure {
+      return f32(self, b);
     }
-    builder f30([int, int, int, int] self, builder b) impure {
+    builder f30([tuple, tuple] self, builder b) impure {
       builder b = f31(get0(func_believe_me(self)), b);
-      builder b = f28(get1(func_believe_me(self)), b);
-      builder b = f31(get2(func_believe_me(self)), b);
-      builder b = f31(get3(func_believe_me(self)), b);
+      builder b = f31(get1(func_believe_me(self)), b);
       return b;
     }
-    builder f29([int, int, int, int] self, builder b) impure {
+    builder f29([tuple, tuple] self, builder b) impure {
       return f30(self, b);
     }
-    builder f34([int, int] self, builder b) impure {
+    builder f36(builder self, int c) impure {
+      return builtin_store_grams(self, c);
+    }
+    builder f35(int self, builder builder_) impure {
+      return f36(builder_, self);
+    }
+    builder f34([int, int, int, int] self, builder b) impure {
+      builder b = f35(get0(func_believe_me(self)), b);
+      builder b = f28(get1(func_believe_me(self)), b);
+      builder b = f35(get2(func_believe_me(self)), b);
+      builder b = f35(get3(func_believe_me(self)), b);
+      return b;
+    }
+    builder f33([int, int, int, int] self, builder b) impure {
+      return f34(self, b);
+    }
+    builder f38([int, int] self, builder b) impure {
       builder b = f21(get0(func_believe_me(self)), b);
       builder b = f23(get1(func_believe_me(self)), b);
       return b;
     }
-    builder f33([int, int] self, builder b) impure {
-      return f34(self, b);
+    builder f37([int, int] self, builder b) impure {
+      return f38(self, b);
     }
     builder f25([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
       self, builder b) impure {
       builder b = f26(get0(func_believe_me(self)), b);
-      builder b = f29(get2(func_believe_me(self)), b);
-      builder b = f33(get3(func_believe_me(self)), b);
+      builder b = f29(get1(func_believe_me(self)), b);
+      builder b = f33(get2(func_believe_me(self)), b);
+      builder b = f37(get3(func_believe_me(self)), b);
       return b;
     }
     builder f24([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
@@ -1766,33 +1840,39 @@ let%expect_test "serialization api" =
       {
         tuple temp = self;
         int discr = first(temp);
-        if (discr == 1) {
-          [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]] info
-            = second(temp);
-          {
-            builder b = f4(b, 0, 1);
-            return f24(info, b);
+        {
+          if (discr == 1) {
+            [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+              info = second(temp);
+            {
+              builder b = f4(b, 0, 1);
+              return f24(info, b);
+            }
           }
-        }
-        else if (discr == 0) {
-          [tuple, tuple, int, int] info = second(temp);
-          {
-            builder b = f4(b, 3, 2);
-            return f5(info, b);
+          else {
+            if (discr == 0) {
+              [tuple, tuple, int, int] info = second(temp);
+              {
+                builder b = f4(b, 3, 2);
+                return f5(info, b);
+              }
+            }
+            else {
+              thrown(90);
+              return func_believe_me([]);
+            }
           }
-        }
-        else {
         }
       }
     }
-    builder f35([] self, builder b) impure {
+    builder f39([] self, builder b) impure {
       return b;
     }
     builder f2([tuple, []] self, builder b) impure {
       builder b = f3(get0(func_believe_me(self)), b);
       builder b = f4(b, 0, 1);
       builder b = f4(b, 0, 1);
-      builder b = f35(get1(func_believe_me(self)), b);
+      builder b = f39(get1(func_believe_me(self)), b);
       return b;
     }
     _ test([tuple, []] m) impure {
@@ -2848,429 +2928,11 @@ let%expect_test "codegen while block" =
         }
     } |}]
 
-let%expect_test "codegen while block" =
-  let source =
-    {|
-    // TODO: remove this type.
-    struct MsgBodyData {
-      val subwallet: Uint[32]
-      val valid_until: Uint[32]
-      val seqno: Uint[32]
-
-      @derive impl Deserialize {}
-    }
-    struct MsgBody {
-      val signature: Signature
-      val data: MsgBodyData
-      val rest: RestSlice
-    
-      @derive impl Deserialize {}
-    }
-    
-    struct WalletState {
-      val seqno: Uint[32]
-      val subwallet: Uint[32]
-      val public_key: Uint[256]
-    
-      @derive impl Deserialize {}
-      @derive impl Serialize {}
-    }
-    
-    struct NextMessage {
-      val cell: RefCell
-      val flags: SendRawMsgFlags
-      
-      @derive impl Deserialize {}
-    }
-    
-    fn recv_internal(_: Slice) {}
-    
-    fn recv_external(input: Slice) {
-      let body = MsgBody.deserialize(input).value;
-      let data = body.data;
-      let state = WalletState.deserialize(Slice.parse(builtin_get_data())).value;
-      if (builtin_leq(data.valid_until.value, builtin_now())) { thrown(35) }
-      if (builtin_neq(data.seqno.value, state.seqno.value)) { thrown(33) }
-      if (builtin_neq(data.subwallet.value, state.subwallet.value)) { thrown(34) }
-      if (builtin_not(body.signature.is_valid(state.public_key))) { thrown(35) }
-    
-      builtin_accept_message();
-    
-      let slice = body.rest.inner;
-      while (builtin_neq(slice.refs_count(), 0)) {
-        let {value as next, slice as new_slice} = NextMessage.deserialize(slice);
-        slice = new_slice;
-        send_raw_msg(next.cell.inner, next.flags);
-      }
-    
-      let new_state = WalletState {
-        seqno: builtin_add(state.seqno.value, 1),
-        subwallet: state.subwallet,
-        public_key: state.public_key
-      };
-      let new_state = new_state.serialize(Builder.new()).build();
-      builtin_set_data(new_state.c);
-    }
-    |}
-  in
-  pp_codegen source ;
-  [%expect
-    {|
-    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
-      (Value1 value, _) = tensor;
-      return value;
-    }
-    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
-      (_, Value2 value) = tensor;
-      return value;
-    }
-    forall A, B -> B func_believe_me(A i) asm "NOP";
-    int func_bit_not(int a) {
-      return ~ a;
-    }
-    forall A -> A get2(tuple t) asm "2 INDEX";
-    forall A -> A get1(tuple t) asm "1 INDEX";
-    forall A -> A get0(tuple t) asm "0 INDEX";
-    int builtin_gt(int i1, int i2) impure {
-      return _>_(i1, i2);
-    }
-    int builtin_geq(int i1, int i2) impure {
-      return _>=_(i1, i2);
-    }
-    int builtin_lt(int i1, int i2) impure {
-      return _<_(i1, i2);
-    }
-    int builtin_leq(int i1, int i2) impure {
-      return _<=_(i1, i2);
-    }
-    int builtin_neq(int i1, int i2) impure {
-      return _!=_(i1, i2);
-    }
-    int builtin_eq(int i1, int i2) impure {
-      return _==_(i1, i2);
-    }
-    int builtin_bit_or(int i1, int i2) impure {
-      return _|_(i1, i2);
-    }
-    int builtin_bit_and(int i1, int i2) impure {
-      return _&_(i1, i2);
-    }
-    int builtin_div(int i1, int i2) impure {
-      return _/_(i1, i2);
-    }
-    int builtin_mul(int i1, int i2) impure {
-      return _*_(i1, i2);
-    }
-    int builtin_sub(int i1, int i2) impure {
-      return _-_(i1, i2);
-    }
-    int builtin_add(int i1, int i2) impure {
-      return _+_(i1, i2);
-    }
-    int builtin_not(int c) impure {
-      return func_bit_not(c);
-    }
-    forall A, B -> B believe_me(A i) asm "NOP";
-    _ builtin_accept_message() impure {
-      return accept_message();
-    }
-    int builtin_slice_hash(slice s) impure {
-      return slice_hash(s);
-    }
-    int builtin_check_signature(int h, slice s, int k) impure {
-      return check_signature(h, s, k);
-    }
-    int builtin_block_lt() impure {
-      return block_lt();
-    }
-    int builtin_cur_lt() impure {
-      return cur_lt();
-    }
-    _ builtin_get_balance() impure {
-      return get_balance();
-    }
-    slice builtin_my_address() impure {
-      return my_address();
-    }
-    int builtin_now() impure {
-      return now();
-    }
-    _ builtin_set_data(cell d) impure {
-      return set_data(d);
-    }
-    cell builtin_get_data() impure {
-      return get_data();
-    }
-    _ builtin_throw(int e) impure {
-      return throw(e);
-    }
-    _ builtin_send_raw_message(cell c, int f) impure {
-      return send_raw_message(c, f);
-    }
-    (int, int) builtin_divmod(int i1, int i2) impure {
-      return divmod(i1, i2);
-    }
-    _ builtin_end_parse(slice s) impure {
-      return end_parse(s);
-    }
-    int builtin_slice_bits(slice s) impure {
-      return slice_bits(s);
-    }
-    int builtin_slice_refs(slice s) impure {
-      return slice_refs(s);
-    }
-    slice builtin_slice_last(slice s, int l) impure {
-      return slice_last(s, l);
-    }
-    (slice, cell) builtin_load_ref(slice s) impure {
-      return load_ref(s);
-    }
-    (slice, int) builtin_load_grams(slice s) impure {
-      return load_grams(s);
-    }
-    (slice, slice) builtin_load_bits(slice s, int bs) impure {
-      return load_bits(s, bs);
-    }
-    (slice, int) builtin_load_uint(slice s, int bs) impure {
-      return load_uint(s, bs);
-    }
-    (slice, int) builtin_load_int(slice s, int bs) impure {
-      return load_int(s, bs);
-    }
-    slice builtin_begin_parse(cell c) impure {
-      return begin_parse(c);
-    }
-    int builtin_builder_depth(builder b) impure {
-      return builder_depth(b);
-    }
-    int builtin_builder_refs(builder b) impure {
-      return builder_refs(b);
-    }
-    int builtin_builder_bits(builder b) impure {
-      return builder_bits(b);
-    }
-    builder builtin_store_maybe_ref(builder b, cell c) impure {
-      return store_maybe_ref(b, c);
-    }
-    builder builtin_store_slice(builder b, slice s) impure {
-      return store_slice(b, s);
-    }
-    builder builtin_store_ref(builder b, cell c) impure {
-      return store_ref(b, c);
-    }
-    builder builtin_store_grams(builder b, int c) impure {
-      return store_grams(b, c);
-    }
-    builder builtin_store_uint(builder b, int i, int bs) impure {
-      return store_uint(b, i, bs);
-    }
-    builder builtin_store_int(builder b, int i, int bs) impure {
-      return store_int(b, i, bs);
-    }
-    cell builtin_end_cell(builder b) impure {
-      return end_cell(b);
-    }
-    builder builtin_begin_cell() impure {
-      return begin_cell();
-    }
-    _ thrown(int n) impure {
-      return builtin_throw(n);
-    }
-    _ send_raw_msg(cell msg, int flags) impure {
-      return builtin_send_raw_message(msg, flags);
-    }
-    int f0(int i) impure {
-      return i;
-    }
-    int hash_of_slice(slice s) impure {
-      return f0(builtin_slice_hash(s));
-    }
-    int is_signature_valid(int hash, slice sign, int pubkey) impure {
-      return builtin_check_signature(hash, sign, pubkey);
-    }
-    _ recv_internal(slice _) impure {
-    }
-    [slice, slice] f5(slice self, int bits) impure {
-      (slice, slice) output = builtin_load_bits(self, bits);
-      slice slice_ = tensor2_value1(output);
-      slice slice2 = tensor2_value2(output);
-      return [believe_me(slice_), believe_me(slice2)];
-    }
-    [slice, slice] f6(slice v, slice s) impure {
-      return [s, v];
-    }
-    [slice, slice] f4(slice s) impure {
-      [slice slice_, slice value] = f5(s, 512);
-      return f6(value, slice_);
-    }
-    [slice, [slice, slice]] f7([slice, slice] v, slice s) impure {
-      return [s, v];
-    }
-    [slice, [slice, slice]] f3(slice s) impure {
-      [slice slice_, slice sig] = f4(s);
-      return f7([sig, slice_], slice_);
-    }
-    [slice, int] f11(slice self, int bits) impure {
-      (slice, int) output = builtin_load_uint(self, bits);
-      slice slice_ = tensor2_value1(output);
-      int int_ = tensor2_value2(output);
-      return [believe_me(slice_), int_];
-    }
-    [slice, int] f10(slice s) impure {
-      [slice, int] res = f11(s, 32);
-      return [get0(func_believe_me(res)), get1(func_believe_me(res))];
-    }
-    [slice, [int, int, int]] f9(slice slice_) impure {
-      [slice slice_, int subwallet] = f10(slice_);
-      [slice slice_, int valid_until] = f10(slice_);
-      [slice slice_, int seqno] = f10(slice_);
-      return [slice_, [subwallet, valid_until, seqno]];
-    }
-    [slice, [int, int, int]] f8(slice s) impure {
-      return f9(s);
-    }
-    [slice, slice] f13(slice v, slice s) impure {
-      return [s, v];
-    }
-    [slice, slice] f12(slice s) impure {
-      slice empty_slice = builtin_slice_last(s, 0);
-      return f13(s, empty_slice);
-    }
-    [slice, [[slice, slice], [int, int, int], slice]] f2(slice slice_) impure {
-      [slice slice_, [slice, slice] signature] = f3(slice_);
-      [slice slice_, [int, int, int] data] = f8(slice_);
-      [slice slice_, slice rest] = f12(slice_);
-      return [slice_, [signature, data, rest]];
-    }
-    [slice, [[slice, slice], [int, int, int], slice]] f1(slice s) impure {
-      return f2(s);
-    }
-    slice f14(cell cell_) impure {
-      return builtin_begin_parse(cell_);
-    }
-    [slice, int] f17(slice s) impure {
-      [slice, int] res = f11(s, 256);
-      return [get0(func_believe_me(res)), get1(func_believe_me(res))];
-    }
-    [slice, [int, int, int]] f16(slice slice_) impure {
-      [slice slice_, int seqno] = f10(slice_);
-      [slice slice_, int subwallet] = f10(slice_);
-      [slice slice_, int public_key] = f17(slice_);
-      return [slice_, [seqno, subwallet, public_key]];
-    }
-    [slice, [int, int, int]] f15(slice s) impure {
-      return f16(s);
-    }
-    int f18([slice, slice] self, int public_key) impure {
-      return
-        is_signature_valid(hash_of_slice(get1(func_believe_me(self))), get0(func_believe_me(self)), public_key);
-    }
-    [slice, cell] f22(slice self) impure {
-      (slice, cell) output = builtin_load_ref(self);
-      slice slice_ = tensor2_value1(output);
-      cell ref = tensor2_value2(output);
-      return [believe_me(slice_), ref];
-    }
-    [slice, cell] f23(cell v, slice s) impure {
-      return [s, v];
-    }
-    [slice, cell] f21(slice s) impure {
-      [slice slice_, cell value] = f22(s);
-      return f23(value, slice_);
-    }
-    [slice, int] f27(slice self, int bits) impure {
-      (slice, int) output = builtin_load_int(self, bits);
-      slice slice_ = tensor2_value1(output);
-      int int_ = tensor2_value2(output);
-      return [believe_me(slice_), int_];
-    }
-    [slice, int] f26(slice s) impure {
-      [slice, int] res = f27(s, 8);
-      [slice slice_, int value] = res;
-      return [slice_, value];
-    }
-    [slice, int] f25(slice slice_) impure {
-      [slice slice_, int value] = f26(slice_);
-      return [slice_, value];
-    }
-    [slice, int] f24(slice s) impure {
-      return f25(s);
-    }
-    [slice, [cell, int]] f20(slice slice_) impure {
-      [slice slice_, cell cell_] = f21(slice_);
-      [slice slice_, int flags] = f24(slice_);
-      return [slice_, [cell_, flags]];
-    }
-    [slice, [cell, int]] f19(slice s) impure {
-      return f20(s);
-    }
-    int f28(slice self) impure {
-      return builtin_slice_refs(self);
-    }
-    int f29(int i) impure {
-      return i;
-    }
-    builder f30() impure {
-      return builtin_begin_cell();
-    }
-    builder f34(builder self, int uint, int bits) impure {
-      return builtin_store_uint(self, uint, bits);
-    }
-    builder f33(int self, builder builder_) impure {
-      return f34(builder_, self, 32);
-    }
-    builder f35(int self, builder builder_) impure {
-      return f34(builder_, self, 256);
-    }
-    builder f32([int, int, int] self, builder b) impure {
-      builder b = f33(get0(func_believe_me(self)), b);
-      builder b = f33(get1(func_believe_me(self)), b);
-      builder b = f35(get2(func_believe_me(self)), b);
-      return b;
-    }
-    builder f31([int, int, int] self, builder b) impure {
-      return f32(self, b);
-    }
-    cell f36(builder self) impure {
-      return builtin_end_cell(self);
-    }
-    _ recv_external(slice input) impure {
-      [[slice, slice], [int, int, int], slice] body =
-        get1(func_believe_me(f1(input)));
-      [int, int, int] data = get1(func_believe_me(body));
-      [int, int, int] state = get1(func_believe_me(f15(f14(builtin_get_data()))));
-      if (builtin_leq(get1(func_believe_me(data)), builtin_now())) {
-        thrown(35);
-      }
-      if (builtin_neq(get2(func_believe_me(data)), get0(func_believe_me(state)))) {
-        thrown(33);
-      }
-      if (builtin_neq(get0(func_believe_me(data)), get1(func_believe_me(state)))) {
-        thrown(34);
-      }
-      if
-        (builtin_not(f18(get0(func_believe_me(body)), get2(func_believe_me(state)))))
-        {
-        thrown(35);
-      }
-      builtin_accept_message();
-      slice slice_ = get2(func_believe_me(body));
-      while (builtin_neq(f28(slice_), 0)) {
-          [slice new_slice, [cell, int] next] = f19(slice_);
-          slice_ = new_slice;
-          send_raw_msg(get0(func_believe_me(next)), get1(func_believe_me(next)));
-        }
-      [int, int, int] new_state =
-        [f29(builtin_add(get0(func_believe_me(state)), 1)), get1(func_believe_me(state)), get2(func_believe_me(state))];
-      cell new_state = f36(f31(new_state, f30()));
-      return builtin_set_data(new_state);
-    } |}]
-
 let%expect_test "request builder" =
   let source =
     {|
       struct EmptyMsg { @derive impl Serialize {} }
-      fn test() {
+      fn test_req_builder() {
         let b = RequestBuilder[EmptyMsg].new()
                   .can_be_bounced()
                   .ihr_disabled()
@@ -3491,28 +3153,36 @@ let%expect_test "request builder" =
       {
         tuple temp = money;
         int discr = first(temp);
-        if (discr == 0) {
-          int coins = second(temp);
-          {
-            return
-              [get0(func_believe_me(self)), get1(func_believe_me(self)), f9(coins, get2(func_believe_me(get2(func_believe_me(self)))), get3(func_believe_me(get2(func_believe_me(self))))), get3(func_believe_me(self)), get4(func_believe_me(self))];
+        {
+          if (discr == 0) {
+            int coins = second(temp);
+            {
+              return
+                [get0(func_believe_me(self)), get1(func_believe_me(self)), f9(coins, get2(func_believe_me(get2(func_believe_me(self)))), get3(func_believe_me(get2(func_believe_me(self))))), get3(func_believe_me(self)), get4(func_believe_me(self))];
+            }
           }
-        }
-        else if (discr == 1) {
-          [] _ = second(temp);
-          {
-            return
-              [get0(func_believe_me(self)), f8(get1(func_believe_me(self))), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
+          else {
+            if (discr == 1) {
+              [] _ = second(temp);
+              {
+                return
+                  [get0(func_believe_me(self)), f8(get1(func_believe_me(self))), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
+              }
+            }
+            else {
+              if (discr == 2) {
+                [] _ = second(temp);
+                {
+                  return
+                    [get0(func_believe_me(self)), f5(get1(func_believe_me(self))), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
+                }
+              }
+              else {
+                thrown(90);
+                return func_believe_me([]);
+              }
+            }
           }
-        }
-        else if (discr == 2) {
-          [] _ = second(temp);
-          {
-            return
-              [get0(func_believe_me(self)), f5(get1(func_believe_me(self))), get2(func_believe_me(self)), get3(func_believe_me(self)), get4(func_believe_me(self))];
-          }
-        }
-        else {
         }
       }
     }
@@ -3524,77 +3194,178 @@ let%expect_test "request builder" =
     }
     [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
       f12([int, int, int] flags, tuple dst, [int, int, int, int] coins) impure {
-      return [flags, [[2, [0, 0]], dst], coins, [0, 0]];
+      return [flags, [func_believe_me([2, [0, 0]]), dst], coins, [0, 0]];
     }
-    builder f13() impure {
+    tuple f13([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+      v) impure {
+      return func_believe_me([0, v]);
+    }
+    builder f14() impure {
       return builtin_begin_cell();
     }
-    builder f19(builder self, int uint, int bits) impure {
+    builder f22(builder self, int uint, int bits) impure {
       return builtin_store_uint(self, uint, bits);
     }
-    builder f18(int self, builder builder_) impure {
-      return f19(builder_, self, 1);
+    builder f21(int self, builder builder_) impure {
+      return f22(builder_, self, 1);
     }
-    builder f17([int, int, int] self, builder b) impure {
-      builder b = f18(get0(func_believe_me(self)), b);
-      builder b = f18(get1(func_believe_me(self)), b);
-      builder b = f18(get2(func_believe_me(self)), b);
+    builder f20([int, int, int] self, builder b) impure {
+      builder b = f21(get0(func_believe_me(self)), b);
+      builder b = f21(get1(func_believe_me(self)), b);
+      builder b = f21(get2(func_believe_me(self)), b);
       return b;
     }
-    builder f16([int, int, int] self, builder b) impure {
-      return f17(self, b);
-    }
-    builder f23(builder self, int c) impure {
-      return builtin_store_grams(self, c);
-    }
-    builder f22(int self, builder builder_) impure {
-      return f23(builder_, self);
-    }
-    builder f21([int, int, int, int] self, builder b) impure {
-      builder b = f22(get0(func_believe_me(self)), b);
-      builder b = f18(get1(func_believe_me(self)), b);
-      builder b = f22(get2(func_believe_me(self)), b);
-      builder b = f22(get3(func_believe_me(self)), b);
-      return b;
-    }
-    builder f20([int, int, int, int] self, builder b) impure {
-      return f21(self, b);
-    }
-    builder f26(int self, builder builder_) impure {
-      return f19(builder_, self, 64);
-    }
-    builder f27(int self, builder builder_) impure {
-      return f19(builder_, self, 32);
-    }
-    builder f25([int, int] self, builder b) impure {
-      builder b = f26(get0(func_believe_me(self)), b);
-      builder b = f27(get1(func_believe_me(self)), b);
-      return b;
-    }
-    builder f24([int, int] self, builder b) impure {
-      return f25(self, b);
-    }
-    builder f15([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
-      self, builder b) impure {
-      builder b = f16(get0(func_believe_me(self)), b);
-      builder b = f20(get2(func_believe_me(self)), b);
-      builder b = f24(get3(func_believe_me(self)), b);
-      return b;
-    }
-    builder f14([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
-      self, builder b) impure {
-      return f15(self, b);
+    builder f19([int, int, int] self, builder b) impure {
+      return f20(self, b);
     }
     builder f28(builder self, int int_, int bits) impure {
       return builtin_store_int(self, int_, bits);
     }
-    builder f30([] self, builder b) impure {
+    builder f30(int self, builder builder_) impure {
+      return f28(builder_, self, 8);
+    }
+    builder f31(int self, builder builder_) impure {
+      return f28(builder_, self, 256);
+    }
+    builder f29([int, int] self, builder b) impure {
+      builder b = f30(get0(func_believe_me(self)), b);
+      builder b = f31(get1(func_believe_me(self)), b);
       return b;
     }
-    builder f29([] self, builder b) impure {
-      return f30(self, b);
+    builder f27([int, int] self, builder b) impure {
+      builder b = f28(b, 0, 0);
+      return f29(self, b);
     }
-    cell f31(builder self) impure {
+    builder f34(int self, builder builder_) impure {
+      return f28(builder_, self, 9);
+    }
+    builder f35(int self, builder builder_) impure {
+      return f28(builder_, self, 32);
+    }
+    builder f33([int, int, int] self, builder b) impure {
+      builder b = f34(get0(func_believe_me(self)), b);
+      builder b = f35(get1(func_believe_me(self)), b);
+      return b;
+    }
+    builder f32([int, int, int] self, builder b) impure {
+      builder b = f28(b, 0, 0);
+      builder b = f33(self, b);
+      return b;
+    }
+    builder f26(tuple self, builder b) impure {
+      {
+        tuple temp = self;
+        int discr = first(temp);
+        {
+          if (discr == 3) {
+            [int, int, int] varr = second(temp);
+            {
+              builder b = store_uint(b, 3, 2);
+              builder b = f32(varr, b);
+              return b;
+            }
+          }
+          else {
+            if (discr == 2) {
+              [int, int] varr = second(temp);
+              {
+                builder b = store_uint(b, 2, 2);
+                builder b = f27(varr, b);
+                return b;
+              }
+            }
+            else {
+              thrown(90);
+              return func_believe_me([]);
+            }
+          }
+        }
+      }
+    }
+    builder f25(tuple self, builder b) impure {
+      return f26(self, b);
+    }
+    builder f24([tuple, tuple] self, builder b) impure {
+      builder b = f25(get0(func_believe_me(self)), b);
+      builder b = f25(get1(func_believe_me(self)), b);
+      return b;
+    }
+    builder f23([tuple, tuple] self, builder b) impure {
+      return f24(self, b);
+    }
+    builder f39(builder self, int c) impure {
+      return builtin_store_grams(self, c);
+    }
+    builder f38(int self, builder builder_) impure {
+      return f39(builder_, self);
+    }
+    builder f37([int, int, int, int] self, builder b) impure {
+      builder b = f38(get0(func_believe_me(self)), b);
+      builder b = f21(get1(func_believe_me(self)), b);
+      builder b = f38(get2(func_believe_me(self)), b);
+      builder b = f38(get3(func_believe_me(self)), b);
+      return b;
+    }
+    builder f36([int, int, int, int] self, builder b) impure {
+      return f37(self, b);
+    }
+    builder f42(int self, builder builder_) impure {
+      return f22(builder_, self, 64);
+    }
+    builder f43(int self, builder builder_) impure {
+      return f22(builder_, self, 32);
+    }
+    builder f41([int, int] self, builder b) impure {
+      builder b = f42(get0(func_believe_me(self)), b);
+      builder b = f43(get1(func_believe_me(self)), b);
+      return b;
+    }
+    builder f40([int, int] self, builder b) impure {
+      return f41(self, b);
+    }
+    builder f18([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+      self, builder b) impure {
+      builder b = f19(get0(func_believe_me(self)), b);
+      builder b = f23(get1(func_believe_me(self)), b);
+      builder b = f36(get2(func_believe_me(self)), b);
+      builder b = f40(get3(func_believe_me(self)), b);
+      return b;
+    }
+    builder f17([[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+      self, builder b) impure {
+      return f18(self, b);
+    }
+    builder f16(tuple self, builder b) impure {
+      {
+        tuple temp = self;
+        int discr = first(temp);
+        {
+          if (discr == 0) {
+            [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]]
+              varr = second(temp);
+            {
+              builder b = store_uint(b, 0, 1);
+              builder b = f17(varr, b);
+              return b;
+            }
+          }
+          else {
+            thrown(90);
+            return func_believe_me([]);
+          }
+        }
+      }
+    }
+    builder f15(tuple self, builder b) impure {
+      return f16(self, b);
+    }
+    builder f45([] self, builder b) impure {
+      return b;
+    }
+    builder f44([] self, builder b) impure {
+      return f45(self, b);
+    }
+    cell f46(builder self) impure {
       return builtin_end_cell(self);
     }
     _ f11([[int, int, int], int, [int, int, int, int], int, []] self, tuple dst)
@@ -3602,16 +3373,17 @@ let%expect_test "request builder" =
       if (get3(func_believe_me(self))) {
         [[int, int, int], [tuple, tuple], [int, int, int, int], [int, int]] info =
           f12(get0(func_believe_me(self)), dst, get2(func_believe_me(self)));
-        builder b = f14(info, f13());
+        builder b = f15(f13(info), f14());
         builder b = f28(b, 0, 1);
         builder b = f28(b, 0, 1);
-        builder b = f29(get4(func_believe_me(self)), b);
-        send_raw_msg(f31(b), get1(func_believe_me(self)));
+        builder b = f44(get4(func_believe_me(self)), b);
+        send_raw_msg(f46(b), get1(func_believe_me(self)));
       }
       else {
         thrown(87);
       }
     }
-    _ test() impure {
-      _ b = f11(f10(f4(f3(f2(f1())), 1), []), [0, 0]);
+    _ test_req_builder() impure {
+      _ b =
+        f11(f10(f4(f3(f2(f1())), func_believe_me([0, 1])), []), func_believe_me([2, [0, 0]]));
     } |}]

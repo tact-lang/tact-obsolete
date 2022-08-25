@@ -91,7 +91,9 @@ let%expect_test "Immediacy Checks Runtime Reference" =
 
 let%expect_test "Immediacy Checks Primitive" =
   let scope = [] in
-  let expr = bl @@ Primitive (Prim {name = ""; exprs = []}) in
+  let expr =
+    bl @@ Primitive (Prim {name = ""; exprs = []; out_ty = VoidType})
+  in
   pp_sexp @@ sexp_of_bool @@ is_immediate_expr scope (default_program ()) expr ;
   [%expect {| false |}]
 
@@ -241,8 +243,11 @@ let%expect_test "Immediacy Checks Function Call WITH Primitive" =
                                    @@ Expr
                                         ( bl
                                         @@ Primitive
-                                             (Prim {name = ""; exprs = []}) ) ]
-                            ) } ) ),
+                                             (Prim
+                                                { name = "";
+                                                  exprs = [];
+                                                  out_ty = VoidType } ) ) ] ) }
+                   ) ),
            [],
            false )
   in
@@ -266,8 +271,11 @@ let f_with_primitive =
                    @@ Block
                         [ bl
                           @@ Expr
-                               (bl @@ Primitive (Prim {name = ""; exprs = []}))
-                        ] ) } ) )
+                               ( bl
+                               @@ Primitive
+                                    (Prim
+                                       {name = ""; exprs = []; out_ty = VoidType}
+                                    ) ) ] ) } ) )
 
 let%expect_test "Immediacy Checks Function Call that contains function with \
                  primitive" =

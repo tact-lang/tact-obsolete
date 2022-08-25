@@ -1021,7 +1021,8 @@ let%expect_test "Deserialize Unions" =
                             (Prim (name _==_)
                              (exprs
                               ((Reference (i1 IntegerType))
-                               (Reference (i2 IntegerType))))))))))))
+                               (Reference (i2 IntegerType))))
+                             (out_ty BoolType)))))))))
                      ((StructField
                        ((Reference (res_discr (StructType 5))) value IntegerType))
                       (Value (Integer 0)))
@@ -1158,7 +1159,8 @@ let%expect_test "Deserialize Unions" =
                                   (Prim (name _==_)
                                    (exprs
                                     ((Reference (i1 IntegerType))
-                                     (Reference (i2 IntegerType))))))))))))
+                                     (Reference (i2 IntegerType))))
+                                   (out_ty BoolType)))))))))
                            ((StructField
                              ((Reference (res_discr (StructType 5))) value
                               IntegerType))
@@ -1233,7 +1235,8 @@ let%expect_test "Deserialize Unions" =
                         (if_else
                          ((Expr
                            (Primitive
-                            (Prim (name throw) (exprs ((Value (Integer 0)))))))))))))))))))))))))
+                            (Prim (name throw) (exprs ((Value (Integer 0))))
+                             (out_ty VoidType))))))))))))))))))))))
         (TestUnion (Value (Type (UnionType 133))))))
       (structs
        ((136

@@ -247,11 +247,11 @@ struct AddrExtern {
   impl Deserialize {
     fn deserialize(slice: Slice) -> LoadResult[Self] {
       let {value as len, slice} = Int9.deserialize(slice);
-      let {value as bits, slice} = slice.load_int(len);
+      let {value as bits, slice} = slice.load_int(len.value);
 
-      LoadResult[Self] { 
-        slice: slice, 
-        value: Self { 
+      LoadResult[Self] {
+        slice: slice,
+        value: Self {
           len: len,
           bits: bits,
         }
@@ -322,7 +322,7 @@ struct AddressVar {
       if (anycast == 0) {
         let {value as len, slice} = Int9.deserialize(slice);
         let {value as workchain_id, slice} = Int32.deserialize(slice);
-        let {value as address, slice} = slice.load_int(len);
+        let {value as address, slice} = slice.load_int(len.value);
         return LoadResult[Self]
           .new(slice, Self {
             len: len,
@@ -422,6 +422,9 @@ struct IntMsgInfoAddresses {
   val dst: MsgAddressInt
 
   @derive
+  impl Serialize {}
+
+  @derive
   impl Deserialize {}
 }
 
@@ -489,6 +492,9 @@ union CommonMsgInfo {
   case IntMsgInfo
   @discriminator(2, 2) // 0b10
   case ExtInMsgInfo
+
+  @derive
+  impl Serialize {}
 
   @derive
   impl Deserialize {}
@@ -664,13 +670,13 @@ struct Globals {
     Cell { c: builtin_get_data() }
   }
   fn save_state(state: Cell) {
-    builtin_set_data(state.c)
+    builtin_set_data(state.c);
   }
   fn get_now() -> Int[32] {
     builtin_now()
   }
   fn get_my_address() -> AddressStd {
-    AddressStd.deserialize(builtin_my_address()).value
+    AddressStd.deserialize(Slice { s: builtin_my_address() }).value
   }
   fn get_balance() -> Coins {
     struct Balance {
@@ -775,7 +781,7 @@ struct RequestBuilder[X: Serialize] {
     if (self.is_body_setup) {
       // TODO: I don't know why MessageRelaxed[X] type does not work here.
       let info = IntMsgInfo.new(self.msg_flags, dst, self.coins);
-      let b = info.serialize(Builder.new());
+      let b = CommonMsgInfo.serialize(info, Builder.new());
       let b = b.serialize_int(0, 1); // init
       let b = b.serialize_int(0, 1); // body discriminant
       let b = self.body.serialize(b);
