@@ -124,6 +124,10 @@ module Make (Config : Config.T) = struct
 
   let comma_sep p = sep_by p comma
 
+  let dot s = char '.' s
+
+  let dot_sep p = sep_by p dot
+
   let rec keyword state =
     ( string "as" <|> string "let" <|> string "interface" <|> string "impl"
     <|> string "struct" <|> string "union" <|> string "fn" <|> string "fn"
@@ -727,7 +731,7 @@ module Make (Config : Config.T) = struct
   (* ASSIGNMENT expr *)
   and assignment_stmt state =
     (pipe3
-       (locate (ident |>> fun x -> [x]))
+       (locate (attempt (dot_sep ident) <|> (ident |>> fun x -> [x])))
        !!(char '=')
        (locate expr)
        (fun assignment_ident _ assignment_expr ->
