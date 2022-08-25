@@ -242,7 +242,16 @@ functor
           DestructuringLet let_
 
         method build_Assignment env assignment =
-          let {assignment_ident; assignment_expr; _} = assignment in
+          let {assignment_ident = assignment_ident'; assignment_expr; _} =
+            assignment
+          in
+          let assignment_ident =
+            Syntax.map_located assignment_ident' ~f:(function
+              | [assignment_ident] ->
+                  assignment_ident
+              | _ ->
+                  failwith "TODO" )
+          in
           let make name expr =
             match
               is_immediate_expr !current_bindings program expr
@@ -307,7 +316,8 @@ functor
                 assignment_expr
           in
           current_bindings := update !current_bindings ;
-          Assignment {assignment_ident; assignment_expr = right}
+          Assignment
+            {assignment_ident = assignment_ident'; assignment_expr = right}
 
         method build_Reference : _ -> string located -> _ =
           fun _ ref ->

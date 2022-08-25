@@ -127,7 +127,7 @@ functor
         destructuring_binding_rest : bool }
 
     and assignment =
-      {assignment_ident : ident located; assignment_expr : expr located}
+      {assignment_ident : ident list located; assignment_expr : expr located}
 
     and if_ =
       { condition : expr located;

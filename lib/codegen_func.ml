@@ -37,7 +37,11 @@ functor
 
         method cg_Assignment
             ({assignment_ident; assignment_expr; _} : T.assignment) =
-          F.Assignment (value assignment_ident, self#cg_expr assignment_expr)
+          match value assignment_ident with
+          | [assignment_ident] ->
+              F.Assignment (assignment_ident, self#cg_expr assignment_expr)
+          | _ ->
+              raise Unsupported
 
         method cg_DestructuringLet : T.destructuring_let -> F.stmt =
           fun let_ ->

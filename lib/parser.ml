@@ -726,7 +726,8 @@ module Make (Config : Config.T) = struct
 
   (* ASSIGNMENT expr *)
   and assignment_stmt state =
-    (pipe3 (locate ident)
+    (pipe3
+       (locate (ident |>> fun x -> [x]))
        !!(char '=')
        (locate expr)
        (fun assignment_ident _ assignment_expr ->

@@ -4870,7 +4870,7 @@ let%expect_test "runtime assignment" =
                 (Block
                  ((Let ((a (Value (Integer 1)))))
                   (Assignment
-                   ((assignment_ident a)
+                   ((assignment_ident (a))
                     (assignment_expr (Reference (n IntegerType)))))
                   (Return (Reference (a IntegerType)))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
@@ -4921,12 +4921,12 @@ let%expect_test "assignment with condition block" =
                     (if_then
                      (Block
                       ((Assignment
-                        ((assignment_ident a)
+                        ((assignment_ident (a))
                          (assignment_expr (Value (Integer 10))))))))
                     (if_else
                      ((Block
                        ((Assignment
-                         ((assignment_ident a)
+                         ((assignment_ident (a))
                           (assignment_expr (Value (Integer 20)))))))))))
                   (Return (Reference (a IntegerType)))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)

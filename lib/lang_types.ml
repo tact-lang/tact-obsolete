@@ -212,7 +212,8 @@ functor
     and attribute =
       {attribute_ident : string located; attribute_exprs : expr list}
 
-    and assignment = {assignment_ident : string located; assignment_expr : expr}
+    and assignment =
+      {assignment_ident : string list located; assignment_expr : expr}
 
     and type_ =
       | TypeN of int

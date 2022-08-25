@@ -1242,7 +1242,7 @@ let%expect_test "assignment" =
     {|
     ((stmts
       ((Let ((binding_name (Ident a)) (binding_expr (Int 1))))
-       (Assignment ((assignment_ident (Ident a)) (assignment_expr (Int 2))))))) |}]
+       (Assignment ((assignment_ident ((Ident a))) (assignment_expr (Int 2))))))) |}]
 
 let%expect_test "while loop syntax" =
   let source = {|

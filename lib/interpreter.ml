@@ -98,6 +98,13 @@ functor
               self#with_vars args_scope (fun _ -> self#interpret_stmt_list rest)
           | Assignment {assignment_ident; assignment_expr; _} ->
               let span = span assignment_expr |> span_to_concrete in
+              let assignment_ident =
+                map_located assignment_ident ~f:(function
+                  | [assignment_ident] ->
+                      assignment_ident
+                  | _ ->
+                      failwith "TODO" )
+              in
               (* Update individual bindings *)
               let rec update' = function
                 | [] ->
