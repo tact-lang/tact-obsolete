@@ -309,6 +309,13 @@ functor
           current_bindings := update !current_bindings ;
           Assignment {assignment_ident; assignment_expr = right}
 
+        method build_ReferenceLvalue _env x = x
+
+        method build_FieldAccessLvalue _ _ _ = ice "Unsupported"
+
+        method build_assignment _env assignment_ident assignment_expr =
+          {assignment_ident = assignment_ident.value; assignment_expr}
+
         method build_Reference : _ -> string located -> _ =
           fun _ ref ->
             match find_in_scope ref.value !current_bindings with
@@ -456,9 +463,6 @@ functor
           { destructuring_let = Syntax.value destructuring_binding;
             destructuring_let_expr;
             destructuring_let_rest }
-
-        method build_assignment _env assignment_ident assignment_expr =
-          {assignment_ident; assignment_expr}
 
         method build_field_access _env expr field =
           let mk_err () = s#report `Error (`FieldNotFoundF field) in

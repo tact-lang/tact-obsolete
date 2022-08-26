@@ -127,7 +127,12 @@ functor
         destructuring_binding_rest : bool }
 
     and assignment =
-      {assignment_ident : ident located; assignment_expr : expr located}
+      { assignment_lvalue : assignment_lvalue located;
+        assignment_expr : expr located }
+
+    and assignment_lvalue =
+      | ReferenceLvalue of ident located
+      | FieldAccessLvalue of ident located * ident located list
 
     and if_ =
       { condition : expr located;
