@@ -55,16 +55,27 @@ functor
                     then
                       let fn : F.function_ =
                         { function_name = fun_name;
-                          function_forall = ["F"];
+                          function_forall = ["F"; "T"];
                           function_body =
                             AsmFn (Int.to_string field ^ " SETINDEX");
                           function_args =
                             [("t", UnknownTuple); ("elem", NamedType "F")];
-                          function_returns = F.TensorType [];
+                          function_returns = F.NamedType "T";
                           function_is_impure = false }
                       in
                       helpers <- fn :: helpers ) ;
-                    F.FunctionCall (fun_name, [struct_ty], field_ty)
+                    F.Assignment
+                      ( value ref,
+                        F.FunctionCall
+                          ( fun_name,
+                            [ F.FunctionCall
+                                ( "func_believe_me",
+                                  [ Reference
+                                      (ref.value, self#lang_type_to_type ref_ty)
+                                  ],
+                                  F.UnknownTuple );
+                              struct_ty ],
+                            field_ty ) )
                 | Some _ ->
                     ice "Updating tensor values is not supported by codegen."
               in
@@ -86,8 +97,7 @@ functor
                           else None )
                         (self#cg_expr assignment_expr)
                         field_id
-                        (self#lang_type_to_type field.field_type)
-                      |> fun x -> F.Expr x )
+                        (self#lang_type_to_type field.field_type) )
               | _ ->
                   raise Invalid )
           | _ ->

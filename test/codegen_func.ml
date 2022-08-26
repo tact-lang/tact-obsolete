@@ -3414,8 +3414,8 @@ let%expect_test "field assignment" =
     int func_bit_not(int a) {
       return ~ a;
     }
-    forall F -> () update1(tuple t, F elem) asm "1 SETINDEX";
-    forall F -> () update0(tuple t, F elem) asm "0 SETINDEX";
+    forall F, T -> T update1(tuple t, F elem) asm "1 SETINDEX";
+    forall F, T -> T update0(tuple t, F elem) asm "0 SETINDEX";
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }
@@ -3560,6 +3560,6 @@ let%expect_test "field assignment" =
     }
     _ test() impure {
       [int, int] a = [0, 1];
-      update0(2);
-      update1(3);
+      a = update0(func_believe_me(a), 2);
+      a = update1(func_believe_me(a), 3);
     } |}]
