@@ -4870,7 +4870,7 @@ let%expect_test "runtime assignment" =
                 (Block
                  ((Let ((a (Value (Integer 1)))))
                   (Assignment
-                   ((assignment_ident a)
+                   ((assignment_lvalue (ReferenceLvalue a))
                     (assignment_expr (Reference (n IntegerType)))))
                   (Return (Reference (a IntegerType)))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
@@ -4921,16 +4921,108 @@ let%expect_test "assignment with condition block" =
                     (if_then
                      (Block
                       ((Assignment
-                        ((assignment_ident a)
+                        ((assignment_lvalue (ReferenceLvalue a))
                          (assignment_expr (Value (Integer 10))))))))
                     (if_else
                      ((Block
                        ((Assignment
-                         ((assignment_ident a)
+                         ((assignment_lvalue (ReferenceLvalue a))
                           (assignment_expr (Value (Integer 20)))))))))))
                   (Return (Reference (a IntegerType)))))))))))))
         (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
         (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "field assignment OK" =
+  let source =
+    {|
+      struct Test { val field: Integer }
+      fn test() {
+        let var = Test { field: 10 };
+        var.field = 20;
+      }
+    |}
+  in
+  pp_compile source ~include_std:false ~strip_defaults:true ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns HoleType)))
+            (function_impl
+             (Fn
+              (Block
+               ((Let
+                 ((var
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 1)))
+                      ((field (Value (Integer 10))))))))))
+                (Assignment
+                 ((assignment_lvalue
+                   (FieldAccessLvalue (ref var) (fields (field))))
+                  (assignment_expr (Value (Integer 20)))))))))))))
+        (Test (Value (Type (StructType 1))))))
+      (structs
+       ((1
+         ((struct_fields ((field ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 1) (uty_base_id 0)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ((field (ResolvedReference (Integer <opaque>)))))
+          (st_sig_methods ()) (st_sig_base_id 0) (st_sig_id 1)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "field assignment WRONG TYPE" =
+  let source =
+    {|
+      struct Test { val field: Integer }
+      fn test() {
+        let var = Test { field: 10 };
+        var.field = true;
+      }
+    |}
+  in
+  pp_compile source ~include_std:false ~strip_defaults:true ;
+  [%expect
+    {|
+    (((TypeError (IntegerType BoolType <opaque>)))
+     ((bindings
+       ((test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns HoleType)))
+            (function_impl
+             (Fn
+              (Block
+               ((Let
+                 ((var
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 1)))
+                      ((field (Value (Integer 10))))))))))
+                (Assignment
+                 ((assignment_lvalue
+                   (FieldAccessLvalue (ref var) (fields (field))))
+                  (assignment_expr (Value Void))))))))))))
+        (Test (Value (Type (StructType 1))))))
+      (structs
+       ((1
+         ((struct_fields ((field ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 1) (uty_base_id 0)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ((field (ResolvedReference (Integer <opaque>)))))
+          (st_sig_methods ()) (st_sig_base_id 0) (st_sig_id 1)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "methods incrementally added" =
   let source =
