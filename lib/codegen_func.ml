@@ -40,8 +40,58 @@ functor
           match assignment_lvalue.value with
           | T.ReferenceLvalue assignment_ident ->
               F.Assignment (value assignment_ident, self#cg_expr assignment_expr)
+          | T.FieldAccessLvalue {ref; ref_ty; fields = [field_ident]} -> (
+              let build_updating ~(tensor : int option) struct_ty field field_ty
+                  =
+                match tensor with
+                | None ->
+                    if field >= 16 then
+                      ice "Only structs with 16 or less fields are allowed" ;
+                    let fun_name = "update" ^ Int.to_string field in
+                    ( if
+                      not
+                      @@ List.exists helpers ~f:(fun x ->
+                             String.equal x.function_name fun_name )
+                    then
+                      let fn : F.function_ =
+                        { function_name = fun_name;
+                          function_forall = ["F"];
+                          function_body =
+                            AsmFn (Int.to_string field ^ " SETINDEX");
+                          function_args =
+                            [("t", UnknownTuple); ("elem", NamedType "F")];
+                          function_returns = F.TensorType [];
+                          function_is_impure = false }
+                      in
+                      helpers <- fn :: helpers ) ;
+                    F.FunctionCall (fun_name, [struct_ty], field_ty)
+                | Some _ ->
+                    ice "Updating tensor values is not supported by codegen."
+              in
+              match ref_ty with
+              | StructType s -> (
+                  let s = T.Program.get_struct program s in
+                  match s.struct_fields with
+                  | [_] ->
+                      F.Assignment (value ref, self#cg_expr assignment_expr)
+                  | _ ->
+                      let field_id, (_, field) =
+                        Option.value_exn
+                          (List.findi s.struct_fields ~f:(fun _ (name, _) ->
+                               equal_string name.value field_ident.value ) )
+                      in
+                      build_updating
+                        ~tensor:
+                          ( if s.tensor then Some (List.length s.struct_fields)
+                          else None )
+                        (self#cg_expr assignment_expr)
+                        field_id
+                        (self#lang_type_to_type field.field_type)
+                      |> fun x -> F.Expr x )
+              | _ ->
+                  raise Invalid )
           | _ ->
-              raise Unsupported
+              ice "Nested field updating is not supported by codegen"
 
         method cg_DestructuringLet : T.destructuring_let -> F.stmt =
           fun let_ ->

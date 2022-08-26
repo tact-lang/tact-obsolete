@@ -217,7 +217,8 @@ functor
 
     and assignment_lvalue =
       | ReferenceLvalue of string located
-      | FieldAccessLvalue of {ref : string located; fields : string located list}
+      | FieldAccessLvalue of
+          {ref : string located; ref_ty : type_; fields : string located list}
 
     and type_ =
       | TypeN of int

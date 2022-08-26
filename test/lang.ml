@@ -4963,7 +4963,8 @@ let%expect_test "field assignment OK" =
                       ((field (Value (Integer 10))))))))))
                 (Assignment
                  ((assignment_lvalue
-                   (FieldAccessLvalue (ref var) (fields (field))))
+                   (FieldAccessLvalue (ref var) (ref_ty (StructType 1))
+                    (fields (field))))
                   (assignment_expr (Value (Integer 20)))))))))))))
         (Test (Value (Type (StructType 1))))))
       (structs
@@ -5009,7 +5010,8 @@ let%expect_test "field assignment WRONG TYPE" =
                       ((field (Value (Integer 10))))))))))
                 (Assignment
                  ((assignment_lvalue
-                   (FieldAccessLvalue (ref var) (fields (field))))
+                   (FieldAccessLvalue (ref var) (ref_ty (StructType 1))
+                    (fields (field))))
                   (assignment_expr (Value Void))))))))))))
         (Test (Value (Type (StructType 1))))))
       (structs
