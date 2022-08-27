@@ -242,72 +242,146 @@ functor
           DestructuringLet let_
 
         method build_Assignment env assignment =
-          let {assignment_ident; assignment_expr; _} = assignment in
-          let make name expr =
-            match
-              is_immediate_expr !current_bindings program expr
-              && not env.is_inside_condition_block
-            with
-            | true ->
+          let {assignment_lvalue; assignment_expr; _} = assignment in
+          let make name (expr : expr option) expr_ty =
+            match expr with
+            | Some expr
+              when is_immediate_expr !current_bindings program expr
+                   && not env.is_inside_condition_block ->
                 make_comptime (name, expr)
-            | false ->
-                make_runtime (name, type_of program expr)
+            | _ ->
+                make_runtime (name, expr_ty)
           in
           (* Update individual bindings *)
-          let rec update' = function
+          let rec update' assignment_ident assignment_expr ty = function
             | [] ->
                 None
             | (name, _) :: rest
               when equal_located String.equal name assignment_ident ->
-                Some (make name assignment_expr :: rest)
+                Some (make name assignment_expr ty :: rest)
             | binding :: rest -> (
-              match update' rest with
+              match update' assignment_ident assignment_expr ty rest with
               | Some updated ->
                   Some (binding :: updated)
               | None ->
                   None )
           in
           (* Update binding sets *)
-          let rec update = function
+          let rec update assignment_ident assignment_expr ty = function
             | [] ->
                 errors#report `Error (`UnresolvedIdentifier assignment_ident) () ;
                 []
             | binding_set :: bindings -> (
-              match update' binding_set with
+              match update' assignment_ident assignment_expr ty binding_set with
               | Some binding_set' ->
                   binding_set' :: bindings
               | None ->
-                  binding_set :: update bindings )
+                  binding_set
+                  :: update assignment_ident assignment_expr ty bindings )
           in
-          let right =
-            match find_in_scope assignment_ident.value !current_bindings with
-            | Some bind -> (
-                let expected =
-                  match bind with
-                  | Comptime ex ->
-                      type_of program ex
-                  | Runtime rt ->
-                      rt
-                in
-                match s#check_type ~expected assignment_expr with
-                | Ok _ ->
+          match assignment_lvalue.value with
+          | ReferenceLvalue assignment_ident ->
+              let right =
+                match
+                  find_in_scope assignment_ident.value !current_bindings
+                with
+                | Some bind -> (
+                    let expected =
+                      match bind with
+                      | Comptime ex ->
+                          type_of program ex
+                      | Runtime rt ->
+                          rt
+                    in
+                    match s#check_type ~expected assignment_expr with
+                    | Ok _ ->
+                        assignment_expr
+                    | Error (NeedFromCall func) ->
+                        let s = FunctionCall (func, [assignment_expr], false) in
+                        {value = s; span = assignment_expr.span}
+                    | _ ->
+                        errors#report `Error
+                          (`TypeError
+                            ( expected,
+                              type_of program assignment_expr,
+                              assignment_expr.span ) )
+                          () ;
+                        {value = Value Void; span = assignment_expr.span} )
+                | None ->
                     assignment_expr
-                | Error (NeedFromCall func) ->
-                    let s = FunctionCall (func, [assignment_expr], false) in
-                    {value = s; span = assignment_expr.span}
-                | _ ->
-                    errors#report `Error
-                      (`TypeError
-                        ( expected,
-                          type_of program assignment_expr,
-                          assignment_expr.span ) )
-                      () ;
-                    {value = Value Void; span = assignment_expr.span} )
-            | None ->
-                assignment_expr
-          in
-          current_bindings := update !current_bindings ;
-          Assignment {assignment_ident; assignment_expr = right}
+              in
+              current_bindings :=
+                update assignment_ident (Some assignment_expr)
+                  (type_of program assignment_expr)
+                  !current_bindings ;
+              Assignment {assignment_lvalue; assignment_expr = right}
+          | FieldAccessLvalue {ref; ref_ty = _; fields = [field_ident]} ->
+              let right, ref_ty =
+                match find_in_scope ref.value !current_bindings with
+                | Some bind -> (
+                    let bind_ty =
+                      match bind with
+                      | Comptime ex ->
+                          type_of program ex
+                      | Runtime rt ->
+                          rt
+                    in
+                    match Type.get_struct_fields program bind_ty with
+                    | Some fields -> (
+                      match
+                        List.find_map fields ~f:(fun (id, ty) ->
+                            if String.equal id.value field_ident.value then
+                              Some ty
+                            else None )
+                      with
+                      | Some expected -> (
+                        match s#check_type ~expected assignment_expr with
+                        | Ok _ ->
+                            (assignment_expr, bind_ty)
+                        | Error (NeedFromCall func) ->
+                            let s =
+                              FunctionCall (func, [assignment_expr], false)
+                            in
+                            ({value = s; span = assignment_expr.span}, bind_ty)
+                        | _ ->
+                            errors#report `Error
+                              (`TypeError
+                                ( expected,
+                                  type_of program assignment_expr,
+                                  assignment_expr.span ) )
+                              () ;
+                            ( {value = Value Void; span = assignment_expr.span},
+                              bind_ty ) )
+                      | None ->
+                          errors#report `Error (`FieldNotFoundF field_ident) () ;
+                          (assignment_expr, bind_ty) )
+                    | None ->
+                        errors#report `Error
+                          (`IsNotStruct
+                            {value = Reference (ref, bind_ty); span = ref.span}
+                            )
+                          () ;
+                        (assignment_expr, bind_ty) )
+                | None ->
+                    (assignment_expr, VoidType)
+              in
+              current_bindings := update ref None ref_ty !current_bindings ;
+              Assignment
+                { assignment_lvalue =
+                    { value =
+                        FieldAccessLvalue {ref; ref_ty; fields = [field_ident]};
+                      span = assignment_lvalue.span };
+                  assignment_expr = right }
+          | FieldAccessLvalue _ ->
+              ice "Nested fields assignment unsupported."
+
+        method build_ReferenceLvalue _env x = ReferenceLvalue x
+
+        method build_FieldAccessLvalue _env ref fields =
+          FieldAccessLvalue {ref; ref_ty = VoidType; fields}
+
+        method build_assignment _env assignment_lvalue assignment_expr =
+          {assignment_lvalue; assignment_expr}
 
         method build_Reference : _ -> string located -> _ =
           fun _ ref ->
@@ -456,9 +530,6 @@ functor
           { destructuring_let = Syntax.value destructuring_binding;
             destructuring_let_expr;
             destructuring_let_rest }
-
-        method build_assignment _env assignment_ident assignment_expr =
-          {assignment_ident; assignment_expr}
 
         method build_field_access _env expr field =
           let mk_err () = s#report `Error (`FieldNotFoundF field) in

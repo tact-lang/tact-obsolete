@@ -212,7 +212,13 @@ functor
     and attribute =
       {attribute_ident : string located; attribute_exprs : expr list}
 
-    and assignment = {assignment_ident : string located; assignment_expr : expr}
+    and assignment =
+      {assignment_lvalue : assignment_lvalue located; assignment_expr : expr}
+
+    and assignment_lvalue =
+      | ReferenceLvalue of string located
+      | FieldAccessLvalue of
+          {ref : string located; ref_ty : type_; fields : string located list}
 
     and type_ =
       | TypeN of int

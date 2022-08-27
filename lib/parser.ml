@@ -117,6 +117,9 @@ module Make (Config : Config.T) = struct
     many (sep >>> (attempt (option p) <|> return None))
     >>= fun xs -> return (Some x :: xs)
 
+  and sep_by1_exclude p sep =
+    p >>= fun x -> many (sep >>> p) >>= fun xs -> return (x :: xs)
+
   let sep_by p sep =
     opt [] (sep_by1 p sep) |>> fun l -> List.filter_map l ~f:(fun s -> s)
 
@@ -726,11 +729,26 @@ module Make (Config : Config.T) = struct
 
   (* ASSIGNMENT expr *)
   and assignment_stmt state =
-    (pipe3 (locate ident)
+    (pipe3 assignment_lvalue
        !!(char '=')
        (locate expr)
-       (fun assignment_ident _ assignment_expr ->
-         Assignment {assignment_ident; assignment_expr} ) )
+       (fun assignment_lvalue _ assignment_expr ->
+         Assignment {assignment_lvalue; assignment_expr} ) )
+      state
+
+  and assignment_lvalue state =
+    locate
+      ( locate
+          ( attempt (sep_by1_exclude (locate ident) (char '.'))
+          <|> (locate ident |>> fun x -> [x]) )
+      |>> fun xs ->
+      match xs.value with
+      | [] ->
+          Errors.unreachable ()
+      | x :: [] ->
+          ReferenceLvalue x
+      | x :: xs ->
+          FieldAccessLvalue (x, xs) )
       state
 
   and stmt_expr state = (locate expr |>> fun e -> Expr e) state

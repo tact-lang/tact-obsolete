@@ -3387,3 +3387,179 @@ let%expect_test "request builder" =
       _ b =
         f11(f10(f4(f3(f2(f1())), func_believe_me([0, 1])), []), func_believe_me([2, [0, 0]]));
     } |}]
+
+let%expect_test "field assignment" =
+  let source =
+    {|
+      struct Test { val field1: Integer val field2: Integer }
+      fn test() {
+        let a = Test { field1: 0, field2: 1 };
+        a.field1 = 2;
+        a.field2 = 3;
+      }
+    |}
+  in
+  pp_codegen source ~include_std:false ;
+  [%expect
+    {|
+    forall Value1, Value2 -> Value1 tensor2_value1((Value1, Value2) tensor) {
+      (Value1 value, _) = tensor;
+      return value;
+    }
+    forall Value1, Value2 -> Value2 tensor2_value2((Value1, Value2) tensor) {
+      (_, Value2 value) = tensor;
+      return value;
+    }
+    forall A, B -> B func_believe_me(A i) asm "NOP";
+    int func_bit_not(int a) {
+      return ~ a;
+    }
+    forall F, T -> T update1(tuple t, F elem) asm "1 SETINDEX";
+    forall F, T -> T update0(tuple t, F elem) asm "0 SETINDEX";
+    int builtin_gt(int i1, int i2) impure {
+      return _>_(i1, i2);
+    }
+    int builtin_geq(int i1, int i2) impure {
+      return _>=_(i1, i2);
+    }
+    int builtin_lt(int i1, int i2) impure {
+      return _<_(i1, i2);
+    }
+    int builtin_leq(int i1, int i2) impure {
+      return _<=_(i1, i2);
+    }
+    int builtin_neq(int i1, int i2) impure {
+      return _!=_(i1, i2);
+    }
+    int builtin_eq(int i1, int i2) impure {
+      return _==_(i1, i2);
+    }
+    int builtin_bit_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_bit_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
+    int builtin_div(int i1, int i2) impure {
+      return _/_(i1, i2);
+    }
+    int builtin_mul(int i1, int i2) impure {
+      return _*_(i1, i2);
+    }
+    int builtin_sub(int i1, int i2) impure {
+      return _-_(i1, i2);
+    }
+    int builtin_add(int i1, int i2) impure {
+      return _+_(i1, i2);
+    }
+    int builtin_not(int c) impure {
+      return func_bit_not(c);
+    }
+    forall A, B -> B believe_me(A i) asm "NOP";
+    _ builtin_accept_message() impure {
+      return accept_message();
+    }
+    int builtin_slice_hash(slice s) impure {
+      return slice_hash(s);
+    }
+    int builtin_check_signature(int h, slice s, int k) impure {
+      return check_signature(h, s, k);
+    }
+    int builtin_block_lt() impure {
+      return block_lt();
+    }
+    int builtin_cur_lt() impure {
+      return cur_lt();
+    }
+    _ builtin_get_balance() impure {
+      return get_balance();
+    }
+    slice builtin_my_address() impure {
+      return my_address();
+    }
+    int builtin_now() impure {
+      return now();
+    }
+    _ builtin_set_data(cell d) impure {
+      return set_data(d);
+    }
+    cell builtin_get_data() impure {
+      return get_data();
+    }
+    _ builtin_throw(int e) impure {
+      return throw(e);
+    }
+    _ builtin_send_raw_message(cell c, int f) impure {
+      return send_raw_message(c, f);
+    }
+    (int, int) builtin_divmod(int i1, int i2) impure {
+      return divmod(i1, i2);
+    }
+    _ builtin_end_parse(slice s) impure {
+      return end_parse(s);
+    }
+    int builtin_slice_bits(slice s) impure {
+      return slice_bits(s);
+    }
+    int builtin_slice_refs(slice s) impure {
+      return slice_refs(s);
+    }
+    slice builtin_slice_last(slice s, int l) impure {
+      return slice_last(s, l);
+    }
+    (slice, cell) builtin_load_ref(slice s) impure {
+      return load_ref(s);
+    }
+    (slice, int) builtin_load_grams(slice s) impure {
+      return load_grams(s);
+    }
+    (slice, slice) builtin_load_bits(slice s, int bs) impure {
+      return load_bits(s, bs);
+    }
+    (slice, int) builtin_load_uint(slice s, int bs) impure {
+      return load_uint(s, bs);
+    }
+    (slice, int) builtin_load_int(slice s, int bs) impure {
+      return load_int(s, bs);
+    }
+    slice builtin_begin_parse(cell c) impure {
+      return begin_parse(c);
+    }
+    int builtin_builder_depth(builder b) impure {
+      return builder_depth(b);
+    }
+    int builtin_builder_refs(builder b) impure {
+      return builder_refs(b);
+    }
+    int builtin_builder_bits(builder b) impure {
+      return builder_bits(b);
+    }
+    builder builtin_store_maybe_ref(builder b, cell c) impure {
+      return store_maybe_ref(b, c);
+    }
+    builder builtin_store_slice(builder b, slice s) impure {
+      return store_slice(b, s);
+    }
+    builder builtin_store_ref(builder b, cell c) impure {
+      return store_ref(b, c);
+    }
+    builder builtin_store_grams(builder b, int c) impure {
+      return store_grams(b, c);
+    }
+    builder builtin_store_uint(builder b, int i, int bs) impure {
+      return store_uint(b, i, bs);
+    }
+    builder builtin_store_int(builder b, int i, int bs) impure {
+      return store_int(b, i, bs);
+    }
+    cell builtin_end_cell(builder b) impure {
+      return end_cell(b);
+    }
+    builder builtin_begin_cell() impure {
+      return begin_cell();
+    }
+    _ test() impure {
+      [int, int] a = [0, 1];
+      a = update0(func_believe_me(a), 2);
+      a = update1(func_believe_me(a), 3);
+    } |}]
