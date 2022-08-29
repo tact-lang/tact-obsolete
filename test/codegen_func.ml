@@ -106,6 +106,12 @@ let%expect_test "Int[bits] serializer codegen" =
        int func_bit_not(int a) {
          return ~ a;
        }
+       int builtin_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
        int builtin_gt(int i1, int i2) impure {
          return _>_(i1, i2);
        }
@@ -306,6 +312,12 @@ let%expect_test "demo struct serializer" =
        }
        forall A -> A get1(tuple t) asm "1 INDEX";
        forall A -> A get0(tuple t) asm "0 INDEX";
+       int builtin_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
        int builtin_gt(int i1, int i2) impure {
          return _>_(i1, i2);
        }
@@ -517,6 +529,12 @@ let%expect_test "demo struct serializer 2" =
        }
        forall A -> A get1(tuple t) asm "1 INDEX";
        forall A -> A get0(tuple t) asm "0 INDEX";
+       int builtin_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
        int builtin_gt(int i1, int i2) impure {
          return _>_(i1, i2);
        }
@@ -792,6 +810,12 @@ let%expect_test "serializer inner struct" =
          return ~ a;
        }
        forall A -> A get0(tuple t) asm "0 INDEX";
+       int builtin_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
        int builtin_gt(int i1, int i2) impure {
          return _>_(i1, i2);
        }
@@ -1034,6 +1058,12 @@ let%expect_test "switch statement" =
     int func_bit_not(int a) {
       return ~ a;
     }
+    int builtin_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }
@@ -1242,6 +1272,12 @@ let%expect_test "tensor2" =
        int func_bit_not(int a) {
          return ~ a;
        }
+       int builtin_or(int i1, int i2) impure {
+         return _|_(i1, i2);
+       }
+       int builtin_and(int i1, int i2) impure {
+         return _&_(i1, i2);
+       }
        int builtin_gt(int i1, int i2) impure {
          return _>_(i1, i2);
        }
@@ -1440,6 +1476,12 @@ let%expect_test "serialization api" =
     forall A -> A get2(tuple t) asm "2 INDEX";
     forall A -> A get1(tuple t) asm "1 INDEX";
     forall A -> A get0(tuple t) asm "0 INDEX";
+    int builtin_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }
@@ -1913,6 +1955,12 @@ let%expect_test "deserialization api" =
     }
     forall A -> A get1(tuple t) asm "1 INDEX";
     forall A -> A get0(tuple t) asm "0 INDEX";
+    int builtin_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }
@@ -2420,6 +2468,12 @@ let%expect_test "deserializer" =
     int func_bit_not(int a) {
       return ~ a;
     }
+    int builtin_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }
@@ -2626,6 +2680,12 @@ let%expect_test "deserializer unions" =
     }
     forall A -> A get1(tuple t) asm "1 INDEX";
     forall A -> A get0(tuple t) asm "0 INDEX";
+    int builtin_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }
@@ -2962,6 +3022,12 @@ let%expect_test "request builder" =
     forall A -> A get2(tuple t) asm "2 INDEX";
     forall A -> A get1(tuple t) asm "1 INDEX";
     forall A -> A get0(tuple t) asm "0 INDEX";
+    int builtin_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }
@@ -3416,6 +3482,12 @@ let%expect_test "field assignment" =
     }
     forall F, T -> T update1(tuple t, F elem) asm "1 SETINDEX";
     forall F, T -> T update0(tuple t, F elem) asm "0 SETINDEX";
+    int builtin_or(int i1, int i2) impure {
+      return _|_(i1, i2);
+    }
+    int builtin_and(int i1, int i2) impure {
+      return _&_(i1, i2);
+    }
     int builtin_gt(int i1, int i2) impure {
       return _>_(i1, i2);
     }

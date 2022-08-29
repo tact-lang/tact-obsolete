@@ -796,8 +796,13 @@ functor
             make_builtin_names "builtin_leq" "_<=_" [("i1", i); ("i2", i)] bool_;
             make_builtin_names "builtin_lt" "_<_" [("i1", i); ("i2", i)] bool_;
             make_builtin_names "builtin_geq" "_>=_" [("i1", i); ("i2", i)] bool_;
-            make_builtin_names "builtin_gt" "_>_" [("i1", i); ("i2", i)] bool_
-          ]
+            make_builtin_names "builtin_gt" "_>_" [("i1", i); ("i2", i)] bool_;
+            make_builtin_names "builtin_and" "_&_"
+              [("i1", bool_); ("i2", bool_)]
+              bool_;
+            make_builtin_names "builtin_or" "_|_"
+              [("i1", bool_); ("i2", bool_)]
+              bool_ ]
         in
         {p with bindings = p.bindings @ make_bindings builtins}
     end
@@ -851,7 +856,46 @@ functor
             ("geq", logic_op "builtin_geq" Z.geq);
             ("gt", logic_op "builtin_gt" Z.gt) ]
       in
-      let methods = [(IntegerType, {ty_functions = integer_functions})] in
+      let bool_functions =
+        let rec make_bin_op fun_c_name op ret_ty =
+          { function_signature =
+              bl
+              @@ { function_params =
+                     [(bl "left", BoolType); (bl "right", BoolType)];
+                   function_returns = ret_ty;
+                   function_attributes = [];
+                   function_is_type = false };
+            function_impl =
+              (let builtin_add = Program.find_binding_exn p fun_c_name in
+               UniversalFn
+                 ( bl
+                   @@ Block
+                        [ bl
+                          @@ Return
+                               ( bl
+                               @@ FunctionCall
+                                    ( builtin_add,
+                                      [ bl @@ Reference (bl "left", IntegerType);
+                                        bl @@ Reference (bl "right", IntegerType)
+                                      ],
+                                      false ) ) ],
+                   builtin_fun (fun _ args ->
+                       match args with
+                       | [Bool x; Bool y] ->
+                           op x y
+                       | _ ->
+                           Errors.ice "unreachable" ) ) ) }
+        and make_logic_op name op =
+          make_bin_op name (fun x y -> Bool (op x y)) BoolType
+        in
+        make_bindings
+          [ ("and", make_logic_op "builtin_and" ( && ));
+            ("or", make_logic_op "builtin_or" ( || )) ]
+      in
+      let methods =
+        [ (IntegerType, {ty_functions = integer_functions});
+          (BoolType, {ty_functions = bool_functions}) ]
+      in
       {p with type_functions = p.type_functions @ methods}
 
     let add_default_bindings p =
