@@ -517,8 +517,16 @@ module Make (Config : Config.T) = struct
       (* TODO: operator <= does not work *)
       [ [prefix (locate (string "-")) negate];
         (* BITWISE OPERATORS *)
-        [ infix (locate (string "&")) (op "bit_and") Assoc_left;
-          infix (locate (string "|")) (op "bit_or") Assoc_left ];
+        [ infix
+            (locate
+               (attempt
+                  (string "&" << not_followed_by (string "&") "logic operator") ) )
+            (op "bit_and") Assoc_left;
+          infix
+            (locate
+               (attempt
+                  (string "|" << not_followed_by (string "|") "logic operator") ) )
+            (op "bit_or") Assoc_left ];
         (* ARITHMETIC OPERATORS *)
         [ infix (locate (string "*")) (op "mul") Assoc_left;
           infix (locate (string "/")) (op "div") Assoc_left ];
@@ -530,7 +538,9 @@ module Make (Config : Config.T) = struct
           infix (locate (string "<")) (op "lt") Assoc_left;
           infix (locate (string "<=")) (op "leq") Assoc_left;
           infix (locate (string ">")) (op "gt") Assoc_left;
-          infix (locate (string ">=")) (op "geq") Assoc_left ] ]
+          infix (locate (string ">=")) (op "geq") Assoc_left ];
+        [infix (locate (string "&&")) (op "and") Assoc_left];
+        [infix (locate (string "||")) (op "or") Assoc_left] ]
     in
     (* handle type and function indices, method calls and field access  *)
     let exp =

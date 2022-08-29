@@ -1280,6 +1280,8 @@ let%expect_test "operators" =
     1 < 1;
     1 >= 1;
     1 > 1;
+    true && true;
+    true || false;
   |}
   in
   pp source ;
@@ -1333,7 +1335,15 @@ let%expect_test "operators" =
        (Expr
         (MethodCall
          ((receiver (Int 1)) (receiver_fn (Ident gt))
-          (receiver_arguments ((Int 1))))))))) |}]
+          (receiver_arguments ((Int 1))))))
+       (Expr
+        (MethodCall
+         ((receiver (Bool true)) (receiver_fn (Ident and))
+          (receiver_arguments ((Bool true))))))
+       (Expr
+        (MethodCall
+         ((receiver (Bool true)) (receiver_fn (Ident or))
+          (receiver_arguments ((Bool false))))))))) |}]
 
 let%expect_test "sized int/uint helpers" =
   let source =
