@@ -159,6 +159,20 @@ struct Int[bits: Integer] {
     Self { value: i }
   }
 
+  fn add(self: Self, other: Self) { Self { value: self.value + other.value } }
+  fn sub(self: Self, other: Self) { Self { value: self.value - other.value } }
+  fn mul(self: Self, other: Self) { Self { value: self.value * other.value } }
+  fn div(self: Self, other: Self) { Self { value: self.value / other.value } }
+  fn bit_and(self: Self, other: Self) { Self { value: self.value & other.value } }
+  fn bit_or(self: Self, other: Self) { Self { value: self.value | other.value } }
+  fn eq(self: Self, other: Self) { self.value == other.value }
+  fn neq(self: Self, other: Self) { self.value != other.value  }
+  fn leq(self: Self, other: Self) { self.value <= other.value  }
+  fn lt(self: Self, other: Self) { self.value < other.value  }
+  fn lt(self: Self, other: Self) { self.value < other.value  }
+  fn geq(self: Self, other: Self) { self.value >= other.value  }
+  fn gt(self: Self, other: Self) { self.value > other.value  }
+
   impl Serialize {
     fn serialize(self: Self, builder: Builder) -> Builder {
       builder.serialize_int(self.value, bits)
@@ -190,6 +204,20 @@ struct Uint[bits: Integer] {
   fn new(i: Integer) -> Self {
     Self { value: i }
   }
+
+  fn add(self: Self, other: Self) { Self { value: self.value + other.value } }
+  fn sub(self: Self, other: Self) { Self { value: self.value - other.value } }
+  fn mul(self: Self, other: Self) { Self { value: self.value * other.value } }
+  fn div(self: Self, other: Self) { Self { value: self.value / other.value } }
+  fn bit_and(self: Self, other: Self) { Self { value: self.value & other.value } }
+  fn bit_or(self: Self, other: Self) { Self { value: self.value | other.value } }
+  fn eq(self: Self, other: Self) { self.value == other.value }
+  fn neq(self: Self, other: Self) { self.value != other.value  }
+  fn leq(self: Self, other: Self) { self.value <= other.value  }
+  fn lt(self: Self, other: Self) { self.value < other.value  }
+  fn lt(self: Self, other: Self) { self.value < other.value  }
+  fn geq(self: Self, other: Self) { self.value >= other.value  }
+  fn gt(self: Self, other: Self) { self.value > other.value  }
 
   impl Serialize {
     fn serialize(self: Self, builder: Builder) -> Builder {
@@ -672,7 +700,7 @@ struct Globals {
   fn save_state(state: Cell) {
     builtin_set_data(state.c);
   }
-  fn get_now() -> Int[32] {
+  fn get_now() -> Uint[32] {
     builtin_now()
   }
   fn get_my_address() -> AddressStd {

@@ -30,9 +30,9 @@ fn recv_external(input: Slice) {
 
   let body = signed.verify_body(state.public_key);
 
-  if (body.valid_until.value <= builtin_now()) { thrown(35) }
-  if (body.seqno.value != state.seqno.value) { thrown(33) }
-  if (body.subwallet.value != state.subwallet.value) { thrown(34) }
+  if (body.valid_until <= Globals.get_now()) { thrown(35) }
+  if (body.seqno != state.seqno) { thrown(33) }
+  if (body.subwallet != state.subwallet) { thrown(34) }
 
   builtin_accept_message();
 
@@ -42,11 +42,7 @@ fn recv_external(input: Slice) {
     send_raw_msg(next.cell.inner, next.flags);
   }
 
-  let new_state = WalletState {
-    seqno: state.seqno.value + 1,
-    subwallet: state.subwallet,
-    public_key: state.public_key
-  };
-  let new_state = new_state.serialize(Builder.new()).build();
+  state.seqno = state.seqno + 1;
+  let new_state = state.serialize(Builder.new()).build();
   Globals.save_state(new_state);
 }

@@ -108,7 +108,238 @@ let%expect_test "Int[bits] constructor" =
                      (Value
                       (Struct
                        ((Value (Type (StructType 132)))
-                        ((value (Reference (i IntegerType))))))))))))))
+                        ((value (Reference (i IntegerType))))))))))))
+                (add
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (add <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (sub
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (sub <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (mul
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (mul <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (div
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (div <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (bit_and
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (bit_and <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (bit_or
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (bit_or <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (eq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (eq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (neq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (neq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (leq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (leq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (lt
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (lt <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (lt
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (lt <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (geq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (geq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (gt
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (gt <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))))
               (uty_impls
                (((impl_interface -1)
                  (impl_methods
@@ -413,7 +644,238 @@ let%expect_test "demo struct serializer" =
                      (Value
                       (Struct
                        ((Value (Type (StructType 132)))
-                        ((value (Reference (i IntegerType))))))))))))))
+                        ((value (Reference (i IntegerType))))))))))))
+                (add
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (add <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (sub
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (sub <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (mul
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (mul <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (div
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (div <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (bit_and
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (bit_and <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (bit_or
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns (StructType 132))))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 132)))
+                        ((value
+                          (FunctionCall
+                           ((ResolvedReference (bit_or <opaque>))
+                            ((StructField
+                              ((Reference (self (StructType 132))) value
+                               IntegerType))
+                             (StructField
+                              ((Reference (other (StructType 132))) value
+                               IntegerType)))
+                            false))))))))))))
+                (eq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (eq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (neq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (neq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (leq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (leq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (lt
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (lt <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (lt
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (lt <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (geq
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (geq <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))
+                (gt
+                 ((function_signature
+                   ((function_params
+                     ((self (StructType 132)) (other (StructType 132))))
+                    (function_returns BoolType)))
+                  (function_impl
+                   (Fn
+                    (Return
+                     (FunctionCall
+                      ((ResolvedReference (gt <opaque>))
+                       ((StructField
+                         ((Reference (self (StructType 132))) value IntegerType))
+                        (StructField
+                         ((Reference (other (StructType 132))) value IntegerType)))
+                       false)))))))))
               (uty_impls
                (((impl_interface -1)
                  (impl_methods
