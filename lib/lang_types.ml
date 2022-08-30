@@ -205,8 +205,9 @@ functor
 
     and actor =
       { actor_name : string located;
-        actor_fields : (string * expr) list;
-        actor_functions : (string * function_) list }
+        actor_fields : (string located * type_) list;
+        actor_receive_external : function_;
+        actor_receive_internal : function_ }
 
     and while_loop = {while_cond : expr; while_body : stmt}
 

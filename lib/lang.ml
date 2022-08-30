@@ -36,7 +36,8 @@ functor
       | `CaseNotFound of (span[@equal.ignore] [@sexp.opaque])
       | `ArgumentNumberMismatch of
         int * int * (span[@equal.ignore] [@sexp.opaque])
-      | `ExpectedTypeFunction of bool * (span[@equal.ignore] [@sexp.opaque]) ]
+      | `ExpectedTypeFunction of bool * (span[@equal.ignore] [@sexp.opaque])
+      | `DuplicateActor of string located ]
     [@@deriving equal, sexp_of]
 
     include Builtin
@@ -881,9 +882,66 @@ functor
 
         method build_function_definition _ _ _ _ _ = unreachable ()
 
-        method build_actor_definition _ _ = unreachable ()
+        method build_actor_definition _ _ _ _ _ = unreachable ()
 
-        method build_Actor _ _ = unreachable ()
+        method! visit_actor_definition env actor =
+          let actor_name = s#visit_located s#visit_ident env actor.actor_name in
+          match program.current_actor with
+          | None ->
+              let get_method funcs method_name =
+                List.find_map funcs ~f:(fun (name, func) ->
+                    if String.equal name.value method_name then Some func
+                    else None )
+                |> Option.value
+                     ~default:
+                       { value =
+                           { function_signature =
+                               { value =
+                                   { function_params = [];
+                                     function_returns = HoleType;
+                                     function_attributes = [];
+                                     function_is_type = false };
+                                 span = actor_name.span };
+                             function_impl =
+                               Fn {value = Block []; span = actor_name.span} };
+                         span = actor_name.span }
+              in
+              let output =
+                s#visit_struct_definition env
+                  { struct_attributes = actor.actor_attributes;
+                    fields = actor.actor_fields;
+                    struct_bindings = actor.actor_bindings;
+                    impls = [];
+                    struct_span = actor.actor_name.span }
+              in
+              let methods =
+                List.filter_map output.mk_struct_details.mk_methods
+                  ~f:(fun binding ->
+                    let name, expr = binding in
+                    match expr.value with
+                    | Value (Function f) | MkFunction f ->
+                        Some (name, f)
+                    | _ ->
+                        None )
+              in
+              let actor_receive_internal =
+                get_method methods "receive_internal"
+              in
+              let actor_receive_external =
+                get_method methods "receive_external"
+              in
+              let actor =
+                { actor_name;
+                  actor_fields = [];
+                  actor_receive_internal;
+                  actor_receive_external }
+              in
+              program.current_actor <- Some actor ;
+              ()
+          | Some _ ->
+              s#report `Error (`DuplicateActor actor_name)
+
+        method build_Actor _ _ = Expr (builtin_located @@ Value Void)
 
         method! visit_if_ env x =
           let new_env = {env with is_inside_condition_block = true} in

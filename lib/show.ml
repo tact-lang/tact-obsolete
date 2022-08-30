@@ -380,4 +380,12 @@ functor
               spans = [(span, "When calling this function")];
               additional_msg = [] }
             code
+      | `DuplicateActor name ->
+          DiagnosticMsg.show f
+            { severity = `Error;
+              diagnostic_id = 1;
+              diagnostic_msg = "Only one actor in contract is allowed.";
+              spans = [(name.span, "Duplicated actor")];
+              additional_msg = [] }
+            code
   end
