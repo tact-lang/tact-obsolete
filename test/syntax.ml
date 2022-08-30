@@ -1374,3 +1374,35 @@ let%expect_test "sized int/uint helpers" =
         (FunctionCall
          ((fn (Reference (Ident Int))) (arguments ((Int 31)))
           (is_type_func_call))))))) |}]
+
+let%expect_test "actors" =
+  let source =
+    {|
+    actor Test {
+      val field: Uint32
+      fn method() -> Uint32 {}
+    }
+  |}
+  in
+  pp source ;
+  [%expect
+    {|
+    ((stmts
+      ((Actor
+        ((actor_name (Ident Test))
+         (actor_fields
+          (((field_name (Ident field))
+            (field_type
+             (FunctionCall
+              ((fn (Reference (Ident Uint))) (arguments ((Int 32)))
+               (is_type_func_call)))))))
+         (actor_bindings
+          (((binding_name (Ident method))
+            (binding_expr
+             (Function
+              ((returns
+                (FunctionCall
+                 ((fn (Reference (Ident Uint))) (arguments ((Int 32)))
+                  (is_type_func_call))))
+               (function_body ((function_stmt (CodeBlock ()))))
+               (function_def_span <opaque>)))))))))))) |}]

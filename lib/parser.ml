@@ -288,6 +288,34 @@ module Make (Config : Config.T) = struct
          () ) )
       state
 
+  and actor_item state =
+    ( attempt struct_field
+    <|> attempt (fn_stmt |>> fun x -> `Fn x)
+    <<< (attempt (skip_char ';') <|> whitespace <|> look_ahead (skip_char '}'))
+    )
+      state
+
+  and actor state =
+    ( !!(locate
+           (pair attributes
+              (pair
+                 (skip_keyword "actor" >>> locate ident)
+                 !!!(char '{' >>> many !!actor_item <<< char '}') ) ) )
+    |>> fun v ->
+    let actor_attributes, (actor_name, items) = Syntax.value v in
+    Actor
+      (make_actor_definition ~actor_attributes ~actor_name
+         ~actor_fields:
+           (List.filter_map items ~f:(function `Field f -> Some f | _ -> None))
+         ~actor_bindings:
+           (List.filter_map items ~f:(function
+             | `Fn (Let f) ->
+                 Some f
+             | _ ->
+                 None ) )
+         () ) )
+      state
+
   and union_member state = (skip_keyword "case" >>> locate expr) state
 
   and union_item state =
@@ -771,8 +799,9 @@ module Make (Config : Config.T) = struct
   and stmt state =
     ( whitespace
     >> ( attempt let_ <|> attempt struct_stmt <|> attempt union_stmt
-       <|> attempt interface_stmt <|> attempt fn_stmt <|> switch <|> while_loop
-       <|> semicolon_stmt <|> if_stmt <|> code_block ) )
+       <|> attempt interface_stmt <|> attempt fn_stmt <|> attempt actor
+       <|> switch <|> while_loop <|> semicolon_stmt <|> if_stmt <|> code_block
+       ) )
       state
 
   and program state =

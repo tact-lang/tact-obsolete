@@ -881,6 +881,10 @@ functor
 
         method build_function_definition _ _ _ _ _ = unreachable ()
 
+        method build_actor_definition _ _ = unreachable ()
+
+        method build_Actor _ _ = unreachable ()
+
         method! visit_if_ env x =
           let new_env = {env with is_inside_condition_block = true} in
           let cond = s#visit_located s#visit_expr env x.condition in

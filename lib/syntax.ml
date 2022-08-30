@@ -34,6 +34,12 @@ functor
         interface : expr located;
         methods : binding located list }
 
+    and actor_definition =
+      { actor_attributes : attribute list; [@sexp.list]
+        actor_name : ident located;
+        actor_fields : struct_field located list; [@sexp.list]
+        actor_bindings : binding located list [@sexp.list] }
+
     and interface_definition =
       { interface_attributes : attribute list; [@sexp.list]
         interface_members : binding located list [@sexp.list] }
@@ -85,6 +91,7 @@ functor
       | Expr of expr located
       | Switch of switch
       | WhileLoop of while_loop
+      | Actor of actor_definition
 
     and while_loop = {while_cond : expr located; while_body : stmt located}
 
