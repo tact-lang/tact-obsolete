@@ -114,6 +114,29 @@ struct RefCell {
   }
 }
 
+struct TypedSerializeCell[X: Serialize] {
+  val value: X
+
+  impl Serialize {
+    fn serialize(self: Self, b: Builder) -> Builder {
+      let cell = self.value.serialize(Builder.new()).build();
+      b.serialize_ref(cell)
+    }
+  }
+}
+
+struct TypedDeserializeCell[X: Deserialize] {
+  val value: X
+
+  impl Deserialize {
+    fn deserialize(s: Slice) -> LoadResult[Self] {
+      let {slice, value} = s.load_ref();
+      let {slice as _, value} = X.deserialize(Slice.parse(value));
+      LoadResult[Self].new(Self { value: believe_me(value) }, slice)
+    } 
+  }
+}
+
 struct SliceBits[N: Integer] {
   val inner: Slice
 

@@ -65,17 +65,17 @@ let%expect_test "program returns" =
                                                                  <opaque>)))
 
     (Ok
-     ((bindings ((T (Value (Type (StructType 133))))))
+     ((bindings ((T (Value (Type (StructType 135))))))
       (structs
-       ((133
+       ((135
          ((struct_fields ())
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
+           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
-        (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 132)
-          (st_sig_id 54)))))
+        (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 134)
+          (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "scope resolution" =
@@ -86,4600 +86,7 @@ let%expect_test "scope resolution" =
   [%expect
     {|
     (Ok
-     ((bindings ((T (Value (Type (StructType 132))))))
-      (structs
-       ((133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "binding resolution" =
-  let source = {|
-    let T = Int[257];
-  |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings ((T (Value (Type (StructType 132))))))
-      (structs
-       ((133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "failed scope resolution" =
-  let source = {|
-    let T = NotInt256;
-  |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (((UnresolvedIdentifier NotInt256))
-     ((bindings ()) (structs ()) (type_counter <opaque>)
-      (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
-      (attr_executors <opaque>))) |}]
-
-let%expect_test "scope resolution after let binding" =
-  let source = {|
-    let A = Int[257];
-    let B = A;
-  |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((B (Value (Type (StructType 132)))) (A (Value (Type (StructType 132))))))
-      (structs
-       ((133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "basic struct definition" =
-  let source = {|
-    struct T { val t: Int[257] }
-  |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings ((T (Value (Type (StructType 135))))))
-      (structs
-       ((135
-         ((struct_fields ((t ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))
-        (133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields ((t (Value (Type (StructType 132))))))
-          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "Tact function evaluation" =
-  let source =
-    {|
-    fn test(i: Int[257]) -> Int[257] {
-      i
-    }
-    let a = test(test(Int[257].new(1)));
-  |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((a
-         (Value
-          (Struct
-           ((Value (Type (StructType 132))) ((value (Value (Integer 1))))))))
-        (test
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((i (StructType 132))))
-              (function_returns (StructType 132))))
-            (function_impl (Fn (Return (Reference (i (StructType 132))))))))))))
-      (structs
-       ((133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "struct definition" =
-  let source =
-    {|
-  let MyType = struct {
-       val a: Int[257]
-       val b: Bool
-  };
-  |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings ((MyType (Value (Type (StructType 135))))))
-      (structs
-       ((135
-         ((struct_fields
-           ((a ((field_type (StructType 132)))) (b ((field_type BoolType)))))
-          (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))
-        (133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields
-           ((a (Value (Type (StructType 132))))
-            (b (ResolvedReference (Bool <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "duplicate type field" =
-  let source =
-    {|
-  let MyType = struct {
-      val a: Int[257]
-      val a: Bool
-  };
-  |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (((DuplicateField
-       (a
-        ((mk_struct_fields
-          ((a (Value (Type (StructType 132))))
-           (a (ResolvedReference (Bool <opaque>)))))
-         (mk_struct_details
-          ((mk_methods ()) (mk_impls ()) (mk_id 134) (mk_sig 54)
-           (mk_span <opaque>)))))))
-     ((bindings ((MyType (Value (Type (StructType 135))))))
-      (structs
-       ((135
-         ((struct_fields
-           ((a ((field_type (StructType 132)))) (a ((field_type BoolType)))))
-          (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))
-        (133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields
-           ((a (Value (Type (StructType 132))))
-            (a (ResolvedReference (Bool <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "parametric struct instantiation" =
-  let source =
-    {|
-      struct T[A: Type] { val a: A }
-      let TA = T[Int[257]];
-   |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((TA (Value (Type (StructType 135))))
-        (T
-         (Value
-          (Function
-           ((function_signature
-             ((function_is_type) (function_params ((A (TypeN 0))))
-              (function_returns (StructSig 54))))
-            (function_impl
-             (Fn
-              (Return
-               (MkStructDef
-                ((mk_struct_fields ((a (Reference (A (TypeN 0))))))
-                 (mk_struct_details
-                  ((mk_methods ()) (mk_impls ()) (mk_id 132) (mk_sig 54)
-                   (mk_span <opaque>))))))))))))))
-      (structs
-       ((135
-         ((struct_fields ((a ((field_type (StructType 133))))))
-          (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 132)))))
-        (134
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 133))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 133)) (s (StructType 7))))
-                  (function_returns (StructType 134))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 134)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 133)))))))))))))))
-            (uty_impls ()) (uty_id 134) (uty_base_id -500)))))
-        (133
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 134))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 134)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 133)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 133))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 133))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 133))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 133))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 133))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 133))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 133))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 133))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 133))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 133))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 133))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 133))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 133))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 133))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 133))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 133))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 133))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 133))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 133)) (other (StructType 133))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 133))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 133))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 133)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 133))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 134))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 134)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 133)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 133)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 133) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields ((a (Reference (A (TypeN 0)))))) (st_sig_methods ())
-          (st_sig_base_id 132) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "function without a return type" =
-  let source = {|
-    fn f() { 1 }
-    let a = f();
-    |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((a (Value (Integer 1)))
-        (f
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ()) (function_returns IntegerType)))
-            (function_impl (Fn (Return (Value (Integer 1)))))))))))
-      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "scoping that `let` introduces in code" =
-  let source =
-    {|
-    fn f(i: Int[257]) {
-      let a = i;
-      a
-    }
-    let b = f(Int[257].new(1));
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((b
-         (Value
-          (Struct
-           ((Value (Type (StructType 132))) ((value (Value (Integer 1))))))))
-        (f
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((i (StructType 132))))
-              (function_returns (StructType 132))))
-            (function_impl
-             (Fn
-              (Block
-               ((Let ((a (Reference (i (StructType 132))))))
-                (Return (Reference (a (StructType 132))))))))))))))
-      (structs
-       ((133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "reference in function bodies" =
-  let source =
-    {|
-      fn op(i: Int[257], i_: Int[257]) {
-        i
-      }
-
-      fn f(x: Int[257]) {
-        let a = op(x, x);
-        let b = op(a, a);
-      }
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((f
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((x (StructType 132))))
-              (function_returns HoleType)))
-            (function_impl
-             (Fn
-              (Block
-               ((Let
-                 ((a
-                   (FunctionCall
-                    ((ResolvedReference (op <opaque>))
-                     ((Reference (x (StructType 132)))
-                      (Reference (x (StructType 132))))
-                     false)))))
-                (Let
-                 ((b
-                   (FunctionCall
-                    ((ResolvedReference (op <opaque>))
-                     ((Reference (a (StructType 132)))
-                      (Reference (a (StructType 132))))
-                     false)))))))))))))
-        (op
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((i (StructType 132)) (i_ (StructType 132))))
-              (function_returns (StructType 132))))
-            (function_impl (Fn (Return (Reference (i (StructType 132))))))))))))
-      (structs
-       ((133
-         ((struct_fields
-           ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
-          (struct_details
-           ((uty_methods
-             ((new
-               ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 133)))
-                      ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
-         ((struct_fields ((value ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods
-             ((from
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (deserialize
-               ((function_signature
-                 ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
-                (function_impl
-                 (Fn
-                  (Block
-                   ((Let
-                     ((res
-                       (FunctionCall
-                        ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 257)))
-                         false)))))
-                    (DestructuringLet
-                     ((destructuring_let ((slice slice) (value value)))
-                      (destructuring_let_expr (Reference (res (StructType 5))))
-                      (destructuring_let_rest false)))
-                    (Return
-                     (Value
-                      (Struct
-                       ((Value (Type (StructType 133)))
-                        ((slice (Reference (slice (StructType 7))))
-                         (value
-                          (Value
-                           (Struct
-                            ((Value (Type (StructType 132)))
-                             ((value (Reference (value IntegerType)))))))))))))))))))
-              (serialize
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
-                  (function_returns (StructType 3))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (serialize_int <opaque>))
-                     ((Reference (builder (StructType 3)))
-                      (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (Value (Integer 257)))
-                     false)))))))
-              (new
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value (Reference (i IntegerType))))))))))))
-              (add
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (add <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (sub
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (sub <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (mul
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (mul <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (div
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (div <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_and
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_and <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (bit_or
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
-                (function_impl
-                 (Fn
-                  (Return
-                   (Value
-                    (Struct
-                     ((Value (Type (StructType 132)))
-                      ((value
-                        (FunctionCall
-                         ((ResolvedReference (bit_or <opaque>))
-                          ((StructField
-                            ((Reference (self (StructType 132))) value
-                             IntegerType))
-                           (StructField
-                            ((Reference (other (StructType 132))) value
-                             IntegerType)))
-                          false))))))))))))
-              (eq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (eq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (neq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (neq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (leq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (leq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (lt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (lt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (geq
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (geq <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))
-              (gt
-               ((function_signature
-                 ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns BoolType)))
-                (function_impl
-                 (Fn
-                  (Return
-                   (FunctionCall
-                    ((ResolvedReference (gt <opaque>))
-                     ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
-                      (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
-                     false)))))))))
-            (uty_impls
-             (((impl_interface -1)
-               (impl_methods
-                ((serialize
-                  ((function_signature
-                    ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
-                     (function_returns (StructType 3))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (FunctionCall
-                       ((ResolvedReference (serialize_int <opaque>))
-                        ((Reference (builder (StructType 3)))
-                         (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
-                         (Value (Integer 257)))
-                        false))))))))))
-              ((impl_interface -2)
-               (impl_methods
-                ((deserialize
-                  ((function_signature
-                    ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
-                   (function_impl
-                    (Fn
-                     (Block
-                      ((Let
-                        ((res
-                          (FunctionCall
-                           ((ResolvedReference (load_int <opaque>))
-                            ((Reference (s (StructType 7)))
-                             (Value (Integer 257)))
-                            false)))))
-                       (DestructuringLet
-                        ((destructuring_let ((slice slice) (value value)))
-                         (destructuring_let_expr
-                          (Reference (res (StructType 5))))
-                         (destructuring_let_rest false)))
-                       (Return
-                        (Value
-                         (Struct
-                          ((Value (Type (StructType 133)))
-                           ((slice (Reference (slice (StructType 7))))
-                            (value
-                             (Value
-                              (Struct
-                               ((Value (Type (StructType 132)))
-                                ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
-                   (function_impl
-                    (Fn
-                     (Return
-                      (Value
-                       (Struct
-                        ((Value (Type (StructType 132)))
-                         ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "resolving a reference from inside a function" =
-  let source =
-    {|
-      let i = 1;
-      fn f() {
-        i
-      }
-      let x = f();
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((x (Value (Integer 1)))
-        (f
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ()) (function_returns IntegerType)))
-            (function_impl (Fn (Return (ResolvedReference (i <opaque>)))))))))
-        (i (Value (Integer 1)))))
-      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "struct method access" =
-  let source =
-    {|
-      struct Foo {
-        fn bar(self: Self, i: Integer) {
-           i
-        }
-      }
-      let foo = Foo {};
-      let res = foo.bar(1);
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((res (Value (Integer 1)))
-        (foo (Value (Struct ((Value (Type (StructType 133))) ()))))
-        (Foo (Value (Type (StructType 133))))))
-      (structs
-       ((133
-         ((struct_fields ())
-          (struct_details
-           ((uty_methods
-             ((bar
-               ((function_signature
-                 ((function_params ((self (StructType 133)) (i IntegerType)))
-                  (function_returns IntegerType)))
-                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields ())
-          (st_sig_methods
-           ((bar
-             ((function_params
-               ((self (ExprType (Reference (Self (StructSig 54)))))
-                (i IntegerType)))
-              (function_returns IntegerType)))))
-          (st_sig_base_id 132) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "struct type method access" =
-  let source =
-    {|
-      struct Foo {
-        fn bar(i: Integer) {
-           i
-        }
-      }
-      let res = Foo.bar(1);
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((res (Value (Integer 1))) (Foo (Value (Type (StructType 133))))))
-      (structs
-       ((133
-         ((struct_fields ())
-          (struct_details
-           ((uty_methods
-             ((bar
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns IntegerType)))
-                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields ())
-          (st_sig_methods
-           ((bar
-             ((function_params ((i IntegerType))) (function_returns IntegerType)))))
-          (st_sig_base_id 132) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "Self type resolution in methods" =
-  let source =
-    {|
-      struct Foo {
-        fn bar(self: Self) -> Self {
-           self
-        }
-      }
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings ((Foo (Value (Type (StructType 133))))))
-      (structs
-       ((133
-         ((struct_fields ())
-          (struct_details
-           ((uty_methods
-             ((bar
-               ((function_signature
-                 ((function_params ((self (StructType 133))))
-                  (function_returns (StructType 133))))
-                (function_impl (Fn (Return (Reference (self (StructType 133))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields ())
-          (st_sig_methods
-           ((bar
-             ((function_params
-               ((self (ExprType (Reference (Self (StructSig 54)))))))
-              (function_returns (ExprType (Reference (Self (StructSig 54)))))))))
-          (st_sig_base_id 132) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "union method access" =
-  let source =
-    {|
-      union Foo {
-        case Bool
-        fn bar(self: Self, i: Integer) {
-          i
-        }
-      }
-      fn make_foo(foo: Foo) -> Foo {
-        foo
-      }
-      let foo = make_foo(true);
-      let res = foo.bar(1);
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((res (Value (Integer 1))) (foo (Value (UnionVariant ((Bool true) 133))))
-        (make_foo
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((foo (UnionType 133))))
-              (function_returns (UnionType 133))))
-            (function_impl (Fn (Return (Reference (foo (UnionType 133))))))))))
-        (Foo (Value (Type (UnionType 133))))))
-      (structs ())
-      (unions
-       ((133
-         ((union_attributes ()) (cases ((BoolType (Discriminator (discr 0)))))
-          (union_details
-           ((uty_methods
-             ((bar
-               ((function_signature
-                 ((function_params ((self (UnionType 133)) (i IntegerType)))
-                  (function_returns IntegerType)))
-                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
-            (uty_impls
-             (((impl_interface 134)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((v BoolType)))
-                     (function_returns (UnionType 132))))
-                   (function_impl
-                    (Fn
-                     (Return (MakeUnionVariant ((Reference (v BoolType)) 133))))))))))))
-            (uty_id 133) (uty_base_id 132)))))))
-      (interfaces
-       ((134
-         ((interface_methods
-           ((from
-             ((function_params ((from BoolType))) (function_returns SelfType)))))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs
-       (1
-        (((un_sig_cases (BoolType))
-          (un_sig_methods
-           ((bar
-             ((function_params
-               ((self (ExprType (Reference (Self (UnionSig 6)))))
-                (i IntegerType)))
-              (function_returns IntegerType)))))
-          (un_sig_base_id 132)))))
-      (attr_executors <opaque>))) |}]
-
-let%expect_test "union type method access" =
-  let source =
-    {|
-      union Foo {
-        case Bool
-        fn bar(i: Integer) {
-           i
-        }
-      }
-      fn make_foo(foo: Foo) -> Foo {
-        foo
-      }
-      let res = Foo.bar(1);
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((res (Value (Integer 1)))
-        (make_foo
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((foo (UnionType 133))))
-              (function_returns (UnionType 133))))
-            (function_impl (Fn (Return (Reference (foo (UnionType 133))))))))))
-        (Foo (Value (Type (UnionType 133))))))
-      (structs ())
-      (unions
-       ((133
-         ((union_attributes ()) (cases ((BoolType (Discriminator (discr 0)))))
-          (union_details
-           ((uty_methods
-             ((bar
-               ((function_signature
-                 ((function_params ((i IntegerType)))
-                  (function_returns IntegerType)))
-                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
-            (uty_impls
-             (((impl_interface 134)
-               (impl_methods
-                ((from
-                  ((function_signature
-                    ((function_params ((v BoolType)))
-                     (function_returns (UnionType 132))))
-                   (function_impl
-                    (Fn
-                     (Return (MakeUnionVariant ((Reference (v BoolType)) 133))))))))))))
-            (uty_id 133) (uty_base_id 132)))))))
-      (interfaces
-       ((134
-         ((interface_methods
-           ((from
-             ((function_params ((from BoolType))) (function_returns SelfType)))))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs
-       (1
-        (((un_sig_cases (BoolType))
-          (un_sig_methods
-           ((bar
-             ((function_params ((i IntegerType))) (function_returns IntegerType)))))
-          (un_sig_base_id 132)))))
-      (attr_executors <opaque>))) |}]
-
-let%expect_test "struct instantiation" =
-  let source =
-    {|
-    struct T {
-      val a: Integer
-      val b: Integer
-    }
-
-    let t = T{a: 1, b: 2};
-  |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((t
-         (Value
-          (Struct
-           ((Value (Type (StructType 133)))
-            ((a (Value (Integer 1))) (b (Value (Integer 2))))))))
-        (T (Value (Type (StructType 133))))))
-      (structs
-       ((133
-         ((struct_fields
-           ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
-          (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs
-       (1
-        (((st_sig_fields
-           ((a (ResolvedReference (Integer <opaque>)))
-            (b (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 132) (st_sig_id 54)))))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "type check error" =
-  let source = {|
-    fn foo(i: Int[32]) -> Int[64] { return i; }
-  |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (((TypeError ((StructType 116) (StructType 41) <opaque>)))
-     ((bindings
-       ((foo
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((i (StructType 41))))
-              (function_returns (StructType 116))))
-            (function_impl (Fn (Return (Reference (i (StructType 41))))))))))))
-      (structs ())
-      (interfaces
-       ((132
-         ((interface_methods
-           ((from
-             ((function_params ((from (StructType 41))))
-              (function_returns SelfType)))))))))
-      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
-      (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "type inference" =
-  let source = {|
-      fn foo(i: Integer) { return i; }
-    |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((foo
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((i IntegerType))) (function_returns IntegerType)))
-            (function_impl (Fn (Return (Reference (i IntegerType)))))))))))
-      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "scope doesn't leak bindings" =
-  let source = {|
-    {
-     let a = 1;
-    }
-  |} in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings ()) (structs ()) (type_counter <opaque>)
-      (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
-      (attr_executors <opaque>))) |}]
-
-let%expect_test "compile-time if/then/else continues interpretation after \
-                 condition check (bug fix)" =
-  let source =
-    {|
-    fn T() {
-      if (false) {
-        return 1;
-      }
-      return 2;
-    }
-
-    let a = T();
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((a (Value (Integer 2)))
-        (T
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ()) (function_returns IntegerType)))
-            (function_impl
-             (Fn
-              (Block
-               ((If
-                 ((if_condition (Value (Bool false)))
-                  (if_then (Block ((Return (Value (Integer 1)))))) (if_else ())))
-                (Return (Value (Integer 2)))))))))))))
-      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>)))
-|}]
-
-let%expect_test "compile-time if/then/else" =
-  let source =
-    {|
-    fn test() {
-      true
-    }
-
-    fn T() {
-      if (test()) {
-        return 1;
-      } else {
-        return 2;
-      }
-    }
-
-    let a = T();
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (Ok
-     ((bindings
-       ((a (Value (Integer 1)))
-        (T
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ()) (function_returns IntegerType)))
-            (function_impl
-             (Fn
-              (If
-               ((if_condition (Value (Bool true)))
-                (if_then (Block ((Return (Value (Integer 1))))))
-                (if_else ((Block ((Return (Value (Integer 2)))))))))))))))
-        (test
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ()) (function_returns BoolType)))
-            (function_impl (Fn (Return (Value (Bool true)))))))))))
-      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
-      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
-
-let%expect_test "type check error" =
-  let source =
-    {|
-      {
-        fn foo(x: Int[99]) { return x; }
-
-        let a = foo(Int[10].new(1));
-      }
-    |}
-  in
-  pp_compile source ;
-  [%expect
-    {|
-    (((TypeError ((StructType 132) (StructType 134) <opaque>)))
-     ((bindings
-       ((foo
-         (Value
-          (Function
-           ((function_signature
-             ((function_params ((x (StructType 132))))
-              (function_returns (StructType 132))))
-            (function_impl (Fn (Return (Reference (x (StructType 132))))))))))))
+     ((bindings ((T (Value (Type (StructType 134))))))
       (structs
        ((135
          ((struct_fields
@@ -4726,7 +133,7 @@ let%expect_test "type check error" =
                      ((res
                        (FunctionCall
                         ((ResolvedReference (load_int <opaque>))
-                         ((Reference (s (StructType 7))) (Value (Integer 10)))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
                          false)))))
                     (DestructuringLet
                      ((destructuring_let ((slice slice) (value value)))
@@ -4755,7 +162,7 @@ let%expect_test "type check error" =
                      ((Reference (builder (StructType 3)))
                       (StructField
                        ((Reference (self (StructType 134))) value IntegerType))
-                      (Value (Integer 10)))
+                      (Value (Integer 257)))
                      false)))))))
               (new
                ((function_signature
@@ -5015,7 +422,7 @@ let%expect_test "type check error" =
                         ((Reference (builder (StructType 3)))
                          (StructField
                           ((Reference (self (StructType 134))) value IntegerType))
-                         (Value (Integer 10)))
+                         (Value (Integer 257)))
                         false))))))))))
               ((impl_interface -2)
                (impl_methods
@@ -5023,6 +430,4599 @@ let%expect_test "type check error" =
                   ((function_signature
                     ((function_params ((s (StructType 7))))
                      (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "binding resolution" =
+  let source = {|
+    let T = Int[257];
+  |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((T (Value (Type (StructType 134))))))
+      (structs
+       ((135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "failed scope resolution" =
+  let source = {|
+    let T = NotInt256;
+  |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (((UnresolvedIdentifier NotInt256))
+     ((bindings ()) (structs ()) (type_counter <opaque>)
+      (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
+      (attr_executors <opaque>))) |}]
+
+let%expect_test "scope resolution after let binding" =
+  let source = {|
+    let A = Int[257];
+    let B = A;
+  |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((B (Value (Type (StructType 134)))) (A (Value (Type (StructType 134))))))
+      (structs
+       ((135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "basic struct definition" =
+  let source = {|
+    struct T { val t: Int[257] }
+  |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((T (Value (Type (StructType 137))))))
+      (structs
+       ((137
+         ((struct_fields ((t ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 137) (uty_base_id 136)))))
+        (135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ((t (Value (Type (StructType 134))))))
+          (st_sig_methods ()) (st_sig_base_id 136) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "Tact function evaluation" =
+  let source =
+    {|
+    fn test(i: Int[257]) -> Int[257] {
+      i
+    }
+    let a = test(test(Int[257].new(1)));
+  |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((a
+         (Value
+          (Struct
+           ((Value (Type (StructType 134))) ((value (Value (Integer 1))))))))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((i (StructType 134))))
+              (function_returns (StructType 134))))
+            (function_impl (Fn (Return (Reference (i (StructType 134))))))))))))
+      (structs
+       ((135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "struct definition" =
+  let source =
+    {|
+  let MyType = struct {
+       val a: Int[257]
+       val b: Bool
+  };
+  |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((MyType (Value (Type (StructType 137))))))
+      (structs
+       ((137
+         ((struct_fields
+           ((a ((field_type (StructType 134)))) (b ((field_type BoolType)))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 137) (uty_base_id 136)))))
+        (135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields
+           ((a (Value (Type (StructType 134))))
+            (b (ResolvedReference (Bool <opaque>)))))
+          (st_sig_methods ()) (st_sig_base_id 136) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "duplicate type field" =
+  let source =
+    {|
+  let MyType = struct {
+      val a: Int[257]
+      val a: Bool
+  };
+  |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (((DuplicateField
+       (a
+        ((mk_struct_fields
+          ((a (Value (Type (StructType 134))))
+           (a (ResolvedReference (Bool <opaque>)))))
+         (mk_struct_details
+          ((mk_methods ()) (mk_impls ()) (mk_id 136) (mk_sig 60)
+           (mk_span <opaque>)))))))
+     ((bindings ((MyType (Value (Type (StructType 137))))))
+      (structs
+       ((137
+         ((struct_fields
+           ((a ((field_type (StructType 134)))) (a ((field_type BoolType)))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 137) (uty_base_id 136)))))
+        (135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields
+           ((a (Value (Type (StructType 134))))
+            (a (ResolvedReference (Bool <opaque>)))))
+          (st_sig_methods ()) (st_sig_base_id 136) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "parametric struct instantiation" =
+  let source =
+    {|
+      struct T[A: Type] { val a: A }
+      let TA = T[Int[257]];
+   |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((TA (Value (Type (StructType 137))))
+        (T
+         (Value
+          (Function
+           ((function_signature
+             ((function_is_type) (function_params ((A (TypeN 0))))
+              (function_returns (StructSig 60))))
+            (function_impl
+             (Fn
+              (Return
+               (MkStructDef
+                ((mk_struct_fields ((a (Reference (A (TypeN 0))))))
+                 (mk_struct_details
+                  ((mk_methods ()) (mk_impls ()) (mk_id 134) (mk_sig 60)
+                   (mk_span <opaque>))))))))))))))
+      (structs
+       ((137
+         ((struct_fields ((a ((field_type (StructType 135))))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 137) (uty_base_id 134)))))
+        (136
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 135))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 135)) (s (StructType 7))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 135)))))))))))))))
+            (uty_impls ()) (uty_id 136) (uty_base_id -500)))))
+        (135
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 136)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 135)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 135))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 135))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 135))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 135))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 135))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 135))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 135))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 135))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 135))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 135))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 135))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 135))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 135))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 135))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 135))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 135))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 135))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 135))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 135)) (other (StructType 135))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 135))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 135))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 135)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 135))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 136))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 136)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 135)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 135)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 135) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ((a (Reference (A (TypeN 0)))))) (st_sig_methods ())
+          (st_sig_base_id 134) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "function without a return type" =
+  let source = {|
+    fn f() { 1 }
+    let a = f();
+    |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((a (Value (Integer 1)))
+        (f
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns IntegerType)))
+            (function_impl (Fn (Return (Value (Integer 1)))))))))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "scoping that `let` introduces in code" =
+  let source =
+    {|
+    fn f(i: Int[257]) {
+      let a = i;
+      a
+    }
+    let b = f(Int[257].new(1));
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((b
+         (Value
+          (Struct
+           ((Value (Type (StructType 134))) ((value (Value (Integer 1))))))))
+        (f
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((i (StructType 134))))
+              (function_returns (StructType 134))))
+            (function_impl
+             (Fn
+              (Block
+               ((Let ((a (Reference (i (StructType 134))))))
+                (Return (Reference (a (StructType 134))))))))))))))
+      (structs
+       ((135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "reference in function bodies" =
+  let source =
+    {|
+      fn op(i: Int[257], i_: Int[257]) {
+        i
+      }
+
+      fn f(x: Int[257]) {
+        let a = op(x, x);
+        let b = op(a, a);
+      }
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((f
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((x (StructType 134))))
+              (function_returns HoleType)))
+            (function_impl
+             (Fn
+              (Block
+               ((Let
+                 ((a
+                   (FunctionCall
+                    ((ResolvedReference (op <opaque>))
+                     ((Reference (x (StructType 134)))
+                      (Reference (x (StructType 134))))
+                     false)))))
+                (Let
+                 ((b
+                   (FunctionCall
+                    ((ResolvedReference (op <opaque>))
+                     ((Reference (a (StructType 134)))
+                      (Reference (a (StructType 134))))
+                     false)))))))))))))
+        (op
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((i (StructType 134)) (i_ (StructType 134))))
+              (function_returns (StructType 134))))
+            (function_impl (Fn (Return (Reference (i (StructType 134))))))))))))
+      (structs
+       ((135
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 134))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 135)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 135))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 257)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 135)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 134)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (Value (Integer 257)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 134)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 134))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 134))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 134))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 134))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 134)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 134))) value IntegerType))
+                         (Value (Integer 257)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 135))))
+                   (function_impl
+                    (Fn
+                     (Block
+                      ((Let
+                        ((res
+                          (FunctionCall
+                           ((ResolvedReference (load_int <opaque>))
+                            ((Reference (s (StructType 7)))
+                             (Value (Integer 257)))
+                            false)))))
+                       (DestructuringLet
+                        ((destructuring_let ((slice slice) (value value)))
+                         (destructuring_let_expr
+                          (Reference (res (StructType 5))))
+                         (destructuring_let_rest false)))
+                       (Return
+                        (Value
+                         (Struct
+                          ((Value (Type (StructType 135)))
+                           ((slice (Reference (slice (StructType 7))))
+                            (value
+                             (Value
+                              (Struct
+                               ((Value (Type (StructType 134)))
+                                ((value (Reference (value IntegerType))))))))))))))))))))))
+              ((impl_interface 19)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((i IntegerType)))
+                     (function_returns (StructType 134))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (Value
+                       (Struct
+                        ((Value (Type (StructType 134)))
+                         ((value (Reference (i IntegerType)))))))))))))))))
+            (uty_id 134) (uty_base_id 18)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "resolving a reference from inside a function" =
+  let source =
+    {|
+      let i = 1;
+      fn f() {
+        i
+      }
+      let x = f();
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((x (Value (Integer 1)))
+        (f
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns IntegerType)))
+            (function_impl (Fn (Return (ResolvedReference (i <opaque>)))))))))
+        (i (Value (Integer 1)))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "struct method access" =
+  let source =
+    {|
+      struct Foo {
+        fn bar(self: Self, i: Integer) {
+           i
+        }
+      }
+      let foo = Foo {};
+      let res = foo.bar(1);
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((res (Value (Integer 1)))
+        (foo (Value (Struct ((Value (Type (StructType 135))) ()))))
+        (Foo (Value (Type (StructType 135))))))
+      (structs
+       ((135
+         ((struct_fields ())
+          (struct_details
+           ((uty_methods
+             ((bar
+               ((function_signature
+                 ((function_params ((self (StructType 135)) (i IntegerType)))
+                  (function_returns IntegerType)))
+                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ())
+          (st_sig_methods
+           ((bar
+             ((function_params
+               ((self (ExprType (Reference (Self (StructSig 60)))))
+                (i IntegerType)))
+              (function_returns IntegerType)))))
+          (st_sig_base_id 134) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "struct type method access" =
+  let source =
+    {|
+      struct Foo {
+        fn bar(i: Integer) {
+           i
+        }
+      }
+      let res = Foo.bar(1);
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((res (Value (Integer 1))) (Foo (Value (Type (StructType 135))))))
+      (structs
+       ((135
+         ((struct_fields ())
+          (struct_details
+           ((uty_methods
+             ((bar
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns IntegerType)))
+                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ())
+          (st_sig_methods
+           ((bar
+             ((function_params ((i IntegerType))) (function_returns IntegerType)))))
+          (st_sig_base_id 134) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "Self type resolution in methods" =
+  let source =
+    {|
+      struct Foo {
+        fn bar(self: Self) -> Self {
+           self
+        }
+      }
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ((Foo (Value (Type (StructType 135))))))
+      (structs
+       ((135
+         ((struct_fields ())
+          (struct_details
+           ((uty_methods
+             ((bar
+               ((function_signature
+                 ((function_params ((self (StructType 135))))
+                  (function_returns (StructType 135))))
+                (function_impl (Fn (Return (Reference (self (StructType 135))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields ())
+          (st_sig_methods
+           ((bar
+             ((function_params
+               ((self (ExprType (Reference (Self (StructSig 60)))))))
+              (function_returns (ExprType (Reference (Self (StructSig 60)))))))))
+          (st_sig_base_id 134) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "union method access" =
+  let source =
+    {|
+      union Foo {
+        case Bool
+        fn bar(self: Self, i: Integer) {
+          i
+        }
+      }
+      fn make_foo(foo: Foo) -> Foo {
+        foo
+      }
+      let foo = make_foo(true);
+      let res = foo.bar(1);
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((res (Value (Integer 1))) (foo (Value (UnionVariant ((Bool true) 135))))
+        (make_foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((foo (UnionType 135))))
+              (function_returns (UnionType 135))))
+            (function_impl (Fn (Return (Reference (foo (UnionType 135))))))))))
+        (Foo (Value (Type (UnionType 135))))))
+      (structs ())
+      (unions
+       ((135
+         ((union_attributes ()) (cases ((BoolType (Discriminator (discr 0)))))
+          (union_details
+           ((uty_methods
+             ((bar
+               ((function_signature
+                 ((function_params ((self (UnionType 135)) (i IntegerType)))
+                  (function_returns IntegerType)))
+                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
+            (uty_impls
+             (((impl_interface 136)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((v BoolType)))
+                     (function_returns (UnionType 134))))
+                   (function_impl
+                    (Fn
+                     (Return (MakeUnionVariant ((Reference (v BoolType)) 135))))))))))))
+            (uty_id 135) (uty_base_id 134)))))))
+      (interfaces
+       ((136
+         ((interface_methods
+           ((from
+             ((function_params ((from BoolType))) (function_returns SelfType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (1
+        (((un_sig_cases (BoolType))
+          (un_sig_methods
+           ((bar
+             ((function_params
+               ((self (ExprType (Reference (Self (UnionSig 6)))))
+                (i IntegerType)))
+              (function_returns IntegerType)))))
+          (un_sig_base_id 134)))))
+      (attr_executors <opaque>))) |}]
+
+let%expect_test "union type method access" =
+  let source =
+    {|
+      union Foo {
+        case Bool
+        fn bar(i: Integer) {
+           i
+        }
+      }
+      fn make_foo(foo: Foo) -> Foo {
+        foo
+      }
+      let res = Foo.bar(1);
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((res (Value (Integer 1)))
+        (make_foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((foo (UnionType 135))))
+              (function_returns (UnionType 135))))
+            (function_impl (Fn (Return (Reference (foo (UnionType 135))))))))))
+        (Foo (Value (Type (UnionType 135))))))
+      (structs ())
+      (unions
+       ((135
+         ((union_attributes ()) (cases ((BoolType (Discriminator (discr 0)))))
+          (union_details
+           ((uty_methods
+             ((bar
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns IntegerType)))
+                (function_impl (Fn (Return (Reference (i IntegerType)))))))))
+            (uty_impls
+             (((impl_interface 136)
+               (impl_methods
+                ((from
+                  ((function_signature
+                    ((function_params ((v BoolType)))
+                     (function_returns (UnionType 134))))
+                   (function_impl
+                    (Fn
+                     (Return (MakeUnionVariant ((Reference (v BoolType)) 135))))))))))))
+            (uty_id 135) (uty_base_id 134)))))))
+      (interfaces
+       ((136
+         ((interface_methods
+           ((from
+             ((function_params ((from BoolType))) (function_returns SelfType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs
+       (1
+        (((un_sig_cases (BoolType))
+          (un_sig_methods
+           ((bar
+             ((function_params ((i IntegerType))) (function_returns IntegerType)))))
+          (un_sig_base_id 134)))))
+      (attr_executors <opaque>))) |}]
+
+let%expect_test "struct instantiation" =
+  let source =
+    {|
+    struct T {
+      val a: Integer
+      val b: Integer
+    }
+
+    let t = T{a: 1, b: 2};
+  |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((t
+         (Value
+          (Struct
+           ((Value (Type (StructType 135)))
+            ((a (Value (Integer 1))) (b (Value (Integer 2))))))))
+        (T (Value (Type (StructType 135))))))
+      (structs
+       ((135
+         ((struct_fields
+           ((a ((field_type IntegerType))) (b ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs
+       (1
+        (((st_sig_fields
+           ((a (ResolvedReference (Integer <opaque>)))
+            (b (ResolvedReference (Integer <opaque>)))))
+          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 60)))))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "type check error" =
+  let source = {|
+    fn foo(i: Int[32]) -> Int[64] { return i; }
+  |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (((TypeError ((StructType 118) (StructType 43) <opaque>)))
+     ((bindings
+       ((foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((i (StructType 43))))
+              (function_returns (StructType 118))))
+            (function_impl (Fn (Return (Reference (i (StructType 43))))))))))))
+      (structs ())
+      (interfaces
+       ((134
+         ((interface_methods
+           ((from
+             ((function_params ((from (StructType 43))))
+              (function_returns SelfType)))))))))
+      (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
+      (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "type inference" =
+  let source = {|
+      fn foo(i: Integer) { return i; }
+    |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((i IntegerType))) (function_returns IntegerType)))
+            (function_impl (Fn (Return (Reference (i IntegerType)))))))))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "scope doesn't leak bindings" =
+  let source = {|
+    {
+     let a = 1;
+    }
+  |} in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings ()) (structs ()) (type_counter <opaque>)
+      (memoized_fcalls <opaque>) (struct_signs (0 ())) (union_signs (0 ()))
+      (attr_executors <opaque>))) |}]
+
+let%expect_test "compile-time if/then/else continues interpretation after \
+                 condition check (bug fix)" =
+  let source =
+    {|
+    fn T() {
+      if (false) {
+        return 1;
+      }
+      return 2;
+    }
+
+    let a = T();
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((a (Value (Integer 2)))
+        (T
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              (Block
+               ((If
+                 ((if_condition (Value (Bool false)))
+                  (if_then (Block ((Return (Value (Integer 1)))))) (if_else ())))
+                (Return (Value (Integer 2)))))))))))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>)))
+|}]
+
+let%expect_test "compile-time if/then/else" =
+  let source =
+    {|
+    fn test() {
+      true
+    }
+
+    fn T() {
+      if (test()) {
+        return 1;
+      } else {
+        return 2;
+      }
+    }
+
+    let a = T();
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (Ok
+     ((bindings
+       ((a (Value (Integer 1)))
+        (T
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns IntegerType)))
+            (function_impl
+             (Fn
+              (If
+               ((if_condition (Value (Bool true)))
+                (if_then (Block ((Return (Value (Integer 1))))))
+                (if_else ((Block ((Return (Value (Integer 2)))))))))))))))
+        (test
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ()) (function_returns BoolType)))
+            (function_impl (Fn (Return (Value (Bool true)))))))))))
+      (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
+      (struct_signs (0 ())) (union_signs (0 ())) (attr_executors <opaque>))) |}]
+
+let%expect_test "type check error" =
+  let source =
+    {|
+      {
+        fn foo(x: Int[99]) { return x; }
+
+        let a = foo(Int[10].new(1));
+      }
+    |}
+  in
+  pp_compile source ;
+  [%expect
+    {|
+    (((TypeError ((StructType 134) (StructType 136) <opaque>)))
+     ((bindings
+       ((foo
+         (Value
+          (Function
+           ((function_signature
+             ((function_params ((x (StructType 134))))
+              (function_returns (StructType 134))))
+            (function_impl (Fn (Return (Reference (x (StructType 134))))))))))))
+      (structs
+       ((137
+         ((struct_fields
+           ((slice ((field_type (StructType 7))))
+            (value ((field_type (StructType 136))))))
+          (struct_details
+           ((uty_methods
+             ((new
+               ((function_signature
+                 ((function_params ((v (StructType 136)) (s (StructType 7))))
+                  (function_returns (StructType 137))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 137)))
+                      ((slice (Reference (s (StructType 7))))
+                       (value (Reference (v (StructType 136)))))))))))))))
+            (uty_impls ()) (uty_id 137) (uty_base_id -500)))))
+        (136
+         ((struct_fields ((value ((field_type IntegerType)))))
+          (struct_details
+           ((uty_methods
+             ((from
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (deserialize
+               ((function_signature
+                 ((function_params ((s (StructType 7))))
+                  (function_returns (StructType 137))))
+                (function_impl
+                 (Fn
+                  (Block
+                   ((Let
+                     ((res
+                       (FunctionCall
+                        ((ResolvedReference (load_int <opaque>))
+                         ((Reference (s (StructType 7))) (Value (Integer 10)))
+                         false)))))
+                    (DestructuringLet
+                     ((destructuring_let ((slice slice) (value value)))
+                      (destructuring_let_expr (Reference (res (StructType 5))))
+                      (destructuring_let_rest false)))
+                    (Return
+                     (Value
+                      (Struct
+                       ((Value (Type (StructType 137)))
+                        ((slice (Reference (slice (StructType 7))))
+                         (value
+                          (Value
+                           (Struct
+                            ((Value (Type (StructType 136)))
+                             ((value (Reference (value IntegerType)))))))))))))))))))
+              (serialize
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (builder (StructType 3))))
+                  (function_returns (StructType 3))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (serialize_int <opaque>))
+                     ((Reference (builder (StructType 3)))
+                      (StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (Value (Integer 10)))
+                     false)))))))
+              (new
+               ((function_signature
+                 ((function_params ((i IntegerType)))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value (Reference (i IntegerType))))))))))))
+              (add
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (add <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 136))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 136))) value
+                             IntegerType)))
+                          false))))))))))))
+              (sub
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (sub <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 136))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 136))) value
+                             IntegerType)))
+                          false))))))))))))
+              (mul
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (mul <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 136))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 136))) value
+                             IntegerType)))
+                          false))))))))))))
+              (div
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (div <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 136))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 136))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_and
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_and <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 136))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 136))) value
+                             IntegerType)))
+                          false))))))))))))
+              (bit_or
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns (StructType 136))))
+                (function_impl
+                 (Fn
+                  (Return
+                   (Value
+                    (Struct
+                     ((Value (Type (StructType 136)))
+                      ((value
+                        (FunctionCall
+                         ((ResolvedReference (bit_or <opaque>))
+                          ((StructField
+                            ((Reference (self (StructType 136))) value
+                             IntegerType))
+                           (StructField
+                            ((Reference (other (StructType 136))) value
+                             IntegerType)))
+                          false))))))))))))
+              (eq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (eq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 136))) value IntegerType)))
+                     false)))))))
+              (neq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (neq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 136))) value IntegerType)))
+                     false)))))))
+              (leq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (leq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 136))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 136))) value IntegerType)))
+                     false)))))))
+              (lt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (lt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 136))) value IntegerType)))
+                     false)))))))
+              (geq
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (geq <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 136))) value IntegerType)))
+                     false)))))))
+              (gt
+               ((function_signature
+                 ((function_params
+                   ((self (StructType 136)) (other (StructType 136))))
+                  (function_returns BoolType)))
+                (function_impl
+                 (Fn
+                  (Return
+                   (FunctionCall
+                    ((ResolvedReference (gt <opaque>))
+                     ((StructField
+                       ((Reference (self (StructType 136))) value IntegerType))
+                      (StructField
+                       ((Reference (other (StructType 136))) value IntegerType)))
+                     false)))))))))
+            (uty_impls
+             (((impl_interface -1)
+               (impl_methods
+                ((serialize
+                  ((function_signature
+                    ((function_params
+                      ((self (StructType 136)) (builder (StructType 3))))
+                     (function_returns (StructType 3))))
+                   (function_impl
+                    (Fn
+                     (Return
+                      (FunctionCall
+                       ((ResolvedReference (serialize_int <opaque>))
+                        ((Reference (builder (StructType 3)))
+                         (StructField
+                          ((Reference (self (StructType 136))) value IntegerType))
+                         (Value (Integer 10)))
+                        false))))))))))
+              ((impl_interface -2)
+               (impl_methods
+                ((deserialize
+                  ((function_signature
+                    ((function_params ((s (StructType 7))))
+                     (function_returns (StructType 137))))
                    (function_impl
                     (Fn
                      (Block
@@ -5040,65 +5040,65 @@ let%expect_test "type check error" =
                        (Return
                         (Value
                          (Struct
-                          ((Value (Type (StructType 135)))
+                          ((Value (Type (StructType 137)))
                            ((slice (Reference (slice (StructType 7))))
                             (value
                              (Value
                               (Struct
-                               ((Value (Type (StructType 134)))
+                               ((Value (Type (StructType 136)))
                                 ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
+              ((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 134))))
+                     (function_returns (StructType 136))))
                    (function_impl
                     (Fn
                      (Return
                       (Value
                        (Struct
-                        ((Value (Type (StructType 134)))
+                        ((Value (Type (StructType 136)))
                          ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 134) (uty_base_id 16)))))
-        (133
+            (uty_id 136) (uty_base_id 18)))))
+        (135
          ((struct_fields
            ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
+            (value ((field_type (StructType 134))))))
           (struct_details
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 133)))
+                     ((Value (Type (StructType 135)))
                       ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_details
            ((uty_methods
              ((from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value (Reference (i IntegerType))))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
+                  (function_returns (StructType 135))))
                 (function_impl
                  (Fn
                   (Block
@@ -5115,17 +5115,17 @@ let%expect_test "type check error" =
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 133)))
+                       ((Value (Type (StructType 135)))
                         ((slice (Reference (slice (StructType 7))))
                          (value
                           (Value
                            (Struct
-                            ((Value (Type (StructType 132)))
+                            ((Value (Type (StructType 134)))
                              ((value (Reference (value IntegerType)))))))))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
+                   ((self (StructType 134)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -5134,150 +5134,150 @@ let%expect_test "type check error" =
                     ((ResolvedReference (serialize_int <opaque>))
                      ((Reference (builder (StructType 3)))
                       (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (Value (Integer 99)))
                      false)))))))
               (new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value (Reference (i IntegerType))))))))))))
               (add
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (add <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (sub
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (sub <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (mul
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (mul <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (div
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (div <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (bit_and
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (bit_and <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (bit_or
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (bit_or <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (eq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -5285,14 +5285,14 @@ let%expect_test "type check error" =
                    (FunctionCall
                     ((ResolvedReference (eq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (neq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -5300,14 +5300,14 @@ let%expect_test "type check error" =
                    (FunctionCall
                     ((ResolvedReference (neq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (leq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -5315,14 +5315,14 @@ let%expect_test "type check error" =
                    (FunctionCall
                     ((ResolvedReference (leq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (lt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -5330,14 +5330,14 @@ let%expect_test "type check error" =
                    (FunctionCall
                     ((ResolvedReference (lt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (lt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -5345,14 +5345,14 @@ let%expect_test "type check error" =
                    (FunctionCall
                     ((ResolvedReference (lt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (geq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -5360,14 +5360,14 @@ let%expect_test "type check error" =
                    (FunctionCall
                     ((ResolvedReference (geq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (gt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -5375,9 +5375,9 @@ let%expect_test "type check error" =
                    (FunctionCall
                     ((ResolvedReference (gt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))))
             (uty_impls
              (((impl_interface -1)
@@ -5385,7 +5385,7 @@ let%expect_test "type check error" =
                 ((serialize
                   ((function_signature
                     ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
+                      ((self (StructType 134)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -5394,7 +5394,7 @@ let%expect_test "type check error" =
                        ((ResolvedReference (serialize_int <opaque>))
                         ((Reference (builder (StructType 3)))
                          (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
+                          ((Reference (self (StructType 134))) value IntegerType))
                          (Value (Integer 99)))
                         false))))))))))
               ((impl_interface -2)
@@ -5402,7 +5402,7 @@ let%expect_test "type check error" =
                 ((deserialize
                   ((function_signature
                     ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
+                     (function_returns (StructType 135))))
                    (function_impl
                     (Fn
                      (Block
@@ -5420,32 +5420,32 @@ let%expect_test "type check error" =
                        (Return
                         (Value
                          (Struct
-                          ((Value (Type (StructType 133)))
+                          ((Value (Type (StructType 135)))
                            ((slice (Reference (slice (StructType 7))))
                             (value
                              (Value
                               (Struct
-                               ((Value (Type (StructType 132)))
+                               ((Value (Type (StructType 134)))
                                 ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
+              ((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
+                     (function_returns (StructType 134))))
                    (function_impl
                     (Fn
                      (Return
                       (Value
                        (Struct
-                        ((Value (Type (StructType 132)))
+                        ((Value (Type (StructType 134)))
                          ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
+            (uty_id 134) (uty_base_id 18)))))))
       (interfaces
-       ((136
+       ((138
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 134))))
+             ((function_params ((from (StructType 136))))
               (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
@@ -5466,9 +5466,9 @@ let%expect_test "implement interface op" =
     {|
     (Ok
      ((bindings
-       ((one (Value (Integer 1))) (Left (Value (Type (StructType 133))))))
+       ((one (Value (Integer 1))) (Left (Value (Type (StructType 135))))))
       (structs
-       ((133
+       ((135
          ((struct_fields ())
           (struct_details
            ((uty_methods
@@ -5485,7 +5485,7 @@ let%expect_test "implement interface op" =
                     ((function_params ((left IntegerType) (right IntegerType)))
                      (function_returns IntegerType)))
                    (function_impl (Fn (Return (Reference (left IntegerType))))))))))))
-            (uty_id 133) (uty_base_id 132)))))))
+            (uty_id 135) (uty_base_id 134)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
@@ -5494,7 +5494,7 @@ let%expect_test "implement interface op" =
            ((op
              ((function_params ((left IntegerType) (right IntegerType)))
               (function_returns IntegerType)))))
-          (st_sig_base_id 132) (st_sig_id 54)))))
+          (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "implement interface op" =
@@ -5516,33 +5516,33 @@ let%expect_test "implement interface op" =
     {|
     (Ok
      ((bindings
-       ((empty (Value (Struct ((Value (Type (StructType 134))) ()))))
-        (Empty (Value (Type (StructType 134))))
-        (Make (Value (Type (InterfaceType 132))))))
+       ((empty (Value (Struct ((Value (Type (StructType 136))) ()))))
+        (Empty (Value (Type (StructType 136))))
+        (Make (Value (Type (InterfaceType 134))))))
       (structs
-       ((134
+       ((136
          ((struct_fields ())
           (struct_details
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ()) (function_returns (StructType 134))))
+                 ((function_params ()) (function_returns (StructType 136))))
                 (function_impl
                  (Fn
-                  (Return (Value (Struct ((Value (Type (StructType 134))) ()))))))))))
+                  (Return (Value (Struct ((Value (Type (StructType 136))) ()))))))))))
             (uty_impls
-             (((impl_interface 132)
+             (((impl_interface 134)
                (impl_methods
                 ((new
                   ((function_signature
-                    ((function_params ()) (function_returns (StructType 134))))
+                    ((function_params ()) (function_returns (StructType 136))))
                    (function_impl
                     (Fn
                      (Return
-                      (Value (Struct ((Value (Type (StructType 134))) ())))))))))))))
-            (uty_id 134) (uty_base_id 133)))))))
+                      (Value (Struct ((Value (Type (StructType 136))) ())))))))))))))
+            (uty_id 136) (uty_base_id 135)))))))
       (interfaces
-       ((132
+       ((134
          ((interface_methods
            ((new ((function_params ()) (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
@@ -5552,8 +5552,8 @@ let%expect_test "implement interface op" =
           (st_sig_methods
            ((new
              ((function_params ())
-              (function_returns (ExprType (Reference (Self (StructSig 54)))))))))
-          (st_sig_base_id 133) (st_sig_id 54)))))
+              (function_returns (ExprType (Reference (Self (StructSig 60)))))))))
+          (st_sig_base_id 135) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "serializer inner struct" =
@@ -5573,7 +5573,7 @@ let%expect_test "serializer inner struct" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((self (StructType 135)) (b (StructType 3))))
+             ((function_params ((self (StructType 137)) (b (StructType 3))))
               (function_returns (StructType 3))))
             (function_impl
              (Fn
@@ -5585,7 +5585,7 @@ let%expect_test "serializer inner struct" =
                       (Function
                        ((function_signature
                          ((function_params
-                           ((self (StructType 41)) (builder (StructType 3))))
+                           ((self (StructType 43)) (builder (StructType 3))))
                           (function_returns (StructType 3))))
                         (function_impl
                          (Fn
@@ -5594,37 +5594,37 @@ let%expect_test "serializer inner struct" =
                             ((ResolvedReference (serialize_int <opaque>))
                              ((Reference (builder (StructType 3)))
                               (StructField
-                               ((Reference (self (StructType 41))) value
+                               ((Reference (self (StructType 43))) value
                                 IntegerType))
                               (Value (Integer 32)))
                              false))))))))
                      ((StructField
-                       ((Reference (self (StructType 135))) y (StructType 41)))
+                       ((Reference (self (StructType 137))) y (StructType 43)))
                       (Reference (b (StructType 3))))
                      false)))))
                 (Return (Reference (b (StructType 3))))))))))))
-        (Outer (Value (Type (StructType 135))))
-        (Inner (Value (Type (StructType 133))))))
+        (Outer (Value (Type (StructType 137))))
+        (Inner (Value (Type (StructType 135))))))
       (structs
-       ((135
+       ((137
          ((struct_fields
-           ((y ((field_type (StructType 41))))
-            (z ((field_type (StructType 133))))))
+           ((y ((field_type (StructType 43))))
+            (z ((field_type (StructType 135))))))
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))
-        (133
-         ((struct_fields ((x ((field_type (StructType 41))))))
+           ((uty_methods ()) (uty_impls ()) (uty_id 137) (uty_base_id 136)))))
+        (135
+         ((struct_fields ((x ((field_type (StructType 43))))))
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
+           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (2
         (((st_sig_fields
-           ((y (Value (Type (StructType 41))))
+           ((y (Value (Type (StructType 43))))
             (z (ResolvedReference (Inner <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 55))
-         ((st_sig_fields ((x (Value (Type (StructType 41))))))
-          (st_sig_methods ()) (st_sig_base_id 132) (st_sig_id 54)))))
+          (st_sig_methods ()) (st_sig_base_id 136) (st_sig_id 61))
+         ((st_sig_fields ((x (Value (Type (StructType 43))))))
+          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "reference resolving in inner functions" =
@@ -5772,59 +5772,59 @@ let%expect_test "union variants constructing" =
          (Value
           (UnionVariant
            ((Struct
-             ((Value (Type (StructType 41))) ((value (Value (Integer 1))))))
-            133))))
-        (a (Value (UnionVariant ((Integer 10) 133))))
+             ((Value (Type (StructType 43))) ((value (Value (Integer 1))))))
+            135))))
+        (a (Value (UnionVariant ((Integer 10) 135))))
         (test
          (Value
           (Function
            ((function_signature
-             ((function_params ((value (UnionType 133))))
-              (function_returns (UnionType 133))))
-            (function_impl (Fn (Return (Reference (value (UnionType 133))))))))))
-        (Uni (Value (Type (UnionType 133))))))
+             ((function_params ((value (UnionType 135))))
+              (function_returns (UnionType 135))))
+            (function_impl (Fn (Return (Reference (value (UnionType 135))))))))))
+        (Uni (Value (Type (UnionType 135))))))
       (structs ())
       (unions
-       ((133
+       ((135
          ((union_attributes ())
           (cases
-           (((StructType 41) (Discriminator (discr 1)))
+           (((StructType 43) (Discriminator (discr 1)))
             (IntegerType (Discriminator (discr 0)))))
           (union_details
            ((uty_methods ())
             (uty_impls
-             (((impl_interface 17)
+             (((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v IntegerType)))
-                     (function_returns (UnionType 132))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v IntegerType)) 133))))))))))
-              ((impl_interface 134)
+                      (MakeUnionVariant ((Reference (v IntegerType)) 135))))))))))
+              ((impl_interface 136)
                (impl_methods
                 ((from
                   ((function_signature
-                    ((function_params ((v (StructType 41))))
-                     (function_returns (UnionType 132))))
+                    ((function_params ((v (StructType 43))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 41))) 133))))))))))))
-            (uty_id 133) (uty_base_id 132)))))))
+                      (MakeUnionVariant ((Reference (v (StructType 43))) 135))))))))))))
+            (uty_id 135) (uty_base_id 134)))))))
       (interfaces
-       ((134
+       ((136
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 41))))
+             ((function_params ((from (StructType 43))))
               (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
       (union_signs
        (1
-        (((un_sig_cases (IntegerType (StructType 41))) (un_sig_methods ())
-          (un_sig_base_id 132)))))
+        (((un_sig_cases (IntegerType (StructType 43))) (un_sig_methods ())
+          (un_sig_base_id 134)))))
       (attr_executors <opaque>))) |}]
 
 let%expect_test "unions duplicate variant" =
@@ -5843,7 +5843,7 @@ let%expect_test "unions duplicate variant" =
     {|
     (((DuplicateVariant (IntegerType <opaque>)))
      ((bindings
-       ((b (Value (Type (UnionType 135)))) (a (Value (Type (UnionType 133))))
+       ((b (Value (Type (UnionType 137)))) (a (Value (Type (UnionType 135))))
         (Test
          (Value
           (Function
@@ -5860,19 +5860,19 @@ let%expect_test "unions duplicate variant" =
                  (mk_union_details
                   ((mk_methods ())
                    (mk_impls
-                    (((mk_impl_interface (Value (Type (InterfaceType 17))))
+                    (((mk_impl_interface (Value (Type (InterfaceType 19))))
                       (mk_impl_methods
                        ((from
                          (Value
                           (Function
                            ((function_signature
                              ((function_params ((v IntegerType)))
-                              (function_returns (UnionType 132))))
+                              (function_returns (UnionType 134))))
                             (function_impl
                              (Fn
                               (Return
                                (MakeUnionVariant
-                                ((Reference (v IntegerType)) 132))))))))))))
+                                ((Reference (v IntegerType)) 134))))))))))))
                      ((mk_impl_interface
                        (FunctionCall
                         ((Value
@@ -5891,44 +5891,44 @@ let%expect_test "unions duplicate variant" =
                            ((function_signature
                              ((function_params
                                ((v (ExprType (Reference (T (TypeN 0)))))))
-                              (function_returns (UnionType 132))))
+                              (function_returns (UnionType 134))))
                             (function_impl
                              (Fn
                               (Return
                                (MakeUnionVariant
                                 ((Reference
                                   (v (ExprType (Reference (T (TypeN 0))))))
-                                 132))))))))))))))
-                   (mk_id 132) (mk_sig 6) (mk_span <opaque>))))))))))))))
+                                 134))))))))))))))
+                   (mk_id 134) (mk_sig 6) (mk_span <opaque>))))))))))))))
       (structs ())
       (unions
-       ((135
+       ((137
          ((union_attributes ()) (cases ((IntegerType (Discriminator (discr 0)))))
           (union_details
            ((uty_methods ())
             (uty_impls
-             (((impl_interface 17)
+             (((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v IntegerType)))
-                     (function_returns (UnionType 132))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v IntegerType)) 135))))))))))
-              ((impl_interface 17)
+                      (MakeUnionVariant ((Reference (v IntegerType)) 137))))))))))
+              ((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v IntegerType)))
-                     (function_returns (UnionType 132))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v IntegerType)) 135))))))))))))
-            (uty_id 135) (uty_base_id 132)))))
-        (133
+                      (MakeUnionVariant ((Reference (v IntegerType)) 137))))))))))))
+            (uty_id 137) (uty_base_id 134)))))
+        (135
          ((union_attributes ())
           (cases
            (((BuiltinType Builder) (Discriminator (discr 1)))
@@ -5936,30 +5936,30 @@ let%expect_test "unions duplicate variant" =
           (union_details
            ((uty_methods ())
             (uty_impls
-             (((impl_interface 17)
+             (((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v IntegerType)))
-                     (function_returns (UnionType 132))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v IntegerType)) 133))))))))))
-              ((impl_interface 134)
+                      (MakeUnionVariant ((Reference (v IntegerType)) 135))))))))))
+              ((impl_interface 136)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v (BuiltinType Builder))))
-                     (function_returns (UnionType 132))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
                       (MakeUnionVariant
-                       ((Reference (v (BuiltinType Builder))) 133))))))))))))
-            (uty_id 133) (uty_base_id 132)))))))
+                       ((Reference (v (BuiltinType Builder))) 135))))))))))))
+            (uty_id 135) (uty_base_id 134)))))))
       (interfaces
-       ((134
+       ((136
          ((interface_methods
            ((from
              ((function_params ((from (BuiltinType Builder))))
@@ -5968,7 +5968,7 @@ let%expect_test "unions duplicate variant" =
       (union_signs
        (1
         (((un_sig_cases (IntegerType (ExprType (Reference (T (TypeN 0))))))
-          (un_sig_methods ()) (un_sig_base_id 132)))))
+          (un_sig_methods ()) (un_sig_base_id 134)))))
       (attr_executors <opaque>))) |}]
 
 let%expect_test "unions" =
@@ -5987,46 +5987,46 @@ let%expect_test "unions" =
   [%expect
     {|
     (Ok
-     ((bindings ((Test (Value (Type (UnionType 135))))))
+     ((bindings ((Test (Value (Type (UnionType 137))))))
       (structs
-       ((133
+       ((135
          ((struct_fields
            ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
+            (value ((field_type (StructType 134))))))
           (struct_details
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 133)))
+                     ((Value (Type (StructType 135)))
                       ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_details
            ((uty_methods
              ((from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value (Reference (i IntegerType))))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
+                  (function_returns (StructType 135))))
                 (function_impl
                  (Fn
                   (Block
@@ -6043,17 +6043,17 @@ let%expect_test "unions" =
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 133)))
+                       ((Value (Type (StructType 135)))
                         ((slice (Reference (slice (StructType 7))))
                          (value
                           (Value
                            (Struct
-                            ((Value (Type (StructType 132)))
+                            ((Value (Type (StructType 134)))
                              ((value (Reference (value IntegerType)))))))))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
+                   ((self (StructType 134)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -6062,150 +6062,150 @@ let%expect_test "unions" =
                     ((ResolvedReference (serialize_int <opaque>))
                      ((Reference (builder (StructType 3)))
                       (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (Value (Integer 257)))
                      false)))))))
               (new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value (Reference (i IntegerType))))))))))))
               (add
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (add <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (sub
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (sub <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (mul
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (mul <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (div
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (div <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (bit_and
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (bit_and <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (bit_or
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (bit_or <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (eq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6213,14 +6213,14 @@ let%expect_test "unions" =
                    (FunctionCall
                     ((ResolvedReference (eq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (neq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6228,14 +6228,14 @@ let%expect_test "unions" =
                    (FunctionCall
                     ((ResolvedReference (neq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (leq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6243,14 +6243,14 @@ let%expect_test "unions" =
                    (FunctionCall
                     ((ResolvedReference (leq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (lt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6258,14 +6258,14 @@ let%expect_test "unions" =
                    (FunctionCall
                     ((ResolvedReference (lt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (lt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6273,14 +6273,14 @@ let%expect_test "unions" =
                    (FunctionCall
                     ((ResolvedReference (lt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (geq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6288,14 +6288,14 @@ let%expect_test "unions" =
                    (FunctionCall
                     ((ResolvedReference (geq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (gt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6303,9 +6303,9 @@ let%expect_test "unions" =
                    (FunctionCall
                     ((ResolvedReference (gt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))))
             (uty_impls
              (((impl_interface -1)
@@ -6313,7 +6313,7 @@ let%expect_test "unions" =
                 ((serialize
                   ((function_signature
                     ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
+                      ((self (StructType 134)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -6322,7 +6322,7 @@ let%expect_test "unions" =
                        ((ResolvedReference (serialize_int <opaque>))
                         ((Reference (builder (StructType 3)))
                          (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
+                          ((Reference (self (StructType 134))) value IntegerType))
                          (Value (Integer 257)))
                         false))))))))))
               ((impl_interface -2)
@@ -6330,7 +6330,7 @@ let%expect_test "unions" =
                 ((deserialize
                   ((function_signature
                     ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
+                     (function_returns (StructType 135))))
                    (function_impl
                     (Fn
                      (Block
@@ -6349,83 +6349,83 @@ let%expect_test "unions" =
                        (Return
                         (Value
                          (Struct
-                          ((Value (Type (StructType 133)))
+                          ((Value (Type (StructType 135)))
                            ((slice (Reference (slice (StructType 7))))
                             (value
                              (Value
                               (Struct
-                               ((Value (Type (StructType 132)))
+                               ((Value (Type (StructType 134)))
                                 ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
+              ((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
+                     (function_returns (StructType 134))))
                    (function_impl
                     (Fn
                      (Return
                       (Value
                        (Struct
-                        ((Value (Type (StructType 132)))
+                        ((Value (Type (StructType 134)))
                          ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
+            (uty_id 134) (uty_base_id 18)))))))
       (unions
-       ((135
+       ((137
          ((union_attributes ())
           (cases
-           (((StructType 116) (Discriminator (discr 1)))
-            ((StructType 132) (Discriminator (discr 0)))))
+           (((StructType 118) (Discriminator (discr 1)))
+            ((StructType 134) (Discriminator (discr 0)))))
           (union_details
            ((uty_methods
              ((id
                ((function_signature
-                 ((function_params ((self (UnionType 135))))
-                  (function_returns (UnionType 135))))
-                (function_impl (Fn (Return (Reference (self (UnionType 135))))))))))
+                 ((function_params ((self (UnionType 137))))
+                  (function_returns (UnionType 137))))
+                (function_impl (Fn (Return (Reference (self (UnionType 137))))))))))
             (uty_impls
-             (((impl_interface 136)
+             (((impl_interface 138)
                (impl_methods
                 ((from
                   ((function_signature
-                    ((function_params ((v (StructType 132))))
-                     (function_returns (UnionType 134))))
+                    ((function_params ((v (StructType 134))))
+                     (function_returns (UnionType 136))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 132))) 135))))))))))
-              ((impl_interface 137)
+                      (MakeUnionVariant ((Reference (v (StructType 134))) 137))))))))))
+              ((impl_interface 139)
                (impl_methods
                 ((from
                   ((function_signature
-                    ((function_params ((v (StructType 116))))
-                     (function_returns (UnionType 134))))
+                    ((function_params ((v (StructType 118))))
+                     (function_returns (UnionType 136))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 116))) 135))))))))))))
-            (uty_id 135) (uty_base_id 134)))))))
+                      (MakeUnionVariant ((Reference (v (StructType 118))) 137))))))))))))
+            (uty_id 137) (uty_base_id 136)))))))
       (interfaces
-       ((137
+       ((139
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 116))))
+             ((function_params ((from (StructType 118))))
               (function_returns SelfType)))))))
-        (136
+        (138
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 132))))
+             ((function_params ((from (StructType 134))))
               (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
       (union_signs
        (1
-        (((un_sig_cases ((StructType 132) (StructType 116)))
+        (((un_sig_cases ((StructType 134) (StructType 118)))
           (un_sig_methods
            ((id
              ((function_params
                ((self (ExprType (Reference (Self (UnionSig 6)))))))
               (function_returns (ExprType (Reference (Self (UnionSig 6)))))))))
-          (un_sig_base_id 134)))))
+          (un_sig_base_id 136)))))
       (attr_executors <opaque>))) |}]
 
 let%expect_test "methods monomorphization" =
@@ -6449,16 +6449,16 @@ let%expect_test "methods monomorphization" =
     {|
     (Ok
      ((bindings
-       ((y (Value (Struct ((Value (Type (StructType 135))) ()))))
-        (foo_empty (Value (Struct ((Value (Type (StructType 136))) ()))))
-        (Empty (Value (Type (StructType 135)))) (x (Value (Integer 10)))
-        (foo (Value (Struct ((Value (Type (StructType 133))) ()))))
+       ((y (Value (Struct ((Value (Type (StructType 137))) ()))))
+        (foo_empty (Value (Struct ((Value (Type (StructType 138))) ()))))
+        (Empty (Value (Type (StructType 137)))) (x (Value (Integer 10)))
+        (foo (Value (Struct ((Value (Type (StructType 135))) ()))))
         (Foo
          (Value
           (Function
            ((function_signature
              ((function_params ((X (TypeN 0))))
-              (function_returns (StructSig 54))))
+              (function_returns (StructSig 60))))
             (function_impl
              (Fn
               (Return
@@ -6470,53 +6470,53 @@ let%expect_test "methods monomorphization" =
                       (MkFunction
                        ((function_signature
                          ((function_params
-                           ((self (ExprType (Reference (Self (StructSig 54)))))
+                           ((self (ExprType (Reference (Self (StructSig 60)))))
                             (x (ExprType (Reference (X (TypeN 0)))))))
                           (function_returns (ExprType (Reference (X (TypeN 0)))))))
                         (function_impl
                          (Fn
                           (Return
                            (Reference (x (ExprType (Reference (X (TypeN 0))))))))))))))
-                   (mk_impls ()) (mk_id 132) (mk_sig 54) (mk_span <opaque>))))))))))))))
+                   (mk_impls ()) (mk_id 134) (mk_sig 60) (mk_span <opaque>))))))))))))))
       (structs
-       ((136
+       ((138
          ((struct_fields ())
           (struct_details
            ((uty_methods
              ((id
                ((function_signature
                  ((function_params
-                   ((self (StructType 136)) (x (StructType 135))))
-                  (function_returns (StructType 135))))
-                (function_impl (Fn (Return (Reference (x (StructType 135))))))))))
-            (uty_impls ()) (uty_id 136) (uty_base_id 132)))))
-        (135
+                   ((self (StructType 138)) (x (StructType 137))))
+                  (function_returns (StructType 137))))
+                (function_impl (Fn (Return (Reference (x (StructType 137))))))))))
+            (uty_impls ()) (uty_id 138) (uty_base_id 134)))))
+        (137
          ((struct_fields ())
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))
-        (133
+           ((uty_methods ()) (uty_impls ()) (uty_id 137) (uty_base_id 136)))))
+        (135
          ((struct_fields ())
           (struct_details
            ((uty_methods
              ((id
                ((function_signature
-                 ((function_params ((self (StructType 133)) (x IntegerType)))
+                 ((function_params ((self (StructType 135)) (x IntegerType)))
                   (function_returns IntegerType)))
                 (function_impl (Fn (Return (Reference (x IntegerType)))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (2
-        (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 134)
-          (st_sig_id 55))
+        (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 136)
+          (st_sig_id 61))
          ((st_sig_fields ())
           (st_sig_methods
            ((id
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 54)))))
+               ((self (ExprType (Reference (Self (StructSig 60)))))
                 (x (ExprType (Reference (X (TypeN 0)))))))
               (function_returns (ExprType (Reference (X (TypeN 0)))))))))
-          (st_sig_base_id 132) (st_sig_id 54)))))
+          (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "switch statement" =
@@ -6546,65 +6546,65 @@ let%expect_test "switch statement" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((i (UnionType 133))))
+             ((function_params ((i (UnionType 135))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               (Switch
-               ((switch_condition (Reference (i (UnionType 133))))
+               ((switch_condition (Reference (i (UnionType 135))))
                 (branches
-                 (((branch_ty (StructType 41)) (branch_var vax)
+                 (((branch_ty (StructType 43)) (branch_var vax)
                    (branch_stmt (Block ((Return (Value (Integer 32)))))))
-                  ((branch_ty (StructType 116)) (branch_var vax)
+                  ((branch_ty (StructType 118)) (branch_var vax)
                    (branch_stmt (Block ((Return (Value (Integer 64)))))))))))))))))
-        (Ints (Value (Type (UnionType 133))))))
+        (Ints (Value (Type (UnionType 135))))))
       (structs ())
       (unions
-       ((133
+       ((135
          ((union_attributes ())
           (cases
-           (((StructType 116) (Discriminator (discr 1)))
-            ((StructType 41) (Discriminator (discr 0)))))
+           (((StructType 118) (Discriminator (discr 1)))
+            ((StructType 43) (Discriminator (discr 0)))))
           (union_details
            ((uty_methods ())
             (uty_impls
-             (((impl_interface 134)
+             (((impl_interface 136)
                (impl_methods
                 ((from
                   ((function_signature
-                    ((function_params ((v (StructType 41))))
-                     (function_returns (UnionType 132))))
+                    ((function_params ((v (StructType 43))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 41))) 133))))))))))
-              ((impl_interface 135)
+                      (MakeUnionVariant ((Reference (v (StructType 43))) 135))))))))))
+              ((impl_interface 137)
                (impl_methods
                 ((from
                   ((function_signature
-                    ((function_params ((v (StructType 116))))
-                     (function_returns (UnionType 132))))
+                    ((function_params ((v (StructType 118))))
+                     (function_returns (UnionType 134))))
                    (function_impl
                     (Fn
                      (Return
-                      (MakeUnionVariant ((Reference (v (StructType 116))) 133))))))))))))
-            (uty_id 133) (uty_base_id 132)))))))
+                      (MakeUnionVariant ((Reference (v (StructType 118))) 135))))))))))))
+            (uty_id 135) (uty_base_id 134)))))))
       (interfaces
-       ((135
+       ((137
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 116))))
+             ((function_params ((from (StructType 118))))
               (function_returns SelfType)))))))
-        (134
+        (136
          ((interface_methods
            ((from
-             ((function_params ((from (StructType 41))))
+             ((function_params ((from (StructType 43))))
               (function_returns SelfType)))))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
       (union_signs
        (1
-        (((un_sig_cases ((StructType 41) (StructType 116))) (un_sig_methods ())
-          (un_sig_base_id 132)))))
+        (((un_sig_cases ((StructType 43) (StructType 118))) (un_sig_methods ())
+          (un_sig_base_id 134)))))
       (attr_executors <opaque>))) |}]
 
 let%expect_test "partial evaluation of a function" =
@@ -6684,50 +6684,50 @@ let%expect_test "let binding with type" =
      ((bindings
        ((a
          (Value
-          (Struct ((Value (Type (StructType 41))) ((value (Value (Integer 2))))))))
+          (Struct ((Value (Type (StructType 43))) ((value (Value (Integer 2))))))))
         (a
          (Value
           (Struct
-           ((Value (Type (StructType 132))) ((value (Value (Integer 1))))))))))
+           ((Value (Type (StructType 134))) ((value (Value (Integer 1))))))))))
       (structs
-       ((133
+       ((135
          ((struct_fields
            ((slice ((field_type (StructType 7))))
-            (value ((field_type (StructType 132))))))
+            (value ((field_type (StructType 134))))))
           (struct_details
            ((uty_methods
              ((new
                ((function_signature
-                 ((function_params ((v (StructType 132)) (s (StructType 7))))
-                  (function_returns (StructType 133))))
+                 ((function_params ((v (StructType 134)) (s (StructType 7))))
+                  (function_returns (StructType 135))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 133)))
+                     ((Value (Type (StructType 135)))
                       ((slice (Reference (s (StructType 7))))
-                       (value (Reference (v (StructType 132)))))))))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id -500)))))
-        (132
+                       (value (Reference (v (StructType 134)))))))))))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id -500)))))
+        (134
          ((struct_fields ((value ((field_type IntegerType)))))
           (struct_details
            ((uty_methods
              ((from
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value (Reference (i IntegerType))))))))))))
               (deserialize
                ((function_signature
                  ((function_params ((s (StructType 7))))
-                  (function_returns (StructType 133))))
+                  (function_returns (StructType 135))))
                 (function_impl
                  (Fn
                   (Block
@@ -6744,17 +6744,17 @@ let%expect_test "let binding with type" =
                     (Return
                      (Value
                       (Struct
-                       ((Value (Type (StructType 133)))
+                       ((Value (Type (StructType 135)))
                         ((slice (Reference (slice (StructType 7))))
                          (value
                           (Value
                            (Struct
-                            ((Value (Type (StructType 132)))
+                            ((Value (Type (StructType 134)))
                              ((value (Reference (value IntegerType)))))))))))))))))))
               (serialize
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (builder (StructType 3))))
+                   ((self (StructType 134)) (builder (StructType 3))))
                   (function_returns (StructType 3))))
                 (function_impl
                  (Fn
@@ -6763,150 +6763,150 @@ let%expect_test "let binding with type" =
                     ((ResolvedReference (serialize_int <opaque>))
                      ((Reference (builder (StructType 3)))
                       (StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (Value (Integer 257)))
                      false)))))))
               (new
                ((function_signature
                  ((function_params ((i IntegerType)))
-                  (function_returns (StructType 132))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value (Reference (i IntegerType))))))))))))
               (add
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (add <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (sub
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (sub <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (mul
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (mul <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (div
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (div <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (bit_and
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (bit_and <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (bit_or
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
-                  (function_returns (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
+                  (function_returns (StructType 134))))
                 (function_impl
                  (Fn
                   (Return
                    (Value
                     (Struct
-                     ((Value (Type (StructType 132)))
+                     ((Value (Type (StructType 134)))
                       ((value
                         (FunctionCall
                          ((ResolvedReference (bit_or <opaque>))
                           ((StructField
-                            ((Reference (self (StructType 132))) value
+                            ((Reference (self (StructType 134))) value
                              IntegerType))
                            (StructField
-                            ((Reference (other (StructType 132))) value
+                            ((Reference (other (StructType 134))) value
                              IntegerType)))
                           false))))))))))))
               (eq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6914,14 +6914,14 @@ let%expect_test "let binding with type" =
                    (FunctionCall
                     ((ResolvedReference (eq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (neq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6929,14 +6929,14 @@ let%expect_test "let binding with type" =
                    (FunctionCall
                     ((ResolvedReference (neq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (leq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6944,14 +6944,14 @@ let%expect_test "let binding with type" =
                    (FunctionCall
                     ((ResolvedReference (leq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (lt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6959,14 +6959,14 @@ let%expect_test "let binding with type" =
                    (FunctionCall
                     ((ResolvedReference (lt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (lt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6974,14 +6974,14 @@ let%expect_test "let binding with type" =
                    (FunctionCall
                     ((ResolvedReference (lt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (geq
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -6989,14 +6989,14 @@ let%expect_test "let binding with type" =
                    (FunctionCall
                     ((ResolvedReference (geq <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))
               (gt
                ((function_signature
                  ((function_params
-                   ((self (StructType 132)) (other (StructType 132))))
+                   ((self (StructType 134)) (other (StructType 134))))
                   (function_returns BoolType)))
                 (function_impl
                  (Fn
@@ -7004,9 +7004,9 @@ let%expect_test "let binding with type" =
                    (FunctionCall
                     ((ResolvedReference (gt <opaque>))
                      ((StructField
-                       ((Reference (self (StructType 132))) value IntegerType))
+                       ((Reference (self (StructType 134))) value IntegerType))
                       (StructField
-                       ((Reference (other (StructType 132))) value IntegerType)))
+                       ((Reference (other (StructType 134))) value IntegerType)))
                      false)))))))))
             (uty_impls
              (((impl_interface -1)
@@ -7014,7 +7014,7 @@ let%expect_test "let binding with type" =
                 ((serialize
                   ((function_signature
                     ((function_params
-                      ((self (StructType 132)) (builder (StructType 3))))
+                      ((self (StructType 134)) (builder (StructType 3))))
                      (function_returns (StructType 3))))
                    (function_impl
                     (Fn
@@ -7023,7 +7023,7 @@ let%expect_test "let binding with type" =
                        ((ResolvedReference (serialize_int <opaque>))
                         ((Reference (builder (StructType 3)))
                          (StructField
-                          ((Reference (self (StructType 132))) value IntegerType))
+                          ((Reference (self (StructType 134))) value IntegerType))
                          (Value (Integer 257)))
                         false))))))))))
               ((impl_interface -2)
@@ -7031,7 +7031,7 @@ let%expect_test "let binding with type" =
                 ((deserialize
                   ((function_signature
                     ((function_params ((s (StructType 7))))
-                     (function_returns (StructType 133))))
+                     (function_returns (StructType 135))))
                    (function_impl
                     (Fn
                      (Block
@@ -7050,27 +7050,27 @@ let%expect_test "let binding with type" =
                        (Return
                         (Value
                          (Struct
-                          ((Value (Type (StructType 133)))
+                          ((Value (Type (StructType 135)))
                            ((slice (Reference (slice (StructType 7))))
                             (value
                              (Value
                               (Struct
-                               ((Value (Type (StructType 132)))
+                               ((Value (Type (StructType 134)))
                                 ((value (Reference (value IntegerType))))))))))))))))))))))
-              ((impl_interface 17)
+              ((impl_interface 19)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((i IntegerType)))
-                     (function_returns (StructType 132))))
+                     (function_returns (StructType 134))))
                    (function_impl
                     (Fn
                      (Return
                       (Value
                        (Struct
-                        ((Value (Type (StructType 132)))
+                        ((Value (Type (StructType 134)))
                          ((value (Reference (i IntegerType)))))))))))))))))
-            (uty_id 132) (uty_base_id 16)))))))
+            (uty_id 134) (uty_base_id 18)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>) (struct_signs (0 ()))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
@@ -7113,7 +7113,7 @@ let%expect_test "interface constraints" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 134))))
+             ((function_params ((t (StructType 136))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
@@ -7122,19 +7122,19 @@ let%expect_test "interface constraints" =
                 ((Value
                   (Function
                    ((function_signature
-                     ((function_params ((self (StructType 134))))
+                     ((function_params ((self (StructType 136))))
                       (function_returns IntegerType)))
                     (function_impl (Fn (Return (Value (Integer 1))))))))
-                 ((Reference (t (StructType 134)))) false)))))))))
+                 ((Reference (t (StructType 136)))) false)))))))))
         (test
          (Value
           (Function
            ((function_signature
-             ((function_params ((T (InterfaceType 132))))
+             ((function_params ((T (InterfaceType 134))))
               (function_returns
                (FunctionType
                 ((function_params
-                  ((t (ExprType (Reference (T (InterfaceType 132)))))))
+                  ((t (ExprType (Reference (T (InterfaceType 134)))))))
                  (function_returns IntegerType))))))
             (function_impl
              (Fn
@@ -7142,7 +7142,7 @@ let%expect_test "interface constraints" =
                (MkFunction
                 ((function_signature
                   ((function_params
-                    ((t (ExprType (Reference (T (InterfaceType 132)))))))
+                    ((t (ExprType (Reference (T (InterfaceType 134)))))))
                    (function_returns IntegerType)))
                  (function_impl
                   (Fn
@@ -7150,39 +7150,39 @@ let%expect_test "interface constraints" =
                     (IntfMethodCall
                      ((intf_instance
                        (Value
-                        (Type (ExprType (Reference (T (InterfaceType 132)))))))
-                      (intf_def 132)
+                        (Type (ExprType (Reference (T (InterfaceType 134)))))))
+                      (intf_def 134)
                       (intf_method
                        (beep
                         ((function_params ((self SelfType)))
                          (function_returns IntegerType))))
                       (intf_args
                        ((Reference
-                         (t (ExprType (Reference (T (InterfaceType 132))))))))
+                         (t (ExprType (Reference (T (InterfaceType 134))))))))
                       (intf_loc <opaque>)))))))))))))))
-        (BeeperImpl1 (Value (Type (StructType 134))))
-        (Beep (Value (Type (InterfaceType 132))))))
+        (BeeperImpl1 (Value (Type (StructType 136))))
+        (Beep (Value (Type (InterfaceType 134))))))
       (structs
-       ((134
+       ((136
          ((struct_fields ())
           (struct_details
            ((uty_methods
              ((beep
                ((function_signature
-                 ((function_params ((self (StructType 134))))
+                 ((function_params ((self (StructType 136))))
                   (function_returns IntegerType)))
                 (function_impl (Fn (Return (Value (Integer 1)))))))))
             (uty_impls
-             (((impl_interface 132)
+             (((impl_interface 134)
                (impl_methods
                 ((beep
                   ((function_signature
-                    ((function_params ((self (StructType 134))))
+                    ((function_params ((self (StructType 136))))
                      (function_returns IntegerType)))
                    (function_impl (Fn (Return (Value (Integer 1))))))))))))
-            (uty_id 134) (uty_base_id 133)))))))
+            (uty_id 136) (uty_base_id 135)))))))
       (interfaces
-       ((132
+       ((134
          ((interface_methods
            ((beep
              ((function_params ((self SelfType))) (function_returns IntegerType)))))))))
@@ -7193,9 +7193,9 @@ let%expect_test "interface constraints" =
           (st_sig_methods
            ((beep
              ((function_params
-               ((self (ExprType (Reference (Self (StructSig 54)))))))
+               ((self (ExprType (Reference (Self (StructSig 60)))))))
               (function_returns IntegerType)))))
-          (st_sig_base_id 133) (st_sig_id 54)))))
+          (st_sig_base_id 135) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "destructuring let" =
@@ -7224,24 +7224,24 @@ let%expect_test "destructuring let" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 133))))
+             ((function_params ((t (StructType 135))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               (Block
                ((DestructuringLet
                  ((destructuring_let ((x x) (y y2) (z z)))
-                  (destructuring_let_expr (Reference (t (StructType 133))))
+                  (destructuring_let_expr (Reference (t (StructType 135))))
                   (destructuring_let_rest false)))
                 (Return (Reference (y2 IntegerType)))))))))))
-        (T (Value (Type (StructType 133))))))
+        (T (Value (Type (StructType 135))))))
       (structs
-       ((133
+       ((135
          ((struct_fields
            ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
             (z ((field_type IntegerType)))))
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
+           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
@@ -7249,7 +7249,7 @@ let%expect_test "destructuring let" =
            ((x (ResolvedReference (Integer <opaque>)))
             (y (ResolvedReference (Integer <opaque>)))
             (z (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 132) (st_sig_id 54)))))
+          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "destructuring let with missing fields" =
@@ -7269,31 +7269,31 @@ let%expect_test "destructuring let with missing fields" =
   pp_compile source ;
   [%expect
     {|
-    (((MissingField ((StructType 133) x <opaque>))
-      (MissingField ((StructType 133) z <opaque>)))
+    (((MissingField ((StructType 135) x <opaque>))
+      (MissingField ((StructType 135) z <opaque>)))
      ((bindings
        ((test
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 133))))
+             ((function_params ((t (StructType 135))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               (Block
                ((DestructuringLet
                  ((destructuring_let ((y y2)))
-                  (destructuring_let_expr (Reference (t (StructType 133))))
+                  (destructuring_let_expr (Reference (t (StructType 135))))
                   (destructuring_let_rest false)))
                 (Return (Reference (y2 IntegerType)))))))))))
-        (T (Value (Type (StructType 133))))))
+        (T (Value (Type (StructType 135))))))
       (structs
-       ((133
+       ((135
          ((struct_fields
            ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
             (z ((field_type IntegerType)))))
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
+           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
@@ -7301,7 +7301,7 @@ let%expect_test "destructuring let with missing fields" =
            ((x (ResolvedReference (Integer <opaque>)))
             (y (ResolvedReference (Integer <opaque>)))
             (z (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 132) (st_sig_id 54)))))
+          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "destructuring let with missing fields ignored" =
@@ -7327,24 +7327,24 @@ let%expect_test "destructuring let with missing fields ignored" =
          (Value
           (Function
            ((function_signature
-             ((function_params ((t (StructType 133))))
+             ((function_params ((t (StructType 135))))
               (function_returns IntegerType)))
             (function_impl
              (Fn
               (Block
                ((DestructuringLet
                  ((destructuring_let ((y y2)))
-                  (destructuring_let_expr (Reference (t (StructType 133))))
+                  (destructuring_let_expr (Reference (t (StructType 135))))
                   (destructuring_let_rest true)))
                 (Return (Reference (y2 IntegerType)))))))))))
-        (T (Value (Type (StructType 133))))))
+        (T (Value (Type (StructType 135))))))
       (structs
-       ((133
+       ((135
          ((struct_fields
            ((x ((field_type IntegerType))) (y ((field_type IntegerType)))
             (z ((field_type IntegerType)))))
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
+           ((uty_methods ()) (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
       (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
@@ -7352,7 +7352,7 @@ let%expect_test "destructuring let with missing fields ignored" =
            ((x (ResolvedReference (Integer <opaque>)))
             (y (ResolvedReference (Integer <opaque>)))
             (z (ResolvedReference (Integer <opaque>)))))
-          (st_sig_methods ()) (st_sig_base_id 132) (st_sig_id 54)))))
+          (st_sig_methods ()) (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "type that does not implement interface passed to the \
@@ -7368,28 +7368,28 @@ let%expect_test "type that does not implement interface passed to the \
   pp_compile source ;
   [%expect
     {|
-    (((TypeError ((InterfaceType 132) (Type0 (StructType 134)) <opaque>)))
+    (((TypeError ((InterfaceType 134) (Type0 (StructType 136)) <opaque>)))
      ((bindings
-       ((Foo (Value (Type (StructType 134))))
+       ((Foo (Value (Type (StructType 136))))
         (ExpectedIntf
          (Value
           (Function
            ((function_signature
-             ((function_params ((T (InterfaceType 132))))
+             ((function_params ((T (InterfaceType 134))))
               (function_returns HoleType)))
             (function_impl (Fn (Block ())))))))
-        (Intf (Value (Type (InterfaceType 132))))))
+        (Intf (Value (Type (InterfaceType 134))))))
       (structs
-       ((134
+       ((136
          ((struct_fields ())
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 134) (uty_base_id 133)))))))
-      (interfaces ((132 ((interface_methods ()))))) (type_counter <opaque>)
+           ((uty_methods ()) (uty_impls ()) (uty_id 136) (uty_base_id 135)))))))
+      (interfaces ((134 ((interface_methods ()))))) (type_counter <opaque>)
       (memoized_fcalls <opaque>)
       (struct_signs
        (1
-        (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 133)
-          (st_sig_id 54)))))
+        (((st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 135)
+          (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "struct signatures" =
@@ -7419,7 +7419,7 @@ let%expect_test "struct signatures" =
           (Function
            ((function_signature
              ((function_is_type) (function_params ((bits IntegerType)))
-              (function_returns (StructSig 54))))
+              (function_returns (StructSig 60))))
             (function_impl
              (Fn
               (Return
@@ -7433,15 +7433,15 @@ let%expect_test "struct signatures" =
                        ((function_signature
                          ((function_params ((i IntegerType)))
                           (function_returns
-                           (ExprType (Reference (Self (StructSig 54)))))))
+                           (ExprType (Reference (Self (StructSig 60)))))))
                         (function_impl
                          (Fn
                           (Return
                            (Value
                             (Struct
-                             ((Reference (Self (StructSig 54)))
+                             ((Reference (Self (StructSig 60)))
                               ((value (Reference (i IntegerType)))))))))))))))
-                   (mk_impls ()) (mk_id 132) (mk_sig 54) (mk_span <opaque>))))))))))))))
+                   (mk_impls ()) (mk_id 134) (mk_sig 60) (mk_span <opaque>))))))))))))))
       (structs ()) (type_counter <opaque>) (memoized_fcalls <opaque>)
       (struct_signs
        (1
@@ -7449,8 +7449,8 @@ let%expect_test "struct signatures" =
           (st_sig_methods
            ((new
              ((function_params ((i IntegerType)))
-              (function_returns (ExprType (Reference (Self (StructSig 54)))))))))
-          (st_sig_base_id 132) (st_sig_id 54)))))
+              (function_returns (ExprType (Reference (Self (StructSig 60)))))))))
+          (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs (0 ())) (attr_executors <opaque>))) |}]
 
 let%expect_test "Deserilize intf with constraints" =
@@ -7917,8 +7917,8 @@ let%expect_test "attributes" =
     {|
     (Ok
      ((bindings
-       ((Ti (Value (Type (StructType 144)))) (U1 (Value (Type (UnionType 142))))
-        (U (Value (Type (UnionType 139)))) (I (Value (Type (InterfaceType 137))))
+       ((Ti (Value (Type (StructType 146)))) (U1 (Value (Type (UnionType 144))))
+        (U (Value (Type (UnionType 141)))) (I (Value (Type (InterfaceType 139))))
         (x1
          (Value
           (Function
@@ -7935,13 +7935,13 @@ let%expect_test "attributes" =
                (((attribute_ident attr) (attribute_exprs ()))))
               (function_params ()) (function_returns HoleType)))
             (function_impl (Fn (Block ())))))))
-        (T1 (Value (Type (StructType 136))))
+        (T1 (Value (Type (StructType 138))))
         (Ta
          (Value
           (Function
            ((function_signature
              ((function_is_type) (function_params ((X IntegerType)))
-              (function_returns (StructSig 55))))
+              (function_returns (StructSig 61))))
             (function_impl
              (Fn
               (Return
@@ -7950,11 +7950,11 @@ let%expect_test "attributes" =
                   (((attribute_ident attr) (attribute_exprs ()))))
                  (mk_struct_fields ())
                  (mk_struct_details
-                  ((mk_methods ()) (mk_impls ()) (mk_id 134) (mk_sig 55)
+                  ((mk_methods ()) (mk_impls ()) (mk_id 136) (mk_sig 61)
                    (mk_span <opaque>))))))))))))
-        (T (Value (Type (StructType 133))))))
+        (T (Value (Type (StructType 135))))))
       (structs
-       ((144
+       ((146
          ((struct_fields ())
           (struct_details
            ((uty_methods
@@ -7966,7 +7966,7 @@ let%expect_test "attributes" =
                 (function_impl (Fn (Return (Value (Bool true)))))))))
             (uty_impls
              (((impl_attributes (((attribute_ident attr) (attribute_exprs ()))))
-               (impl_interface 137)
+               (impl_interface 139)
                (impl_methods
                 ((x
                   ((function_signature
@@ -7974,13 +7974,13 @@ let%expect_test "attributes" =
                       (((attribute_ident attr) (attribute_exprs ()))))
                      (function_params ()) (function_returns BoolType)))
                    (function_impl (Fn (Return (Value (Bool true))))))))))))
-            (uty_id 144) (uty_base_id 143)))))
-        (136
+            (uty_id 146) (uty_base_id 145)))))
+        (138
          ((struct_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (struct_fields ())
           (struct_details
-           ((uty_methods ()) (uty_impls ()) (uty_id 136) (uty_base_id 135)))))
-        (133
+           ((uty_methods ()) (uty_impls ()) (uty_id 138) (uty_base_id 137)))))
+        (135
          ((struct_attributes
            (((attribute_ident attr) (attribute_exprs ()))
             ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
@@ -7995,46 +7995,46 @@ let%expect_test "attributes" =
                    (((attribute_ident attr) (attribute_exprs ()))))
                   (function_params ()) (function_returns BoolType)))
                 (function_impl (Fn (Return (Value (Bool true)))))))))
-            (uty_impls ()) (uty_id 133) (uty_base_id 132)))))))
+            (uty_impls ()) (uty_id 135) (uty_base_id 134)))))))
       (unions
-       ((142
+       ((144
          ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (cases (((ExprType (Value Void)) (Discriminator (discr 0)))))
           (union_details
            ((uty_methods ())
             (uty_impls
-             (((impl_interface 140)
+             (((impl_interface 142)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v VoidType)))
-                     (function_returns (UnionType 141))))
+                     (function_returns (UnionType 143))))
                    (function_impl
                     (Fn
-                     (Return (MakeUnionVariant ((Reference (v VoidType)) 142))))))))))))
-            (uty_id 142) (uty_base_id 141)))))
-        (139
+                     (Return (MakeUnionVariant ((Reference (v VoidType)) 144))))))))))))
+            (uty_id 144) (uty_base_id 143)))))
+        (141
          ((union_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (cases (((ExprType (Value Void)) (Discriminator (discr 0)))))
           (union_details
            ((uty_methods ())
             (uty_impls
-             (((impl_interface 140)
+             (((impl_interface 142)
                (impl_methods
                 ((from
                   ((function_signature
                     ((function_params ((v VoidType)))
-                     (function_returns (UnionType 138))))
+                     (function_returns (UnionType 140))))
                    (function_impl
                     (Fn
-                     (Return (MakeUnionVariant ((Reference (v VoidType)) 139))))))))))))
-            (uty_id 139) (uty_base_id 138)))))))
+                     (Return (MakeUnionVariant ((Reference (v VoidType)) 141))))))))))))
+            (uty_id 141) (uty_base_id 140)))))))
       (interfaces
-       ((140
+       ((142
          ((interface_methods
            ((from
              ((function_params ((from VoidType))) (function_returns SelfType)))))))
-        (137
+        (139
          ((interface_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (interface_methods
            ((x
@@ -8050,13 +8050,13 @@ let%expect_test "attributes" =
              ((function_attributes
                (((attribute_ident attr) (attribute_exprs ()))))
               (function_params ()) (function_returns BoolType)))))
-          (st_sig_base_id 143) (st_sig_id 57))
+          (st_sig_base_id 145) (st_sig_id 63))
          ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
-          (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 135)
-          (st_sig_id 56))
+          (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 137)
+          (st_sig_id 62))
          ((st_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
-          (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 134)
-          (st_sig_id 55))
+          (st_sig_fields ()) (st_sig_methods ()) (st_sig_base_id 136)
+          (st_sig_id 61))
          ((st_sig_attributes
            (((attribute_ident attr) (attribute_exprs ()))
             ((attribute_ident attr) (attribute_exprs ((Value (Integer 1)))))
@@ -8068,15 +8068,15 @@ let%expect_test "attributes" =
              ((function_attributes
                (((attribute_ident attr) (attribute_exprs ()))))
               (function_params ()) (function_returns BoolType)))))
-          (st_sig_base_id 132) (st_sig_id 54)))))
+          (st_sig_base_id 134) (st_sig_id 60)))))
       (union_signs
        (2
         (((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
-          (un_sig_base_id 141))
+          (un_sig_base_id 143))
          ((un_sig_attributes (((attribute_ident attr) (attribute_exprs ()))))
           (un_sig_cases ((ExprType (Value Void)))) (un_sig_methods ())
-          (un_sig_base_id 138)))))
+          (un_sig_base_id 140)))))
       (attr_executors <opaque>))) |}]
 
 let%expect_test "runtime assignment" =
