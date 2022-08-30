@@ -125,6 +125,7 @@ functor
 
     and program =
       { bindings : (string located * expr) list;
+        mutable current_actor : actor option; [@hash.ignore] [@sexp.option]
         mutable structs : (int * struct_) list; [@hash.ignore]
         mutable unions : (int * union) list; [@sexp.list] [@hash.ignore]
         mutable interfaces : (int * interface) list; [@sexp.list] [@hash.ignore]
@@ -201,6 +202,11 @@ functor
       | Switch of switch
       | WhileLoop of while_loop
       | Invalid
+
+    and actor =
+      { actor_name : string located;
+        actor_fields : (string * expr) list;
+        actor_functions : (string * function_) list }
 
     and while_loop = {while_cond : expr; while_body : stmt}
 

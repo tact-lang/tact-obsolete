@@ -676,6 +676,7 @@ functor
 
     let empty_program () =
       { bindings = [];
+        current_actor = None;
         structs = [];
         unions = [];
         type_counter = 0;
