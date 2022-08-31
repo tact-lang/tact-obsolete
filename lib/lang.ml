@@ -9,6 +9,7 @@ functor
     open Config
     module Builtin = Builtin.Make (Config)
     module Lang_types = Lang_types.Make (Config)
+    module Actors = Actors.Make (Config)
     include Lang_types
 
     open Interpreter.Make (Config)
@@ -888,10 +889,11 @@ functor
           let actor_name = s#visit_located s#visit_ident env actor.actor_name in
           match program.current_actor with
           | None ->
-              let get_method funcs method_name =
+              let get_method funcs method_name ~generate_recv_fn =
                 List.find_map funcs ~f:(fun (name, func) ->
                     if String.equal name.value method_name then Some func
                     else None )
+                |> Option.map ~f:generate_recv_fn
                 |> Option.value
                      ~default:
                        { value =
@@ -913,22 +915,36 @@ functor
                     struct_bindings = actor.actor_bindings;
                     impls = [];
                     struct_span = actor.actor_name.span }
+                |> fun mk ->
+                (s#make_interpreter actor.actor_name.span)#interpret_expr
+                  {value = MkStructDef mk; span = actor.actor_name.span}
+                |> fun out ->
+                match out with
+                | Type (StructType ty) ->
+                    Program.get_struct program ty
+                | _ ->
+                    ice "not a struct"
               in
               let methods =
-                List.filter_map output.mk_struct_details.mk_methods
+                List.filter_map output.struct_details.uty_methods
                   ~f:(fun binding ->
                     let name, expr = binding in
-                    match expr.value with
-                    | Value (Function f) | MkFunction f ->
-                        Some (name, f)
-                    | _ ->
-                        None )
+                    Some (name, expr) )
               in
               let actor_receive_internal =
                 get_method methods "receive_internal"
+                  ~generate_recv_fn:(fun f ->
+                    match
+                      Actors.make_internal_messages_handler program errors f
+                    with
+                    | Ok f ->
+                        f
+                    | Error (_span, msg) ->
+                        ice msg )
               in
               let actor_receive_external =
                 get_method methods "receive_external"
+                  ~generate_recv_fn:(fun f -> f)
               in
               let actor =
                 { actor_name;

@@ -315,8 +315,20 @@ functor
 
         method cg_program : T.program -> F.program =
           fun program ->
+            let actor_functions =
+              match program.current_actor with
+              | Some actor ->
+                  let sp x = {value = x; span = actor.actor_name.span} in
+                  [ ( sp "recv_internal",
+                      sp @@ T.Value (Function actor.actor_receive_internal) );
+                    ( sp "recv_external",
+                      sp @@ T.Value (Function actor.actor_receive_external) ) ]
+              | None ->
+                  []
+            in
             let _ =
-              List.filter_map (List.rev program.bindings)
+              List.filter_map
+                (List.rev program.bindings @ actor_functions)
                 ~f:(fun (name, top_level_stmt) ->
                   self#cg_top_level_stmt name.value top_level_stmt )
             and make_tensor_accessors (sz : int) =
