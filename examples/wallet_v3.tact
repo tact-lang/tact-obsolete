@@ -36,9 +36,9 @@ fn recv_external(input: Slice) {
 
   builtin_accept_message();
 
-  while (slice.refs_count() != 0) {
-    let {value as next, slice as new_slice} = NextMessage.deserialize(slice);
-    slice = new_slice;
+  while (body.refs_count() != 0) {
+    let {value as next, slice as new_slice} = NextMessage.deserialize(body);
+    body = new_slice;
     send_raw_msg(next.cell.inner, next.flags);
   }
 
